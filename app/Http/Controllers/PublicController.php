@@ -155,6 +155,7 @@ class PublicController extends Controller
                 'categories',
                 'images',
                 'links.platform',
+                'store',
                 'variants' => function ($query) {
                     $query->with(['color', 'size', 'images']);
                 }
@@ -195,13 +196,8 @@ class PublicController extends Controller
             'social_links',
         ])->first();
 
-        $paymentMethods = PaymentMethod::get();
-        $shippingMethods = ShippingMethod::get();
-
         return Inertia::render('MyCart', [
             'store' => $store,
-            'paymentMethods' => $paymentMethods,
-            'shippingMethods' => $shippingMethods,
         ]);
     }
 }

@@ -66,11 +66,7 @@ if (route().params) {
 
 const filteredVariants = computed(() => {
     return variants.filter((variant) => {
-        return (
-            (filter.motif ? variant.motif === filter.motif : true) &&
-            (filter.color ? variant.color?.id === filter.color?.id : true) &&
-            (filter.size ? variant.size?.id === filter.size?.id : true)
-        );
+        return filter.motif ? variant.motif === filter.motif : true;
     });
 });
 
@@ -141,6 +137,8 @@ function addToCart() {
     }
 
     const cartItem: CartItemModel = {
+        store_id: props.product.store_id,
+        store: props.product.store,
         product_id: props.product.id,
         variant_id: selectedVariant.value.id,
         quantity: quantity.value,
@@ -152,7 +150,17 @@ function addToCart() {
         selected: true,
     };
 
-    cartStore.addItem(cartItem);
+    const cartGroup: CartGroupModel = {
+        store_id: props.product.store_id,
+        store: props.product.store,
+        items: [cartItem],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        selected: true,
+        showDeleteConfirmation: false,
+    };
+
+    cartStore.addGroup(cartGroup);
 
     openSuccessDialog(`Berhasil menambahkan produk ke keranjang.`);
 }
@@ -185,7 +193,7 @@ function closeErrorDialog() {
 
 // Links
 function linkWhatsApp() {
-    const phone = store.phone?.replace(/[^0-9]/g, "");
+    const phone = props.product.store.phone?.replace(/[^0-9]/g, "");
     return `https://wa.me/${phone}?text=Halo, saya tertarik dengan produk "${
         props.product.name
     }". \n\nLink produk: ${route("product.show", props.product.slug)}`;
@@ -198,8 +206,6 @@ function openProductLinkDialog() {
 function closeProductLinkDialog() {
     showProductLinkDialog.value = false;
 }
-
-console.log("Selected Variant:", selectedVariant.value);
 
 defineExpose({
     filter,
@@ -224,11 +230,30 @@ defineExpose({
                         :key="index"
                         :label="motif"
                         :selected="filter.motif === motif"
-                        :disabled="!availableMotifs.includes(motif)"
                         @click="
                             filter.motif === motif
                                 ? (filter.motif = null)
-                                : (filter.motif = motif)
+                                : (filter.motif = motif);
+
+                            if (
+                                filter.size &&
+                                !filteredVariants.some(
+                                    (variant) =>
+                                        variant.size?.id === filter.size.id
+                                )
+                            ) {
+                                filter.size = null;
+                            }
+
+                            if (
+                                filter.color &&
+                                !filteredVariants.some(
+                                    (variant) =>
+                                        variant.color?.id === filter.color.id
+                                )
+                            ) {
+                                filter.color = null;
+                            }
                         "
                     />
                 </div>
@@ -252,7 +277,26 @@ defineExpose({
                         @click="
                             filter.color?.id === color.id
                                 ? (filter.color = null)
-                                : (filter.color = color)
+                                : (filter.color = color);
+
+                            if (
+                                filter.size &&
+                                !filteredVariants.some(
+                                    (variant) =>
+                                        variant.size?.id === filter.size.id
+                                )
+                            ) {
+                                filter.size = null;
+                            }
+
+                            if (
+                                filter.motif &&
+                                !filteredVariants.some(
+                                    (variant) => variant.motif === filter.motif
+                                )
+                            ) {
+                                filter.motif = null;
+                            }
                         "
                     />
                 </div>
@@ -275,7 +319,26 @@ defineExpose({
                         @click="
                             filter.size?.id === size.id
                                 ? (filter.size = null)
-                                : (filter.size = size)
+                                : (filter.size = size);
+
+                            if (
+                                filter.color &&
+                                !filteredVariants.some(
+                                    (variant) =>
+                                        variant.color?.id === filter.color.id
+                                )
+                            ) {
+                                filter.color = null;
+                            }
+
+                            if (
+                                filter.motif &&
+                                !filteredVariants.some(
+                                    (variant) => variant.motif === filter.motif
+                                )
+                            ) {
+                                filter.motif = null;
+                            }
                         "
                     />
                 </div>

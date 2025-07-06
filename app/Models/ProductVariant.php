@@ -10,6 +10,7 @@ class ProductVariant extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'store_id',
         'product_id',
         'sku',
         'barcode',
@@ -25,12 +26,13 @@ class ProductVariant extends Model
         'final_selling_price',
         'current_stock_level',
         'last_stock_update',
-        'unit',
+        'unit_id',
         'disabled_at',
     ];
 
     protected $appends = [
         'name',
+        'unit'
     ];
 
     // Additional attributes
@@ -49,12 +51,22 @@ class ProductVariant extends Model
         return $name;
     }
 
+    protected function getUnitAttribute()
+    {
+        return $this->unit()->first()->name ?? 'pcs';
+    }
+
     protected function url()
     {
         return route('products.show', ['slug' => $this->product->slug, 'sku' => $this->sku]);
     }
 
     // Relationships
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
+
     public function product()
     {
         return $this->belongsTo(Product::class);
@@ -68,6 +80,11 @@ class ProductVariant extends Model
     public function size()
     {
         return $this->belongsTo(Size::class)->orderBy('id', 'asc');
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
     }
 
     public function images()

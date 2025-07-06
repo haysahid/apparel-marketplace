@@ -45,17 +45,17 @@ const hasActions = computed(() => {
 
 <template>
     <div
-        class="flex flex-col items-center justify-between gap-4 py-4 border-b"
+        class="flex flex-col items-center justify-between w-full gap-4 py-4 border-b"
         :class="{
             'border-none': !props.showDivider,
         }"
     >
-        <div class="flex items-start gap-x-4">
+        <div class="flex items-start w-full gap-x-4">
             <div class="flex items-center justify-center flex-shrink-0 gap-4">
                 <!-- Checkbox -->
                 <Checkbox
                     :checked="props.item.selected"
-                    class="transition-colors duration-200 ease-in-out border-2 border-gray-300 rounded-md cursor-pointer size-6 sm:size-7 hover:bg-secondary hover:border-primary"
+                    class="transition-colors duration-200 ease-in-out border-2 border-gray-300 rounded-md cursor-pointer size-6 hover:bg-secondary hover:border-primary"
                     :class="{
                         '!bg-primary': props.item.selected,
                         '!border-primary': props.item.selected,
@@ -68,11 +68,11 @@ const hasActions = computed(() => {
                     v-if="props.item.image"
                     :src="`/storage/${props.item.image}`"
                     alt="Product Image"
-                    class="object-cover size-[80px] sm:size-[120px] rounded-lg outline outline-1 outline-gray-300"
+                    class="object-cover size-[60px] sm:size-[80px] lg:size-[120px] rounded-lg outline outline-1 outline-gray-300"
                 />
                 <div
                     v-else
-                    class="flex items-center justify-center size-[80px] sm:size-[120px] bg-gray-100 rounded-lg aspect-square"
+                    class="flex items-center justify-center size-[60px] sm:size-[80px] lg:size-[120px] bg-gray-100 rounded-lg aspect-square"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -89,7 +89,8 @@ const hasActions = computed(() => {
             </div>
 
             <div
-                class="flex flex-col items-start justify-between gap-4 xl:flex-row"
+                v-if="props.item.variant"
+                class="flex flex-col items-start justify-between w-full gap-4 xl:flex-row"
             >
                 <!-- Detail -->
                 <div class="w-full">
@@ -103,7 +104,7 @@ const hasActions = computed(() => {
                         class="w-full"
                     >
                         <h3
-                            class="w-full text-base font-medium text-gray-800 sm:text-lg hover:text-primary-dark"
+                            class="w-full text-sm font-medium text-gray-800 sm:text-base lg:text-lg hover:text-primary-dark"
                         >
                             {{ props.item.variant.name }}
                         </h3>

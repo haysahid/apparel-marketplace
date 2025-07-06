@@ -14,13 +14,13 @@ class PlatformSeeder extends Seeder
     public function run(): void
     {
         Platform::insert([
-            ['name' => 'Shopee', 'icon' => 'platform/shopee.png'],
-            ['name' => 'Lazada', 'icon' => 'platform/lazada.png'],
-            ['name' => 'Tokopedia', 'icon' => 'platform/tokopedia.png'],
-            ['name' => 'Blibli', 'icon' => 'platform/blibli.png'],
-            ['name' => 'JD.ID', 'icon' => 'platform/jd_id.png'],
-            ['name' => 'Tiktok Shop', 'icon' => 'platform/tiktok_shop.png'],
-            ['name' => 'Facebook Marketplace', 'icon' => 'platform/facebook_marketplace.png'],
+            ['store_id' => null, 'name' => 'Shopee', 'icon' => 'platform/shopee.png'],
+            ['store_id' => null, 'name' => 'Lazada', 'icon' => 'platform/lazada.png'],
+            ['store_id' => null, 'name' => 'Tokopedia', 'icon' => 'platform/tokopedia.png'],
+            ['store_id' => null, 'name' => 'Blibli', 'icon' => 'platform/blibli.png'],
+            ['store_id' => null, 'name' => 'JD.ID', 'icon' => 'platform/jd_id.png'],
+            ['store_id' => null, 'name' => 'Tiktok Shop', 'icon' => 'platform/tiktok_shop.png'],
+            ['store_id' => null, 'name' => 'Facebook Marketplace', 'icon' => 'platform/facebook_marketplace.png'],
         ]);
     }
 }

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('product_variants', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('store_id')->constrained('stores')->onDelete('cascade');
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
             $table->string('sku', 100)->unique()->index();
             $table->string('barcode', 100)->unique()->nullable()->index();
@@ -28,7 +29,7 @@ return new class extends Migration
             $table->integer('final_selling_price')->unsigned()->default(0);
             $table->integer('current_stock_level')->default(0);
             $table->timestamp('last_stock_update')->nullable();
-            $table->string('unit', 20)->default('pcs');
+            $table->foreignId('unit_id')->nullable()->constrained('units')->onDelete('set null');
             $table->integer('min_order')->unsigned()->default(1);
             $table->timestamp('disabled_at')->nullable();
             $table->timestamps();

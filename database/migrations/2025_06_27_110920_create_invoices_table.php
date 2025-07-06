@@ -13,14 +13,15 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('store_id')->constrained('stores')->onDelete('cascade');
             $table->foreignId('transaction_id')->constrained()->onDelete('cascade');
             $table->string('code')->unique()->index();
             $table->string('description')->nullable();
-            $table->integer('amount')->default(0);
+            $table->integer('shipping_cost')->default(0);
             $table->integer('tax')->default(0);
+            $table->integer('amount')->default(0);
             $table->timestamp('due_date');
             $table->timestamp('paid_at')->nullable();
-            $table->string('snap_token')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

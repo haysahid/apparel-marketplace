@@ -26,6 +26,33 @@ class DownloadProductImage implements ShouldQueue
 
     public function handle()
     {
+        $basename = basename(parse_url($this->imageUrl, PHP_URL_PATH));
+        if (!preg_match('/\.[a-zA-Z0-9]+$/', $basename)) {
+            $basename .= '.jpg';
+        }
+        $imagePath = 'product/' . $basename;
+
+        Log::info('----------------------------------');
+        Log::info('Processing image: ' . $imagePath);
+
+        // Check if the image already exists in folder
+        $existingImage = Storage::exists($imagePath);
+
+        if ($existingImage) {
+            Log::info('Image already exists: ' . $imagePath);
+
+            // Save image path to database
+            ProductImage::create([
+                'product_id' => $this->productId,
+                'image' => $imagePath,
+                'order' => $this->order,
+            ]);
+
+            Log::info('Image path saved to database: ' . $imagePath);
+
+            return;
+        }
+
         Log::info('Downloading image async: ' . $this->imageUrl);
 
         $imageContents = @file_get_contents($this->imageUrl);

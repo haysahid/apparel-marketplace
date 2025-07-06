@@ -10,9 +10,16 @@ class Platform extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'store_id',
         'name',
         'icon',
     ];
+
+    // Relationships
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
 
     public function product_links()
     {

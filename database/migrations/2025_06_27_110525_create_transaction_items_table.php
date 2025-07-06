@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('transaction_items', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('store_id')->constrained('stores')->onDelete('cascade');
             $table->foreignId('transaction_id')->constrained()->onDelete('cascade');
             $table->foreignId('variant_id')->constrained('product_variants')->onDelete('cascade');
             $table->integer('quantity');
@@ -21,6 +22,7 @@ return new class extends Migration
             $table->integer('unit_discount')->default(0);
             $table->integer('unit_final_price')->default(0);
             $table->integer('subtotal')->default(0);
+            $table->enum('fullfillment_status', ['pending', 'paid', 'processing', 'completed', 'cancelled'])->default('pending');
             $table->timestamps();
             $table->softDeletes();
         });

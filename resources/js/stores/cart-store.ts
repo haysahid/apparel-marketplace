@@ -1,17 +1,37 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 
-export const useCartStore = defineStore("cart_items", () => {
-    const items = ref(
-        localStorage.getItem("cart_items")
-            ? (JSON.parse(
-                  localStorage.getItem("cart_items")
-              ) as CartItemModel[])
+export const useCartStore = defineStore("cart_groups", () => {
+    const key = "cart_groups";
+
+    const groups = ref(
+        localStorage.getItem(key)
+            ? (JSON.parse(localStorage.getItem(key)) as CartGroupModel[])
             : []
     );
 
+    const items = computed(() => {
+        return groups.value.reduce((acc, group) => {
+            return acc.concat(group.items);
+        }, [] as CartItemModel[]);
+    });
+
+    const selectedGroups = computed(() => {
+        return groups.value.filter((item) => item.selected) as CartGroupModel[];
+    });
+
+    const groupHasSelectedItems = computed(() => {
+        return groups.value.filter((group) =>
+            group.items?.some((item) => item.selected)
+        );
+    });
+
     const selectedItems = computed(() => {
-        return items.value.filter((item) => item.selected);
+        return groups.value.reduce((acc, group) => {
+            const selectedGroupItems =
+                group.items?.filter((item) => item.selected) || [];
+            return acc.concat(selectedGroupItems);
+        }, [] as CartItemModel[]);
     });
 
     const subTotal = computed(() => {
@@ -21,79 +41,178 @@ export const useCartStore = defineStore("cart_items", () => {
         }, 0);
     });
 
-    const toggleItem = (item: CartItemModel) => {
-        const index = items.value.findIndex(
-            (i) => i.variant_id === item.variant_id
+    const totalShippingCost = computed(() => {
+        return groupHasSelectedItems.value.reduce((total, group) => {
+            const shippingCost = group.shipping?.cost || 0;
+            return total + shippingCost;
+        }, 0);
+    });
+
+    const toggleGroup = (group: CartGroupModel) => {
+        const index = groups.value.findIndex(
+            (i) => i.store_id === group.store_id
         );
-        if (index !== -1) {
-            items.value[index].selected = !items.value[index].selected;
-        }
-        localStorage.setItem("cart_items", JSON.stringify(items.value));
+        if (index === -1) return;
+
+        groups.value[index].selected = !groups.value[index].selected;
+        groups.value[index].items.forEach((i) => {
+            i.selected = groups.value[index].selected;
+        });
+
+        localStorage.setItem(key, JSON.stringify(groups.value));
     };
 
-    const addItem = (item: CartItemModel) => {
-        items.value.unshift(item);
-        localStorage.setItem("cart_items", JSON.stringify(items.value));
+    const toggleItem = (item: CartItemModel) => {
+        const groupIndex = groups.value.findIndex(
+            (g) => g.store_id === item.store_id
+        );
+        if (groupIndex === -1) return;
+
+        const itemIndex = groups.value[groupIndex].items.findIndex(
+            (i) => i.variant_id === item.variant_id
+        );
+        if (itemIndex === -1) return;
+
+        groups.value[groupIndex].items[itemIndex].selected =
+            !groups.value[groupIndex].items[itemIndex].selected;
+
+        if (groups.value[groupIndex].items.every((i) => i.selected)) {
+            groups.value[groupIndex].selected = true;
+        } else {
+            groups.value[groupIndex].selected = false;
+        }
+
+        localStorage.setItem(key, JSON.stringify(groups.value));
+    };
+
+    const addGroup = (group: CartGroupModel) => {
+        // Check if the item already exists in the cart
+        const existingGroupIndex = groups.value.findIndex(
+            (g) => g.store_id === group.store_id
+        );
+
+        if (existingGroupIndex !== -1) {
+            // If it exists, update the items array
+            groups.value[existingGroupIndex].items = [
+                ...groups.value[existingGroupIndex].items,
+                ...group.items,
+            ];
+        } else {
+            // If it doesn't exist, add the new item
+            groups.value.unshift(group);
+        }
+
+        localStorage.setItem(key, JSON.stringify(groups.value));
     };
 
     const updateItem = (item: CartItemModel) => {
-        const index = items.value.findIndex(
+        const groupIndex = groups.value.findIndex(
+            (g) => g.store_id === item.store_id
+        );
+        if (groupIndex === -1) return;
+
+        const itemIndex = groups.value[groupIndex].items.findIndex(
             (i) => i.variant_id === item.variant_id
         );
-        if (index !== -1) {
-            items.value[index] = item;
-            localStorage.setItem("cart_items", JSON.stringify(items.value));
+        if (itemIndex !== -1) {
+            groups.value[groupIndex].items[itemIndex] = item;
         }
-    };
-
-    const updateItemByCreatedAt = (createdAt: string, item: CartItemModel) => {
-        const index = items.value.findIndex((i) => i.created_at === createdAt);
-        if (index !== -1) {
-            items.value[index] = item;
-            localStorage.setItem("cart_items", JSON.stringify(items.value));
-        }
+        localStorage.setItem(key, JSON.stringify(groups.value));
     };
 
     const removeItem = (item: CartItemModel) => {
-        items.value = items.value.filter(
-            (i) => i.variant_id !== item.variant_id
+        const groupIndex = groups.value.findIndex(
+            (g) => g.store_id === item.store_id
         );
-        localStorage.setItem("cart_items", JSON.stringify(items.value));
+        if (groupIndex === -1) return;
+
+        groups.value[groupIndex].items =
+            groups.value[groupIndex].items?.filter(
+                (i) => i.variant_id !== item.variant_id
+            ) || [];
+
+        // If the items array is empty, remove the group
+        if (groups.value[groupIndex].items?.length === 0) {
+            groups.value.splice(groupIndex, 1);
+        }
+
+        localStorage.setItem(key, JSON.stringify(groups.value));
     };
 
     const clearCart = () => {
-        items.value = [];
-        localStorage.setItem("cart_items", JSON.stringify(items.value));
+        groups.value = [];
+        localStorage.setItem(key, JSON.stringify(groups.value));
     };
 
-    const getItemByVariant = (item: ProductVariantEntity): CartItemModel => {
-        const foundItem = items.value.find((i) => i.variant_id === item?.id);
+    const getItemByVariant = (variant: ProductVariantEntity): CartItemModel => {
+        const groupIndex = groups.value.findIndex(
+            (g) => g.store_id === variant?.store_id
+        );
+        if (groupIndex === -1) return null;
+
+        const foundItem = groups.value[groupIndex].items.find(
+            (g) => g.variant_id === variant?.id
+        );
         if (foundItem) return foundItem;
         return null;
     };
 
-    const updateAllItems = (newItems: CartItemModel[]) => {
-        items.value = newItems;
-        localStorage.setItem("cart_items", JSON.stringify(items.value));
+    const updateGroup = (group: CartGroupModel) => {
+        const index = groups.value.findIndex(
+            (i) => i.store_id === group.store_id
+        );
+        if (index === -1) return;
+
+        groups.value[index] = group;
+        localStorage.setItem(key, JSON.stringify(groups.value));
     };
 
-    const clearSelectedItems = () => {
-        items.value = items.value.filter((item) => !item.selected);
-        localStorage.setItem("cart_items", JSON.stringify(items.value));
+    const updateGroups = (updatedGroups: CartGroupModel[]) => {
+        updatedGroups.forEach((updatedGroup) => {
+            const index = groups.value.findIndex(
+                (g) => g.store_id === updatedGroup.store_id
+            );
+            if (index !== -1) {
+                groups.value[index] = updatedGroup;
+            }
+        });
+
+        localStorage.setItem(key, JSON.stringify(groups.value));
+    };
+
+    const updateAllGroups = (newGroups: CartGroupModel[]) => {
+        groups.value = newGroups;
+        localStorage.setItem(key, JSON.stringify(groups.value));
+    };
+
+    const removeSelectedItems = () => {
+        groups.value = groups.value.filter((group) => !group.selected);
+
+        groups.value.forEach((group) => {
+            group.items = group.items.filter((item) => !item.selected);
+        });
+
+        localStorage.setItem(key, JSON.stringify(groups.value));
     };
 
     return {
+        groups,
         items,
+        selectedGroups,
+        groupHasSelectedItems,
         selectedItems,
         subTotal,
+        totalShippingCost,
+        toggleGroup,
         toggleItem,
-        addItem,
+        addGroup,
         updateItem,
-        updateItemByCreatedAt,
         removeItem,
         clearCart,
         getItemByVariant,
-        updateAllItems,
-        clearSelectedItems,
+        updateGroup,
+        updateGroups,
+        updateAllGroups,
+        removeSelectedItems,
     };
 });

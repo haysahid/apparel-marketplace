@@ -11,6 +11,7 @@ import ProductDetailTable from "./Product/ProductDetailTable.vue";
 import { usePage } from "@inertiajs/vue3";
 import DiscountTag from "@/Components/DiscountTag.vue";
 import TextInput from "@/Components/TextInput.vue";
+import StoreCard from "@/Components/StoreCard.vue";
 
 const page = usePage();
 if (page.props.flash.access_token) {
@@ -228,6 +229,16 @@ const images = computed(() => {
                             >
                                 <ProductDetailTable :rows="tableRows" />
                             </div>
+                        </div>
+
+                        <!-- Store -->
+                        <div>
+                            <h3
+                                class="mb-2 text-lg font-semibold text-gray-700"
+                            >
+                                Toko
+                            </h3>
+                            <StoreCard :store="props.product.store" />
                         </div>
 
                         <!-- Description -->

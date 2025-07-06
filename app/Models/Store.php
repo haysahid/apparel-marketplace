@@ -17,7 +17,20 @@ class Store extends Model
         'phone',
         'logo',
         'banner',
+        'rajaongkir_origin_id',
+        'rajaongkir_origin_label',
+        'province_name',
+        'city_name',
+        'district_name',
+        'subdistrict_name',
+        'zip_code',
     ];
+
+    // Relationships
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'store_users')->withPivot('role');
+    }
 
     public function advantages()
     {

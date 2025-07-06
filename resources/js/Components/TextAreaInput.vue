@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, onUpdated } from "vue";
 import { useSlots } from "vue";
 import InputError from "@/Components/InputError.vue";
 
@@ -60,7 +60,8 @@ const emit = defineEmits(["update:modelValue"]);
 const input = ref(null);
 
 const slots = useSlots();
-const hasPrefix = !!slots.prefix;
+const hasPrefix = ref(!!slots.prefix);
+const hasSuffix = ref(!!slots.suffix);
 
 function updateValue(value) {
     if (props.preventNewLine) {
@@ -68,8 +69,6 @@ function updateValue(value) {
     }
 
     emit("update:modelValue", value);
-
-    input.value.parentNode.dataset.clonedVal = value;
 }
 
 onMounted(() => {
@@ -77,6 +76,12 @@ onMounted(() => {
         input.value.focus();
     }
 
+    input.value.parentNode.dataset.clonedVal = props.modelValue;
+});
+
+onUpdated(() => {
+    hasPrefix.value = !!slots.prefix;
+    hasSuffix.value = !!slots.suffix;
     input.value.parentNode.dataset.clonedVal = props.modelValue;
 });
 
@@ -104,6 +109,7 @@ defineExpose({ focus: () => input.value.focus() });
                 :class="[
                     {
                         'pl-11': hasPrefix,
+                        'pr-11': hasSuffix,
                         'border-red-500 focus:border-red-500 focus:ring-red-500':
                             props.error,
                     },
@@ -112,6 +118,7 @@ defineExpose({ focus: () => input.value.focus() });
                 :value="props.modelValue"
                 @input="updateValue($event.target.value)"
             />
+            <slot name="suffix"></slot>
         </label>
         <InputError
             :message="props.error"

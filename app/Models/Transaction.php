@@ -16,10 +16,12 @@ class Transaction extends Model
         'note',
         'payment_method_id',
         'shipping_method_id',
-        'province_id',
+        'rajaongkir_destination_id',
         'province_name',
-        'city_id',
         'city_name',
+        'district_name',
+        'subdistrict_name',
+        'zip_code',
         'address',
         'shipping_estimate',
         'shipping_cost',
@@ -63,6 +65,6 @@ class Transaction extends Model
 
     public function payments()
     {
-        return $this->hasMany(Payment::class);
+        return $this->hasMany(Payment::class)->orderBy('created_at', 'desc');
     }
 }

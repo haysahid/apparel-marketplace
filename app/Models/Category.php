@@ -10,9 +10,16 @@ class Category extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'store_id',
         'name',
         'image',
     ];
+
+    // Relationships
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
 
     public function products()
     {

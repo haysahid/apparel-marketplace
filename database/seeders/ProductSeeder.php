@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Models\Color;
 use App\Models\Product;
 use App\Models\Size;
+use App\Models\Unit;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
@@ -23,9 +24,10 @@ class ProductSeeder extends Seeder
     {
         $this->call([
             BrandSeeder::class,
-            ColorSeeder::class,
             CategorySeeder::class,
+            ColorSeeder::class,
             SizeSeeder::class,
+            UnitSeeder::class,
         ]);
 
         $products = require __DIR__ . '/data/products.php';
@@ -148,6 +150,7 @@ class ProductSeeder extends Seeder
 
                     // Create the product variant
                     $productVariant = $product->variants()->create([
+                        'store_id' => $product->store_id,
                         'sku' => $variant['sku'],
                         'barcode' => $variant['barcode'] ?? null,
                         'slug' => $variant['slug'] ?? null,
@@ -162,7 +165,7 @@ class ProductSeeder extends Seeder
                         'final_selling_price' => $variant['final_selling_price'] ?? 0,
                         'current_stock_level' => $variant['current_stock_level'] ?? 0,
                         'last_stock_update' => $variant['last_stock_update'] ?? now(),
-                        'unit' => $variant['unit'] ?? null,
+                        'unit_id' => Unit::where('name', $variant['unit'] ?? 'pcs')->first()->id ?? null,
                     ]);
 
                     // Add variant images

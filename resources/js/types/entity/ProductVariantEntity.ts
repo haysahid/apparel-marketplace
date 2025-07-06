@@ -1,5 +1,6 @@
 interface ProductVariantEntity {
     id: number;
+    store_id: number;
     product_id: number;
     sku: string;
     barcode: string;

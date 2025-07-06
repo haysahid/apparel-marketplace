@@ -19,10 +19,13 @@ return new class extends Migration
             $table->string('note')->nullable();
             $table->foreignId('payment_method_id')->nullable()->constrained('payment_methods')->onDelete('set null');
             $table->foreignId('shipping_method_id')->nullable()->constrained('shipping_methods')->onDelete('set null');
-            $table->integer('province_id')->nullable()->index();
+            $table->integer('rajaongkir_destination_id')->nullable();
+            $table->string('rajaongkir_destination_label')->nullable();
             $table->string('province_name')->nullable();
-            $table->integer('city_id')->nullable()->index();
             $table->string('city_name')->nullable();
+            $table->string('district_name')->nullable();
+            $table->string('subdistrict_name')->nullable();
+            $table->string('zip_code')->nullable();
             $table->string('address')->nullable();
             $table->integer('shipping_cost')->nullable();
             $table->string('shipping_estimate')->nullable();

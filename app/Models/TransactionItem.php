@@ -10,6 +10,7 @@ class TransactionItem extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'store_id',
         'transaction_id',
         'variant_id',
         'quantity',
@@ -17,7 +18,8 @@ class TransactionItem extends Model
         'unit_discount_type',
         'unit_discount',
         'unit_final_price',
-        'subtotal'
+        'subtotal',
+        'fullfillment_status',
     ];
 
     protected $appends = [
@@ -30,6 +32,11 @@ class TransactionItem extends Model
     }
 
     // Relationships
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
+
     public function transaction()
     {
         return $this->belongsTo(Transaction::class);

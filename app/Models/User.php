@@ -72,6 +72,7 @@ class User extends Authenticatable
         ];
     }
 
+    // Relationships
     public function role()
     {
         return $this->belongsTo(Role::class);
@@ -80,6 +81,11 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role->slug === 'super-admin' || $this->role->slug === 'admin';
+    }
+
+    public function stores()
+    {
+        return $this->belongsToMany(Store::class, 'store_roles')->withPivot('role')->withTimestamps();
     }
 
     public function transactions()

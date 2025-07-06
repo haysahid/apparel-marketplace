@@ -27,6 +27,7 @@ Route::post('/profile', [UserController::class, 'updateProfile'])->name('profile
 Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
     Route::get('/order-success', [OrderController::class, 'orderSuccess'])->name('order.success');
     Route::get('/my-order', [OrderController::class, 'myOrder'])->name('my-order');
     Route::get('/my-order/{transaction_code}', [OrderController::class, 'myOrderDetail'])->name('my-order.detail');

@@ -3,16 +3,12 @@ import LandingLayout from "@/Layouts/LandingLayout.vue";
 import OrderDetail from "./Order/OrderDetail.vue";
 
 const props = defineProps({
-    invoice: {
-        type: Object as () => InvoiceEntity,
-        required: true,
-    },
     transaction: {
         type: Object as () => TransactionEntity,
         required: true,
     },
-    items: {
-        type: Array as () => TransactionItemEntity[],
+    groups: {
+        type: Array as () => OrderGroupModel[],
         required: true,
     },
 });
@@ -37,10 +33,6 @@ const props = defineProps({
             </p>
         </div>
 
-        <OrderDetail
-            :invoice="props.invoice"
-            :transaction="props.transaction"
-            :items="props.items"
-        />
+        <OrderDetail :transaction="props.transaction" :groups="props.groups" />
     </LandingLayout>
 </template>

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Store;
 use App\Models\StoreAdvantage;
 use App\Models\StoreCertificate;
+use App\Models\StoreRole;
 use App\Models\StoreSocialLink;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -24,6 +25,13 @@ class StoreSeeder extends Seeder
             'phone' => '021-12345678',
             'logo' => 'logo_black.png',
             'banner' => 'store.png',
+            'rajaongkir_origin_id' => 73442,
+            'rajaongkir_origin_label' => 'KUTA BUMI, PASAR KEMIS, TANGERANG, BANTEN, 15560',
+            'province_name' => 'BANTEN',
+            'city_name' => 'TANGERANG',
+            'district_name' => 'PASAR KEMIS',
+            'subdistrict_name' => 'KUTABUMI',
+            'zip_code' => '15560',
         ]);
 
         StoreAdvantage::insert([
@@ -83,6 +91,19 @@ class StoreSeeder extends Seeder
                 'name' => 'TikTok',
                 'url' => 'https://www.tiktok.com/@nhspasarkemis1',
                 'icon' => 'icon/ic_tiktok.svg',
+            ],
+        ]);
+
+        StoreRole::insert([
+            [
+                'store_id' => 1,
+                'user_id' => 1, // Super Admin
+                'role_id' => 1,
+            ],
+            [
+                'store_id' => 1,
+                'user_id' => 2, // Admin
+                'role_id' => 2,
             ],
         ]);
     }

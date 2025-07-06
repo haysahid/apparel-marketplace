@@ -1,42 +1,174 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import LandingSection from "@/Components/LandingSection.vue";
 import OrderItem from "./OrderItem.vue";
 import OrderContentRow from "@/Components/OrderContentRow.vue";
 import OrderStatusChip from "./OrderStatusChip.vue";
 import formatDate from "@/plugins/date-formatter";
+import OrderGroup from "./OrderGroup.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import axios from "axios";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { router } from "@inertiajs/vue3";
+
+async function initScript() {
+    const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
+    const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
+
+    const script = document.createElement("script");
+    script.src = snapScript;
+    script.setAttribute("data-client-key", clientKey);
+    script.async = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+        document.body.removeChild(script);
+    };
+}
 
 const props = defineProps({
-    invoice: {
-        type: Object as () => InvoiceEntity,
-        required: true,
-    },
     transaction: {
         type: Object as () => TransactionEntity,
         required: true,
     },
-    items: {
-        type: Array as () => TransactionItemEntity[],
+    groups: {
+        type: Array as () => OrderGroupModel[],
         required: true,
     },
 });
 
-const subTotal = props.items
-    .reduce((total, item) => total + item.subtotal, 0)
-    .toLocaleString("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    });
+// Check payment
+const payment = ref(null);
 
-const total = (
-    props.items.reduce((total, item) => total + item.subtotal, 0) +
-    props.transaction.shipping_cost
-).toLocaleString("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
+async function checkPayment() {
+    await axios
+        .get(`/api/check-payment?transaction_code=${props.transaction.code}`, {
+            headers: {
+                authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+        })
+        .then((response) => {
+            payment.value = response.data.result;
+        });
+}
+
+if (props.transaction.payments) {
+    payment.value = props.transaction.payments[0];
+}
+
+const showPaymentActions = computed(() => {
+    return (
+        props.transaction.status !== "paid" &&
+        props.transaction.payment_method.slug === "transfer"
+    );
 });
+
+if (showPaymentActions.value) {
+    checkPayment();
+}
+
+// Resume Payment
+const resumePaymentStatus = ref(null);
+
+async function showSnap() {
+    resumePaymentStatus.value = "loading";
+
+    if (!window.snap) {
+        await initScript();
+    }
+
+    setTimeout(async () => {
+        const snapToken = payment.value.midtrans_snap_token;
+
+        if (!snapToken) {
+            console.error("Snap token is not available");
+            return;
+        }
+
+        await window.snap.pay(snapToken, {
+            onSuccess: async function (result) {
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth",
+                });
+
+                await axios
+                    .post(
+                        "/api/confirm-payment",
+                        {
+                            payment_id: payment.value.id,
+                        },
+                        {
+                            headers: {
+                                authorization: `Bearer ${localStorage.getItem(
+                                    "access_token"
+                                )}`,
+                            },
+                        }
+                    )
+                    .then((response) => {
+                        resumePaymentStatus.value = "success";
+                        router.visit(
+                            route("my-order.detail", {
+                                transaction_code: props.transaction.code,
+                            })
+                        );
+                    })
+                    .catch((error) => {
+                        resumePaymentStatus.value = "error";
+                    });
+            },
+            onPending: async function (result) {
+                resumePaymentStatus.value = "pending";
+                await checkPayment();
+            },
+            onError: async function (result) {
+                resumePaymentStatus.value = "error";
+                await checkPayment();
+            },
+            onClose: async function () {
+                resumePaymentStatus.value = "error";
+                await checkPayment();
+            },
+        });
+    }, 1000);
+}
+
+// Change Payment Type
+async function changePaymentType() {
+    await axios
+        .put(
+            "/api/change-payment-type",
+            {
+                transaction_code: props.transaction.code,
+            },
+            {
+                headers: {
+                    authorization: `Bearer ${localStorage.getItem(
+                        "access_token"
+                    )}`,
+                },
+            }
+        )
+        .then(async (response) => {
+            payment.value = response.data.result;
+
+            if (payment.value.midtrans_snap_token) {
+                await showSnap();
+            }
+        });
+}
+
+const subTotal = props.groups.reduce(
+    (total, group) =>
+        total + (group.invoice.amount - group.invoice.shipping_cost),
+    0
+);
+const total = props.groups.reduce(
+    (total, group) => total + group.invoice.amount,
+    0
+);
 
 const orderCreated = (date: string | null, status: boolean) => {
     return {
@@ -100,12 +232,9 @@ const histories = ref([
 const status = props.transaction.status;
 const shippingEstimate = props.transaction.shipping_estimate;
 
-// example shipping_estimate: '1-3'
-// calculate the average shipping estimate
 const dayShippingEstimate = computed(() => {
     if (!shippingEstimate) return 0;
-    const [min, max] = shippingEstimate.split("-").map(Number);
-    return Math.round((min + max) / 2);
+    return shippingEstimate.replace(/[^0-9]/g, "");
 });
 
 function buildHistories() {
@@ -392,16 +521,35 @@ setTimeout(() => {
             histories.value.length) *
         100;
 }, 100);
+
+onMounted(() => {
+    if (route().params?.transaction_status == "settlement") {
+        // Reload the page
+        router.visit(
+            route("my-order.detail", {
+                transaction_code: props.transaction.code,
+            })
+        );
+    } else if (route().params?.show_snap == 1) {
+        showSnap();
+    }
+});
 </script>
 
 <template>
     <div
         data-aos="fade-up"
         data-aos-duration="600"
-        class="p-6 !pt-0 sm:p-12 md:p-[100px] flex flex-col gap-4 sm:gap-12"
+        class="p-6 !pt-0 sm:p-12 md:p-[100px] flex flex-col gap-5 sm:gap-12"
     >
         <!-- Tracking -->
-        <div class="flex flex-col items-center gap-4 mx-auto w-fit sm:gap-6">
+        <div
+            v-if="
+                !showPaymentActions ||
+                props.transaction.payment_method.slug === 'cod'
+            "
+            class="flex flex-col items-center gap-4 mx-auto w-fit sm:gap-6"
+        >
             <div
                 class="flex items-start justify-center gap-4 md:gap-8 lg:gap-12"
             >
@@ -451,30 +599,30 @@ setTimeout(() => {
         <!-- Details -->
         <LandingSection class="!flex-col !justify-start !min-h-[56vh]">
             <div
-                class="flex flex-col items-center justify-center w-full gap-2 mx-auto lg:flex-row lg:items-start sm:gap-12 max-w-7xl"
+                class="flex flex-col items-center justify-center w-full gap-5 mx-auto lg:flex-row lg:items-start sm:gap-8 max-w-7xl"
             >
                 <!-- Items -->
-                <div>
-                    <OrderItem
-                        v-for="(item, index) in props.items"
-                        :key="item.id"
-                        :item="item"
-                        :showDivider="index !== props.items.length - 1"
+                <div class="w-full">
+                    <OrderGroup
+                        v-for="(item, index) in props.groups"
+                        :key="index"
+                        :orderGroup="item"
+                        :showDivider="index !== props.groups.length - 1"
                     />
                 </div>
 
                 <!-- Summary -->
                 <div
-                    class="w-full lg:w-[400px] outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl p-4 gap-y-4 flex flex-col gap-4"
+                    class="w-full lg:w-[480px] outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl p-4 gap-y-4 flex flex-col gap-4"
                 >
                     <h3 class="text-lg font-semibold text-gray-700">
-                        Detail Pemesanan
+                        Ringkasan Pemesanan
                     </h3>
                     <div>
                         <div class="flex flex-col gap-2">
                             <OrderContentRow
-                                label="Invoice"
-                                :value="props.invoice.code"
+                                label="Kode Pemesanan"
+                                :value="props.transaction.code"
                             />
 
                             <OrderContentRow
@@ -506,33 +654,111 @@ setTimeout(() => {
                                 :value="props.transaction.shipping_method.name"
                             />
 
+                            <!-- Payment -->
+                            <template v-if="showPaymentActions">
+                                <!-- Divider -->
+                                <div
+                                    class="my-2 border-b border-gray-300"
+                                ></div>
+                                <OrderContentRow
+                                    label="Status Pembayaran"
+                                    :value="payment?.status"
+                                >
+                                    <template #value>
+                                        <OrderStatusChip
+                                            :status="payment.status"
+                                            :label="
+                                                payment.status?.toUpperCase()
+                                            "
+                                        />
+                                    </template>
+                                </OrderContentRow>
+                                <OrderContentRow
+                                    v-if="payment?.midtrans_response"
+                                    label="Tipe Pembayaran"
+                                    :value="
+                                        payment?.midtrans_response?.payment_type
+                                            ?.split('_')
+                                            .map(
+                                                (word) =>
+                                                    word
+                                                        .charAt(0)
+                                                        .toUpperCase() +
+                                                    word.slice(1)
+                                            )
+                                            .join(' ')
+                                    "
+                                />
+                                <OrderContentRow
+                                    v-if="
+                                        payment?.midtrans_response?.va_numbers
+                                    "
+                                    label="Tujuan Pembayaran"
+                                    :value="
+                                        payment?.midtrans_response?.va_numbers[0]?.bank?.toUpperCase()
+                                    "
+                                />
+                                <OrderContentRow
+                                    v-if="payment?.midtrans_response"
+                                    label="Batas Akhir Pembayaran"
+                                    :value="
+                                        payment?.midtrans_response?.expiry_time
+                                    "
+                                />
+                            </template>
+
                             <!-- Divider -->
                             <div class="my-2 border-b border-gray-300"></div>
 
                             <OrderContentRow
                                 label="Sub Total"
-                                :value="subTotal"
+                                :value="$formatCurrency(subTotal)"
                             />
                             <OrderContentRow
                                 label="Biaya Pengiriman"
                                 :value="
-                                    props.transaction.shipping_cost.toLocaleString(
-                                        'id-ID',
-                                        {
-                                            style: 'currency',
-                                            currency: 'IDR',
-                                            minimumFractionDigits: 0,
-                                        }
+                                    $formatCurrency(
+                                        props.transaction.shipping_cost
                                     )
                                 "
                             />
                             <div class="flex items-center justify-between">
                                 <p class="text-lg font-bold text-gray-700">
-                                    Total
+                                    {{
+                                        props.transaction.status !== "paid"
+                                            ? "Total Tagihan"
+                                            : "Total"
+                                    }}
                                 </p>
                                 <p class="text-lg font-bold text-primary">
-                                    {{ total }}
+                                    {{ $formatCurrency(total) }}
                                 </p>
+                            </div>
+
+                            <!-- Payment Buttons -->
+                            <div
+                                v-if="showPaymentActions"
+                                class="flex flex-col gap-2 mt-2"
+                            >
+                                <PrimaryButton
+                                    class="w-full py-3"
+                                    :disabled="
+                                        resumePaymentStatus === 'loading'
+                                    "
+                                    @click="showSnap()"
+                                >
+                                    Lanjutkan Pembayaran
+                                </PrimaryButton>
+                                <SecondaryButton
+                                    v-if="payment?.midtrans_response"
+                                    class="w-full py-3"
+                                    :disabled="
+                                        resumePaymentStatus === 'loading'
+                                    "
+                                    @click="changePaymentType()"
+                                >
+                                    Ubah Tipe Pembayaran
+                                </SecondaryButton>
                             </div>
                         </div>
                     </div>

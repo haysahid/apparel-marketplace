@@ -14,12 +14,12 @@ class SizeSeeder extends Seeder
     public function run(): void
     {
         Size::insert([
-            ['name' => 'XS'],
-            ['name' => 'S'],
-            ['name' => 'M'],
-            ['name' => 'L'],
-            ['name' => 'XL'],
-            ['name' => 'XXL'],
+            ['store_id' => null, 'name' => 'XS'],
+            ['store_id' => null, 'name' => 'S'],
+            ['store_id' => null, 'name' => 'M'],
+            ['store_id' => null, 'name' => 'L'],
+            ['store_id' => null, 'name' => 'XL'],
+            ['store_id' => null, 'name' => 'XXL'],
         ]);
     }
 }

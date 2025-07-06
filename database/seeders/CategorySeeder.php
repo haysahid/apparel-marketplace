@@ -14,20 +14,36 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         Category::insert([
-            ['id' => 1, 'name' => 'Koko Dewasa/Anak'],
-            ['id' => 2, 'name' => 'Gamis Dewasa/Anak'],
-            ['id' => 3, 'name' => 'Baju Muslim Pria'],
-            ['id' => 4, 'name' => 'Baju Muslim Wanita'],
-            ['id' => 5, 'name' => 'Baju Muslim Anak'],
-            ['id' => 6, 'name' => 'Aksesoris Muslim'],
-            ['id' => 7, 'name' => 'Sepatu Muslim'],
-            ['id' => 8, 'name' => 'Tas Muslim'],
-            ['id' => 9, 'name' => 'Pakaian Dalam Muslim'],
-            ['id' => 10, 'name' => 'Pakaian Tidur Muslim'],
-            ['id' => 11, 'name' => 'Pakaian Renang Muslim'],
-            ['id' => 12, 'name' => 'Pakaian Olahraga Muslim'],
-            ['id' => 13, 'name' => 'Pakaian Formal Muslim'],
-            ['id' => 14, 'name' => 'Pakaian Santai Muslim'],
+            [
+                'id' => 1,
+                'store_id' => null,
+                'name' => 'T-Shirts',
+                'image' => 'category/t-shirts.jpg'
+            ],
+            [
+                'id' => 2,
+                'store_id' => null,
+                'name' => 'Jeans',
+                'image' => 'category/jeans.jpg'
+            ],
+            [
+                'id' => 3,
+                'store_id' => null,
+                'name' => 'Jackets',
+                'image' => 'category/jackets.jpg'
+            ],
+            [
+                'id' => 4,
+                'store_id' => null,
+                'name' => 'Shoes',
+                'image' => 'category/shoes.jpg'
+            ],
+            [
+                'id' => 5,
+                'store_id' => null,
+                'name' => 'Accessories',
+                'image' => 'category/accessories.jpg'
+            ],
         ]);
     }
 }

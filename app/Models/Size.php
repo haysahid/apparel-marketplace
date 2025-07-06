@@ -10,8 +10,15 @@ class Size extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'store_id',
         'name',
     ];
+
+    // Relationships
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
 
     public function products()
     {

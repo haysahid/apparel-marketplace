@@ -10,9 +10,16 @@ class Color extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'store_id',
         'name',
         'hex_code',
     ];
+
+    // Relationships
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
 
     public function products()
     {

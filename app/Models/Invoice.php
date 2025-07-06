@@ -10,15 +10,22 @@ class Invoice extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'store_id',
         'transaction_id',
         'code',
         'description',
-        'amount',
+        'shipping_cost',
         'tax',
+        'amount',
         'due_date',
         'paid_at',
-        'snap_token',
     ];
+
+    // Relationships
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
 
     public function transaction()
     {
