@@ -85,7 +85,7 @@ class User extends Authenticatable
 
     public function stores()
     {
-        return $this->belongsToMany(Store::class, 'store_roles')->withPivot('role')->withTimestamps();
+        return $this->belongsToMany(Store::class, 'store_roles')->withTimestamps()->withPivot(['store_id', 'role_id']);
     }
 
     public function transactions()

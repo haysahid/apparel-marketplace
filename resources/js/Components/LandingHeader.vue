@@ -206,6 +206,16 @@ const logout = () => {
 
                                         <template #content>
                                             <DropdownLink
+                                                :href="route('store.create')"
+                                            >
+                                                Buat Toko
+                                            </DropdownLink>
+
+                                            <div
+                                                class="border-t border-gray-200"
+                                            />
+
+                                            <DropdownLink
                                                 :href="route('profile')"
                                             >
                                                 Profile

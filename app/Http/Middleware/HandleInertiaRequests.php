@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -30,8 +32,17 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = User::with([
+            'role',
+            'stores',
+        ])->find($request->user()?->id);
+
         return [
             ...parent::share($request),
+            'auth' => [
+                'user' => $user,
+                'is_admin' => $user && $user->isAdmin(),
+            ],
             'ziggy' => fn() => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
@@ -43,6 +54,9 @@ class HandleInertiaRequests extends Middleware
                 'info' => session('info'),
                 'access_token' => session('access_token'),
             ],
+            'setting' => function () {
+                return Setting::all()->pluck('value', 'key');
+            },
         ];
     }
 }

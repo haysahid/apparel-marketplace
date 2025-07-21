@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class Store extends Model
 {
@@ -45,5 +46,17 @@ class Store extends Model
     public function social_links()
     {
         return $this->hasMany(StoreSocialLink::class);
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'store_roles');
+    }
+
+    public function my_role()
+    {
+        return $this->belongsToMany(Role::class, 'store_roles')
+            ->where('user_id', Auth::id())
+            ->withPivot('role');
     }
 }

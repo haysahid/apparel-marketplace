@@ -398,7 +398,6 @@ function buildHistories() {
                         true
                     ),
                     orderShipped("Segera", false),
-                    paymentReceived("Saat barang diterima", false),
                     orderDelivered(estimateText, false),
                 ];
             }
@@ -412,7 +411,6 @@ function buildHistories() {
                         getDateOrFallback(shipped_at, updated_at),
                         true
                     ),
-                    paymentReceived("Saat barang diterima", false),
                     orderDelivered(estimateText, false),
                 ];
             }
@@ -426,10 +424,6 @@ function buildHistories() {
                         getDateOrFallback(shipped_at, updated_at),
                         true
                     ),
-                    paymentReceived(
-                        getDateOrFallback(paid_at, updated_at),
-                        true
-                    ),
                     orderDelivered(estimateText, false),
                 ];
             }
@@ -441,10 +435,6 @@ function buildHistories() {
                     ),
                     orderShipped(
                         getDateOrFallback(shipped_at, updated_at),
-                        true
-                    ),
-                    paymentReceived(
-                        getDateOrFallback(paid_at, updated_at),
                         true
                     ),
                     orderDelivered(

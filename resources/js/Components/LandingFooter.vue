@@ -8,6 +8,10 @@ import IconInstagram from "@/Icons/IconInstagram.vue";
 
 const page = usePage();
 const store = page.props.store || {};
+const setting = {
+    ...page.props.setting,
+    social_links: JSON.parse(page.props.setting.social_links),
+};
 
 const isHome = route().current("home");
 </script>
@@ -24,7 +28,7 @@ const isHome = route().current("home");
                 >
                     <Link :href="route('home')" class="hidden sm:block">
                         <img
-                            src="/storage/logo_yellow.png"
+                            src="/storage/logo-shopywear-white.png"
                             alt="Logo"
                             class="h-24 mb-8"
                         />
@@ -34,51 +38,56 @@ const isHome = route().current("home");
                         <h2
                             class="mb-4 text-2xl font-semibold text-yellow-400 sm:hidden"
                         >
-                            {{ store.name }}
+                            {{ setting.name }}
                         </h2>
                     </Link>
 
                     <div class="text-start">
-                        <p v-if="store.address" class="mb-2 text-gray-100">
-                            {{ store.address }}
+                        <p v-if="setting.address" class="mb-2 text-gray-100">
+                            {{ setting.address }}
                         </p>
-                        <p v-if="store.email" class="mb-2 text-gray-100">
+                        <p
+                            v-if="setting.contact_email"
+                            class="mb-2 text-gray-100"
+                        >
                             <a
-                                :href="`mailto:${store.email}`"
+                                :href="`mailto:${setting.contact_email}`"
                                 target="_blank"
                                 class="text-gray-100 hover:text-white"
                             >
-                                {{ store.email }}
+                                {{ setting.contact_email }}
                             </a>
                         </p>
-                        <p v-if="store.phone" class="mb-2 text-gray-100">
+                        <p
+                            v-if="setting.contact_phone"
+                            class="mb-2 text-gray-100"
+                        >
                             <a
-                                :href="`https://wa.me/${store.phone}`"
+                                :href="`https://wa.me/${setting.contact_phone}`"
                                 target="_blank"
                                 class="text-gray-100 hover:text-white"
                             >
-                                {{ store.phone }}
+                                {{ setting.contact_phone }}
                             </a>
                         </p>
                         <div
                             class="flex items-center justify-start mt-4 space-x-4"
                         >
                             <template
-                                v-for="(link, index) in $page.props.store
-                                    .social_links"
-                                :key="index"
+                                v-for="(link, key) in setting.social_links"
+                                :key="key"
                             >
-                                <a :href="link.url" target="_blank">
+                                <a :href="link" target="_blank">
                                     <IconInstagram
-                                        v-if="link.name == 'Instagram'"
+                                        v-if="key == 'instagram'"
                                         class="!fill-white/80 hover:!fill-white max-sm:!size-6"
                                     />
                                     <IconFacebook
-                                        v-else-if="link.name == 'Facebook'"
+                                        v-else-if="key == 'facebook'"
                                         class="!fill-white/80 hover:!fill-white max-sm:!size-7"
                                     />
                                     <IconTikTok
-                                        v-else-if="link.name == 'TikTok'"
+                                        v-else-if="key == 'tiktok'"
                                         class="!fill-white/80 hover:!fill-white max-sm:!size-7"
                                     />
                                 </a>
@@ -196,8 +205,8 @@ const isHome = route().current("home");
             </div>
             <div class="text-center">
                 <p class="text-sm text-gray-100 sm:text-base">
-                    &copy; {{ new Date().getFullYear() }} {{ store.name }}. All
-                    rights reserved.
+                    &copy; {{ new Date().getFullYear() }}
+                    {{ setting.site_name }}. All rights reserved.
                 </p>
             </div>
         </div>
