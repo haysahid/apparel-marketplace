@@ -106,7 +106,7 @@ defineExpose({ focus: () => input.value.focus() });
                 :autocomplete="props.autocomplete"
                 :rows="props.rows"
                 @focusout="emit('focusout')"
-                class="w-full px-4 py-2 border-gray-300 shadow-sm rounded-[21px] focus:border-indigo-500 focus:ring-indigo-500 max-h-[300px]"
+                class="w-full px-4 py-2 border-gray-300 shadow-sm rounded-lg focus:border-indigo-500 focus:ring-indigo-500 max-h-[300px]"
                 :class="[
                     {
                         'pl-11': hasPrefix,

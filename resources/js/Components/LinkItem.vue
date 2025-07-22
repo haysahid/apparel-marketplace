@@ -75,9 +75,16 @@ const getPlatformNameFromUrl = (url) => {
                 {{ props.name || getPlatformNameFromUrl(props.url) }}
             </p>
             <p
+                v-if="props.url"
                 class="flex-1 text-xs text-gray-800 line-clamp-1 overflow-ellipsis text-start"
             >
-                {{ props.url || "Tautan Tidak Diketahui" }}
+                {{ props.url }}
+            </p>
+            <p
+                v-else
+                class="flex-1 text-xs italic text-gray-500 line-clamp-1 overflow-ellipsis text-start"
+            >
+                {{ "Belum Ada Tautan" }}
             </p>
         </div>
 

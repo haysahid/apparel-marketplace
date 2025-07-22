@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('store_advantages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('store_id')->constrained('stores')->onDelete('cascade');
-            $table->string('name');
+            $table->string('name')->nullable();
             $table->string('description')->nullable();
             $table->timestamps();
             $table->softDeletes();

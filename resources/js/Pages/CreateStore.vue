@@ -1,19 +1,17 @@
 <script setup lang="ts">
 import { Head, Link, useForm } from "@inertiajs/vue3";
+import { usePage } from "@inertiajs/vue3";
 import AuthenticationCard from "@/Components/AuthenticationCard.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import LandingLayout from "@/Layouts/LandingLayout.vue";
 import useDebounce from "@/plugins/debounce";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import axios from "axios";
 import InputLabel from "@/Components/InputLabel.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
-
-const props = defineProps({
-    status: String,
-});
+import ErrorDialog from "@/Components/ErrorDialog.vue";
 
 const originSearch = ref("");
 const isOriginDropdownOpen = ref(false);
@@ -53,7 +51,6 @@ const form = useForm({
     phone: "",
     rajaongkir_origin_id: null,
     rajaongkir_origin: null,
-    zip_code: null,
 });
 
 const submit = () => {
@@ -64,9 +61,32 @@ const submit = () => {
         email: data.email,
         phone: data.phone,
         rajaongkir_origin_id: data.rajaongkir_origin_id,
-        rajaongkir_origin_name: data.rajaongkir_origin?.name || null,
-        zip_code: data.zip_code || null,
-    })).post(route("store.store"));
+        rajaongkir_origin_label: data.rajaongkir_origin?.label || null,
+        province_name: data.rajaongkir_origin?.province_name || null,
+        city_name: data.rajaongkir_origin?.city_name || null,
+        district_name: data.rajaongkir_origin?.district_name || null,
+        subdistrict_name: data.rajaongkir_origin?.subdistrict_name || null,
+        zip_code: data.rajaongkir_origin?.zip_code || null,
+    })).post(route("store.store"), {
+        onError: (errors) => {
+            if (errors.error) {
+                openErrorDialog(errors.error);
+            }
+        },
+    });
+};
+
+const showErrorDialog = ref(false);
+const errorMessage = ref(null);
+
+const openErrorDialog = (message) => {
+    errorMessage.value = message;
+    showErrorDialog.value = true;
+};
+
+const closeErrorDialog = () => {
+    showErrorDialog.value = false;
+    errorMessage.value = null;
 };
 </script>
 
@@ -302,6 +322,12 @@ const submit = () => {
                     </PrimaryButton>
                 </div>
             </form>
+
+            <ErrorDialog
+                :show="showErrorDialog"
+                :title="errorMessage"
+                @close="closeErrorDialog"
+            />
         </AuthenticationCard>
     </LandingLayout>
 </template>

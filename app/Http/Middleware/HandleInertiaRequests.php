@@ -42,6 +42,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $user,
                 'is_admin' => $user && $user->isAdmin(),
+                'has_store' => $user && $user->stores->isNotEmpty(),
             ],
             'ziggy' => fn() => [
                 ...(new Ziggy)->toArray(),
@@ -53,6 +54,7 @@ class HandleInertiaRequests extends Middleware
                 'warning' => session('warning'),
                 'info' => session('info'),
                 'access_token' => session('access_token'),
+                'selected_store_id' => session('selected_store_id'),
             ],
             'setting' => function () {
                 return Setting::all()->pluck('value', 'key');

@@ -1,5 +1,5 @@
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { ref, watch } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import TextInput from "@/Components/TextInput.vue";
@@ -14,6 +14,9 @@ import IconTikTok from "@/Icons/IconTikTok.vue";
 import IconInstagram from "@/Icons/IconInstagram.vue";
 import IconFacebook from "@/Icons/IconFacebook.vue";
 import SocialLinkForm from "./Store/SocialLinkForm.vue";
+import Dropdown from "@/Components/Dropdown.vue";
+import axios from "axios";
+import useDebounce from "@/plugins/debounce";
 
 const props = defineProps({
     store: {
@@ -22,8 +25,44 @@ const props = defineProps({
     },
 });
 
+const originSearch = ref("");
+const isOriginDropdownOpen = ref(false);
+const origins = ref([] as DestinationEntity[]);
+
+function getOrigins(search) {
+    axios
+        .get("/api/destinations", {
+            params: {
+                search: search,
+            },
+        })
+        .then((response) => {
+            origins.value = response.data.result;
+            isOriginDropdownOpen.value = true;
+        })
+        .catch((error) => {
+            isOriginDropdownOpen.value = false;
+        });
+}
+
+const debouncedGetOrigins = useDebounce(getOrigins, 400);
+
+watch(
+    () => originSearch.value,
+    (newValue) => {
+        if (newValue) {
+            debouncedGetOrigins(newValue);
+        } else {
+            origins.value = [];
+            isOriginDropdownOpen.value = false;
+        }
+    }
+);
+
 const form = useForm({
     ...props.store,
+    rajaongkir_origin_id: props.store.rajaongkir_origin_id || null,
+    rajaongkir_origin: null,
     social_links: [
         ...props.store.social_links.map(function (link) {
             if (!link.icon) return link;
@@ -34,6 +73,26 @@ const form = useForm({
         }),
     ],
 });
+
+// Initialize origin
+if (props.store.zip_code) {
+    axios
+        .get("/api/destinations", {
+            params: {
+                search: props.store.zip_code,
+            },
+        })
+        .then((response) => {
+            if (response.data.result.length > 0) {
+                const origin = response.data.result[0];
+                form.rajaongkir_origin_id = origin.id;
+                form.rajaongkir_origin = origin;
+            }
+        })
+        .catch((error) => {
+            console.error("Error fetching origin:", error);
+        });
+}
 
 const submit = () => {
     form.post(route("admin.store.update"), {
@@ -166,13 +225,135 @@ const openErrorDialog = (message) => {
                         />
                     </div>
 
+                    <!-- Origin -->
+                    <div class="flex flex-col gap-2 mt-4">
+                        <InputLabel
+                            for="rajaongkir_origin_id"
+                            value="Alamat Toko"
+                            class="!text-gray-500"
+                        />
+                        <Dropdown
+                            v-if="origins"
+                            id="rajaongkir_origin_id"
+                            v-model="form.rajaongkir_origin_id"
+                            :options="origins"
+                            option-label="name"
+                            option-value="id"
+                            placeholder="Cari Alamat Toko"
+                            align="left"
+                            required
+                            :error="form.errors.rajaongkir_origin_id"
+                            @update:modelValue="
+                                form.errors.rajaongkir_origin_id = null
+                            "
+                            @onOpen="isOriginDropdownOpen = true"
+                            @onClose="isOriginDropdownOpen = false"
+                        >
+                            <template #trigger>
+                                <TextAreaInput
+                                    :modelValue="
+                                        form.rajaongkir_origin_id &&
+                                        !isOriginDropdownOpen
+                                            ? form.rajaongkir_origin?.label
+                                            : originSearch
+                                    "
+                                    @update:modelValue="
+                                        form.rajaongkir_origin_id &&
+                                        !isOriginDropdownOpen
+                                            ? null
+                                            : (originSearch = $event)
+                                    "
+                                    class="w-full"
+                                    placeholder="Cari Alamat Toko"
+                                    :rows="1"
+                                    :preventNewLine="true"
+                                    :error="
+                                        form.errors?.rajaongkir_origin_id
+                                            ? form.errors
+                                                  ?.rajaongkir_origin_id[0] ||
+                                              null
+                                            : null
+                                    "
+                                >
+                                    <template #suffix>
+                                        <button
+                                            v-if="
+                                                form.rajaongkir_origin_id &&
+                                                !isOriginDropdownOpen
+                                            "
+                                            type="button"
+                                            class="absolute p-[7px] text-gray-400 bg-white rounded-full top-1 right-1 hover:bg-gray-100 transition-all duration-300 ease-in-out"
+                                            @click="
+                                                form.rajaongkir_origin_id =
+                                                    null;
+                                                form.rajaongkir_origin = null;
+                                                originSearch = '';
+                                            "
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                                class="size-5"
+                                            >
+                                                <path
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12"
+                                                />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            v-else
+                                            type="button"
+                                            class="absolute p-2 top-1.5 right-1"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="24"
+                                                height="24"
+                                                viewBox="0 0 24 24"
+                                                class="size-4 fill-gray-400"
+                                            >
+                                                <path
+                                                    d="M18.6054 7.3997C18.4811 7.273 18.3335 7.17248 18.1709 7.10389C18.0084 7.0353 17.8342 7 17.6583 7C17.4823 7 17.3081 7.0353 17.1456 7.10389C16.9831 7.17248 16.8355 7.273 16.7112 7.3997L11.4988 12.7028L6.28648 7.3997C6.03529 7.14415 5.69462 7.00058 5.33939 7.00058C4.98416 7.00058 4.64348 7.14415 4.3923 7.3997C4.14111 7.65526 4 8.00186 4 8.36327C4 8.72468 4.14111 9.07129 4.3923 9.32684L10.5585 15.6003C10.6827 15.727 10.8304 15.8275 10.9929 15.8961C11.1554 15.9647 11.3296 16 11.5055 16C11.6815 16 11.8557 15.9647 12.0182 15.8961C12.1807 15.8275 12.3284 15.727 12.4526 15.6003L18.6188 9.32684C19.1293 8.80747 19.1293 7.93274 18.6054 7.3997Z"
+                                                />
+                                            </svg>
+                                        </button>
+                                    </template>
+                                </TextAreaInput>
+                            </template>
+                            <template #content>
+                                <ul class="overflow-y-auto max-h-60">
+                                    <li
+                                        v-for="origin in origins"
+                                        :key="origin.id"
+                                        @click="
+                                            isOriginDropdownOpen = false;
+
+                                            form.rajaongkir_origin_id =
+                                                origin.id;
+                                            form.rajaongkir_origin = origin;
+                                            originSearch = '';
+                                        "
+                                        class="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                                    >
+                                        {{ origin.label }}
+                                    </li>
+                                </ul>
+                            </template>
+                        </Dropdown>
+                    </div>
+
                     <!-- Address -->
                     <div
                         class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-center sm:flex-row"
                     >
                         <InputLabel
                             for="address"
-                            value="Alamat Toko"
+                            value="Alamat Lengkap"
                             class="w-[100px] sm:w-1/5 text-lg font-bold"
                         />
                         <span class="hidden text-sm sm:block">:</span>
@@ -180,7 +361,7 @@ const openErrorDialog = (message) => {
                             id="address"
                             v-model="form.address"
                             type="text"
-                            placeholder="Masukkan Alamat Toko"
+                            placeholder="Masukkan Alamat Lengkap Toko"
                             class="block w-full mt-1"
                             required
                             autocomplete="address"

@@ -8,8 +8,11 @@ import DropdownLink from "./DropdownLink.vue";
 import Dropdown from "./Dropdown.vue";
 import MyOrderButton from "./MyOrderButton.vue";
 import Tooltip from "./Tooltip.vue";
+import StoreOptionsDialog from "./StoreOptionsDialog.vue";
+import { useMyStoreStore } from "@/stores/my-store-store";
 
 const cartStore = useCartStore();
+const myStoreStore = useMyStoreStore();
 
 const showingNavigationDropdown = ref(false);
 
@@ -43,6 +46,8 @@ const logout = () => {
     localStorage.removeItem("access_token");
     router.post(route("logout"));
 };
+
+const showStoreOptionsDialog = ref(false);
 </script>
 
 <template>
@@ -57,9 +62,9 @@ const logout = () => {
                     <div class="flex items-center shrink-0">
                         <Link :href="route('home')">
                             <img
-                                src="/storage/logo_white.png"
+                                :src="`/storage/${$page.props.setting.logo}`"
                                 alt="Logo"
-                                class="w-auto h-12 sm:h-16"
+                                class="w-auto h-8 sm:h-12"
                             />
                         </Link>
                     </div>
@@ -206,6 +211,19 @@ const logout = () => {
 
                                         <template #content>
                                             <DropdownLink
+                                                v-if="
+                                                    $page.props.auth.has_store
+                                                "
+                                                as="button"
+                                                @click="
+                                                    showStoreOptionsDialog = true
+                                                "
+                                            >
+                                                Toko Saya
+                                            </DropdownLink>
+
+                                            <DropdownLink
+                                                v-else
                                                 :href="route('store.create')"
                                             >
                                                 Buat Toko
@@ -392,5 +410,21 @@ const logout = () => {
                 </li>
             </ul>
         </div>
+
+        <StoreOptionsDialog
+            v-if="$page.props.auth.user?.stores"
+            :title="'Pilih Toko'"
+            :stores="$page.props.auth.user.stores"
+            :show="showStoreOptionsDialog"
+            @close="showStoreOptionsDialog = false"
+            @select="
+                myStoreStore.setSelectedStoreId($event.id);
+                $inertia.visit(
+                    route('my-store.select-store', { storeId: $event.id })
+                );
+
+                showStoreOptionsDialog = false;
+            "
+        />
     </nav>
 </template>

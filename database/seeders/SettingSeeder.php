@@ -51,7 +51,7 @@ class SettingSeeder extends Seeder
             ],
             [
                 'key' => 'logo',
-                'value' => '/images/logo.png',
+                'value' => 'logo-shopywear-white.png',
                 'type' => 'string',
                 'name' => 'Logo',
                 'description' => 'The URL path to the site\'s logo image.',

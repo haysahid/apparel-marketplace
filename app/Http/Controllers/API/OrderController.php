@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
+use App\Repositories\RajaongkirRepository;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\PaymentMethod;
@@ -14,6 +15,7 @@ use App\Models\Store;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
 use App\Models\User;
+use App\Repositories\MidtransRepository;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
@@ -24,65 +26,16 @@ use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
+    protected $rajaongkirRepository;
+    protected $midtransRepository;
+
     protected $weight = 1000; // 1000 gram (1 kg)
     protected $courier = 'jne'; // Courier service
 
-    protected function getShipping($originId, $destinationId, $weight, $courier)
+    public function __construct()
     {
-        $cacheKey = "rajaongkir_shipping_cost_{$originId}_{$destinationId}_{$weight}_{$courier}";
-        $shippings = cache()->remember(
-            $cacheKey,
-            60 * 60 * 6, // Cache for 6 hours
-            function () use ($originId, $destinationId, $weight, $courier) {
-                $client = new Client();
-                $response = $client->post('https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost', [
-                    'headers' => [
-                        'key' => env('RAJAONGKIR_API_KEY'),
-                    ],
-                    'form_params' => [
-                        'origin' => $originId,
-                        'destination' => $destinationId,
-                        'weight' => $weight,
-                        'courier' => $courier,
-                        'price' => 'lowest'
-                    ],
-                ]);
-
-                return json_decode($response->getBody()->getContents(), true)['data'][0];
-            }
-        );
-
-        if (!$shippings) {
-            cache()->forget($cacheKey);
-            throw new Exception('Gagal mendapatkan biaya pengiriman');
-        }
-
-        return $shippings;
-    }
-
-    protected function createMidtransSnapToken($orderId, $itemDetails, $customer, $grossAmount)
-    {
-        // Set your Merchant Server Key
-        \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-        \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
-        \Midtrans\Config::$isSanitized = true;
-        \Midtrans\Config::$is3ds = true;
-
-        $params = [
-            'transaction_details' => [
-                'order_id' => $orderId,
-                'gross_amount' => $grossAmount,
-            ],
-            'item_details' => $itemDetails,
-            'customer_details' => [
-                'first_name' => $customer->name,
-                'last_name' => '',
-                'email' => $customer->email,
-                'phone' => $customer->phone,
-            ],
-        ];
-
-        return \Midtrans\Snap::getSnapToken($params);
+        $this->rajaongkirRepository = new RajaongkirRepository();
+        $this->midtransRepository = new MidtransRepository();
     }
 
     public function syncCart(Request $request)
@@ -245,25 +198,7 @@ class OrderController extends Controller
 
         try {
             $search = $validated['search'];
-
-            $cacheKey = 'rajaongkir_destination_' . md5($search);
-            $destinations = cache()->remember(
-                $cacheKey,
-                60 * 60 * 6, // Cache for 6 hours
-                function () use ($search) {
-                    $client = new Client();
-                    $response = $client->get('https://rajaongkir.komerce.id/api/v1/destination/domestic-destination', [
-                        'query' => [
-                            'search' => $search,
-                            'limit' => 20,
-                        ],
-                        'headers' => [
-                            'key' => env('RAJAONGKIR_API_KEY'),
-                        ],
-                    ]);
-                    return json_decode($response->getBody()->getContents())->data;
-                }
-            );
+            $destinations = $this->rajaongkirRepository->getDestinations($search);
 
             return ResponseFormatter::success(
                 $destinations,
@@ -310,7 +245,7 @@ class OrderController extends Controller
                 $originId = $store->rajaongkir_origin_id;
 
                 // Get shipping cost
-                $shipping = $this->getShipping($originId, $destinationId, $weight, $courier);
+                $shipping = $this->rajaongkirRepository->getShipping($originId, $destinationId, $weight, $courier);
                 if ($shipping) {
                     $shippings[] = [
                         'store_id' => $store->id,
@@ -416,7 +351,7 @@ class OrderController extends Controller
                     $weight = $this->weight;
                     $courier = $this->courier;
                     $destinationId = $rajaongkirShipping['destination_id'];
-                    $shipping = $this->getShipping($originId, $destinationId, $weight, $courier);
+                    $shipping = $this->rajaongkirRepository->getShipping($originId, $destinationId, $weight, $courier);
 
                     if (!$shipping) {
                         throw new Exception('Gagal mendapatkan biaya pengiriman');
@@ -565,7 +500,7 @@ class OrderController extends Controller
 
             if ($paymentMethod->slug === 'transfer') {
                 // Create snap token for Midtrans
-                $snapToken = $this->createMidtransSnapToken(
+                $snapToken = $this->midtransRepository->createSnapToken(
                     $transaction->code,
                     $itemDetails,
                     $customer,
@@ -823,7 +758,7 @@ class OrderController extends Controller
 
             $paymentsLength = $transaction->payments->count();
 
-            $snapToken = $this->createMidtransSnapToken(
+            $snapToken = $this->midtransRepository->createSnapToken(
                 $transaction->code . '-' . $paymentsLength,
                 $itemDetails,
                 $customer,

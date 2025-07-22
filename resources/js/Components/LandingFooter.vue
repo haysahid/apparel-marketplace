@@ -28,9 +28,9 @@ const isHome = route().current("home");
                 >
                     <Link :href="route('home')" class="hidden sm:block">
                         <img
-                            src="/storage/logo-shopywear-white.png"
+                            :src="`/storage/${$page.props.setting.logo}`"
                             alt="Logo"
-                            class="h-24 mb-8"
+                            class="h-20 mb-8"
                         />
                     </Link>
 

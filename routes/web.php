@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\MyStoreController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PublicController;
@@ -64,6 +65,23 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/product/{product}', [ProductController::class, 'update'])->name('product.update');
         Route::delete('/product/{product}', [ProductController::class, 'destroy'])->name('product.destroy');
     });
+});
+
+Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->group(function () {
+    Route::get('/', [MyStoreController::class, 'index'])->name('index');
+    Route::get('/select-store/{storeId}', [MyStoreController::class, 'selectStore'])->name('select-store');
+    Route::get('/dashboard', [MyStoreController::class, 'dashboard'])->name('dashboard');
+
+    // Store
+    Route::get('/store-info', [MyStoreController::class, 'storeInfo'])->name('store.edit');
+    Route::post('/store-info', [MyStoreController::class, 'updateStore'])->name('store.update');
+
+    // Route::get('/products', [ProductController::class, 'myStoreProducts'])->name('products');
+    // Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+    // Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    // Route::get('/products/{product}', [ProductController::class, 'edit'])->name('products.edit');
+    // Route::post('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+    // Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 });
 
 // Route::middleware([
