@@ -4,13 +4,12 @@ import { Link, router } from "@inertiajs/vue3";
 import NavLink from "@/Components/NavLink.vue";
 import CartButton from "./CartButton.vue";
 import { useCartStore } from "@/stores/cart-store";
-import DropdownLink from "./DropdownLink.vue";
-import Dropdown from "./Dropdown.vue";
 import MyOrderButton from "./MyOrderButton.vue";
 import Tooltip from "./Tooltip.vue";
 import StoreOptionsDialog from "./StoreOptionsDialog.vue";
 import { useMyStoreStore } from "@/stores/my-store-store";
 import UserDropdown from "./UserDropdown.vue";
+import HamburgerButton from "./HamburgerButton.vue";
 
 const cartStore = useCartStore();
 const myStoreStore = useMyStoreStore();
@@ -42,11 +41,6 @@ const trailingMenus = [
         active: route().current("login"),
     },
 ];
-
-const logout = () => {
-    localStorage.removeItem("access_token");
-    router.post(route("logout"));
-};
 
 const showStoreOptionsDialog = ref(false);
 
@@ -176,7 +170,12 @@ onMounted(() => {
                                     v-if="$page.props.auth.user"
                                     class="relative"
                                 >
-                                    <UserDropdown :invert="scrolled" />
+                                    <UserDropdown
+                                        :invert="scrolled"
+                                        @showStoreOptionsDialog="
+                                            showStoreOptionsDialog = true
+                                        "
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -185,45 +184,14 @@ onMounted(() => {
 
                 <!-- Hamburger -->
                 <div class="flex items-center -me-2 sm:hidden">
-                    <button
-                        class="inline-flex items-center justify-center p-2 transition duration-150 ease-in-out rounded-md text-gray-500/80 hover:text-gray-500 hover:bg-gray-500/10 focus:outline-none focus:bg-gray-500/10 focus:hover:bg-gray-500/20 focus:text-gray-500"
-                        :class="{
-                            'hover:bg-white/10 focus:bg-white/10 !text-white/80':
-                                scrolled,
-                        }"
-                        @click="
+                    <HamburgerButton
+                        :invert="scrolled"
+                        :active="showingNavigationDropdown"
+                        @toggle="
                             showingNavigationDropdown =
                                 !showingNavigationDropdown
                         "
-                    >
-                        <svg
-                            class="size-6"
-                            stroke="currentColor"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                :class="{
-                                    hidden: showingNavigationDropdown,
-                                    'inline-flex': !showingNavigationDropdown,
-                                }"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16"
-                            />
-                            <path
-                                :class="{
-                                    hidden: !showingNavigationDropdown,
-                                    'inline-flex': showingNavigationDropdown,
-                                }"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </button>
+                    />
                 </div>
             </div>
         </div>
@@ -290,7 +258,12 @@ onMounted(() => {
                 <!-- Settings Dropdown -->
                 <li v-if="$page.props.auth.user">
                     <div class="relative">
-                        <UserDropdown :invert="scrolled" />
+                        <UserDropdown
+                            :invert="scrolled"
+                            @showStoreOptionsDialog="
+                                showStoreOptionsDialog = true
+                            "
+                        />
                     </div>
                 </li>
             </ul>

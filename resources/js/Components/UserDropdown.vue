@@ -7,13 +7,22 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    responsive: {
+        type: Boolean,
+        default: false,
+    },
 });
 </script>
 
 <template>
     <Dropdown align="right" width="48">
         <template #trigger>
-            <span class="inline-flex rounded-md">
+            <span
+                class="inline-flex rounded-md"
+                :class="{
+                    'px-1': props.responsive,
+                }"
+            >
                 <button
                     type="button"
                     class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 transition duration-150 ease-in-out bg-transparent border border-transparent rounded-md text-gray-500/90 hover:text-gray-500 focus:outline-none hover:bg-gray-500/10 focus:bg-gray-500/10 active:bg-gray-500/20 group"
@@ -71,7 +80,7 @@ const props = defineProps({
             <DropdownLink
                 v-if="$page.props.auth.has_store"
                 as="button"
-                @click="showStoreOptionsDialog = true"
+                @click="$emit('showStoreOptionsDialog')"
             >
                 Toko Saya
             </DropdownLink>

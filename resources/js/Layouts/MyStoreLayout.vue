@@ -20,7 +20,7 @@ defineProps({
         <Banner />
 
         <!-- Page Content -->
-        <div class="flex h-screen bg-gray-100">
+        <div class="flex h-screen bg-secondary-box">
             <!-- Sidebar -->
             <MyStoreSidebar />
 
@@ -46,7 +46,7 @@ defineProps({
                 </MyStoreHeader>
 
                 <!-- Main Content -->
-                <main class="p-6 pb-16">
+                <main class="p-2 sm:p-6 sm:pb-16">
                     <slot />
                 </main>
             </div>

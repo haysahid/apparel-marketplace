@@ -20,21 +20,21 @@ html {
     }
 
     .table-default {
-        @apply min-w-full divide-y divide-gray-100;
+        @apply min-w-full;
 
         thead {
             @apply bg-gray-100;
 
             th {
-                @apply px-4 py-2 text-xs font-medium text-center text-gray-700 sm:text-sm sm:px-6 sm:py-3;
+                @apply px-4 py-2 text-xs font-medium text-gray-700 text-start sm:text-sm sm:px-6 sm:py-3;
             }
         }
 
         tbody {
-            @apply bg-white divide-y divide-gray-200;
+            @apply bg-white;
 
             td {
-                @apply px-4 py-2 text-xs sm:text-sm sm:px-6 sm:py-3 whitespace-nowrap;
+                @apply px-4 py-2 text-xs border-b border-gray-200 sm:text-sm sm:px-6 sm:py-3 whitespace-nowrap;
             }
         }
     }

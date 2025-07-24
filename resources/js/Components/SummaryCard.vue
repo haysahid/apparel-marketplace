@@ -7,7 +7,7 @@ defineProps({
 
 <template>
     <div
-        class="bg-white p-6 flex flex-col gap-3.5 rounded-xl border border-secondary shadow-sm hover:shadow-lg transition-shadow duration-300 ease-in-out shadow-secondary/20 hover:shadow-secondary/50"
+        class="bg-white p-6 flex flex-col gap-3.5 rounded-xl border border-transparent hover:border-primary-light transition-all duration-300 ease-in-out"
     >
         <div class="flex items-center gap-3.5">
             <slot name="icon"></slot>

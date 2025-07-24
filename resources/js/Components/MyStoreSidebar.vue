@@ -89,6 +89,7 @@ const menus = [
         class="fixed top-0 left-0 w-0 h-screen overflow-y-hidden transition-all duration-300 ease-in-out md:w-64"
         :class="{
             '!static w-full': props.responsive,
+            'border-r border-gray-100': !props.responsive,
         }"
     >
         <nav
@@ -98,7 +99,10 @@ const menus = [
             }"
         >
             <!-- Logo -->
-            <div class="flex items-center px-6 py-2.5 mb-1 shrink-0">
+            <div
+                v-if="!props.responsive"
+                class="flex items-center px-6 py-2.5 mb-1 shrink-0"
+            >
                 <Link :href="route('home')">
                     <img
                         :src="`/storage/${$page.props.setting.logo}`"
@@ -113,26 +117,30 @@ const menus = [
                     <NavLink
                         :href="menu.href"
                         :active="menu.active"
-                        active-class="!bg-secondary !border-primary text-primary"
-                        class="w-full px-6 py-4 !text-gray-500 transition-all duration-300 ease-in-out bg-transparent border-l-4 border-white hover:bg-primary/10 hover:border-l-4 hover:border-primary"
-                        :class="{
-                            '!px-4 !py-2.5': props.responsive,
-                            '!text-gray-800 !bg-primary/20': menu.active,
-                        }"
+                        active-class="!bg-primary-light/15 !border-primary"
+                        class="w-full px-6 py-4 !text-gray-500 hover:!text-gray-600 transition-all duration-300 ease-in-out bg-transparent border-l-4 border-white group"
+                        :class="[
+                            {
+                                '!px-4 !py-2.5': props.responsive,
+                            },
+                            menu.active
+                                ? 'hover:!bg-primary-light/15 hover:border-l-4 hover:border-primary !text-gray-600'
+                                : 'hover:!bg-primary-light/10 hover:border-l-4 hover:border-primary-light',
+                        ]"
                     >
                         <span
                             v-if="menu.icon"
                             v-html="menu.icon"
-                            class="me-2 [&>svg]:fill-gray-500"
+                            class="me-3 [&>svg]:fill-gray-400 group-hover:[&>svg]:fill-gray-600 [&>svg]:transition-all [&>svg]:duration-300 [&>svg]:ease-in-out"
                             :class="{
-                                '[&>svg]:!fill-gray-800': menu.active,
+                                '[&>svg]:!fill-gray-600': menu.active,
                                 '[&>svg]:size-6 me-1.5': props.responsive,
                             }"
                         ></span>
                         <p
-                            class="font-bold line-clamp-1 overflow-ellipsis"
+                            class="font-semibold line-clamp-1 overflow-ellipsis"
                             :class="{
-                                'font-semibold text-sm': props.responsive,
+                                'text-sm': props.responsive,
                             }"
                         >
                             {{ menu.name }}

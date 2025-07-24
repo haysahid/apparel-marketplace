@@ -318,7 +318,6 @@ const openErrorDialog = (message) => {
                     <div class="w-full max-w-xs">
                         <!-- Social Links -->
                         <div class="flex flex-col items-start w-full gap-2">
-                            <!-- <h2 class="text-lg font-semibold">Tautan Sosial</h2> -->
                             <InputGroup label="Tautan Sosial">
                                 <div
                                     v-for="(link, index) in form.social_links"

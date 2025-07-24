@@ -2,11 +2,12 @@
 import { ref } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
-import InputLabel from "@/Components/InputLabel.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import ImageInput from "@/Components/ImageInput.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
+import InputGroup from "@/Components/InputGroup.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 
 const props = defineProps({
     certificate: {
@@ -86,15 +87,7 @@ const openErrorDialog = (message) => {
     <form @submit.prevent="submit" class="max-w-3xl">
         <div class="flex flex-col items-start gap-4">
             <!-- Name -->
-            <div
-                class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-center sm:flex-row"
-            >
-                <InputLabel
-                    for="name"
-                    value="Nama Sertifikat"
-                    class="w-[100px] sm:w-1/5 text-lg font-bold"
-                />
-                <span class="hidden text-sm sm:block">:</span>
+            <InputGroup id="name" label="Nama Sertifikat">
                 <TextInput
                     id="name"
                     v-model="form.name"
@@ -106,18 +99,10 @@ const openErrorDialog = (message) => {
                     :error="form.errors.name"
                     @update:modelValue="form.errors.name = null"
                 />
-            </div>
+            </InputGroup>
 
             <!-- Image -->
-            <div
-                class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-start sm:flex-row"
-            >
-                <InputLabel
-                    for="image"
-                    value="Gambar Sertifikat"
-                    class="text-lg font-bold sm:w-1/5"
-                />
-                <span class="hidden text-sm sm:block">:</span>
+            <InputGroup id="image" label="Gambar Sertifikat">
                 <ImageInput
                     id="image"
                     v-model="form.image"
@@ -131,15 +116,10 @@ const openErrorDialog = (message) => {
                     :error="form.errors.image"
                     @update:modelValue="form.errors.image = null"
                 />
-            </div>
+            </InputGroup>
 
             <!-- Description -->
-            <div class="flex flex-col items-start w-full gap-1 sm:gap-1.5">
-                <InputLabel
-                    for="description"
-                    value="Deskripsi Sertifikat"
-                    class="text-lg font-bold"
-                />
+            <InputGroup id="description" label="Deskripsi Sertifikat">
                 <TextAreaInput
                     id="description"
                     v-model="form.description"
@@ -151,11 +131,20 @@ const openErrorDialog = (message) => {
                     :error="form.errors.description"
                     @update:modelValue="form.errors.description = null"
                 />
-            </div>
+            </InputGroup>
 
-            <PrimaryButton type="submit" class="mt-4">
-                Simpan Data
-            </PrimaryButton>
+            <div class="flex items-center gap-4">
+                <PrimaryButton type="submit" class="mt-4">
+                    Simpan
+                </PrimaryButton>
+                <SecondaryButton
+                    type="button"
+                    class="mt-4"
+                    @click="$inertia.visit(route('my-store.certificate'))"
+                >
+                    Kembali
+                </SecondaryButton>
+            </div>
         </div>
 
         <ErrorDialog :show="showErrorDialog" @close="showErrorDialog = false">

@@ -46,8 +46,6 @@ class MyStoreController extends Controller
         $productCount = Product::where('store_id', $this->storeId)->count();
         return Inertia::render('MyStore/Dashboard', [
             'productCount' => $productCount,
-        ])->with([
-            'store_id' => $this->storeId,
         ]);
     }
 

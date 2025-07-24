@@ -18,11 +18,8 @@ const props = defineProps({
 const page = usePage();
 
 onMounted(() => {
-    if (page.props.flash.selected_store_id) {
-        localStorage.setItem(
-            "selected_store_id",
-            page.props.flash.selected_store_id
-        );
+    if (page.props.selected_store_id) {
+        localStorage.setItem("selected_store_id", page.props.selected_store_id);
     }
 });
 </script>

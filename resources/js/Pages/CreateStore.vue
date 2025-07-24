@@ -296,6 +296,7 @@ const closeErrorDialog = () => {
                         v-model="form.address"
                         class="w-full"
                         placeholder="Masukkan alamat lengkap"
+                        required
                         @update:modelValue="form.errors.address = null"
                         :error="
                             form.errors?.address

@@ -28,7 +28,7 @@ const emit = defineEmits(["click"]);
         :class="{
             '!bg-transparent !p-0 hover:!bg-transparent': !showBackground,
             'hover:bg-white/20 focus:bg-white/10': showBackground && invert,
-            'bg-primary/10 hover:bg-primary/20 focus:bg-primary/20':
+            'bg-primary/10 hover:!bg-primary/10 focus:bg-primary/20':
                 showBackground && active,
         }"
         @click="emit('click')"

@@ -11,7 +11,7 @@ const props = defineProps({
 const classes = computed(() => {
     return props.active
         ? "block w-full ps-6 pe-6 py-2 text-start text-sm font-medium text-indigo-700 bg-indigo-50 focus:outline-none focus:text-indigo-800 focus:bg-indigo-100  transition duration-150 ease-in-out"
-        : "block w-full ps-6 pe-6 py-2 text-start text-sm font-medium text-white/80 hover:text-white hover:bg-secondary/10 focus:outline-none focus:text-gray-800 focus:bg-gray-50 transition duration-150 ease-in-out";
+        : "block w-full ps-6 pe-6 py-2 text-start text-sm font-medium text-white/80 hover:text-white hover:bg-primary-light/10 focus:outline-none focus:text-gray-800 focus:bg-gray-50 transition duration-150 ease-in-out";
 });
 </script>
 

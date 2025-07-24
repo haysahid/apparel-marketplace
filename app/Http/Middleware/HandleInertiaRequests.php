@@ -54,10 +54,13 @@ class HandleInertiaRequests extends Middleware
                 'warning' => session('warning'),
                 'info' => session('info'),
                 'access_token' => session('access_token'),
-                'selected_store_id' => session('selected_store_id'),
             ],
             'setting' => function () {
                 return Setting::all()->pluck('value', 'key');
+            },
+            'selected_store_id' => session('selected_store_id'),
+            'selected_store' => function () use ($user) {
+                return $user?->stores->firstWhere('id', session('selected_store_id'));
             },
         ];
     }

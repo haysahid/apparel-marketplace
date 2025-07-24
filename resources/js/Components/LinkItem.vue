@@ -43,7 +43,7 @@ const getPlatformNameFromUrl = (url) => {
 <template>
     <button
         type="button"
-        class="flex items-center justify-start w-full max-w-sm gap-3 pl-3.5 pr-2 py-2.5 bg-white outline outline-gray-300 rounded-xl hover:outline-indigo-500 transition-all duration-200 ease-in-out cursor-pointer -outline-offset-2"
+        class="flex items-center justify-start w-full max-w-sm gap-3 pl-3.5 pr-2 py-2.5 bg-white outline outline-gray-300 rounded-xl hover:outline-primary-light transition-all duration-200 ease-in-out cursor-pointer -outline-offset-2"
         :class="{
             'hover:outline-gray-300 ': drag,
             'pr-3.5': !showDeleteButton,

@@ -1,10 +1,14 @@
 <script setup>
-import { defineProps, ref } from "vue";
+import { defineProps, ref, onMounted } from "vue";
 import { Head, Link, router } from "@inertiajs/vue3";
-import Dropdown from "@/Components/Dropdown.vue";
-import DropdownLink from "@/Components/DropdownLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
-import AdminSidebar from "./AdminSidebar.vue";
+import UserDropdown from "./UserDropdown.vue";
+import MyStoreSidebar from "./MyStoreSidebar.vue";
+import NavLink from "./NavLink.vue";
+import StoreItem from "./StoreItem.vue";
+import StoreOptionsDialog from "./StoreOptionsDialog.vue";
+import { useMyStoreStore } from "@/stores/my-store-store";
+import HamburgerButton from "./HamburgerButton.vue";
 
 const props = defineProps({
     title: String,
@@ -12,15 +16,13 @@ const props = defineProps({
 
 const showingNavigationDropdown = ref(false);
 
-const logout = () => {
-    localStorage.removeItem("access_token");
-    router.post(route("logout"));
-};
+const myStoreStore = useMyStoreStore();
+const showStoreOptionsDialog = ref(false);
 </script>
 
 <template>
     <nav
-        class="bg-white z-50 py-1 h-auto sm:h-[72px] fixed top-0 md:w-[calc(100vw-256px)] w-full border-b border-gray-200"
+        class="bg-white z-50 py-1 h-auto sm:h-[72px] fixed top-0 md:w-[calc(100vw-256px)] w-full border-b border-gray-100"
         :class="{
             '!h-auto': showingNavigationDropdown,
         }"
@@ -30,122 +32,28 @@ const logout = () => {
             class="px-4 mx-auto transition-all duration-300 ease-in-out sm:px-6 lg:px-8"
         >
             <div class="flex items-center justify-between h-16">
-                <Link :href="route('home')" class="block md:hidden">
-                    <img
-                        src="/storage/logo_black.png"
-                        alt="Logo"
-                        class="w-auto h-12 sm:h-16"
-                    />
-                </Link>
-
                 <slot name="leading" />
 
                 <div class="hidden md:flex sm:items-center sm:ms-6">
                     <!-- Settings Dropdown -->
                     <div class="relative ms-3">
-                        <Dropdown align="right" width="48">
-                            <template #trigger>
-                                <span class="inline-flex rounded-md">
-                                    <button
-                                        type="button"
-                                        class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out border border-transparent rounded-md bg-secondary hover:text-gray-700 focus:outline-none focus:bg-secondary/80 active:bg-secondary/90"
-                                    >
-                                        <img
-                                            v-if="$page.props.auth.user.avatar"
-                                            class="object-cover rounded-full size-8 me-2"
-                                            :src="$page.props.auth.user.avatar"
-                                            :alt="$page.props.auth.user.name"
-                                        />
-                                        <svg
-                                            v-else
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="44"
-                                            height="44"
-                                            viewBox="0 0 44 44"
-                                            class="fill-primary size-8 me-1.5"
-                                        >
-                                            <path
-                                                fill-rule="evenodd"
-                                                clip-rule="evenodd"
-                                                d="M40.3333 22.0003C40.3333 32.1258 32.1255 40.3337 22 40.3337C11.8745 40.3337 3.66663 32.1258 3.66663 22.0003C3.66663 11.8748 11.8745 3.66699 22 3.66699C32.1255 3.66699 40.3333 11.8748 40.3333 22.0003ZM27.5 16.5003C27.5 17.959 26.9205 19.358 25.889 20.3894C24.8576 21.4209 23.4586 22.0003 22 22.0003C20.5413 22.0003 19.1423 21.4209 18.1109 20.3894C17.0794 19.358 16.5 17.959 16.5 16.5003C16.5 15.0416 17.0794 13.6427 18.1109 12.6112C19.1423 11.5798 20.5413 11.0003 22 11.0003C23.4586 11.0003 24.8576 11.5798 25.889 12.6112C26.9205 13.6427 27.5 15.0416 27.5 16.5003ZM22 37.5837C25.1465 37.5887 28.2201 36.6366 30.8128 34.8538C31.9201 34.093 32.3931 32.6447 31.7478 31.4658C30.415 29.022 27.665 27.5003 22 27.5003C16.335 27.5003 13.585 29.022 12.2503 31.4658C11.6068 32.6447 12.0798 34.093 13.1871 34.8538C15.7798 36.6366 18.8535 37.5887 22 37.5837Z"
-                                            />
-                                        </svg>
-
-                                        {{ $page.props.auth.user.name }}
-
-                                        <svg
-                                            class="ms-2 -me-0.5 size-4"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                                            />
-                                        </svg>
-                                    </button>
-                                </span>
-                            </template>
-
-                            <template #content>
-                                <DropdownLink :href="route('profile')">
-                                    Profile
-                                </DropdownLink>
-
-                                <div class="border-t border-gray-200" />
-
-                                <!-- Authentication -->
-                                <form @submit.prevent="logout">
-                                    <DropdownLink as="button">
-                                        Log Out
-                                    </DropdownLink>
-                                </form>
-                            </template>
-                        </Dropdown>
+                        <UserDropdown
+                            @showStoreOptionsDialog="
+                                showStoreOptionsDialog = true
+                            "
+                        />
                     </div>
                 </div>
 
                 <!-- Hamburger -->
                 <div class="flex items-center -me-2 md:hidden">
-                    <button
-                        class="inline-flex items-center justify-center p-2 transition duration-150 ease-in-out rounded-md text-primary/80 hover:text-primary hover:bg-white/50 focus:outline-none focus:bg-white/60 focus:text-primary/90"
-                        @click="
+                    <HamburgerButton
+                        :active="showingNavigationDropdown"
+                        @toggle="
                             showingNavigationDropdown =
                                 !showingNavigationDropdown
                         "
-                    >
-                        <svg
-                            class="size-6"
-                            stroke="currentColor"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                :class="{
-                                    hidden: showingNavigationDropdown,
-                                    'inline-flex': !showingNavigationDropdown,
-                                }"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16"
-                            />
-                            <path
-                                :class="{
-                                    hidden: !showingNavigationDropdown,
-                                    'inline-flex': showingNavigationDropdown,
-                                }"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </button>
+                    />
                 </div>
             </div>
         </div>
@@ -156,69 +64,71 @@ const logout = () => {
                 block: showingNavigationDropdown,
                 hidden: !showingNavigationDropdown,
             }"
-            class="md:hidden bg-primary"
+            class="bg-white md:hidden"
         >
             <!-- Responsive Settings Options -->
             <div class="pt-4 pb-1 border-t border-gray-200">
-                <div class="flex items-center px-4">
-                    <img
-                        v-if="$page.props.auth.user.avatar"
-                        class="object-cover rounded-full size-12 me-3"
-                        :src="$page.props.auth.user.avatar"
-                        :alt="$page.props.auth.user.name"
-                    />
-                    <svg
-                        v-else
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="44"
-                        height="44"
-                        viewBox="0 0 44 44"
-                        class="fill-gray-200 size-12 me-2"
+                <!-- Store Card -->
+                <div v-if="$page.props.selected_store" class="w-full px-4">
+                    <StoreItem
+                        :name="$page.props.selected_store.name"
+                        :description="$page.props.selected_store.description"
+                        :icon="$page.props.selected_store.icon"
+                        @click="showStoreOptionsDialog = true"
                     >
-                        <path
-                            fill-rule="evenodd"
-                            clip-rule="evenodd"
-                            d="M40.3333 22.0003C40.3333 32.1258 32.1255 40.3337 22 40.3337C11.8745 40.3337 3.66663 32.1258 3.66663 22.0003C3.66663 11.8748 11.8745 3.66699 22 3.66699C32.1255 3.66699 40.3333 11.8748 40.3333 22.0003ZM27.5 16.5003C27.5 17.959 26.9205 19.358 25.889 20.3894C24.8576 21.4209 23.4586 22.0003 22 22.0003C20.5413 22.0003 19.1423 21.4209 18.1109 20.3894C17.0794 19.358 16.5 17.959 16.5 16.5003C16.5 15.0416 17.0794 13.6427 18.1109 12.6112C19.1423 11.5798 20.5413 11.0003 22 11.0003C23.4586 11.0003 24.8576 11.5798 25.889 12.6112C26.9205 13.6427 27.5 15.0416 27.5 16.5003ZM22 37.5837C25.1465 37.5887 28.2201 36.6366 30.8128 34.8538C31.9201 34.093 32.3931 32.6447 31.7478 31.4658C30.415 29.022 27.665 27.5003 22 27.5003C16.335 27.5003 13.585 29.022 12.2503 31.4658C11.6068 32.6447 12.0798 34.093 13.1871 34.8538C15.7798 36.6366 18.8535 37.5887 22 37.5837Z"
-                        />
-                    </svg>
-
-                    <div>
-                        <div class="text-base font-medium text-gray-200">
-                            {{ $page.props.auth.user.name }}
-                        </div>
-                        <div class="text-sm font-medium text-gray-300">
-                            {{ $page.props.auth.user.email }}
-                        </div>
-                    </div>
+                        <template #trailing>
+                            <button
+                                type="button"
+                                class="absolute p-2 right-1.5"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    class="size-4 fill-gray-400"
+                                >
+                                    <path
+                                        d="M18.6054 7.3997C18.4811 7.273 18.3335 7.17248 18.1709 7.10389C18.0084 7.0353 17.8342 7 17.6583 7C17.4823 7 17.3081 7.0353 17.1456 7.10389C16.9831 7.17248 16.8355 7.273 16.7112 7.3997L11.4988 12.7028L6.28648 7.3997C6.03529 7.14415 5.69462 7.00058 5.33939 7.00058C4.98416 7.00058 4.64348 7.14415 4.3923 7.3997C4.14111 7.65526 4 8.00186 4 8.36327C4 8.72468 4.14111 9.07129 4.3923 9.32684L10.5585 15.6003C10.6827 15.727 10.8304 15.8275 10.9929 15.8961C11.1554 15.9647 11.3296 16 11.5055 16C11.6815 16 11.8557 15.9647 12.0182 15.8961C12.1807 15.8275 12.3284 15.727 12.4526 15.6003L18.6188 9.32684C19.1293 8.80747 19.1293 7.93274 18.6054 7.3997Z"
+                                    />
+                                </svg>
+                            </button>
+                        </template>
+                    </StoreItem>
                 </div>
 
-                <AdminSidebar :responsive="true">
+                <MyStoreSidebar :responsive="true">
                     <template #extra>
                         <!-- divider -->
-                        <div class="mx-6 my-2 border-t border-secondary/20" />
+                        <div class="mx-6 my-2 border-t border-gray-200" />
 
-                        <div class="space-y-0.5 bg-primary">
-                            <ResponsiveNavLink
-                                :href="route('profile')"
-                                :active="route().current('profile.show')"
-                                class="[&>*]:text-gray-200"
-                            >
-                                Profile
-                            </ResponsiveNavLink>
-
-                            <!-- Authentication -->
-                            <form method="POST" @submit.prevent="logout">
-                                <ResponsiveNavLink
-                                    as="button"
-                                    class="[&>*]:text-gray-200"
-                                >
-                                    Log Out
-                                </ResponsiveNavLink>
-                            </form>
+                        <div class="space-y-0.5 relative">
+                            <UserDropdown
+                                :responsive="true"
+                                @showStoreOptionsDialog="
+                                    showStoreOptionsDialog = true
+                                "
+                            />
                         </div>
                     </template>
-                </AdminSidebar>
+                </MyStoreSidebar>
             </div>
         </div>
+
+        <StoreOptionsDialog
+            v-if="$page.props.auth.user?.stores"
+            :title="'Pilih Toko'"
+            :stores="$page.props.auth.user.stores"
+            :show="showStoreOptionsDialog"
+            @close="showStoreOptionsDialog = false"
+            @select="
+                myStoreStore.setSelectedStoreId($event.id);
+                $inertia.visit(
+                    route('my-store.select-store', { storeId: $event.id })
+                );
+
+                showStoreOptionsDialog = false;
+            "
+        />
     </nav>
 </template>
