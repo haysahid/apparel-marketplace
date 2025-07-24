@@ -18,13 +18,13 @@ const props = defineProps({
 <template>
     <div class="flex justify-start">
         <nav
-            class="flex items-center gap-4 text-gray-600 [&>*]:rounded-md [&>*]:size-8 [&>*]:sm:size-10 [&>*]:aspect-square [&>*]:sm:rounded-lg"
+            class="flex items-center gap-2 sm:gap-2.5 text-gray-600 [&>*]:rounded-md [&>*]:size-8 [&>*]:sm:size-10 [&>*]:aspect-square [&>*]:sm:rounded-lg [&>*]:sm:font-medium"
         >
             <template v-for="(link, index) in props.links" :key="index">
                 <Link
                     v-if="link.label.includes('Previous') && link.url !== null"
                     :href="link.active ? '#' : link.url"
-                    class="flex items-center justify-center font-semibold transition duration-300 aspect-square text-primary hover:bg-secondary-box/80"
+                    class="flex items-center justify-center transition duration-300 aspect-square text-primary hover:bg-secondary-box/80"
                     :class="
                         link.active
                             ? 'bg-primary text-white  active:bg-primary/90 focus:bg-primary focus:ring-primary'
@@ -56,7 +56,7 @@ const props = defineProps({
                     "
                     :href="link.active ? '#' : link.url"
                     :class="[
-                        'aspect-square flex items-center justify-center transition duration-300 font-semibold',
+                        'aspect-square flex items-center justify-center transition duration-300',
                         link.active
                             ? 'bg-primary text-white  active:bg-primary/90 focus:bg-primary focus:ring-primary'
                             : 'text-gray-500 bg-secondary-box hover:bg-secondary-box/80',
@@ -67,7 +67,7 @@ const props = defineProps({
                 <Link
                     v-if="link.label.includes('Next') && link.url !== null"
                     :href="link.active ? '#' : link.url"
-                    class="flex items-center justify-center font-semibold transition duration-300 aspect-square text-primary hover:bg-secondary-box/80"
+                    class="flex items-center justify-center transition duration-300 aspect-square text-primary hover:bg-secondary-box/80"
                     :class="
                         link.active
                             ? 'bg-primary text-white  active:bg-primary/90 focus:bg-primary focus:ring-primary'

@@ -13,8 +13,8 @@ class StoreCertificateRepository
     public static function getCertificates(
         $limit = 5,
         $search = null,
-        $sortBy = 'created_at',
-        $sortDirection = 'desc',
+        $orderBy = 'created_at',
+        $orderDirection = 'desc',
     ) {
         $certificates = StoreCertificate::query();
 
@@ -23,7 +23,7 @@ class StoreCertificateRepository
                 ->orWhere('description', 'like', '%' . $search . '%');
         }
 
-        $certificates->orderBy($sortBy, $sortDirection);
+        $certificates->orderBy($orderBy, $orderDirection);
         $certificates->get();
 
         return $certificates->paginate($limit);

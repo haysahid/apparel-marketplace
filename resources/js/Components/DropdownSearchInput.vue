@@ -47,6 +47,10 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    bgClass: {
+        type: String,
+        default: null,
+    },
 });
 
 const emit = defineEmits(["update:modelValue", "clear", "search"]);
@@ -92,13 +96,14 @@ watch(
                 "
                 class="w-full"
                 textClass="text-sm sm:text-base"
+                :bgClass="props.bgClass"
                 :placeholder="props.placeholder"
             >
                 <template #suffix>
                     <button
                         v-if="props.modelValue && !isDropdownOpen"
                         type="button"
-                        class="absolute p-[7px] text-gray-400 bg-white rounded-full top-1 right-1 hover:bg-gray-100 transition-all duration-300 ease-in-out"
+                        class="absolute p-[7px] text-gray-400 bg-white rounded-full right-1 hover:bg-gray-100 transition-all duration-300 ease-in-out"
                         @click="
                             isDropdownOpen = false;
                             search = '';
@@ -120,11 +125,7 @@ watch(
                             />
                         </svg>
                     </button>
-                    <button
-                        v-else
-                        type="button"
-                        class="absolute p-2 top-1.5 right-1"
-                    >
+                    <button v-else type="button" class="absolute p-2 right-1">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
@@ -161,7 +162,7 @@ watch(
                     <button
                         v-if="props.modelValue && !isDropdownOpen"
                         type="button"
-                        class="absolute p-[7px] text-gray-400 bg-white rounded-full top-1 right-1 hover:bg-gray-100 transition-all duration-300 ease-in-out"
+                        class="absolute p-[7px] text-gray-400 bg-white rounded-full right-1 hover:bg-gray-100 transition-all duration-300 ease-in-out"
                         @click="
                             isDropdownOpen = false;
                             search = '';
@@ -183,11 +184,7 @@ watch(
                             />
                         </svg>
                     </button>
-                    <button
-                        v-else
-                        type="button"
-                        class="absolute p-2 top-1.5 right-1"
-                    >
+                    <button v-else type="button" class="absolute p-2 right-1">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"

@@ -3,13 +3,10 @@
 namespace App\Http\Controllers\MyStore;
 
 use App\Http\Controllers\Controller;
-use App\Models\Store;
 use App\Models\StoreCertificate;
 use App\Repositories\StoreCertificateRepository;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class MyStoreCertificateController extends Controller
@@ -21,14 +18,14 @@ class MyStoreCertificateController extends Controller
     {
         $limit = $request->input('limit', 5);
         $search = $request->input('search');
-        $sortBy = $request->input('order_by', 'created_at');
-        $sortDirection = $request->input('order_direction', 'desc');
+        $orderBy = $request->input('order_by', 'created_at');
+        $orderDirection = $request->input('order_direction', 'desc');
 
         $certificates = StoreCertificateRepository::getCertificates(
             $limit,
             $search,
-            $sortBy,
-            $sortDirection
+            $orderBy,
+            $orderDirection
         );
 
         return Inertia::render('MyStore/Certificate', [

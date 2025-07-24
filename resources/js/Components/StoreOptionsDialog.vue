@@ -39,7 +39,7 @@ const emit = defineEmits(["close", "select"]);
                         :key="store.id"
                         :name="store.name"
                         :description="store.description"
-                        :icon="store.logo"
+                        :icon="store.logo ? `/storage/${store.logo}` : null"
                         @click="emit('select', store)"
                     />
                 </div>

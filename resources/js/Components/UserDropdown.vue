@@ -1,6 +1,7 @@
 <script setup>
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
+import { router } from "@inertiajs/vue3";
 
 const props = defineProps({
     invert: {
@@ -12,6 +13,12 @@ const props = defineProps({
         default: false,
     },
 });
+
+const logout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("selected_store_id");
+    router.post(route("logout"));
+};
 </script>
 
 <template>
@@ -77,28 +84,25 @@ const props = defineProps({
         </template>
 
         <template #content>
-            <DropdownLink
-                v-if="$page.props.auth.has_store"
-                as="button"
-                @click="$emit('showStoreOptionsDialog')"
-            >
-                Toko Saya
-            </DropdownLink>
+            <div class="divide-y divide-gray-200">
+                <DropdownLink
+                    v-if="$page.props.auth.has_store"
+                    as="button"
+                    @click="$emit('showStoreOptionsDialog')"
+                >
+                    Toko Saya
+                </DropdownLink>
 
-            <DropdownLink v-else :href="route('store.create')">
-                Buat Toko
-            </DropdownLink>
+                <DropdownLink v-else :href="route('store.create')">
+                    Buat Toko
+                </DropdownLink>
 
-            <div class="border-t border-gray-200" />
+                <DropdownLink :href="route('profile')"> Profile </DropdownLink>
 
-            <DropdownLink :href="route('profile')"> Profile </DropdownLink>
-
-            <div class="border-t border-gray-200" />
-
-            <!-- Authentication -->
-            <form @submit.prevent="logout">
-                <DropdownLink as="button"> Log Out </DropdownLink>
-            </form>
+                <DropdownLink as="button" @click="logout">
+                    Log Out
+                </DropdownLink>
+            </div>
         </template>
     </Dropdown>
 </template>

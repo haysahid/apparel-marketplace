@@ -14,6 +14,10 @@ const props = defineProps({
         type: Array,
         default: () => ["py-1", "bg-white"],
     },
+    showBackdrop: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits(["onOpen", "onClose"]);
@@ -40,6 +44,9 @@ watch(open, (newValue) => {
 const widthClass = computed(() => {
     return {
         48: "w-48",
+        52: "w-52",
+        56: "w-56",
+        64: "w-64",
     }[props.width.toString()];
 });
 
@@ -54,6 +61,10 @@ const alignmentClasses = computed(() => {
 
     return "origin-top";
 });
+
+defineExpose({
+    open,
+});
 </script>
 
 <template>
@@ -63,7 +74,25 @@ const alignmentClasses = computed(() => {
         </div>
 
         <!-- Full Screen Dropdown Overlay -->
-        <div v-show="open" class="fixed inset-0 z-40" @click="open = false" />
+        <div v-show="open" class="fixed inset-0 z-40" @click="open = false">
+            <transition
+                v-if="showBackdrop"
+                enter-active-class="duration-300 ease-out"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="duration-200 ease-in"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+            >
+                <div
+                    v-show="open"
+                    class="fixed inset-0 transition-all transform"
+                    @click="open = false"
+                >
+                    <div class="absolute inset-0 bg-gray-500 opacity-15" />
+                </div>
+            </transition>
+        </div>
 
         <transition
             enter-active-class="transition duration-200 ease-out"
@@ -75,7 +104,7 @@ const alignmentClasses = computed(() => {
         >
             <div
                 v-show="open"
-                class="absolute z-[999] mt-2 rounded-md shadow-lg w-full"
+                class="absolute z-[999] w-full mt-2 rounded-md shadow-lg"
                 :class="[widthClass, alignmentClasses]"
                 style="display: none"
                 @click="open = false"

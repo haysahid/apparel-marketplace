@@ -46,7 +46,7 @@ defineProps({
                 </MyStoreHeader>
 
                 <!-- Main Content -->
-                <main class="p-2 sm:p-6 sm:pb-16">
+                <main class="sm:p-6">
                     <slot />
                 </main>
             </div>

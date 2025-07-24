@@ -11,7 +11,7 @@ import AOS from 'aos';
 
 // My plugins
 import formatDate from './plugins/date-formatter';
-import numberFormatter from './plugins/number-formatter';
+import { formatCurrency } from './plugins/number-formatter';
 
 
 AOS.init();
@@ -30,7 +30,7 @@ createInertiaApp({
             .use(pinia);
 
         app.config.globalProperties.$formatDate = formatDate;
-        app.config.globalProperties.$formatCurrency = numberFormatter.formatCurrency;
+        app.config.globalProperties.$formatCurrency = formatCurrency;
         app.mount(el);
     },
     progress: {

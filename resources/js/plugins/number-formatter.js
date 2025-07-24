@@ -1,4 +1,4 @@
-const formatCurrency = (value, options = {
+export const formatCurrency = (value, options = {
     style: "currency",
     currency: "IDR",
     minimumFractionDigits: 0,
@@ -8,5 +8,3 @@ const formatCurrency = (value, options = {
     }
     return value.toLocaleString("id-ID", options);
 }
-
-export default { formatCurrency };

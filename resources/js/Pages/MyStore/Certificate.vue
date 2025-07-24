@@ -93,7 +93,7 @@ onMounted(() => {
                 class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
                 @click="$inertia.visit(route('my-store.certificate.create'))"
             >
-                Tambah Data
+                Tambah
             </PrimaryButton>
 
             <!-- Table -->
@@ -127,7 +127,7 @@ onMounted(() => {
                                 <img
                                     :src="certificate.image"
                                     alt="Sertifikat"
-                                    class="object-cover w-[80px] sm:w-[120px] rounded aspect-[3/2]"
+                                    class="object-cover w-[80px] sm:w-[120px] rounded aspect-[3/2] border border-gray-200"
                                 />
                             </td>
                             <td>
@@ -164,30 +164,6 @@ onMounted(() => {
                         </tr>
                     </tbody>
                 </table>
-
-                <SuccessDialog
-                    :show="showSuccessDialog"
-                    :title="successMessage"
-                    @close="showSuccessDialog = false"
-                />
-
-                <ErrorDialog
-                    :show="showErrorDialog"
-                    @close="showErrorDialog = false"
-                >
-                    <template #content>
-                        <div>
-                            <div
-                                class="mb-1 text-lg font-medium text-center text-gray-900"
-                            >
-                                Terjadi Kesalahan
-                            </div>
-                            <p class="text-center text-gray-700">
-                                {{ errorMessage }}
-                            </p>
-                        </div>
-                    </template>
-                </ErrorDialog>
             </div>
 
             <!-- Mobile View -->
@@ -202,36 +178,41 @@ onMounted(() => {
                         alt="Sertifikat"
                         class="object-cover w-[80px] rounded aspect-[3/2] border border-gray-200"
                     />
-                    <div class="w-full">
-                        <p class="text-base font-semibold text-gray-900">
+                    <div class="flex flex-col w-full gap-1">
+                        <p class="text-sm font-medium text-gray-900">
                             {{ certificate.name }}
                         </p>
-                        <p class="text-xs text-gray-600 line-clamp-1">
+                        <p
+                            class="text-xs text-gray-500 line-clamp-2 overflow-ellipsis"
+                        >
                             {{ certificate.description }}
                         </p>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <AdminItemAction
-                            @edit="
-                                $inertia.visit(
-                                    route('my-store.certificate.edit', {
-                                        storeCertificate: certificate,
-                                    })
-                                )
-                            "
-                            @delete="showDeleteCertificateDialog(certificate)"
-                        />
-                        <DeleteConfirmationDialog
-                            :show="certificate.showDeleteModal"
-                            @close="closeDeleteCertificateDialog(certificate)"
-                            @delete="deleteCertificate(certificate)"
-                        />
-                    </div>
+
+                    <AdminItemAction
+                        @edit="
+                            $inertia.visit(
+                                route('my-store.certificate.edit', {
+                                    storeCertificate: certificate,
+                                })
+                            )
+                        "
+                        @delete="showDeleteCertificateDialog(certificate)"
+                    />
+
+                    <DeleteConfirmationDialog
+                        :show="certificate.showDeleteModal"
+                        @close="closeDeleteCertificateDialog(certificate)"
+                        @delete="deleteCertificate(certificate)"
+                    />
                 </div>
             </div>
 
             <!-- Pagination -->
-            <div class="flex flex-col gap-2 mt-4">
+            <div
+                v-if="props.certificates.total > 0"
+                class="flex flex-col gap-2 mt-4"
+            >
                 <p class="text-xs text-gray-500 sm:text-sm">
                     Menampilkan {{ props.certificates.from }} -
                     {{ props.certificates.to }} dari
@@ -240,5 +221,26 @@ onMounted(() => {
                 <DefaultPagination :links="props.certificates.links" />
             </div>
         </DefaultCard>
+
+        <SuccessDialog
+            :show="showSuccessDialog"
+            :title="successMessage"
+            @close="showSuccessDialog = false"
+        />
+
+        <ErrorDialog :show="showErrorDialog" @close="showErrorDialog = false">
+            <template #content>
+                <div>
+                    <div
+                        class="mb-1 text-lg font-medium text-center text-gray-900"
+                    >
+                        Terjadi Kesalahan
+                    </div>
+                    <p class="text-center text-gray-700">
+                        {{ errorMessage }}
+                    </p>
+                </div>
+            </template>
+        </ErrorDialog>
     </MyStoreLayout>
 </template>

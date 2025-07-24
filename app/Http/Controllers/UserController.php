@@ -167,6 +167,7 @@ class UserController extends Controller
 
     public function logout()
     {
+        session()->forget('selected_store_id');
         Auth::logout();
         return redirect()->route('home')->with([
             'success' => 'Berhasil keluar.',
