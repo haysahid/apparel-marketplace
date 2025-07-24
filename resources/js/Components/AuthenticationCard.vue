@@ -1,6 +1,6 @@
 <template>
     <div
-        class="min-h-screen flex flex-col justify-center items-center py-6 px-6 bg-gradient-to-t from-[#E0BEFF80] from-80% to-white relative"
+        class="relative flex flex-col items-center justify-center min-h-screen px-6 py-6 bg-secondary-box"
     >
         <img
             src="/storage/couple.png"

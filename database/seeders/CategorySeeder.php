@@ -18,31 +18,31 @@ class CategorySeeder extends Seeder
                 'id' => 1,
                 'store_id' => null,
                 'name' => 'T-Shirts',
-                'image' => 'category/t-shirts.jpg'
+                'image' => 'category/t-shirt.png'
             ],
             [
                 'id' => 2,
                 'store_id' => null,
                 'name' => 'Jeans',
-                'image' => 'category/jeans.jpg'
+                'image' => 'category/trouser.png'
             ],
             [
                 'id' => 3,
                 'store_id' => null,
                 'name' => 'Jackets',
-                'image' => 'category/jackets.jpg'
+                'image' => 'category/jacket.png'
             ],
             [
                 'id' => 4,
                 'store_id' => null,
                 'name' => 'Shoes',
-                'image' => 'category/shoes.jpg'
+                'image' => 'category/shoe.png'
             ],
             [
                 'id' => 5,
                 'store_id' => null,
                 'name' => 'Accessories',
-                'image' => 'category/accessories.jpg'
+                'image' => 'category/ribbon.png'
             ],
         ]);
     }

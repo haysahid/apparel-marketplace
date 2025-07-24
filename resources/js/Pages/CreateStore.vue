@@ -103,13 +103,6 @@ const closeErrorDialog = () => {
                 </div>
             </template>
 
-            <div
-                v-if="status"
-                class="mb-4 text-sm font-medium text-center text-green-600"
-            >
-                {{ status }}
-            </div>
-
             <form @submit.prevent="submit">
                 <!-- Name -->
                 <div class="flex flex-wrap gap-2">

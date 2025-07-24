@@ -14,6 +14,7 @@ return [
     'discount_type' => 'percentage',
     'discount' => 20,
     'categories' => [
+        ['name' => 'Accessories'],
         ['name' => 'Aksesoris Muslim'],
         ['name' => 'Tas Muslim'],
     ],

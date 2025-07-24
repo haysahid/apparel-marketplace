@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\MyStore\MyStoreCertificateController;
 use App\Http\Controllers\MyStoreController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\StoreCertificateController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AdminMiddleware;
+use App\Models\StoreCertificate;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -75,6 +77,14 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->grou
     // Store
     Route::get('/store-info', [MyStoreController::class, 'storeInfo'])->name('store.edit');
     Route::post('/store-info', [MyStoreController::class, 'updateStore'])->name('store.update');
+
+    // Certificate
+    Route::get('/certificate', [MyStoreCertificateController::class, 'index'])->name('certificate');
+    Route::get('/certificate/create', [MyStoreCertificateController::class, 'create'])->name('certificate.create');
+    Route::post('/certificate', [MyStoreCertificateController::class, 'store'])->name('certificate.store');
+    Route::get('/certificate/{storeCertificate}', [MyStoreCertificateController::class, 'edit'])->name('certificate.edit');
+    Route::post('/certificate/{storeCertificate}', [MyStoreCertificateController::class, 'update'])->name('certificate.update');
+    Route::delete('/certificate/{storeCertificate}', [MyStoreCertificateController::class, 'destroy'])->name('certificate.destroy');
 
     // Route::get('/products', [ProductController::class, 'myStoreProducts'])->name('products');
     // Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');

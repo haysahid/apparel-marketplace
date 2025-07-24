@@ -47,22 +47,22 @@ const menus = [
                 <path d="M22.4359 17.054L20.7459 16.3174L13.26 20.3907C13.0975 20.4774 12.9025 20.4774 12.74 20.3907L5.25419 16.3174L3.56419 17.054C3.38819 17.1453 3.27771 17.327 3.27771 17.5253C3.27771 17.7236 3.38819 17.9053 3.56419 17.9965L12.7942 23.4132C12.9567 23.4999 13.1517 23.4999 13.3142 23.4132L22.5442 17.9965C22.7121 17.8866 22.8036 17.6913 22.7807 17.4919C22.7578 17.2925 22.6243 17.1231 22.4359 17.054Z"/>
             </svg>`,
     },
-    // {
-    //     name: "Sertifikat",
-    //     href: route("my-store.certificate"),
-    //     active: route().current("my-store.certificate"),
-    //     icon: `
-    //         <svg
-    //             xmlns="http://www.w3.org/2000/svg"
-    //             width="26"
-    //             height="27"
-    //             viewBox="0 0 26 27"
-    //             class="fill-primary"
-    //         >
-    //             <rect opacity="0.01" y="0.695312" width="26" height="26"/>
-    //             <path d="M15.7737 2.8625C16.0793 2.86325 16.3707 2.9931 16.5755 3.21992L21.3851 8.63691C21.5656 8.8355 21.6665 9.09414 21.6673 9.3625V21.8215C21.6587 22.5483 21.3612 23.2423 20.8411 23.7502C20.3211 24.2579 19.6206 24.5381 18.8939 24.5295H7.10675C6.38003 24.5381 5.67952 24.2579 5.15948 23.7502C4.63944 23.2423 4.34196 22.5483 4.33331 21.8215V5.57148C4.34188 4.84456 4.63938 4.15069 5.15948 3.64277C5.67954 3.1349 6.3799 2.85389 7.10675 2.8625H15.7737ZM9.75031 18.0295C9.15205 18.0295 8.66739 18.5143 8.6673 19.1125C8.6673 19.7108 9.152 20.1955 9.75031 20.1955H16.2503C16.8486 20.1955 17.3333 19.7108 17.3333 19.1125C17.3332 18.5143 16.8486 18.0295 16.2503 18.0295H9.75031ZM9.75031 13.6965C9.152 13.6965 8.6673 14.1812 8.6673 14.7795C8.66739 15.3777 9.15205 15.8625 9.75031 15.8625H13.0003C13.5986 15.8625 14.0832 15.3777 14.0833 14.7795C14.0833 14.1812 13.5986 13.6965 13.0003 13.6965H9.75031ZM15.1663 8.4416C15.1286 8.90696 15.4712 9.31674 15.9359 9.3625H19.2181L15.1663 5.02949V8.4416Z"/>
-    //         </svg>`,
-    // },
+    {
+        name: "Sertifikat",
+        href: route("my-store.certificate"),
+        active: route().current("my-store.certificate"),
+        icon: `
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="26"
+                height="27"
+                viewBox="0 0 26 27"
+                class="fill-primary"
+            >
+                <rect opacity="0.01" y="0.695312" width="26" height="26"/>
+                <path d="M15.7737 2.8625C16.0793 2.86325 16.3707 2.9931 16.5755 3.21992L21.3851 8.63691C21.5656 8.8355 21.6665 9.09414 21.6673 9.3625V21.8215C21.6587 22.5483 21.3612 23.2423 20.8411 23.7502C20.3211 24.2579 19.6206 24.5381 18.8939 24.5295H7.10675C6.38003 24.5381 5.67952 24.2579 5.15948 23.7502C4.63944 23.2423 4.34196 22.5483 4.33331 21.8215V5.57148C4.34188 4.84456 4.63938 4.15069 5.15948 3.64277C5.67954 3.1349 6.3799 2.85389 7.10675 2.8625H15.7737ZM9.75031 18.0295C9.15205 18.0295 8.66739 18.5143 8.6673 19.1125C8.6673 19.7108 9.152 20.1955 9.75031 20.1955H16.2503C16.8486 20.1955 17.3333 19.7108 17.3333 19.1125C17.3332 18.5143 16.8486 18.0295 16.2503 18.0295H9.75031ZM9.75031 13.6965C9.152 13.6965 8.6673 14.1812 8.6673 14.7795C8.66739 15.3777 9.15205 15.8625 9.75031 15.8625H13.0003C13.5986 15.8625 14.0832 15.3777 14.0833 14.7795C14.0833 14.1812 13.5986 13.6965 13.0003 13.6965H9.75031ZM15.1663 8.4416C15.1286 8.90696 15.4712 9.31674 15.9359 9.3625H19.2181L15.1663 5.02949V8.4416Z"/>
+            </svg>`,
+    },
     // {
     //     name: "Produk",
     //     href: route("my-store.product"),
@@ -92,7 +92,7 @@ const menus = [
         }"
     >
         <nav
-            class="h-full bg-primary"
+            class="h-full bg-white"
             :class="{
                 '!py-4': props.responsive,
             }"
@@ -103,7 +103,7 @@ const menus = [
                     <img
                         :src="`/storage/${$page.props.setting.logo}`"
                         alt="Logo"
-                        class="w-auto h-8 sm:h-12"
+                        class="w-auto h-8 sm:h-12 fill-primary"
                     />
                 </Link>
             </div>
@@ -113,19 +113,19 @@ const menus = [
                     <NavLink
                         :href="menu.href"
                         :active="menu.active"
-                        active-class="!bg-secondary !border-[#CE4DB1] text-primary"
-                        class="px-6 py-4 w-full bg-transparent hover:bg-secondary/10 hover:border-l-4 hover:border-[#CE4DB1] border-l-4 transition-all duration-300 ease-in-out border-primary"
+                        active-class="!bg-secondary !border-primary text-primary"
+                        class="w-full px-6 py-4 !text-gray-500 transition-all duration-300 ease-in-out bg-transparent border-l-4 border-white hover:bg-primary/10 hover:border-l-4 hover:border-primary"
                         :class="{
                             '!px-4 !py-2.5': props.responsive,
-                            '!text-primary': menu.active,
+                            '!text-gray-800 !bg-primary/20': menu.active,
                         }"
                     >
                         <span
                             v-if="menu.icon"
                             v-html="menu.icon"
-                            class="me-2"
+                            class="me-2 [&>svg]:fill-gray-500"
                             :class="{
-                                '[&>svg]:fill-white/80': !menu.active,
+                                '[&>svg]:!fill-gray-800': menu.active,
                                 '[&>svg]:size-6 me-1.5': props.responsive,
                             }"
                         ></span>

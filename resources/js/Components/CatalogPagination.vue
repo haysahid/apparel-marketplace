@@ -22,11 +22,11 @@ const props = defineProps({
                 <Link
                     v-if="link.label.includes('Previous') && link.url !== null"
                     :href="link.active ? '#' : link.url"
-                    class="size-12 aspect-square flex items-center justify-center text-primary rounded-md sm:rounded-lg hover:bg-[#E4CFF6]/80 transition duration-300 font-semibold"
+                    class="flex items-center justify-center font-semibold transition duration-300 rounded-md size-12 aspect-square text-primary sm:rounded-lg hover:bg-secondary-box/80"
                     :class="
                         link.active
                             ? 'bg-primary text-white  active:bg-primary/90 focus:bg-primary focus:ring-primary'
-                            : 'text-primary bg-[#E4CFF6] hover:bg-[#E4CFF6]/80'
+                            : 'text-primary bg-secondary-box hover:bg-secondary-box/80'
                     "
                 >
                     <svg
@@ -57,7 +57,7 @@ const props = defineProps({
                         'size-12 aspect-square flex items-center justify-center rounded-lg transition duration-300 font-semibold',
                         link.active
                             ? 'bg-primary text-white  active:bg-primary/90 focus:bg-primary focus:ring-primary'
-                            : 'text-primary bg-[#E4CFF6] hover:bg-[#E4CFF6]/80',
+                            : 'text-gray-500 bg-secondary-box hover:bg-secondary-box/80',
                     ]"
                 >
                     <span v-html="link.label" />
@@ -65,11 +65,11 @@ const props = defineProps({
                 <Link
                     v-if="link.label.includes('Next') && link.url !== null"
                     :href="link.active ? '#' : link.url"
-                    class="size-12 aspect-square flex items-center justify-center text-primary rounded-md sm:rounded-lg hover:bg-[#E4CFF6]/80 transition duration-300 font-semibold"
+                    class="flex items-center justify-center font-semibold transition duration-300 rounded-md size-12 aspect-square text-primary sm:rounded-lg hover:bg-secondary-box/80"
                     :class="
                         link.active
                             ? 'bg-primary text-white  active:bg-primary/90 focus:bg-primary focus:ring-primary'
-                            : 'text-primary bg-[#E4CFF6] hover:bg-[#E4CFF6]/80'
+                            : 'text-primary bg-secondary-box hover:bg-secondary-box/80'
                     "
                 >
                     <svg

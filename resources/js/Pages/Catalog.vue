@@ -18,13 +18,15 @@ const props = defineProps({
     filters: null,
 });
 
-const products = props.products.data.map((product) => ({
-    ...product,
-    images: product.images.map((image) => ({
-        ...image,
-        image: image.image ? "/storage/" + image.image : null,
-    })),
-}));
+const products = ref(
+    props.products.data.map((product) => ({
+        ...product,
+        images: product.images.map((image) => ({
+            ...image,
+            image: image.image ? "/storage/" + image.image : null,
+        })),
+    }))
+);
 
 const catalogFilter = ref(null);
 
@@ -84,11 +86,27 @@ function onChangeCategories(categories) {
         .filter((category) => category.selected)
         .map((category) => category.name)
         .join(",");
-    router.get(route("catalog"), {
-        ...route().params,
-        categories: selectedCategories || undefined,
-        page: undefined,
-    });
+    router.get(
+        route("catalog"),
+        {
+            ...route().params,
+            categories: selectedCategories || undefined,
+            page: undefined,
+        },
+        {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                products.value = page.props.products.data.map((product) => ({
+                    ...product,
+                    images: product.images.map((image) => ({
+                        ...image,
+                        image: image.image ? "/storage/" + image.image : null,
+                    })),
+                }));
+            },
+        }
+    );
 }
 
 function onChangeSearch() {
@@ -98,11 +116,27 @@ function onChangeSearch() {
         filters.value.search = null;
     }
 
-    router.get(route("catalog"), {
-        ...route().params,
-        search: searchQuery || undefined,
-        page: undefined,
-    });
+    router.get(
+        route("catalog"),
+        {
+            ...route().params,
+            search: searchQuery || undefined,
+            page: undefined,
+        },
+        {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                products.value = page.props.products.data.map((product) => ({
+                    ...product,
+                    images: product.images.map((image) => ({
+                        ...image,
+                        image: image.image ? "/storage/" + image.image : null,
+                    })),
+                }));
+            },
+        }
+    );
 }
 </script>
 
@@ -110,13 +144,13 @@ function onChangeSearch() {
     <LandingLayout title="Katalog">
         <!-- Search -->
         <LandingSection
-            class="bg-gradient-to-b from-secondary/60 from-80% to-white !min-h-[40vh] px-6 sm:px-12 md:px-[100px]"
+            class="bg-secondary-box !min-h-[30vh] px-6 sm:px-12 md:px-[100px]"
         >
             <div
                 class="flex flex-col items-center w-full py-12 text-center gap-9"
             >
                 <div>
-                    <h1 class="mb-4 text-4xl font-bold text-center">
+                    <h1 class="mb-4 text-3xl font-bold text-center sm:text-4xl">
                         Katalog Produk
                     </h1>
                     <p>Silahkan cari produk disini.</p>
@@ -137,7 +171,7 @@ function onChangeSearch() {
                                 name="search"
                                 placeholder="Cari produk..."
                                 :autofocus="route().params.search"
-                                class="w-full py-4 pl-8 pr-24 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 overflow-ellipsis"
+                                class="w-full py-4 pl-8 pr-24 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-light overflow-ellipsis focus:border-primary-light"
                             />
                             <button
                                 type="submit"
@@ -153,7 +187,7 @@ function onChangeSearch() {
 
         <!-- Content -->
         <div
-            class="p-6 !pt-4 sm:p-12 md:p-[100px] flex flex-col gap-12 lg:gap-20"
+            class="p-6 sm:p-12 md:p-[100px] md:pt-[80px] flex flex-col gap-12 lg:gap-20"
         >
             <LandingSection>
                 <div

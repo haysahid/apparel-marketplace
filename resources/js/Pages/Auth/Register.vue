@@ -255,7 +255,7 @@ const submit = () => {
                                 redirect: route().params.redirect,
                             })
                         "
-                        class="font-medium text-primary hover:font-semibold"
+                        class="font-medium text-primary hover:underline"
                     >
                         Masuk disini
                     </Link>

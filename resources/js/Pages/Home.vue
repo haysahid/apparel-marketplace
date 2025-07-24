@@ -9,6 +9,7 @@ import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { Link } from "@inertiajs/vue3";
 import { usePage } from "@inertiajs/vue3";
+import CategoryCard from "@/Components/CategoryCard.vue";
 
 const page = usePage();
 if (page.props.flash.access_token) {
@@ -20,13 +21,15 @@ const props = defineProps({
     brands: {
         type: Array as () => BrandEntity[],
     },
+    categories: {
+        type: Array as () => CategoryEntity[],
+        default: () => [],
+    },
     popularProducts: {
         type: Array as () => ProductEntity[],
         default: () => [],
     },
 });
-
-const certificate = ref(props.store?.certificates[0] || null);
 </script>
 
 <template>
@@ -40,7 +43,7 @@ const certificate = ref(props.store?.certificates[0] || null);
 
         <!-- Brands -->
         <div
-            class="bg-[#E0BEFF80] flex max-sm:flex-wrap flex-row items-center justify-center gap-4 sm:gap-8 md:gap-24 py-4 sm:py-6 px-6 lg:px-40 [&>img]:max-w-16 [&>img]:sm:max-w-20 [&>img]:lg:max-w-32 [&>img]:h-8 [&>img]:sm:h-16 [&>img]:lg:h-20 [&>img]:object-contain"
+            class="flex flex-row items-center justify-center gap-6 px-6 py-4 bg-secondary-box/30 max-sm:flex-wrap sm:gap-8 md:gap-x-24 sm:py-6 lg:px-40"
         >
             <img
                 v-for="brand in props.brands || []"
@@ -51,6 +54,7 @@ const certificate = ref(props.store?.certificates[0] || null);
                 data-aos-duration="600"
                 data-aos-delay="100"
                 data-aos-once="true"
+                class="object-contain h-8 max-w-12 sm:max-w-20 lg:max-w-32 sm:h-16 lg:h-20"
             />
         </div>
 
@@ -69,13 +73,13 @@ const certificate = ref(props.store?.certificates[0] || null);
                             class="flex items-center justify-between w-full gap-12 mb-4"
                         >
                             <h1
-                                class="text-2xl font-bold sm:text-3xl text-nowrap"
+                                class="text-xl font-bold sm:text-2xl lg:text-3xl text-nowrap"
                             >
                                 Produk Terlaris
                             </h1>
                             <TextInput
                                 placeholder="Cari produk..."
-                                bgClass="bg-gray-100"
+                                bgClass="bg-gray-100 focus:bg-white"
                                 textClass="text-sm sm:text-base !ps-4"
                                 class="relative w-full max-w-md"
                                 @keyup.enter="
@@ -135,108 +139,48 @@ const certificate = ref(props.store?.certificates[0] || null);
                 </div>
             </LandingSection>
 
-            <!-- About Us -->
-            <LandingSection id="about">
-                <div
-                    class="grid grid-cols-1 gap-8 mx-auto lg:grid-cols-2 lg:gap-14 max-w-7xl"
-                >
-                    <img
-                        data-aos="fade-up"
-                        data-aos-duration="600"
-                        :src="'/storage/' + props.store.banner"
-                        alt=""
-                        class="rounded-2xl"
-                    />
-                    <div
-                        data-aos="fade-up"
-                        data-aos-duration="600"
-                        data-aos-delay="100"
-                        class="flex flex-col justify-center"
-                    >
-                        <h1 class="mb-4 text-2xl font-bold sm:text-3xl">
-                            Tentang Kami
-                        </h1>
-                        <p class="text-gray-700">
-                            {{ props.store.description }}
-                        </p>
-                    </div>
-                </div>
-            </LandingSection>
-
-            <!-- Store Advantages -->
-            <LandingSection id="advantages">
-                <div
-                    class="grid grid-cols-1 gap-8 mx-auto lg:gap-14 xl:grid-cols-2 max-w-7xl"
-                >
-                    <div
-                        data-aos="fade-up"
-                        data-aos-duration="600"
-                        data-aos-delay="200"
-                        class="flex flex-col justify-center"
-                    >
-                        <h1 class="mb-4 text-2xl font-bold sm:text-3xl">
-                            Kenapa memilih Kami?
-                        </h1>
-                        <p class="text-gray-700">
-                            Kami memiliki keunggulan antara lain:
-                        </p>
-                    </div>
-                    <div
-                        data-aos="fade-up"
-                        data-aos-duration="600"
-                        data-aos-delay="300"
-                        class="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-9"
-                    >
-                        <AdvantageCard
-                            v-for="(advantage, index) in props.store
-                                ?.advantages || []"
-                            :key="advantage.id"
-                            :title="advantage.name"
-                            :description="advantage.description"
-                        />
-                    </div>
-                </div>
-            </LandingSection>
-
-            <!-- Certificates -->
-            <LandingSection id="certificates">
+            <!-- Categories -->
+            <LandingSection class="min-h-[30vh]">
                 <div
                     data-aos="fade-up"
                     data-aos-duration="600"
-                    class="grid grid-cols-1 gap-8 mx-auto lg:grid-cols-2 lg:gap-14 max-w-7xl"
+                    data-aos-delay="200"
+                    data-aos-once="true"
+                    class="flex flex-col items-start justify-center w-full gap-4 mx-auto max-w-7xl"
                 >
-                    <div class="flex flex-col items-start w-full gap-4">
-                        <div class="flex items-center justify-center">
-                            <img
-                                v-if="certificate"
-                                :src="'/storage/' + certificate.image"
-                                :alt="certificate.name"
-                                class="object-contain w-full rounded-2xl"
-                            />
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div
-                                v-for="cert in props.store?.certificates || []"
-                                :key="cert.id"
-                                @click="certificate = cert"
-                                class="w-4 h-4 bg-[#F8E4F3] rounded-full cursor-pointer transition-all duration-300 ease-in-out hover:scale-125"
-                                :class="{
-                                    'w-8 h-4 rounded-full bg-primary hover:scale-100 !cursor-default':
-                                        cert.id === certificate.id,
-                                }"
-                            ></div>
-                        </div>
-                    </div>
-                    <div class="flex flex-col justify-center">
-                        <h1 class="mb-4 text-2xl font-bold sm:text-3xl">
-                            {{ certificate?.name || "Sertifikat" }}
+                    <div
+                        class="flex items-center justify-between w-full gap-12 mb-4"
+                    >
+                        <h1
+                            class="text-2xl font-bold text-center sm:text-3xl text-nowrap"
+                        >
+                            Kategori Populer
                         </h1>
-                        <p class="text-gray-700">
-                            {{
-                                certificate?.description ||
-                                "Sertifikat ini menunjukkan komitmen kami terhadap kualitas dan keamanan produk yang kami tawarkan. Kami berusaha untuk memberikan yang terbaik bagi pelanggan kami."
-                            }}
-                        </p>
+                        <!-- Selengkapnya -->
+                        <Link
+                            :href="route('catalog')"
+                            class="text-sm text-primary hover:underline"
+                        >
+                            Selengkapnya
+                        </Link>
+                    </div>
+                    <div
+                        class="grid w-full grid-cols-3 gap-6 md:grid-cols-4 lg:grid-cols-5 sm:gap-9"
+                    >
+                        <Link
+                            v-for="category in props.categories || []"
+                            :key="category.id"
+                            :href="
+                                route('catalog', {
+                                    categories: category.name,
+                                })
+                            "
+                        >
+                            <CategoryCard
+                                :name="category.name"
+                                :image="`/storage/${category.image}`"
+                            />
+                        </Link>
                     </div>
                 </div>
             </LandingSection>

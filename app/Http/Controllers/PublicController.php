@@ -18,35 +18,19 @@ class PublicController extends Controller
 {
     public function home()
     {
-        $store = Store::with([
-            'advantages',
-            'certificates' => function ($query) {
-                $query->limit(5);
-            },
-            'social_links',
-        ])->first();
-
         $brands = Brand::take(5)->get();
-
+        $categories = Category::whereNotNull('image')->orderBy('name', 'asc')->get();
         $popularProducts = Product::with(['brand', 'categories', 'images'])->take(8)->get();
 
         return Inertia::render('Home', [
-            'store' => $store,
             'brands' => $brands,
+            'categories' => $categories,
             'popularProducts' => $popularProducts,
         ]);
     }
 
     public function catalog(Request $request)
     {
-        $store = Store::with([
-            'advantages',
-            'certificates' => function ($query) {
-                $query->limit(5);
-            },
-            'social_links',
-        ])->first();
-
         $limit = $request->input('limit', 10);
         $orderBy = $request->input('order_by', 'created_at');
         $orderDirection = $request->input('order_direction', 'desc');
@@ -128,7 +112,6 @@ class PublicController extends Controller
         $products->get();
 
         return Inertia::render('Catalog', [
-            'store' => $store,
             'products' => $products->paginate($limit),
             'filters' => [
                 'brands' => Brand::get(),
@@ -141,14 +124,6 @@ class PublicController extends Controller
 
     public function productDetail($slug)
     {
-        $store = Store::with([
-            'advantages',
-            'certificates' => function ($query) {
-                $query->limit(5);
-            },
-            'social_links',
-        ])->first();
-
         $product = Product::with(
             [
                 'brand',
@@ -175,7 +150,6 @@ class PublicController extends Controller
             ->get();
 
         return Inertia::render('ProductDetail', [
-            'store' => $store,
             'product' => $product,
             'accumulatedStock' => $accumulatedStock,
             'minOrder' => $minOrder,
@@ -188,16 +162,6 @@ class PublicController extends Controller
 
     public function myCart()
     {
-        $store = Store::with([
-            'advantages',
-            'certificates' => function ($query) {
-                $query->limit(5);
-            },
-            'social_links',
-        ])->first();
-
-        return Inertia::render('MyCart', [
-            'store' => $store,
-        ]);
+        return Inertia::render('MyCart');
     }
 }

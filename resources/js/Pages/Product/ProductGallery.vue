@@ -60,18 +60,18 @@ const goToNextImage = () => {
         class="flex flex-col items-start justify-start"
     >
         <div
-            class="relative flex items-center justify-center w-full overflow-hidden transition-all duration-300 ease-in-out group rounded-2xl outline outline-1 -outline-offset-1 outline-gray-200"
+            class="relative flex items-center justify-center w-full overflow-hidden transition-all duration-300 ease-in-out group rounded-xl outline outline-1 -outline-offset-1 outline-gray-200"
         >
             <img
                 :src="'/storage/' + image.image"
                 :alt="props.altText"
-                class="object-cover w-full transition-all duration-300 ease-in-out rounded-2xl aspect-square"
+                class="object-cover w-full transition-all duration-300 ease-in-out rounded-xl aspect-square"
             />
             <button
                 v-if="canGoToPreviousImage"
                 @click="goToPreviousImage"
                 type="button"
-                class="size-8 sm:size-10 opacity-0 aspect-square flex items-center justify-center text-primary hover:bg-[#E4CFF6]/80 font-semibold absolute -left-8 group-hover:bg-black/40 group-hover:opacity-100 group-hover:left-4 transition-all duration-300 ease-in-out rounded-full hover:scale-110"
+                class="absolute flex items-center justify-center font-semibold transition-all duration-300 ease-in-out rounded-full opacity-0 size-8 sm:size-10 aspect-square text-primary hover:bg-primary-light/80 -left-8 group-hover:bg-black/40 group-hover:opacity-100 group-hover:left-4 hover:scale-110"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -91,7 +91,7 @@ const goToNextImage = () => {
                 v-if="canGoToNextImage"
                 @click="goToNextImage"
                 type="button"
-                class="size-8 sm:size-10 opacity-0 aspect-square flex items-center justify-center text-primary hover:bg-[#E4CFF6]/80 font-semibold absolute -right-8 group-hover:bg-black/40 group-hover:opacity-100 group-hover:right-4 transition-all duration-300 ease-in-out rounded-full hover:scale-110"
+                class="absolute flex items-center justify-center font-semibold transition-all duration-300 ease-in-out rounded-full opacity-0 size-8 sm:size-10 aspect-square text-primary hover:bg-primary-light/80 -right-8 group-hover:bg-black/40 group-hover:opacity-100 group-hover:right-4 hover:scale-110"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

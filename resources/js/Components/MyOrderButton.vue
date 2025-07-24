@@ -8,6 +8,14 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    invert: {
+        type: Boolean,
+        default: false,
+    },
+    active: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits(["click"]);
@@ -16,9 +24,12 @@ const emit = defineEmits(["click"]);
 <template>
     <button
         type="button"
-        class="relative flex items-center justify-center p-2 transition duration-150 ease-in-out rounded-md text-white/80 hover:text-white hover:bg-white/10 focus:outline-none focus:bg-white/10 focus:hover:bg-white/20 focus:text-white group"
+        class="relative flex items-center justify-center p-2 transition duration-150 ease-in-out rounded-md text-gray-500/80 hover:text-gray-500 hover:bg-gray-500/10 focus:outline-none focus:bg-gray-500/10 focus:hover:bg-gray-500/20 focus:text-gray-500 group"
         :class="{
             '!bg-transparent !p-0 hover:!bg-transparent': !showBackground,
+            'hover:bg-white/20 focus:bg-white/10': showBackground && invert,
+            'bg-primary/10 hover:bg-primary/20 focus:bg-primary/20':
+                showBackground && active,
         }"
         @click="emit('click')"
     >
@@ -27,9 +38,12 @@ const emit = defineEmits(["click"]);
             width="24"
             height="25"
             viewBox="0 0 24 25"
-            class="fill-white/80 group-hover:fill-white"
+            class="fill-gray-500/80 group-hover:fill-gray-500"
             :class="{
-                'group-hover:fill-white/80': !showBackground,
+                'group-hover:fill-gray-500/80': !showBackground,
+                'fill-white/80 group-hover:fill-white/80':
+                    showBackground && invert,
+                'fill-primary group-hover:fill-primary': active,
             }"
         >
             <path
@@ -39,7 +53,11 @@ const emit = defineEmits(["click"]);
 
         <div
             v-if="length > 0"
-            class="px-1 py-0.5 ms-2 text-xs font-semibold text-white bg-[#CE4DB1] rounded-full min-w-[20px] text-center absolute top-0 right-0"
+            class="px-1 py-0.5 ms-2 text-xs font-semibold text-white bg-primary rounded-full min-w-[20px] text-center absolute top-0 right-0"
+            :class="{
+                'bg-primary/80': !showBackground,
+                'bg-primary': showBackground && invert,
+            }"
         >
             {{ length }}
         </div>
