@@ -8,9 +8,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <div
-        class="border border-gray-200 rounded-md lg:block overflow-x-auto h-[68vh]"
-    >
+    <div class="border border-gray-200 rounded-md overflow-x-auto h-[68vh]">
         <table class="table-default">
             <thead v-if="$slots.thead" class="sticky top-0">
                 <slot name="thead" />

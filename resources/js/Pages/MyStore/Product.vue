@@ -17,6 +17,7 @@ import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import { formatCurrency } from "@/plugins/number-formatter";
+import ErrorDialog from "@/Components/ErrorDialog.vue";
 
 const screenSize = useScreenSize();
 
@@ -73,39 +74,40 @@ const finalPrice = (product) => {
     )} - ${formatCurrency(product.highest_final_selling_price)}`;
 };
 
-const showDeleteProductDialog = (id) => {
-    const product = products.value.find((item) => item.id === id);
+const selectedProduct = ref(null);
+const showDeleteProductDialog = ref(false);
+
+const openDeleteProductDialog = (product) => {
     if (product) {
-        product.showDeleteModal = true;
-        console.log(`Deleting product with ID: ${product}`);
+        selectedProduct.value = product;
+        showDeleteProductDialog.value = true;
     }
 };
 
-const closeDeleteProductDialog = (product, result = false) => {
-    if (product) {
-        product.showDeleteModal = false;
-        if (result) {
-            openSuccessDialog("Data Berhasil Dihapus");
-            products.value = products.value.filter(
-                (item) => item.id !== product.id
-            );
-        }
+const closeDeleteProductDialog = (result = false) => {
+    showDeleteProductDialog.value = false;
+    if (result) {
+        selectedProduct.value = null;
+        openSuccessDialog("Data Berhasil Dihapus");
+        products.value = products.value.filter(
+            (item) => item.id !== selectedProduct.value.id
+        );
     }
 };
 
-const deleteProduct = (product) => {
-    if (product) {
+const deleteProduct = () => {
+    if (selectedProduct.value) {
         const form = useForm();
         form.delete(
             route("my-store.product.destroy", {
-                product: product,
+                product: selectedProduct.value,
             }),
             {
                 onError: (errors) => {
                     openErrorDialog(errors.error);
                 },
                 onSuccess: () => {
-                    closeDeleteProductDialog(product, true);
+                    closeDeleteProductDialog(true);
                 },
             }
         );
@@ -118,6 +120,14 @@ const successMessage = ref("Data Berhasil Dihapus");
 const openSuccessDialog = (message) => {
     successMessage.value = message;
     showSuccessDialog.value = true;
+};
+
+const showErrorDialog = ref(false);
+const errorMessage = ref("");
+
+const openErrorDialog = (message) => {
+    errorMessage.value = message;
+    showErrorDialog.value = true;
 };
 
 // Filters
@@ -260,8 +270,9 @@ onMounted(() => {
 
             <!-- Table -->
             <DefaultTable
+                v-if="screenSize.is('xl')"
                 :isEmpty="products.length === 0"
-                class="hidden mt-6 lg:block"
+                class="mt-6"
             >
                 <template #thead>
                     <tr>
@@ -269,7 +280,7 @@ onMounted(() => {
                         <th class="min-w-[120px] w-[120px]">Foto</th>
                         <th>Nama Barang</th>
                         <th>Harga</th>
-                        <th class="w-[200px]">Kategori</th>
+                        <th class="w-12">Brand</th>
                         <th>Stok</th>
                         <th class="w-24 !text-center">Aksi</th>
                     </tr>
@@ -309,14 +320,7 @@ onMounted(() => {
                             </div>
                         </td>
                         <td class="!whitespace-normal">
-                            <div>
-                                <p class="font-medium text-gray-900">
-                                    {{ product.name }}
-                                </p>
-                                <p class="text-sm text-gray-600">
-                                    {{ product.brand.name }}
-                                </p>
-                            </div>
+                            {{ product.name }}
                         </td>
                         <td>
                             <p>
@@ -338,9 +342,7 @@ onMounted(() => {
                             </div>
                         </td>
                         <td class="!whitespace-normal">
-                            {{
-                                product.categories.map((c) => c.name).join(", ")
-                            }}
+                            {{ product.brand.name }}
                         </td>
                         <td class="text-center">
                             {{
@@ -360,14 +362,7 @@ onMounted(() => {
                                         })
                                     )
                                 "
-                                @delete="showDeleteProductDialog(product.id)"
-                            />
-                            <DeleteConfirmationDialog
-                                v-if="screenSize.is('lg')"
-                                :show="product.showDeleteModal"
-                                :title="`Hapus Produk <b>${product.name}</b>?`"
-                                @close="closeDeleteProductDialog(product)"
-                                @delete="deleteProduct(product)"
+                                @delete="openDeleteProductDialog(product)"
                             />
                         </td>
                     </tr>
@@ -376,7 +371,8 @@ onMounted(() => {
 
             <!-- Mobile View -->
             <div
-                class="mt-4 lg:hidden min-h-[60vh] flex flex-col gap-3"
+                v-if="!screenSize.is('xl')"
+                class="mt-4 min-h-[60vh] flex flex-col gap-3"
                 :class="{ 'min-h-auto h-[60vh]': products.length == 0 }"
             >
                 <template v-if="products.length > 0">
@@ -390,15 +386,7 @@ onMounted(() => {
                                     })
                                 )
                             "
-                            @delete="showDeleteProductDialog(product.id)"
-                        />
-
-                        <DeleteConfirmationDialog
-                            v-if="!screenSize.is('lg')"
-                            :show="product.showDeleteModal"
-                            :title="`Hapus Produk <b>${product.name}</b>?`"
-                            @close="closeDeleteProductDialog(product)"
-                            @delete="deleteProduct(product)"
+                            @delete="openDeleteProductDialog(product)"
                         />
                     </div>
                 </template>
@@ -421,11 +409,36 @@ onMounted(() => {
                 <DefaultPagination :links="props.products.links" />
             </div>
 
+            <DeleteConfirmationDialog
+                :show="showDeleteProductDialog"
+                :title="`Hapus Produk <b>${selectedProduct?.name}</b>?`"
+                @close="closeDeleteProductDialog()"
+                @delete="deleteProduct()"
+            />
+
             <SuccessDialog
                 :show="showSuccessDialog"
                 :title="successMessage"
                 @close="showSuccessDialog = false"
             />
+
+            <ErrorDialog
+                :show="showErrorDialog"
+                @close="showErrorDialog = false"
+            >
+                <template #content>
+                    <div>
+                        <div
+                            class="mb-1 text-lg font-medium text-center text-gray-900"
+                        >
+                            Terjadi Kesalahan
+                        </div>
+                        <p class="text-center text-gray-700">
+                            {{ errorMessage }}
+                        </p>
+                    </div>
+                </template>
+            </ErrorDialog>
         </DefaultCard>
     </MyStoreLayout>
 </template>

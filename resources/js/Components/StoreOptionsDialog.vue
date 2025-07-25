@@ -38,7 +38,7 @@ const emit = defineEmits(["close", "select"]);
                         v-for="store in props.stores"
                         :key="store.id"
                         :name="store.name"
-                        :description="store.description"
+                        :description="store.rajaongkir_origin_label"
                         :icon="store.logo ? `/storage/${store.logo}` : null"
                         @click="emit('select', store)"
                     />

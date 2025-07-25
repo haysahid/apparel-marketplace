@@ -43,18 +43,18 @@ const finalPrice = computed(() => {
 
 <template>
     <div
-        class="flex flex-col items-center justify-between gap-2 p-2.5 transition-all duration-300 ease-in-out border border-gray-200 rounded-lg hover:border-primary-light hover:ring-1 hover:ring-primary-light"
+        class="flex flex-col items-center justify-between gap-2 p-2.5 sm:gap-3 sm:p-4 transition-all duration-300 ease-in-out border border-gray-200 rounded-lg hover:border-primary-light hover:ring-1 hover:ring-primary-light relative"
     >
-        <div class="flex items-start w-full gap-2 sm:gap-4">
+        <div class="flex items-start w-full gap-2.5 sm:gap-3">
             <img
                 v-if="props.product.images.length > 0"
                 :src="(props.product.images[0].image as string)"
                 :alt="props.product.name"
-                class="object-cover h-[60px] sm:h-[80px] aspect-square rounded border border-gray-200 self-start"
+                class="object-cover h-[80px] sm:h-[100px] aspect-square rounded border border-gray-200 self-start"
             />
             <div
                 v-else
-                class="flex items-center justify-center h-[60px] sm:h-[80px] bg-gray-100 rounded aspect-square"
+                class="flex items-center justify-center h-[80px] sm:h-[100px] bg-gray-100 rounded aspect-square"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -70,76 +70,69 @@ const finalPrice = computed(() => {
             </div>
 
             <div class="flex w-full gap-2">
-                <div class="flex flex-col items-start justify-start w-full">
-                    <p class="text-sm font-medium text-gray-900">
+                <div
+                    class="flex flex-col items-start justify-start w-full gap-0.5 sm:gap-1"
+                >
+                    <p
+                        class="text-sm font-medium text-gray-900 md:text-base pe-12"
+                    >
                         {{ props.product.name }}
                     </p>
-                    <p class="text-xs text-gray-600">
+                    <p class="text-xs text-gray-500 pe-12">
                         {{ props.product.brand.name }}
                     </p>
-                    <p class="text-xs font-medium text-gray-600">
-                        {{
-                            props.product.categories
-                                .map((category) => category.name)
-                                .join(", ")
-                        }}
-                    </p>
-                </div>
-                <AdminItemAction class="!flex sm:!hidden" :showMore="true">
-                    <template #moreContent>
-                        <div class="divide-y divide-gray-200">
-                            <DropdownLink as="button" @click="emit('edit')">
-                                Edit
-                            </DropdownLink>
-                            <DropdownLink as="button" @click="emit('delete')">
-                                Delete
-                            </DropdownLink>
+                    <div class="flex items-start w-full gap-4 mt-1">
+                        <div class="flex flex-col items-start w-full">
+                            <p class="text-sm font-medium text-gray-600">
+                                {{ finalPrice }}
+                            </p>
+                            <div
+                                v-if="props.product.discount"
+                                class="flex items-center gap-2"
+                            >
+                                <p class="text-xs text-gray-500 line-through">
+                                    {{ basePrice }}
+                                </p>
+                                <DiscountTag
+                                    v-if="props.product.discount"
+                                    :discount-type="props.product.discount_type"
+                                    :discount="props.product.discount"
+                                    class="!px-1 !py-0 !rounded-md !text-[10px] !font-medium"
+                                />
+                            </div>
                         </div>
-                    </template>
-                </AdminItemAction>
-            </div>
-
-            <AdminItemAction
-                @edit="emit('edit')"
-                @delete="emit('delete')"
-                class="hidden sm:!flex"
-            />
-        </div>
-
-        <div
-            class="flex items-start w-full gap-4 px-3 py-2 bg-gray-100 rounded-md"
-        >
-            <div class="flex flex-col items-start w-3/4">
-                <p class="text-sm font-semibold text-primary">
-                    {{ finalPrice }}
-                </p>
-                <div
-                    v-if="props.product.discount"
-                    class="flex items-center gap-2"
-                >
-                    <p class="text-xs text-gray-500 line-through">
-                        {{ basePrice }}
-                    </p>
-                    <DiscountTag
-                        v-if="props.product.discount"
-                        :discount-type="props.product.discount_type"
-                        :discount="props.product.discount"
-                        class="!px-1 !py-[1px] !rounded-md !text-[10px] !font-medium"
-                    />
+                        <div
+                            class="flex items-center gap-2 py-1.5 px-2 bg-gray-100 rounded-md"
+                        >
+                            <p class="text-sm font-medium text-gray-600">
+                                {{
+                                    props.product.variants.reduce(
+                                        (total, variant) =>
+                                            total + variant.current_stock_level,
+                                        0
+                                    )
+                                }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="w-1/4">
-                <p class="text-xs text-gray-500">Stok</p>
-                <p class="text-sm font-medium text-gray-600">
-                    {{
-                        props.product.variants.reduce(
-                            (total, variant) =>
-                                total + variant.current_stock_level,
-                            0
-                        )
-                    }}
-                </p>
-            </div>
         </div>
+
+        <AdminItemAction
+            :showMore="true"
+            class="absolute top-2.5 right-2.5 sm:top-4 sm:right-4"
+        >
+            <template #moreContent>
+                <div class="divide-y divide-gray-200">
+                    <DropdownLink as="button" @click="emit('edit')">
+                        Ubah
+                    </DropdownLink>
+                    <DropdownLink as="button" @click="emit('delete')">
+                        Hapus
+                    </DropdownLink>
+                </div>
+            </template>
+        </AdminItemAction>
     </div>
 </template>

@@ -64,7 +64,7 @@ const hasDeleteCallback = computed(() => {
         <Dropdown
             v-if="$slots.moreContent"
             align="right"
-            width="52"
+            width="32"
             :showBackdrop="true"
         >
             <template #trigger>

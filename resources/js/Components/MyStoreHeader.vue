@@ -72,7 +72,9 @@ const showStoreOptionsDialog = ref(false);
                 <div v-if="$page.props.selected_store" class="w-full px-4">
                     <StoreItem
                         :name="$page.props.selected_store.name"
-                        :description="$page.props.selected_store.description"
+                        :description="
+                            $page.props.selected_store.rajaongkir_origin_label
+                        "
                         :icon="$page.props.selected_store.icon"
                         @click="showStoreOptionsDialog = true"
                     >

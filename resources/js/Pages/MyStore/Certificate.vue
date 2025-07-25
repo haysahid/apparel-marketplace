@@ -9,6 +9,11 @@ import ErrorDialog from "@/Components/ErrorDialog.vue";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
+import DefaultTable from "@/Components/DefaultTable.vue";
+import MyStoreCertificateCard from "./Certificate/MyStoreCertificateCard.vue";
+import { useScreenSize } from "@/plugins/screen-size";
+
+const screenSize = useScreenSize();
 
 const props = defineProps({
     certificates: null,
@@ -22,38 +27,40 @@ const certificates = ref(
     }))
 );
 
-const showDeleteCertificateDialog = (certificate) => {
+const selectedCertificate = ref(null);
+const showDeleteCertificateDialog = ref(false);
+
+const openDeleteCertificateDialog = (certificate) => {
     if (certificate) {
-        certificate.showDeleteModal = true;
-        console.log(`Deleting certificate with ID: ${certificate}`);
+        selectedCertificate.value = certificate;
+        showDeleteCertificateDialog.value = true;
     }
 };
 
-const closeDeleteCertificateDialog = (certificate, result) => {
-    if (certificate) {
-        certificate.showDeleteModal = false;
-        if (result) {
-            openSuccessDialog("Data Berhasil Dihapus");
-            certificates.value = certificates.value.filter(
-                (cert) => cert.id !== certificate.id
-            );
-        }
+const closeDeleteCertificateDialog = (result = false) => {
+    showDeleteCertificateDialog.value = false;
+    if (result) {
+        selectedCertificate.value = null;
+        openSuccessDialog("Data Berhasil Dihapus");
+        certificates.value = certificates.value.filter(
+            (cert) => cert.id !== selectedCertificate.value.id
+        );
     }
 };
 
-const deleteCertificate = (certificate) => {
-    if (certificate) {
+const deleteCertificate = () => {
+    if (selectedCertificate.value) {
         const form = useForm();
         form.delete(
             route("my-store.certificate.destroy", {
-                storeCertificate: certificate,
+                storeCertificate: selectedCertificate.value,
             }),
             {
                 onError: (errors) => {
                     openErrorDialog(errors.error);
                 },
                 onSuccess: () => {
-                    closeDeleteCertificateDialog(certificate, true);
+                    closeDeleteCertificateDialog(true);
                 },
             }
         );
@@ -97,99 +104,78 @@ onMounted(() => {
             </PrimaryButton>
 
             <!-- Table -->
-            <div
-                class="hidden mt-4 overflow-x-auto border border-gray-100 rounded-md sm:mt-6 md:block min-h-[60vh]"
+            <DefaultTable
+                v-if="screenSize.is('xl')"
+                :isEmpty="props.certificates.length === 0"
+                class="mt-6"
             >
-                <table class="table-default">
-                    <thead>
-                        <tr>
-                            <th class="w-12">No</th>
-                            <th class="w-[150px]">Foto Sertifikat</th>
-                            <th>Nama Sertifikat</th>
-                            <th>Deskripsi</th>
-                            <th class="w-24 !text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            v-for="(certificate, index) in certificates"
-                            :key="certificate.id"
-                        >
-                            <td>
-                                {{
-                                    index +
-                                    1 +
-                                    (props.certificates.current_page - 1) *
-                                        props.certificates.per_page
-                                }}
-                            </td>
-                            <td>
-                                <img
-                                    :src="certificate.image"
-                                    alt="Sertifikat"
-                                    class="object-cover w-[80px] sm:w-[120px] rounded aspect-[3/2] border border-gray-200"
-                                />
-                            </td>
-                            <td>
-                                {{ certificate.name }}
-                            </td>
-                            <td class="!whitespace-normal">
-                                <p class="line-clamp-2">
-                                    {{ certificate.description }}
-                                </p>
-                            </td>
-                            <td>
-                                <AdminItemAction
-                                    @edit="
-                                        $inertia.visit(
-                                            route('my-store.certificate.edit', {
-                                                storeCertificate: certificate,
-                                            })
-                                        )
-                                    "
-                                    @delete="
-                                        showDeleteCertificateDialog(certificate)
-                                    "
-                                />
-                                <DeleteConfirmationDialog
-                                    :show="certificate.showDeleteModal"
-                                    @close="
-                                        closeDeleteCertificateDialog(
-                                            certificate
-                                        )
-                                    "
-                                    @delete="deleteCertificate(certificate)"
-                                />
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                <template #thead>
+                    <tr>
+                        <th class="w-12">No</th>
+                        <th class="w-[150px]">Foto Sertifikat</th>
+                        <th>Nama Sertifikat</th>
+                        <th>Deskripsi</th>
+                        <th class="w-24 !text-center">Aksi</th>
+                    </tr>
+                </template>
+                <template #tbody>
+                    <tr
+                        v-for="(certificate, index) in certificates"
+                        :key="certificate.id"
+                    >
+                        <td>
+                            {{
+                                index +
+                                1 +
+                                (props.certificates.current_page - 1) *
+                                    props.certificates.per_page
+                            }}
+                        </td>
+                        <td>
+                            <img
+                                :src="certificate.image"
+                                alt="Sertifikat"
+                                class="object-cover w-[80px] sm:w-[120px] rounded aspect-[3/2] border border-gray-200"
+                            />
+                        </td>
+                        <td>
+                            {{ certificate.name }}
+                        </td>
+                        <td class="!whitespace-normal">
+                            <p class="line-clamp-2">
+                                {{ certificate.description }}
+                            </p>
+                        </td>
+                        <td>
+                            <AdminItemAction
+                                @edit="
+                                    $inertia.visit(
+                                        route('my-store.certificate.edit', {
+                                            storeCertificate: certificate,
+                                        })
+                                    )
+                                "
+                                @delete="
+                                    openDeleteCertificateDialog(certificate)
+                                "
+                            />
+                        </td>
+                    </tr>
+                </template>
+            </DefaultTable>
 
             <!-- Mobile View -->
-            <div class="mt-4 md:hidden min-h-[60vh] flex flex-col gap-2">
+            <div
+                v-if="!screenSize.is('xl')"
+                class="mt-4 min-h-[60vh] flex flex-col gap-3"
+                :class="{ 'min-h-auto h-[60vh]': certificates.length == 0 }"
+            >
                 <div
                     v-for="(certificate, index) in certificates"
                     :key="certificate.id"
-                    class="flex items-center justify-between gap-4 p-4 border border-gray-100 rounded-md"
                 >
-                    <img
-                        :src="certificate.image"
-                        alt="Sertifikat"
-                        class="object-cover w-[80px] rounded aspect-[3/2] border border-gray-200"
-                    />
-                    <div class="flex flex-col w-full gap-1">
-                        <p class="text-sm font-medium text-gray-900">
-                            {{ certificate.name }}
-                        </p>
-                        <p
-                            class="text-xs text-gray-500 line-clamp-2 overflow-ellipsis"
-                        >
-                            {{ certificate.description }}
-                        </p>
-                    </div>
-
-                    <AdminItemAction
+                    <MyStoreCertificateCard
+                        :certificate="certificate"
                         @edit="
                             $inertia.visit(
                                 route('my-store.certificate.edit', {
@@ -197,13 +183,7 @@ onMounted(() => {
                                 })
                             )
                         "
-                        @delete="showDeleteCertificateDialog(certificate)"
-                    />
-
-                    <DeleteConfirmationDialog
-                        :show="certificate.showDeleteModal"
-                        @close="closeDeleteCertificateDialog(certificate)"
-                        @delete="deleteCertificate(certificate)"
+                        @delete="openDeleteCertificateDialog(certificate)"
                     />
                 </div>
             </div>
@@ -221,6 +201,13 @@ onMounted(() => {
                 <DefaultPagination :links="props.certificates.links" />
             </div>
         </DefaultCard>
+
+        <DeleteConfirmationDialog
+            :show="showDeleteCertificateDialog"
+            :title="`Hapus Sertifikat <b>${selectedCertificate?.name}</b>?`"
+            @close="closeDeleteCertificateDialog()"
+            @delete="deleteCertificate()"
+        />
 
         <SuccessDialog
             :show="showSuccessDialog"
