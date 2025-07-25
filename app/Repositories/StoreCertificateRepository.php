@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 class StoreCertificateRepository
 {
     public static function getCertificates(
+        $storeId = null,
         $limit = 5,
         $search = null,
         $orderBy = 'created_at',
@@ -18,9 +19,15 @@ class StoreCertificateRepository
     ) {
         $certificates = StoreCertificate::query();
 
+        if ($storeId) {
+            $certificates->where('store_id', $storeId);
+        }
+
         if ($search) {
-            $certificates->where('name', 'like', '%' . $search . '%')
-                ->orWhere('description', 'like', '%' . $search . '%');
+            $certificates->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%');
+            });
         }
 
         $certificates->orderBy($orderBy, $orderDirection);
@@ -38,7 +45,7 @@ class StoreCertificateRepository
                 'store_id' => $data['store_id'],
                 'name' => $data['name'],
                 'description' => $data['description'],
-                'image' => $data['image']->store('certificates', 'public'),
+                'image' => $data['image']->store('certificate', 'public'),
             ]);
 
             DB::commit();
@@ -46,6 +53,7 @@ class StoreCertificateRepository
             return $certificate;
         } catch (Exception $e) {
             Log::error('Failed to create certificate: ' . $e);
+            DB::rollBack();
             throw new Exception('Gagal menyimpan sertifikat: ' . $e);
         }
     }
@@ -63,7 +71,7 @@ class StoreCertificateRepository
                 if ($certificate->image) {
                     Storage::disk('public')->delete($certificate->image);
                 }
-                $certificate->image = $data['image']->store('certificates', 'public');
+                $certificate->image = $data['image']->store('certificate', 'public');
             }
 
             $certificate->save();

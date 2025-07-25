@@ -94,7 +94,7 @@ onMounted(() => {
 
 <template>
     <MyStoreLayout title="Sertifikat" :showTitle="true">
-        <DefaultCard>
+        <DefaultCard :isMain="true">
             <PrimaryButton
                 type="button"
                 class="max-sm:text-sm max-sm:px-4 max-sm:py-2"

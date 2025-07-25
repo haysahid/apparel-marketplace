@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\MyStore\MyStoreCertificateController;
 use App\Http\Controllers\MyStoreController;
 use App\Http\Controllers\MyStore\MyStoreProductController;
+use App\Http\Controllers\MyStore\MyStoreBrandController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PublicController;
@@ -86,6 +87,14 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->grou
     Route::get('/certificate/{storeCertificate}', [MyStoreCertificateController::class, 'edit'])->name('certificate.edit');
     Route::post('/certificate/{storeCertificate}', [MyStoreCertificateController::class, 'update'])->name('certificate.update');
     Route::delete('/certificate/{storeCertificate}', [MyStoreCertificateController::class, 'destroy'])->name('certificate.destroy');
+
+    // Brand
+    Route::get('/brand', [MyStoreBrandController::class, 'index'])->name('brand');
+    Route::get('/brand/create', [MyStoreBrandController::class, 'create'])->name('brand.create');
+    Route::post('/brand', [MyStoreBrandController::class, 'store'])->name('brand.store');
+    Route::get('/brand/{brand}', [MyStoreBrandController::class, 'edit'])->name('brand.edit');
+    Route::post('/brand/{brand}', [MyStoreBrandController::class, 'update'])->name('brand.update');
+    Route::delete('/brand/{brand}', [MyStoreBrandController::class, 'destroy'])->name('brand.destroy');
 
     // Product
     Route::get('/products', [MyStoreProductController::class, 'index'])->name('product');

@@ -10,37 +10,35 @@ import InputGroup from "@/Components/InputGroup.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 
 const props = defineProps({
-    certificate: {
+    brand: {
         type: Object,
         default: () => ({
             name: null,
             description: null,
-            image: null,
+            logo: null,
         }),
     },
 });
 
 const form = useForm(
-    props.certificate
+    props.brand
         ? {
-              ...props.certificate,
-              image: props.certificate.image
-                  ? "/storage/" + props.certificate.image
-                  : null,
+              ...props.brand,
+              logo: props.brand.logo ? "/storage/" + props.brand.logo : null,
           }
         : {
               name: null,
               description: null,
-              image: null,
+              logo: null,
           }
 );
 
 const submit = () => {
-    if (props.certificate.id) {
+    if (props.brand.id) {
         form.transform((data) => {
             const formData = new FormData();
             Object.keys(data).forEach((key) => {
-                if (key === "image" && !(data[key] instanceof File)) {
+                if (key === "logo" && !(data[key] instanceof File)) {
                     return;
                 }
 
@@ -52,8 +50,8 @@ const submit = () => {
             });
             return formData;
         }).post(
-            route("my-store.certificate.update", {
-                storeCertificate: props.certificate,
+            route("my-store.brand.update", {
+                brand: props.brand,
             }),
             {
                 onError: (errors) => {
@@ -67,7 +65,7 @@ const submit = () => {
         return;
     }
 
-    form.post(route("my-store.certificate.store"), {
+    form.post(route("my-store.brand.store"), {
         onFinish: () => {
             form.reset();
         },
@@ -87,12 +85,12 @@ const openErrorDialog = (message) => {
     <form @submit.prevent="submit" class="max-w-3xl">
         <div class="flex flex-col items-start gap-4">
             <!-- Name -->
-            <InputGroup id="name" label="Nama Sertifikat">
+            <InputGroup id="name" label="Nama Brand">
                 <TextInput
                     id="name"
                     v-model="form.name"
                     type="text"
-                    placeholder="Masukkan Nama Sertifikat"
+                    placeholder="Masukkan Nama Brand"
                     class="block w-full mt-1"
                     required
                     :autofocus="true"
@@ -101,25 +99,25 @@ const openErrorDialog = (message) => {
                 />
             </InputGroup>
 
-            <!-- Image -->
-            <InputGroup id="image" label="Gambar Sertifikat">
+            <!-- Logo -->
+            <InputGroup id="logo" label="Logo Brand">
                 <ImageInput
-                    id="image"
-                    v-model="form.image"
+                    id="logo"
+                    v-model="form.logo"
                     type="file"
                     accept="image/*"
-                    placeholder="Upload Sertifikat"
+                    placeholder="Upload Logo Brand"
                     class="block w-full mt-1 h-"
                     width="max-w-[180px]"
                     height="h-[120px]"
                     required
-                    :error="form.errors.image"
-                    @update:modelValue="form.errors.image = null"
+                    :error="form.errors.logo"
+                    @update:modelValue="form.errors.logo = null"
                 />
             </InputGroup>
 
             <!-- Description -->
-            <InputGroup id="description" label="Deskripsi Sertifikat">
+            <InputGroup id="description" label="Deskripsi Brand">
                 <TextAreaInput
                     id="description"
                     v-model="form.description"

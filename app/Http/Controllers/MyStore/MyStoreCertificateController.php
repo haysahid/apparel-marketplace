@@ -22,10 +22,11 @@ class MyStoreCertificateController extends Controller
         $orderDirection = $request->input('order_direction', 'desc');
 
         $certificates = StoreCertificateRepository::getCertificates(
-            $limit,
-            $search,
-            $orderBy,
-            $orderDirection
+            storeId: session('selected_store_id'),
+            limit: $limit,
+            search: $search,
+            orderBy: $orderBy,
+            orderDirection: $orderDirection,
         );
 
         return Inertia::render('MyStore/Certificate', [
