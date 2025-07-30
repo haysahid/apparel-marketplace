@@ -10,9 +10,15 @@ class Brand extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'store_id',
         'name',
         'description',
         'logo',
         'website',
     ];
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
 }

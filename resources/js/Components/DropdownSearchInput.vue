@@ -70,11 +70,9 @@ watch(
     <Dropdown
         :id="props.id"
         v-model="props.modelValue"
-        :options="props.options"
-        option-label="name"
-        option-value="id"
         :placeholder="props.placeholder"
         align="left"
+        width="full"
         required
         class="w-full"
         :error="props.error"
@@ -162,7 +160,7 @@ watch(
                     <button
                         v-if="props.modelValue && !isDropdownOpen"
                         type="button"
-                        class="absolute p-[7px] text-gray-400 bg-white rounded-full right-1 hover:bg-gray-100 transition-all duration-300 ease-in-out"
+                        class="absolute p-[7px] text-gray-400 bg-white rounded-full right-1 hover:bg-gray-100 transition-all duration-300 ease-in-out top-1"
                         @click="
                             isDropdownOpen = false;
                             search = '';
@@ -184,7 +182,7 @@ watch(
                             />
                         </svg>
                     </button>
-                    <button v-else type="button" class="absolute p-2 right-1">
+                    <button v-else type="button" class="absolute p-2 right-1 top-1">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"

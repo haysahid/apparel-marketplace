@@ -23,6 +23,7 @@ class MyStoreBrandController extends Controller
         $orderDirection = $request->input('order_direction', 'desc');
 
         $brands = BrandRepository::getBrands(
+            storeId: session('selected_store_id'),
             limit: $limit,
             search: $search,
             orderBy: $orderBy,

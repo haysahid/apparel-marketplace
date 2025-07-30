@@ -15,6 +15,11 @@ import DialogModal from "@/Components/DialogModal.vue";
 import LinkItem from "@/Components/LinkItem.vue";
 import VariantCard from "./VariantCard.vue";
 import VariantForm from "./VariantForm.vue";
+import DeleteConfirmationDialog from "@/Components/DeleteConfirmationDialog.vue";
+import SuccessDialog from "@/Components/SuccessDialog.vue";
+import InputGroup from "@/Components/InputGroup.vue";
+import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
+import DropdownSearchInputMultiple from "@/Components/DropdownSearchInputMultiple.vue";
 
 const props = defineProps({
     product: {
@@ -60,6 +65,7 @@ const form = useForm(
           }
         : {
               name: null,
+              sku_prefix: null,
               brand_id: null,
               brand: null,
               discount: 0,
@@ -77,8 +83,6 @@ const page = usePage();
 
 const brands = page.props.brands || [];
 const brandSearch = ref("");
-const isBrandDropdownOpen = ref(false);
-
 const filteredBrands = computed(() => {
     return brands.filter((brand) =>
         brand.name.toLowerCase().includes(brandSearch.value.toLowerCase())
@@ -86,6 +90,12 @@ const filteredBrands = computed(() => {
 });
 
 const categories = page.props.categories || [];
+const categorySearch = ref("");
+const filteredCategories = computed(() => {
+    return categories.filter((category) =>
+        category.name.toLowerCase().includes(categorySearch.value.toLowerCase())
+    );
+});
 
 function uploadNewImage(image, index) {
     const token = `Bearer ${localStorage.getItem("access_token")}`;
@@ -192,6 +202,60 @@ function deleteImages() {
     });
 }
 
+function deleteVariant(variant) {
+    const token = `Bearer ${localStorage.getItem("access_token")}`;
+
+    axios
+        .delete(
+            `${page.props.ziggy.url}/api/admin/product-variant/${variant.id}`,
+            {
+                headers: {
+                    Authorization: token,
+                },
+            }
+        )
+        .then((response) => {
+            variantsToDelete.value = variantsToDelete.value.filter(
+                (id) => id !== variant.id
+            );
+
+            openSuccessDialog(response.data.meta.message);
+            getVariants();
+        })
+        .catch((error) => {
+            if (error.response?.data?.error) {
+                openErrorDialog(error.response.data.error);
+            }
+        });
+}
+
+function getVariants() {
+    const token = `Bearer ${localStorage.getItem("access_token")}`;
+
+    axios
+        .get(`${page.props.ziggy.url}/api/admin/product/${props.product.id}`, {
+            headers: {
+                Authorization: token,
+            },
+        })
+        .then((response) => {
+            const product = response.data.result;
+            form.variants = product.variants.map((variant) => ({
+                ...variant,
+                images:
+                    variant.images?.map((image) => ({
+                        ...image,
+                        image: "/storage/" + image.image,
+                    })) || [],
+            }));
+        })
+        .catch((error) => {
+            if (error.response?.data?.error) {
+                openErrorDialog(error.response.data.error);
+            }
+        });
+}
+
 const submit = () => {
     if (props.product?.id) {
         updateImages();
@@ -242,7 +306,7 @@ const submit = () => {
                 if (key === "images") {
                     data[key].forEach((image, index) => {
                         if (image.image instanceof File) {
-                            formData.append(`images[${index}]`, image);
+                            formData.append(`images[${index}]`, image.image);
                         }
                     });
                 } else if (key === "categories") {
@@ -257,6 +321,50 @@ const submit = () => {
                         );
                         formData.append(`links[${index}][url]`, link.url);
                     });
+                } else if (key === "variants") {
+                    data.variants.forEach((variant, index) => {
+                        formData.append(
+                            `variants[${index}][motif]`,
+                            variant.motif
+                        );
+                        formData.append(
+                            `variants[${index}][color_id]`,
+                            variant.color_id
+                        );
+                        formData.append(
+                            `variants[${index}][size_id]`,
+                            variant.size_id
+                        );
+                        formData.append(
+                            `variants[${index}][material]`,
+                            variant.material
+                        );
+                        formData.append(
+                            `variants[${index}][base_selling_price]`,
+                            variant.base_selling_price
+                        );
+                        formData.append(
+                            `variants[${index}][discount]`,
+                            variant.discount
+                        );
+                        formData.append(
+                            `variants[${index}][current_stock_level]`,
+                            variant.current_stock_level
+                        );
+                        formData.append(
+                            `variants[${index}][unit]`,
+                            variant.unit
+                        );
+                        variant.images.forEach((image, imgIndex) => {
+                            console.log("variant image", image);
+                            if (image.image instanceof File) {
+                                formData.append(
+                                    `variants[${index}][images][${imgIndex}]`,
+                                    image.image
+                                );
+                            }
+                        });
+                    });
                 } else if (data[key] !== null && data[key] !== undefined) {
                     formData.append(key, data[key]);
                 }
@@ -264,12 +372,10 @@ const submit = () => {
             return formData;
         }).post(route("admin.product.store"), {
             onError: (errors) => {
+                console.error(errors);
                 if (errors.error) {
                     openErrorDialog(errors.error);
                 }
-            },
-            onFinish: () => {
-                form.reset();
             },
         });
     }
@@ -344,12 +450,30 @@ const draggableVariants = useDraggable(variantsContainer, form.variants, {
     },
 });
 
+const showSuccessDialog = ref(false);
+const successMessage = ref(null);
+
+const openSuccessDialog = (message) => {
+    successMessage.value = message;
+    showSuccessDialog.value = true;
+};
+
+const closeSuccessDialog = () => {
+    showSuccessDialog.value = false;
+    successMessage.value = null;
+};
+
 const showErrorDialog = ref(false);
 const errorMessage = ref(null);
 
 const openErrorDialog = (message) => {
     errorMessage.value = message;
     showErrorDialog.value = true;
+};
+
+const closeErrorDialog = () => {
+    showErrorDialog.value = false;
+    errorMessage.value = null;
 };
 </script>
 
@@ -359,152 +483,83 @@ const openErrorDialog = (message) => {
             <h2 class="text-lg font-semibold">Informasi Produk</h2>
 
             <!-- Name -->
-            <div
-                class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-center sm:flex-row"
-            >
-                <InputLabel
-                    for="name"
-                    value="Nama Produk"
-                    class="w-[100px] sm:w-1/5 text-lg font-bold"
-                />
-                <span class="hidden text-sm sm:block">:</span>
+            <InputGroup id="name" label="Nama Produk">
                 <TextInput
                     id="name"
                     v-model="form.name"
                     type="text"
                     placeholder="Masukkan Nama Produk"
-                    class="block w-full mt-1"
                     required
                     :autofocus="true"
                     :error="form.errors.username"
                     @update:modelValue="form.errors.username = null"
                 />
-            </div>
+            </InputGroup>
+
+            <!-- SKU Prefix -->
+            <InputGroup id="sku_prefix" label="SKU Prefix">
+                <TextInput
+                    id="sku_prefix"
+                    v-model="form.sku_prefix"
+                    type="text"
+                    placeholder="Masukkan SKU Prefix"
+                    required
+                    :error="form.errors.sku_prefix"
+                    @update:modelValue="form.errors.sku_prefix = null"
+                />
+            </InputGroup>
 
             <!-- Brand -->
-            <div
-                class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-center sm:flex-row"
-            >
-                <InputLabel
-                    for="brand_id"
-                    value="Nama Brand"
-                    class="text-lg font-bold sm:w-1/5"
-                />
-                <span class="hidden text-sm sm:block">:</span>
-                <Dropdown
+            <InputGroup id="brand_id" label="Nama Brand">
+                <DropdownSearchInput
                     id="brand_id"
-                    v-model="form.brand_id"
-                    :options="form.brands"
-                    option-label="name"
-                    option-value="id"
+                    :modelValue="
+                        form.brand_id
+                            ? {
+                                  label: form.brand?.name,
+                                  value: form.brand_id,
+                              }
+                            : null
+                    "
+                    :options="
+                        filteredBrands.map((brand) => ({
+                            label: brand.name,
+                            value: brand.id,
+                        }))
+                    "
                     placeholder="Pilih Brand"
-                    align="left"
-                    class="block w-full mt-1"
-                    required
                     :error="form.errors.brand_id"
-                    @update:modelValue="form.errors.brand_id = null"
-                    @onOpen="isBrandDropdownOpen = true"
-                    @onClose="isBrandDropdownOpen = false"
-                >
-                    <template #trigger>
-                        <TextInput
-                            :modelValue="
-                                form.brand_id && !isBrandDropdownOpen
-                                    ? form.brand.name
-                                    : brandSearch
-                            "
-                            @update:modelValue="
-                                form.brand_id && !isBrandDropdownOpen
-                                    ? null
-                                    : (brandSearch = $event)
-                            "
-                            class="w-full"
-                            placeholder="Pilih Brand"
-                        >
-                            <template #suffix>
-                                <button
-                                    v-if="form.brand_id && !isBrandDropdownOpen"
-                                    type="button"
-                                    class="absolute p-[7px] text-gray-400 bg-white rounded-full top-1 right-1 hover:bg-gray-100 transition-all duration-300 ease-in-out"
-                                    @click="
-                                        form.brand_id = null;
-                                        form.brand = null;
-                                        brandSearch = '';
-                                    "
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="size-5"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12"
-                                        />
-                                    </svg>
-                                </button>
-                                <button
-                                    v-else
-                                    type="button"
-                                    class="absolute p-2 top-1.5 right-1"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        class="size-4 fill-gray-400"
-                                    >
-                                        <path
-                                            d="M18.6054 7.3997C18.4811 7.273 18.3335 7.17248 18.1709 7.10389C18.0084 7.0353 17.8342 7 17.6583 7C17.4823 7 17.3081 7.0353 17.1456 7.10389C16.9831 7.17248 16.8355 7.273 16.7112 7.3997L11.4988 12.7028L6.28648 7.3997C6.03529 7.14415 5.69462 7.00058 5.33939 7.00058C4.98416 7.00058 4.64348 7.14415 4.3923 7.3997C4.14111 7.65526 4 8.00186 4 8.36327C4 8.72468 4.14111 9.07129 4.3923 9.32684L10.5585 15.6003C10.6827 15.727 10.8304 15.8275 10.9929 15.8961C11.1554 15.9647 11.3296 16 11.5055 16C11.6815 16 11.8557 15.9647 12.0182 15.8961C12.1807 15.8275 12.3284 15.727 12.4526 15.6003L18.6188 9.32684C19.1293 8.80747 19.1293 7.93274 18.6054 7.3997Z"
-                                        />
-                                    </svg>
-                                </button>
-                            </template>
-                        </TextInput>
-                    </template>
-                    <template #content>
-                        <ul class="overflow-y-auto max-h-60">
-                            <li
-                                v-for="brand in filteredBrands"
-                                :key="brand.id"
-                                @click="
-                                    form.brand_id = brand.id;
-                                    form.brand = brand;
-                                "
-                                class="px-4 py-2 cursor-pointer hover:bg-gray-100"
-                            >
-                                {{ brand.name }}
-                            </li>
-                        </ul>
-                    </template>
-                </Dropdown>
-            </div>
-
-            <!-- Image -->
-            <div
-                class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-start sm:flex-row"
-            >
-                <InputLabel
-                    for="image"
-                    value="Gambar Produk"
-                    class="text-lg font-bold sm:w-1/5"
+                    @update:modelValue="
+                        (option) => {
+                            form.brand_id = option?.value;
+                            form.brand = option
+                                ? filteredBrands.find(
+                                      (brand) => brand.id === option.value
+                                  )
+                                : null;
+                        }
+                    "
+                    @search="brandSearch = $event"
+                    @clear="
+                        form.brand_id = null;
+                        form.brand = null;
+                        brandSearch = '';
+                    "
                 />
-                <span class="hidden text-sm sm:block">:</span>
+            </InputGroup>
+
+            <!-- Images -->
+            <InputGroup label="Gambar Produk">
                 <div ref="imagesContainer" class="flex flex-wrap w-full gap-2">
                     <ImageInput
                         v-for="(image, index) in form.images"
                         :key="image.id"
                         :id="`image-${image.id}`"
-                        v-model="image.image"
+                        :modelValue="image.image"
                         type="file"
                         accept="image/*"
                         placeholder="Upload Produk"
-                        class="!w-auto mt-1"
+                        class="!w-auto"
                         width="!w-[180px]"
                         height="h-[120px]"
                         :showDeleteButton="true"
@@ -512,11 +567,14 @@ const openErrorDialog = (message) => {
                         :isDragging="drag"
                         @update:modelValue="
                             if (isNewImage(image)) {
+                                if (image.image == null) {
+                                    form.images.push({
+                                        id: `new-${countNewImages + 1}`,
+                                        image: null,
+                                    });
+                                }
+
                                 image.image = $event;
-                                form.images.push({
-                                    id: `new-${countNewImages + 1}`,
-                                    image: null,
-                                });
                             } else {
                                 image.image = $event;
                             }
@@ -531,102 +589,59 @@ const openErrorDialog = (message) => {
                         "
                     />
                 </div>
-            </div>
+            </InputGroup>
 
             <!-- Discount -->
-            <div
-                class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-center sm:flex-row"
-            >
-                <InputLabel
-                    for="discount"
-                    value="Diskon (%)"
-                    class="text-lg font-bold sm:w-1/5"
-                />
-                <span class="hidden text-sm sm:block">:</span>
+            <InputGroup id="discount" label="Diskon (%)">
                 <TextInput
                     id="discount"
                     v-model.number="form.discount"
                     type="number"
                     placeholder="Masukkan Diskon"
-                    class="block w-full mt-1"
                     required
                     autocomplete="discount"
                     :error="form.errors.discount"
                     @update:modelValue="form.errors.discount = null"
                 />
-            </div>
+            </InputGroup>
 
             <!-- Categories -->
-            <div
-                class="flex flex-col w-full gap-y-1.5 gap-x-4 sm:items-start sm:flex-row"
-            >
-                <InputLabel
-                    for="categories"
-                    value="Kategori Produk"
-                    class="text-lg font-bold sm:w-1/5"
+            <InputGroup id="categories" label="Kategori Produk">
+                <DropdownSearchInputMultiple
+                    id="categories"
+                    :modelValue="
+                        form.categories?.map((category) => ({
+                            label: category.name,
+                            value: category.id,
+                        }))
+                    "
+                    :options="
+                        filteredCategories.map((category) => ({
+                            label: category.name,
+                            value: category.id,
+                        }))
+                    "
+                    placeholder="Cari Kategori"
+                    :error="form.errors.categories"
+                    @update:modelValue="
+                        (options) => {
+                            form.categories = options.map((option) =>
+                                categories.find(
+                                    (category) => category.id === option.value
+                                )
+                            );
+                        }
+                    "
+                    @search="categorySearch = $event"
+                    @clear="
+                        form.categories = null;
+                        categorySearch = '';
+                    "
                 />
-                <span class="hidden text-sm sm:block">:</span>
-                <div class="flex flex-col items-start w-full gap-3 mt-[1px]">
-                    <div
-                        class="grid w-full grid-cols-1 gap-2 sm:gap-2.5 md:grid-cols-2 lg:grid-cols-3"
-                    >
-                        <div
-                            v-for="category in categories || []"
-                            :key="category.id"
-                            class="flex items-center justify-start"
-                        >
-                            <label
-                                :for="`category-${category.id}`"
-                                class="flex items-center gap-2 cursor-pointer [&>*]:cursor-pointer justify-start"
-                            >
-                                <Checkbox
-                                    :id="`category-${category.id}`"
-                                    :value="category.id.toString()"
-                                    :label="category.name"
-                                    :checked="
-                                        form.categories
-                                            .map((c) => c.id)
-                                            .includes(category.id)
-                                    "
-                                    @update:checked="
-                                        form.categories
-                                            .map((c) => c.id)
-                                            .includes(category.id)
-                                            ? (form.categories =
-                                                  form.categories.filter(
-                                                      (c) =>
-                                                          c.id !== category.id
-                                                  ))
-                                            : form.categories.push(category)
-                                    "
-                                />
-                                <InputLabel
-                                    :for="`category-${category.id}`"
-                                    :value="category.name"
-                                    class="text-sm text-gray-500"
-                                />
-                            </label>
-                        </div>
-                    </div>
-                    <!-- <PrimaryButton
-                        type="button"
-                        class="!px-3 !py-2 text-xs !text-orange-500 bg-yellow-50 hover:bg-yellow-100/80 active:bg-yellow-100/90 focus:bg-yellow-100 focus:ring-yellow-100 outline outline-orange-200"
-                        @click="
-                            $inertia.visit(route('admin.certificate.create'))
-                        "
-                    >
-                        + Tambah Kategori Produk
-                    </PrimaryButton> -->
-                </div>
-            </div>
+            </InputGroup>
 
             <!-- Description -->
-            <div class="flex flex-col items-start w-full gap-1 sm:gap-1.5">
-                <InputLabel
-                    for="description"
-                    value="Deskripsi Produk"
-                    class="text-lg font-bold"
-                />
+            <InputGroup id="description" label="Deskripsi Produk">
                 <TextAreaInput
                     id="description"
                     v-model="form.description"
@@ -638,7 +653,7 @@ const openErrorDialog = (message) => {
                     :error="form.errors.description"
                     @update:modelValue="form.errors.description = null"
                 />
-            </div>
+            </InputGroup>
 
             <!-- Links -->
             <div class="flex flex-col items-start w-full gap-2 mt-4">
@@ -695,7 +710,7 @@ const openErrorDialog = (message) => {
                 </h2>
                 <div
                     ref="variantsContainer"
-                    class="grid w-full grid-cols-1 gap-2 sm:grid-cols-2"
+                    class="grid w-full grid-cols-1 gap-2 lg:grid-cols-2"
                 >
                     <div
                         v-for="(variant, index) in form.variants"
@@ -708,9 +723,13 @@ const openErrorDialog = (message) => {
                             :index="index"
                             @click="variant.showEditForm = true"
                             @delete="
-                                form.variants.splice(index, 1);
-                                if (variant.id) {
-                                    variantsToDelete.push(variant.id);
+                                if (props.product) {
+                                    variant.showDeleteConfirmation = true;
+                                } else {
+                                    form.variants.splice(index, 1);
+                                    if (variant.id) {
+                                        variantsToDelete.push(variant.id);
+                                    }
                                 }
                             "
                         />
@@ -721,7 +740,8 @@ const openErrorDialog = (message) => {
                         >
                             <template #content>
                                 <VariantForm
-                                    :product="props.product"
+                                    :isEdit="props.product != null"
+                                    :product="form.data()"
                                     :variant="variant"
                                     @submit="
                                         form.variants[index] = {
@@ -730,9 +750,23 @@ const openErrorDialog = (message) => {
                                         }
                                     "
                                     @close="variant.showEditForm = false"
+                                    @submitted="
+                                        variant.showEditForm = false;
+                                        openSuccessDialog($event);
+                                        getVariants();
+                                    "
                                 />
                             </template>
                         </DialogModal>
+                        <DeleteConfirmationDialog
+                            :title="`Hapus Varian Produk <b>${variant.name}</b>?`"
+                            :show="variant.showDeleteConfirmation"
+                            @close="variant.showDeleteConfirmation = false"
+                            @delete="
+                                variant.showDeleteConfirmation = false;
+                                deleteVariant(variant);
+                            "
+                        />
                     </div>
                 </div>
 
@@ -772,15 +806,27 @@ const openErrorDialog = (message) => {
         >
             <template #content>
                 <VariantForm
-                    :product="form"
+                    :isEdit="props.product != null"
+                    :product="form.data()"
                     :variant="null"
                     @submit="form.variants.push($event)"
                     @close="showAddVariantForm = false"
+                    @submitted="
+                        showAddVariantForm = false;
+                        openSuccessDialog($event);
+                        getVariants();
+                    "
                 />
             </template>
         </DialogModal>
 
-        <ErrorDialog :show="showErrorDialog" @close="showErrorDialog = false">
+        <SuccessDialog
+            :show="showSuccessDialog"
+            :title="successMessage"
+            @close="closeSuccessDialog"
+        />
+
+        <ErrorDialog :show="showErrorDialog" @close="closeErrorDialog">
             <template #content>
                 <div>
                     <div

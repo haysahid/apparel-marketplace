@@ -4,7 +4,7 @@ import ProductForm from "./ProductForm.vue";
 </script>
 
 <template>
-    <AdminLayout title="Tambah Produk" :showTitle="true">
+    <MyStoreLayo title="Tambah Produk" :showTitle="true">
         <template #icon>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -29,5 +29,5 @@ import ProductForm from "./ProductForm.vue";
         <div class="md:px-11 max-w-7xl">
             <ProductForm />
         </div>
-    </AdminLayout>
+    </MyStoreLayo>
 </template>

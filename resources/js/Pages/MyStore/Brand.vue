@@ -243,18 +243,25 @@ onMounted(() => {
                 class="mt-4 min-h-[60vh] flex flex-col gap-3"
                 :class="{ 'min-h-auto h-[60vh]': brands.length == 0 }"
             >
-                <div v-for="(brand, index) in brands" :key="brand.id">
-                    <MyStoreBrandCard
-                        :brand="brand"
-                        @edit="
-                            $inertia.visit(
-                                route('my-store.brand.edit', {
-                                    brand: brand,
-                                })
-                            )
-                        "
-                        @delete="openDeleteBrandDialog(brand)"
-                    />
+                <template v-if="brands.length > 0">
+                    <div v-for="(brand, index) in brands" :key="brand.id">
+                        <MyStoreBrandCard
+                            :brand="brand"
+                            @edit="
+                                $inertia.visit(
+                                    route('my-store.brand.edit', {
+                                        brand: brand,
+                                    })
+                                )
+                            "
+                            @delete="openDeleteBrandDialog(brand)"
+                        />
+                    </div>
+                </template>
+                <div v-else class="flex items-center justify-center h-[90%]">
+                    <p class="text-sm text-center text-gray-500">
+                        Data tidak ditemukan.
+                    </p>
                 </div>
             </div>
 

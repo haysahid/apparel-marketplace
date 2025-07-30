@@ -106,7 +106,7 @@ onMounted(() => {
             <!-- Table -->
             <DefaultTable
                 v-if="screenSize.is('xl')"
-                :isEmpty="props.certificates.length === 0"
+                :isEmpty="certificates.length === 0"
                 class="mt-6"
             >
                 <template #thead>
@@ -170,21 +170,28 @@ onMounted(() => {
                 class="mt-4 min-h-[60vh] flex flex-col gap-3"
                 :class="{ 'min-h-auto h-[60vh]': certificates.length == 0 }"
             >
-                <div
-                    v-for="(certificate, index) in certificates"
-                    :key="certificate.id"
-                >
-                    <MyStoreCertificateCard
-                        :certificate="certificate"
-                        @edit="
-                            $inertia.visit(
-                                route('my-store.certificate.edit', {
-                                    storeCertificate: certificate,
-                                })
-                            )
-                        "
-                        @delete="openDeleteCertificateDialog(certificate)"
-                    />
+                <template v-if="certificates.length > 0">
+                    <div
+                        v-for="(certificate, index) in certificates"
+                        :key="certificate.id"
+                    >
+                        <MyStoreCertificateCard
+                            :certificate="certificate"
+                            @edit="
+                                $inertia.visit(
+                                    route('my-store.certificate.edit', {
+                                        storeCertificate: certificate,
+                                    })
+                                )
+                            "
+                            @delete="openDeleteCertificateDialog(certificate)"
+                        />
+                    </div>
+                </template>
+                <div v-else class="flex items-center justify-center h-[90%]">
+                    <p class="text-sm text-center text-gray-500">
+                        Data tidak ditemukan.
+                    </p>
                 </div>
             </div>
 

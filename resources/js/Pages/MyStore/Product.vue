@@ -392,7 +392,7 @@ onMounted(() => {
                 </template>
                 <div v-else class="flex items-center justify-center h-[90%]">
                     <p class="text-sm text-center text-gray-500">
-                        Tidak ada produk yang ditemukan.
+                        Data tidak ditemukan.
                     </p>
                 </div>
             </div>
