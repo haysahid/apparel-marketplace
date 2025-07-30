@@ -62,14 +62,13 @@ const submit = () => {
                 },
             }
         );
-        return;
+    } else {
+        form.post(route("my-store.brand.store"), {
+            onError: (errors) => {
+                openErrorDialog(errors.error);
+            },
+        });
     }
-
-    form.post(route("my-store.brand.store"), {
-        onFinish: () => {
-            form.reset();
-        },
-    });
 };
 
 const showErrorDialog = ref(false);
@@ -135,7 +134,7 @@ const openErrorDialog = (message) => {
                 <PrimaryButton type="submit"> Simpan </PrimaryButton>
                 <SecondaryButton
                     type="button"
-                    @click="$inertia.visit(route('my-store.certificate'))"
+                    @click="$inertia.visit(route('my-store.brand'))"
                 >
                     Kembali
                 </SecondaryButton>

@@ -32,7 +32,6 @@ class ProductVariant extends Model
 
     protected $appends = [
         'name',
-        'unit'
     ];
 
     // Additional attributes
@@ -49,11 +48,6 @@ class ProductVariant extends Model
             $name .= ' - ' . $this->size->name;
         }
         return $name;
-    }
-
-    protected function getUnitAttribute()
-    {
-        return $this->unit()->first()->name ?? 'pcs';
     }
 
     protected function url()

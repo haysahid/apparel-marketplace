@@ -20,7 +20,10 @@ class BrandRepository
         $brands = Brand::query();
 
         if ($storeId) {
-            $brands->where('store_id', $storeId);
+            $brands->where(function ($query) use ($storeId) {
+                $query->where('store_id', $storeId)
+                    ->orWhereNull('store_id');
+            });
         }
 
         if ($search) {
@@ -34,6 +37,20 @@ class BrandRepository
         $brands->get();
 
         return $brands->paginate($limit);
+    }
+
+    public static function getBrandDropdown($storeId = null, $orderBy = 'name', $orderDirection = 'asc')
+    {
+        $brandDropdown = Brand::query();
+
+        if ($storeId) {
+            $brandDropdown->where(function ($q) use ($storeId) {
+                $q->where('store_id', $storeId)
+                    ->orWhereNull('store_id');
+            });
+        }
+
+        return $brandDropdown->orderBy($orderBy, $orderDirection)->get();
     }
 
     public static function createBrand(array $data)
@@ -54,7 +71,7 @@ class BrandRepository
         } catch (Exception $e) {
             Log::error('Failed to create brand: ' . $e);
             DB::rollBack();
-            throw new Exception('Gagal menyimpan brand: ' . $e);
+            throw new Exception('Gagal menyimpan brand: ' . $e->getMessage());
         }
     }
 

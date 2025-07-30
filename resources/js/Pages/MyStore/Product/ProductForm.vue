@@ -20,6 +20,7 @@ import SuccessDialog from "@/Components/SuccessDialog.vue";
 import InputGroup from "@/Components/InputGroup.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import DropdownSearchInputMultiple from "@/Components/DropdownSearchInputMultiple.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 
 const props = defineProps({
     product: {
@@ -106,7 +107,7 @@ function uploadNewImage(image, index) {
     formData.append("order", index);
 
     axios
-        .post(`${page.props.ziggy.url}/api/admin/product-image`, formData, {
+        .post(`${page.props.ziggy.url}/api/my-store/product-image`, formData, {
             headers: {
                 "Content-Type": "multipart/form-data",
                 Authorization: token,
@@ -141,7 +142,7 @@ function updateImage(index, image) {
 
     axios
         .post(
-            `${page.props.ziggy.url}/api/admin/product-image/${image.id}`,
+            `${page.props.ziggy.url}/api/my-store/product-image/${image.id}`,
             formData,
             {
                 headers: {
@@ -182,7 +183,7 @@ function deleteImages() {
     images.forEach((imageId) => {
         axios
             .delete(
-                `${page.props.ziggy.url}/api/admin/product-image/${imageId}`,
+                `${page.props.ziggy.url}/api/my-store/product-image/${imageId}`,
                 {
                     headers: {
                         Authorization: token,
@@ -207,7 +208,7 @@ function deleteVariant(variant) {
 
     axios
         .delete(
-            `${page.props.ziggy.url}/api/admin/product-variant/${variant.id}`,
+            `${page.props.ziggy.url}/api/my-store/product-variant/${variant.id}`,
             {
                 headers: {
                     Authorization: token,
@@ -233,11 +234,14 @@ function getVariants() {
     const token = `Bearer ${localStorage.getItem("access_token")}`;
 
     axios
-        .get(`${page.props.ziggy.url}/api/admin/product/${props.product.id}`, {
-            headers: {
-                Authorization: token,
-            },
-        })
+        .get(
+            `${page.props.ziggy.url}/api/my-store/product/${props.product.id}`,
+            {
+                headers: {
+                    Authorization: token,
+                },
+            }
+        )
         .then((response) => {
             const product = response.data.result;
             form.variants = product.variants.map((variant) => ({
@@ -288,15 +292,12 @@ const submit = () => {
                 }
             });
             return formData;
-        }).post(route("admin.product.update", props.product), {
+        }).post(route("my-store.product.update", props.product), {
             onError: (errors) => {
                 console.error(errors);
                 if (errors.error) {
                     openErrorDialog(errors.error);
                 }
-            },
-            onFinish: () => {
-                form.reset();
             },
         });
     } else {
@@ -370,7 +371,7 @@ const submit = () => {
                 }
             });
             return formData;
-        }).post(route("admin.product.store"), {
+        }).post(route("my-store.product.store"), {
             onError: (errors) => {
                 console.error(errors);
                 if (errors.error) {
@@ -779,9 +780,15 @@ const closeErrorDialog = () => {
                 </PrimaryButton>
             </div>
 
-            <PrimaryButton type="submit" class="mt-4">
-                Simpan Data
-            </PrimaryButton>
+            <div class="flex items-center gap-4 mt-4">
+                <PrimaryButton type="submit"> Simpan </PrimaryButton>
+                <SecondaryButton
+                    type="button"
+                    @click="$inertia.visit(route('my-store.product'))"
+                >
+                    Kembali
+                </SecondaryButton>
+            </div>
         </div>
 
         <DialogModal

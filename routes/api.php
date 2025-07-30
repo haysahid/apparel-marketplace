@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\API\OrderController;
+use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\ProductImageController;
+use App\Http\Controllers\API\ProductVariantController;
+use App\Http\Controllers\API\ProductVariantImageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -34,4 +37,13 @@ Route::name('api.')->group(function () {
 
 Route::name('api.admin.')->prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('product-image', ProductImageController::class);
+});
+
+Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->group(function () {
+    Route::apiResource('product', ProductController::class);
+    Route::apiResource('product-image', ProductImageController::class);
+    Route::apiResource('product-variant', ProductVariantController::class);
+    Route::apiResource('product-variant-image', ProductVariantImageController::class);
+    Route::put('change-order-status', [OrderController::class, 'changeStatus'])->name('order.change-status');
+    // Route::post('report/generate', [ReportController::class, 'generateReport'])->name('report.generate');
 });

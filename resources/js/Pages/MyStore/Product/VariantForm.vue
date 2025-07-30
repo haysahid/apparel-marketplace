@@ -10,6 +10,8 @@ import ErrorDialog from "@/Components/ErrorDialog.vue";
 import { useDraggable } from "vue-draggable-plus";
 import axios from "axios";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import InputGroup from "@/Components/InputGroup.vue";
+import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 
 const props = defineProps({
     product: {
@@ -72,6 +74,7 @@ const form = useForm(
               discount_type: props.product?.discount_type || "percentage",
               discount: props.product?.discount,
               current_stock_level: null,
+              unit_id: null,
               unit: null,
               images: [{ id: "new-var-1", image: null }],
           }
@@ -100,6 +103,15 @@ const isSizeDropdownOpen = ref(false);
 const filteredSizes = computed(() => {
     return sizes.filter((size) =>
         size.name.toLowerCase().includes(sizeSearch.value.toLowerCase())
+    );
+});
+
+const units = (page.props.units as UnitEntity[]) || [];
+const unitSearch = ref("");
+const isUnitDropdownOpen = ref(false);
+const filteredUnits = computed(() => {
+    return units.filter((unit) =>
+        unit.name.toLowerCase().includes(unitSearch.value.toLowerCase())
     );
 });
 
@@ -153,7 +165,7 @@ function uploadNewImage(image, index) {
 
     axios
         .post(
-            `${page.props.ziggy.url}/api/admin/product-variant-image`,
+            `${page.props.ziggy.url}/api/my-store/product-variant-image`,
             formData,
             {
                 headers: {
@@ -191,7 +203,7 @@ function updateImage(index, image) {
 
     axios
         .post(
-            `${page.props.ziggy.url}/api/admin/product-variant-image/${image.id}`,
+            `${page.props.ziggy.url}/api/my-store/product-variant-image/${image.id}`,
             formData,
             {
                 headers: {
@@ -232,7 +244,7 @@ function deleteImages() {
     images.forEach((imageId) => {
         axios
             .delete(
-                `${page.props.ziggy.url}/api/admin/product-variant-image/${imageId}`,
+                `${page.props.ziggy.url}/api/my-store/product-variant-image/${imageId}`,
                 {
                     headers: {
                         Authorization: token,
@@ -270,7 +282,7 @@ function updateVariant() {
 
     axios
         .post(
-            `${page.props.ziggy.url}/api/admin/product-variant/${props.variant.id}`,
+            `${page.props.ziggy.url}/api/my-store/product-variant/${props.variant.id}`,
             formData,
             {
                 headers: {
@@ -282,10 +294,15 @@ function updateVariant() {
         .then((response) => {
             if (response.data?.meta?.message) {
                 emit("submitted", response.data?.meta?.message);
+                emit("close");
             }
         })
         .catch((error) => {
-            if (error.response?.data?.error) {
+            if (error.response?.data?.errors) {
+                Object.keys(error.response.data.errors).forEach((key) => {
+                    form.errors[key] = error.response.data.errors[key][0];
+                });
+            } else if (error.response?.data?.error) {
                 openErrorDialog(error.response.data.error);
             }
         });
@@ -294,6 +311,8 @@ function updateVariant() {
 function createVariant() {
     const data = form.data();
     const formData = new FormData();
+
+    formData.append("store_id", localStorage.getItem("selected_store_id"));
 
     Object.keys(data).forEach((key) => {
         if (key === "images") {
@@ -310,19 +329,28 @@ function createVariant() {
     const token = `Bearer ${localStorage.getItem("access_token")}`;
 
     axios
-        .post(`${page.props.ziggy.url}/api/admin/product-variant`, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-                Authorization: token,
-            },
-        })
+        .post(
+            `${page.props.ziggy.url}/api/my-store/product-variant`,
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: token,
+                },
+            }
+        )
         .then((response) => {
             if (response.data?.meta?.message) {
                 emit("submitted", response.data?.meta?.message);
+                emit("close");
             }
         })
         .catch((error) => {
-            if (error.response?.data?.error) {
+            if (error.response?.data?.errors) {
+                Object.keys(error.response.data.errors).forEach((key) => {
+                    form.errors[key] = error.response.data.errors[key][0];
+                });
+            } else if (error.response?.data?.error) {
                 openErrorDialog(error.response.data.error);
             }
         });
@@ -352,9 +380,9 @@ const submit = () => {
                 (image) => image.image instanceof File || isExistingImage(image)
             ),
         });
-    }
 
-    emit("close");
+        emit("close");
+    }
 };
 
 const imagesContainer = ref(null);
@@ -394,269 +422,113 @@ const openErrorDialog = (message) => {
             </h2>
 
             <!-- Motif -->
-            <div
-                class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-center sm:flex-row"
-            >
-                <InputLabel
-                    for="motif"
-                    value="Motif"
-                    class="text-lg font-bold sm:w-1/5"
-                />
-                <span class="hidden text-sm sm:block">:</span>
+            <InputGroup id="motif" label="Motif">
                 <TextInput
                     id="motif"
                     v-model="form.motif"
                     type="text"
                     placeholder="Masukkan Nama Motif"
-                    class="block w-full mt-1"
                     required
                     autocomplete="motif"
                     :error="form.errors.motif"
                     @update:modelValue="form.errors.motif = null"
                 />
-            </div>
+            </InputGroup>
 
             <!-- Color -->
-            <div
-                class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-center sm:flex-row"
-            >
-                <InputLabel
-                    for="color_id"
-                    value="Warna"
-                    class="text-lg font-bold sm:w-1/5"
-                />
-                <span class="hidden text-sm sm:block">:</span>
-                <Dropdown
+            <InputGroup id="color_id" label="Warna">
+                <DropdownSearchInput
                     id="color_id"
-                    v-model="form.color_id"
-                    :options="form.colors"
-                    option-label="name"
-                    option-value="id"
+                    :modelValue="
+                        form.color_id
+                            ? {
+                                  label: form.color?.name,
+                                  value: form.color_id,
+                              }
+                            : null
+                    "
+                    :options="
+                        filteredColors.map((color) => ({
+                            label: color.name,
+                            value: color.id,
+                        }))
+                    "
                     placeholder="Pilih Warna"
-                    align="left"
-                    class="block w-full mt-1"
-                    required
                     :error="form.errors.color_id"
-                    @update:modelValue="form.errors.color_id = null"
-                    @onOpen="isColorDropdownOpen = true"
-                    @onClose="isColorDropdownOpen = false"
-                >
-                    <template #trigger>
-                        <TextInput
-                            :modelValue="
-                                form.color_id && !isColorDropdownOpen
-                                    ? form.color.name
-                                    : colorSearch
-                            "
-                            @update:modelValue="
-                                form.color_id && !isColorDropdownOpen
-                                    ? null
-                                    : (colorSearch = $event)
-                            "
-                            class="w-full"
-                            placeholder="Pilih Warna"
-                        >
-                            <template #suffix>
-                                <button
-                                    v-if="form.color_id && !isColorDropdownOpen"
-                                    type="button"
-                                    class="absolute p-[7px] text-gray-400 bg-white rounded-full top-1 right-1 hover:bg-gray-100 transition-all duration-300 ease-in-out"
-                                    @click="
-                                        form.color_id = null;
-                                        form.color = null;
-                                        colorSearch = '';
-                                    "
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="size-5"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12"
-                                        />
-                                    </svg>
-                                </button>
-                                <button
-                                    v-else
-                                    type="button"
-                                    class="absolute p-2 top-1.5 right-1"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        class="size-4 fill-gray-400"
-                                    >
-                                        <path
-                                            d="M18.6054 7.3997C18.4811 7.273 18.3335 7.17248 18.1709 7.10389C18.0084 7.0353 17.8342 7 17.6583 7C17.4823 7 17.3081 7.0353 17.1456 7.10389C16.9831 7.17248 16.8355 7.273 16.7112 7.3997L11.4988 12.7028L6.28648 7.3997C6.03529 7.14415 5.69462 7.00058 5.33939 7.00058C4.98416 7.00058 4.64348 7.14415 4.3923 7.3997C4.14111 7.65526 4 8.00186 4 8.36327C4 8.72468 4.14111 9.07129 4.3923 9.32684L10.5585 15.6003C10.6827 15.727 10.8304 15.8275 10.9929 15.8961C11.1554 15.9647 11.3296 16 11.5055 16C11.6815 16 11.8557 15.9647 12.0182 15.8961C12.1807 15.8275 12.3284 15.727 12.4526 15.6003L18.6188 9.32684C19.1293 8.80747 19.1293 7.93274 18.6054 7.3997Z"
-                                        />
-                                    </svg>
-                                </button>
-                            </template>
-                        </TextInput>
-                    </template>
-                    <template #content>
-                        <ul class="overflow-y-auto max-h-60">
-                            <li
-                                v-for="color in filteredColors"
-                                :key="color.id"
-                                @click="
-                                    form.color_id = color.id;
-                                    form.color = color;
-                                "
-                                class="px-4 py-2 cursor-pointer hover:bg-gray-100 text-start"
-                            >
-                                {{ color.name }}
-                            </li>
-                        </ul>
-                    </template>
-                </Dropdown>
-            </div>
+                    @update:modelValue="
+                        (option) => {
+                            form.color_id = option?.value;
+                            form.color = option
+                                ? filteredColors.find(
+                                      (color) => color.id === option.value
+                                  )
+                                : null;
+                        }
+                    "
+                    @search="colorSearch = $event"
+                    @clear="
+                        form.color_id = null;
+                        form.color = null;
+                        colorSearch = '';
+                    "
+                />
+            </InputGroup>
 
             <!-- Size -->
-            <div
-                class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-center sm:flex-row"
-            >
-                <InputLabel
-                    for="size_id"
-                    value="Ukuran"
-                    class="text-lg font-bold sm:w-1/5"
-                />
-                <span class="hidden text-sm sm:block">:</span>
-                <Dropdown
+            <InputGroup id="size_id" label="Ukuran">
+                <DropdownSearchInput
                     id="size_id"
-                    v-model="form.size_id"
-                    :options="form.sizes"
-                    option-label="name"
-                    option-value="id"
+                    :modelValue="
+                        form.size_id
+                            ? {
+                                  label: form.size?.name,
+                                  value: form.size_id,
+                              }
+                            : null
+                    "
+                    :options="
+                        filteredSizes.map((size) => ({
+                            label: size.name,
+                            value: size.id,
+                        }))
+                    "
                     placeholder="Pilih Ukuran"
-                    align="left"
-                    class="block w-full mt-1"
-                    required
                     :error="form.errors.size_id"
-                    @update:modelValue="form.errors.size_id = null"
-                    @onOpen="isSizeDropdownOpen = true"
-                    @onClose="isSizeDropdownOpen = false"
-                >
-                    <template #trigger>
-                        <TextInput
-                            :modelValue="
-                                form.size_id && !isSizeDropdownOpen
-                                    ? form.size.name
-                                    : sizeSearch
-                            "
-                            @update:modelValue="
-                                form.size_id && !isSizeDropdownOpen
-                                    ? null
-                                    : (sizeSearch = $event)
-                            "
-                            class="w-full"
-                            placeholder="Pilih Ukuran"
-                        >
-                            <template #suffix>
-                                <button
-                                    v-if="form.size_id && !isSizeDropdownOpen"
-                                    type="button"
-                                    class="absolute p-[7px] text-gray-400 bg-white rounded-full top-1 right-1 hover:bg-gray-100 transition-all duration-300 ease-in-out"
-                                    @click="
-                                        form.size_id = null;
-                                        form.size = null;
-                                        sizeSearch = '';
-                                    "
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        class="size-5"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M6 18L18 6M6 6l12 12"
-                                        />
-                                    </svg>
-                                </button>
-                                <button
-                                    v-else
-                                    type="button"
-                                    class="absolute p-2 top-1.5 right-1"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="24"
-                                        height="24"
-                                        viewBox="0 0 24 24"
-                                        class="size-4 fill-gray-400"
-                                    >
-                                        <path
-                                            d="M18.6054 7.3997C18.4811 7.273 18.3335 7.17248 18.1709 7.10389C18.0084 7.0353 17.8342 7 17.6583 7C17.4823 7 17.3081 7.0353 17.1456 7.10389C16.9831 7.17248 16.8355 7.273 16.7112 7.3997L11.4988 12.7028L6.28648 7.3997C6.03529 7.14415 5.69462 7.00058 5.33939 7.00058C4.98416 7.00058 4.64348 7.14415 4.3923 7.3997C4.14111 7.65526 4 8.00186 4 8.36327C4 8.72468 4.14111 9.07129 4.3923 9.32684L10.5585 15.6003C10.6827 15.727 10.8304 15.8275 10.9929 15.8961C11.1554 15.9647 11.3296 16 11.5055 16C11.6815 16 11.8557 15.9647 12.0182 15.8961C12.1807 15.8275 12.3284 15.727 12.4526 15.6003L18.6188 9.32684C19.1293 8.80747 19.1293 7.93274 18.6054 7.3997Z"
-                                        />
-                                    </svg>
-                                </button>
-                            </template>
-                        </TextInput>
-                    </template>
-                    <template #content>
-                        <ul class="overflow-y-auto max-h-60">
-                            <li
-                                v-for="size in filteredSizes"
-                                :key="size.id"
-                                @click="
-                                    form.size_id = size.id;
-                                    form.size = size;
-                                "
-                                class="px-4 py-2 cursor-pointer hover:bg-gray-100 text-start"
-                            >
-                                {{ size.name }}
-                            </li>
-                        </ul>
-                    </template>
-                </Dropdown>
-            </div>
+                    @update:modelValue="
+                        (option) => {
+                            form.size_id = option?.value;
+                            form.size = option
+                                ? filteredSizes.find(
+                                      (size) => size.id === option.value
+                                  )
+                                : null;
+                        }
+                    "
+                    @search="sizeSearch = $event"
+                    @clear="
+                        form.size_id = null;
+                        form.size = null;
+                        sizeSearch = '';
+                    "
+                />
+            </InputGroup>
 
             <!-- Material -->
-            <div
-                class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-center sm:flex-row"
-            >
-                <InputLabel
-                    for="material"
-                    value="Jenis Bahan"
-                    class="text-lg font-bold sm:w-1/5"
-                />
-                <span class="hidden text-sm sm:block">:</span>
+            <InputGroup id="material" label="Jenis Bahan">
                 <TextInput
                     id="material"
                     v-model="form.material"
                     type="text"
                     placeholder="Masukkan Nama Jenis Bahan"
-                    class="block w-full mt-1"
                     required
                     autocomplete="material"
                     :error="form.errors.material"
                     @update:modelValue="form.errors.material = null"
                 />
-            </div>
+            </InputGroup>
 
             <!-- Images -->
-            <div
-                class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-start sm:flex-row"
-            >
-                <InputLabel
-                    for="image"
-                    value="Gambar Produk"
-                    class="text-lg font-bold sm:w-1/5"
-                />
-                <span class="hidden text-sm sm:block">:</span>
+            <InputGroup id="images" label="Gambar Produk">
                 <div ref="imagesContainer" class="flex flex-wrap w-full gap-2">
                     <ImageInput
                         v-for="(image, index) in form.images"
@@ -696,99 +568,88 @@ const openErrorDialog = (message) => {
                         "
                     />
                 </div>
-            </div>
+            </InputGroup>
 
             <!-- Base Selling Price -->
-            <div
-                class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-center sm:flex-row"
-            >
-                <InputLabel
-                    for="base_selling_price"
-                    value="Harga "
-                    class="text-lg font-bold sm:w-1/5"
-                />
-                <span class="hidden text-sm sm:block">:</span>
+            <InputGroup id="base_selling_price" label="Harga Dasar">
                 <TextInput
                     id="base_selling_price"
                     v-model.number="form.base_selling_price"
                     type="number"
                     placeholder="Masukkan Harga"
-                    class="block w-full mt-1"
                     required
                     autocomplete="base_selling_price"
                     :error="form.errors.base_selling_price"
                     @update:modelValue="form.errors.base_selling_price = null"
                 />
-            </div>
+            </InputGroup>
 
             <!-- Discount -->
-            <div
-                class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-center sm:flex-row"
-            >
-                <InputLabel
-                    for="discount"
-                    value="Diskon (%)"
-                    class="text-lg font-bold sm:w-1/5"
-                />
-                <span class="hidden text-sm sm:block">:</span>
+            <InputGroup id="discount" label="Diskon (%)">
                 <TextInput
                     id="discount"
                     v-model.number="form.discount"
                     type="number"
                     placeholder="Masukkan Diskon"
-                    class="block w-full mt-1"
                     required
                     autocomplete="discount"
                     :error="form.errors.discount"
                     @update:modelValue="form.errors.discount = null"
                 />
-            </div>
+            </InputGroup>
 
             <!-- Stock -->
-            <div
-                class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-center sm:flex-row"
-            >
-                <InputLabel
-                    for="current_stock_level"
-                    value="Stok"
-                    class="text-lg font-bold sm:w-1/5"
-                />
-                <span class="hidden text-sm sm:block">:</span>
+            <InputGroup id="current_stock_level" label="Stok">
                 <TextInput
                     id="current_stock_level"
                     v-model.number="form.current_stock_level"
                     type="number"
                     placeholder="Masukkan Stok"
-                    class="block w-full mt-1"
                     required
                     autocomplete="current_stock_level"
                     :error="form.errors.current_stock_level"
                     @update:modelValue="form.errors.current_stock_level = null"
                 />
-            </div>
+            </InputGroup>
 
             <!-- Unit -->
-            <div
-                class="flex flex-col w-full gap-y-1 gap-x-4 sm:items-center sm:flex-row"
-            >
-                <InputLabel
-                    for="unit"
-                    value="Satuan"
-                    class="text-lg font-bold sm:w-1/5"
+            <InputGroup id="unit" label="Satuan">
+                <DropdownSearchInput
+                    id="unit_id"
+                    :modelValue="
+                        form.unit_id
+                            ? {
+                                  label: form.unit?.name,
+                                  value: form.unit_id,
+                              }
+                            : null
+                    "
+                    :options="
+                        filteredUnits.map((unit) => ({
+                            label: unit.name,
+                            value: unit.id,
+                        }))
+                    "
+                    placeholder="Pilih Satuan"
+                    :error="form.errors.unit_id"
+                    @update:modelValue="
+                        (option) => {
+                            form.unit_id = option?.value;
+                            form.unit = option
+                                ? filteredUnits.find(
+                                      (unit) => unit.id === option.value
+                                  )
+                                : null;
+                        }
+                    "
+                    @search="unitSearch = $event"
+                    @clear="
+                        form.unit_id = null;
+                        form.unit = null;
+                        unitSearch = '';
+                    "
                 />
-                <span class="hidden text-sm sm:block">:</span>
-                <TextInput
-                    id="unit"
-                    v-model="form.unit"
-                    type="text"
-                    placeholder="Masukkan Nama Satuan"
-                    class="block w-full mt-1"
-                    required
-                    autocomplete="unit"
-                    :error="form.errors.unit"
-                    @update:modelValue="form.errors.unit = null"
-                />
-            </div>
+            </InputGroup>
 
             <div class="flex items-center justify-start w-full gap-4 mt-4">
                 <PrimaryButton type="submit"> Simpan Data </PrimaryButton>

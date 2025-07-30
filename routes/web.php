@@ -5,6 +5,7 @@ use App\Http\Controllers\MyStore\MyStoreCertificateController;
 use App\Http\Controllers\MyStoreController;
 use App\Http\Controllers\MyStore\MyStoreProductController;
 use App\Http\Controllers\MyStore\MyStoreBrandController;
+use App\Http\Controllers\MyStore\MyStoreTransactionController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PublicController;
@@ -104,12 +105,9 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->grou
     Route::post('/products/{product}', [MyStoreProductController::class, 'update'])->name('product.update');
     Route::delete('/products/{product}', [MyStoreProductController::class, 'destroy'])->name('product.destroy');
 
-    // Route::get('/products', [ProductController::class, 'myStoreProducts'])->name('products');
-    // Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
-    // Route::post('/products', [ProductController::class, 'store'])->name('products.store');
-    // Route::get('/products/{product}', [ProductController::class, 'edit'])->name('products.edit');
-    // Route::post('/products/{product}', [ProductController::class, 'update'])->name('products.update');
-    // Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    // Transaction
+    Route::get('/transaction', [MyStoreTransactionController::class, 'index'])->name('transaction');
+    Route::get('/transaction/{transaction}', [MyStoreTransactionController::class, 'edit'])->name('transaction.edit');
 });
 
 // Route::middleware([

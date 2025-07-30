@@ -9,13 +9,26 @@ use App\Models\Color;
 use App\Models\Platform;
 use App\Models\Product;
 use App\Models\Size;
+use App\Repositories\BrandRepository;
+use App\Repositories\CategoryRepository;
+use App\Repositories\ColorRepository;
+use App\Repositories\PlatformRepository;
 use App\Repositories\ProductRepository;
+use App\Repositories\SizeRepository;
+use App\Repositories\UnitRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class MyStoreProductController extends Controller
 {
+    protected $storeId;
+
+    public function __construct()
+    {
+        $this->storeId = session('selected_store_id') ?? null;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -32,7 +45,7 @@ class MyStoreProductController extends Controller
         $sizes = $request->input('sizes');
 
         $products = ProductRepository::getProducts(
-            storeId: session('selected_store_id'),
+            storeId: $this->storeId,
             limit: $limit,
             search: $search,
             orderBy: $orderBy,
@@ -43,9 +56,13 @@ class MyStoreProductController extends Controller
             sizes: $sizes,
         );
 
+        $brands = BrandRepository::getBrandDropdown(
+            storeId: $this->storeId
+        );
+
         return Inertia::render('MyStore/Product', [
             'products' => $products,
-            'brands' => Brand::orderBy('name', 'asc')->get(),
+            'brands' => $brands,
         ]);
     }
 
@@ -54,17 +71,31 @@ class MyStoreProductController extends Controller
      */
     public function create()
     {
-        $brands = Brand::orderBy('name', 'asc')->get();
-        $categories = Category::orderBy('name', 'asc')->get();
-        $sizes = Size::get();
-        $colors = Color::orderBy('name', 'asc')->get();
-        $platforms = Platform::orderBy('name', 'asc')->get();
+        $brands = BrandRepository::getBrandDropdown(
+            storeId: $this->storeId
+        );
+        $categories = CategoryRepository::getCategoryDropdown(
+            storeId: $this->storeId
+        );
+        $sizes = SizeRepository::getSizeDropdown(
+            storeId: $this->storeId
+        );
+        $colors = ColorRepository::getColorDropdown(
+            storeId: $this->storeId
+        );
+        $units = UnitRepository::getUnitDropdown(
+            storeId: $this->storeId
+        );
+        $platforms = PlatformRepository::getPlatformDropdown(
+            storeId: $this->storeId
+        );
 
         return Inertia::render('MyStore/Product/AddProduct', [
             'brands' => $brands,
             'categories' => $categories,
             'sizes' => $sizes,
             'colors' => $colors,
+            'units' => $units,
             'platforms' => $platforms,
         ]);
     }
@@ -93,7 +124,7 @@ class MyStoreProductController extends Controller
             'variants.*.base_selling_price' => 'required|numeric',
             'variants.*.discount' => 'nullable|numeric',
             'variants.*.current_stock_level' => 'required|integer',
-            'variants.*.unit' => 'required|string|max:100',
+            'variants.*.unit_id' => 'required|exists:units,id',
             'variants.*.images' => 'required|array',
             'variants.*.images.*' => 'file|mimes:jpg,jpeg,png,webp|max:2048',
         ], [
@@ -125,9 +156,8 @@ class MyStoreProductController extends Controller
             'variants.*.discount.numeric' => 'Diskon varian harus berupa angka.',
             'variants.*.current_stock_level.required' => 'Stok saat ini varian harus diisi.',
             'variants.*.current_stock_level.integer' => 'Stok saat ini varian harus berupa bilangan bulat.',
-            'variants.*.unit.required' => 'Satuan varian harus diisi.',
-            'variants.*.unit.string' => 'Satuan varian harus berupa string.',
-            'variants.*.unit.max' => 'Satuan varian tidak boleh lebih dari 100 karakter.',
+            'variants.*.unit_id.required' => 'Unit varian harus dipilih.',
+            'variants.*.unit_id.exists' => 'Unit yang dipilih tidak valid.',
             'variants.*.images.required' => 'Gambar varian harus diunggah.',
             'variants.*.images.array' => 'Gambar varian harus berupa array.',
             'variants.*.images.*.file' => 'Setiap gambar varian harus berupa file.',
@@ -136,9 +166,13 @@ class MyStoreProductController extends Controller
         ]);
 
         try {
+            $data = [
+                ...$validated,
+                'store_id' => $this->storeId,
+            ];
+
             ProductRepository::createProduct(
-                data: $validated,
-                storeId: session('selected_store_id')
+                data: $data,
             );
 
             return redirect()->route('my-store.product')
@@ -170,13 +204,27 @@ class MyStoreProductController extends Controller
             'variants.color',
             'variants.size',
             'variants.images',
+            'variants.unit',
         ]);
 
-        $brands = Brand::orderBy('name', 'asc')->get();
-        $categories = Category::orderBy('name', 'asc')->get();
-        $sizes = Size::get();
-        $colors = Color::orderBy('name', 'asc')->get();
-        $platforms = Platform::orderBy('name', 'asc')->get();
+        $brands = BrandRepository::getBrandDropdown(
+            storeId: $this->storeId
+        );
+        $categories = CategoryRepository::getCategoryDropdown(
+            storeId: $this->storeId
+        );
+        $sizes = SizeRepository::getSizeDropdown(
+            storeId: $this->storeId
+        );
+        $colors = ColorRepository::getColorDropdown(
+            storeId: $this->storeId
+        );
+        $units = UnitRepository::getUnitDropdown(
+            storeId: $this->storeId
+        );
+        $platforms = PlatformRepository::getPlatformDropdown(
+            storeId: $this->storeId
+        );
 
         return Inertia::render('MyStore/Product/EditProduct', [
             'product' => $product,
@@ -184,6 +232,7 @@ class MyStoreProductController extends Controller
             'categories' => $categories,
             'sizes' => $sizes,
             'colors' => $colors,
+            'units' => $units,
             'platforms' => $platforms,
         ]);
     }

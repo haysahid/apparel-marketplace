@@ -96,6 +96,7 @@ watch(
                 textClass="text-sm sm:text-base"
                 :bgClass="props.bgClass"
                 :placeholder="props.placeholder"
+                :error="props.error"
             >
                 <template #suffix>
                     <button
@@ -182,7 +183,11 @@ watch(
                             />
                         </svg>
                     </button>
-                    <button v-else type="button" class="absolute p-2 right-1 top-1">
+                    <button
+                        v-else
+                        type="button"
+                        class="absolute p-2 right-1 top-1"
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"

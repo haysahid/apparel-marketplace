@@ -64,17 +64,7 @@ class UserController extends Controller
 
     public function register()
     {
-        $store = Store::with([
-            'advantages',
-            'certificates' => function ($query) {
-                $query->limit(5);
-            },
-            'social_links',
-        ])->first();
-
-        return Inertia::render('Auth/Register', [
-            'store' => $store,
-        ]);
+        return Inertia::render('Auth/Register');
     }
 
     public function registerProcess(Request $request)
@@ -107,15 +97,27 @@ class UserController extends Controller
 
         Auth::login($user);
 
+        $accessToken = $user->createToken('authToken')->plainTextToken;
+
         $redirectUrl = $request->input('redirect');
+
         if ($redirectUrl) {
             return redirect()->to($redirectUrl)->with([
-                'success' => 'Akun berhasil dibuat. Selamat datang!',
+                'success' => 'Berhasil masuk.',
+                'access_token' => $accessToken,
+            ]);
+        }
+
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.dashboard')->with([
+                'success' => 'Berhasil masuk sebagai admin.',
+                'access_token' => $accessToken,
             ]);
         }
 
         return redirect()->route('home')->with([
             'success' => 'Akun berhasil dibuat. Selamat datang!',
+            'access_token' => $accessToken,
         ]);
     }
 

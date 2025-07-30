@@ -22,14 +22,6 @@ class OrderController extends Controller
 {
     public function orderSuccess(Request $request)
     {
-        $store = Store::with([
-            'advantages',
-            'certificates' => function ($query) {
-                $query->limit(5);
-            },
-            'social_links',
-        ])->first();
-
         $orderId = $request->query('order_id');
         $transaction_code = $request->query('transaction_code') ?? $orderId;
 
@@ -66,7 +58,6 @@ class OrderController extends Controller
         return Inertia::render('OrderSuccess', [
             'transaction' => $transaction,
             'groups' => $groups,
-            'store' => $store,
         ]);
     }
 

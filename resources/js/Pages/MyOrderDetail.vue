@@ -33,6 +33,27 @@ const props = defineProps({
             </p>
         </div>
 
-        <OrderDetail :transaction="props.transaction" :groups="props.groups" />
+        <OrderDetail :transaction="props.transaction" :groups="props.groups">
+            <template #actions v-if="showPaymentActions">
+                <!-- Payment Buttons -->
+                <div class="flex flex-col gap-2 mt-2">
+                    <PrimaryButton
+                        class="w-full py-3"
+                        :disabled="resumePaymentStatus === 'loading'"
+                        @click="showSnap()"
+                    >
+                        Lanjutkan Pembayaran
+                    </PrimaryButton>
+                    <SecondaryButton
+                        v-if="payment?.midtrans_response"
+                        class="w-full py-3"
+                        :disabled="resumePaymentStatus === 'loading'"
+                        @click="changePaymentType()"
+                    >
+                        Ubah Tipe Pembayaran
+                    </SecondaryButton>
+                </div>
+            </template>
+        </OrderDetail>
     </LandingLayout>
 </template>

@@ -43,7 +43,6 @@ class ProductSeeder extends Seeder
                 Log::info('Creating brand: ' . $productData['brand']['name']);
                 $brand = Brand::firstOrCreate(
                     [
-                        'store_id' => 1, // Assuming store_id is 1 for seeding
                         'name' => $productData['brand']['name']
                     ]
                 );

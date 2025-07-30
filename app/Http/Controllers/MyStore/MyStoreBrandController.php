@@ -5,6 +5,7 @@ namespace App\Http\Controllers\MyStore;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Repositories\BrandRepository;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -54,14 +55,29 @@ class MyStoreBrandController extends Controller
             'logo' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        Brand::create([
-            'name' => $validated['name'],
-            'description' => $validated['description'] ?? null,
-            'logo' => $request->file('logo') ? $request->file('logo')->store('brand') : null,
-            'website' => url('catalog?brands=' . $validated['name']),
-        ]);
+        try {
+            $isBrandExists = Brand::where('name', $validated['name'])
+                ->where('store_id', session('selected_store_id'))
+                ->exists();
 
-        return redirect()->route('my-store.brand')->with('success', 'Brand berhasil dibuat.');
+            if ($isBrandExists) {
+                return redirect()->back()->withErrors(['name' => 'Brand dengan nama ini sudah ada.']);
+            }
+
+            $data = [
+                'store_id' => session('selected_store_id'),
+                'name' => $validated['name'],
+                'description' => $validated['description'] ?? null,
+                'logo' => $request->file('logo') ? $request->file('logo') : null,
+                'website' => url('catalog?brands=' . $validated['name']),
+            ];
+
+            BrandRepository::createBrand($data);
+
+            return redirect()->route('my-store.brand')->with('success', 'Brand berhasil dibuat.');
+        } catch (Exception $e) {
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
+        }
     }
 
     /**
@@ -94,28 +110,16 @@ class MyStoreBrandController extends Controller
         ]);
 
         try {
-            DB::beginTransaction();
+            $data = [
+                ...$validated,
+                'website' => url('catalog?brands=' . $validated['name']),
+            ];
 
-            $brand->name = $validated['name'];
-            $brand->description = $validated['description'] ?? null;
-            $brand->website = url('catalog?brands=' . $validated['name']);
-
-            if ($request->hasFile('logo')) {
-                // Delete old logo if exists
-                if ($brand->logo) {
-                    Storage::delete($brand->logo);
-                }
-                $brand->logo = $request->file('logo')->store('brand');
-            }
-
-            $brand->save();
-
-            DB::commit();
+            BrandRepository::updateBrand($brand, $data);
 
             return redirect()->route('my-store.brand')->with('success', 'Brand berhasil diperbarui.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->withErrors(['error' => 'Gagal memperbarui brand: ' . $e->getMessage()]);
+        } catch (Exception $e) {
+            return redirect()->back()->withErrors(['error' => $e]);
         }
     }
 

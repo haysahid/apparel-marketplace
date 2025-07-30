@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import LandingSection from "@/Components/LandingSection.vue";
-import OrderItem from "./OrderItem.vue";
 import OrderContentRow from "@/Components/OrderContentRow.vue";
 import OrderStatusChip from "./OrderStatusChip.vue";
 import formatDate from "@/plugins/date-formatter";
 import OrderGroup from "./OrderGroup.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import axios from "axios";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { router } from "@inertiajs/vue3";
+import OrderSummaryCard from "./OrderSummaryCard.vue";
+import axios from "axios";
 
 async function initScript() {
     const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
@@ -159,16 +159,6 @@ async function changePaymentType() {
             }
         });
 }
-
-const subTotal = props.groups.reduce(
-    (total, group) =>
-        total + (group.invoice.amount - group.invoice.shipping_cost),
-    0
-);
-const total = props.groups.reduce(
-    (total, group) => total + group.invoice.amount,
-    0
-);
 
 const orderCreated = (date: string | null, status: boolean) => {
     return {
@@ -602,157 +592,19 @@ onMounted(() => {
                 </div>
 
                 <!-- Summary -->
-                <div
-                    class="w-full lg:w-[480px] outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl p-4 gap-y-4 flex flex-col gap-4"
+                <OrderSummaryCard
+                    :transaction="props.transaction"
+                    :groups="props.groups"
+                    :payment="payment"
+                    :showPaymentActions="showPaymentActions"
                 >
-                    <h3 class="text-lg font-semibold text-gray-700">
-                        Ringkasan Pemesanan
-                    </h3>
-                    <div>
-                        <div class="flex flex-col gap-2">
-                            <OrderContentRow
-                                label="Kode Pemesanan"
-                                :value="props.transaction.code"
-                            />
-
-                            <OrderContentRow
-                                label="Tgl. Pemesanan"
-                                :value="
-                                    formatDate(props.transaction.created_at)
-                                "
-                            />
-                            <OrderContentRow
-                                label="Status"
-                                :value="props.transaction.status"
-                            >
-                                <template #value>
-                                    <!-- Status -->
-                                    <OrderStatusChip
-                                        :status="props.transaction.status"
-                                        :label="
-                                            props.transaction.status?.toUpperCase()
-                                        "
-                                    />
-                                </template>
-                            </OrderContentRow>
-                            <OrderContentRow
-                                label="Metode Pembayaran"
-                                :value="props.transaction.payment_method.name"
-                            />
-                            <OrderContentRow
-                                label="Metode Pengiriman"
-                                :value="props.transaction.shipping_method.name"
-                            />
-
-                            <!-- Payment -->
-                            <template v-if="showPaymentActions">
-                                <!-- Divider -->
-                                <div
-                                    class="my-2 border-b border-gray-300"
-                                ></div>
-                                <OrderContentRow
-                                    label="Status Pembayaran"
-                                    :value="payment?.status"
-                                >
-                                    <template #value>
-                                        <OrderStatusChip
-                                            :status="payment.status"
-                                            :label="
-                                                payment.status?.toUpperCase()
-                                            "
-                                        />
-                                    </template>
-                                </OrderContentRow>
-                                <OrderContentRow
-                                    v-if="payment?.midtrans_response"
-                                    label="Tipe Pembayaran"
-                                    :value="
-                                        payment?.midtrans_response?.payment_type
-                                            ?.split('_')
-                                            .map(
-                                                (word) =>
-                                                    word
-                                                        .charAt(0)
-                                                        .toUpperCase() +
-                                                    word.slice(1)
-                                            )
-                                            .join(' ')
-                                    "
-                                />
-                                <OrderContentRow
-                                    v-if="
-                                        payment?.midtrans_response?.va_numbers
-                                    "
-                                    label="Tujuan Pembayaran"
-                                    :value="
-                                        payment?.midtrans_response?.va_numbers[0]?.bank?.toUpperCase()
-                                    "
-                                />
-                                <OrderContentRow
-                                    v-if="payment?.midtrans_response"
-                                    label="Batas Akhir Pembayaran"
-                                    :value="
-                                        payment?.midtrans_response?.expiry_time
-                                    "
-                                />
-                            </template>
-
-                            <!-- Divider -->
-                            <div class="my-2 border-b border-gray-300"></div>
-
-                            <OrderContentRow
-                                label="Sub Total"
-                                :value="$formatCurrency(subTotal)"
-                            />
-                            <OrderContentRow
-                                label="Biaya Pengiriman"
-                                :value="
-                                    $formatCurrency(
-                                        props.transaction.shipping_cost
-                                    )
-                                "
-                            />
-                            <div class="flex items-center justify-between">
-                                <p class="text-lg font-bold text-gray-700">
-                                    {{
-                                        props.transaction.status !== "paid"
-                                            ? "Total Tagihan"
-                                            : "Total"
-                                    }}
-                                </p>
-                                <p class="text-lg font-bold text-primary">
-                                    {{ $formatCurrency(total) }}
-                                </p>
-                            </div>
-
-                            <!-- Payment Buttons -->
-                            <div
-                                v-if="showPaymentActions"
-                                class="flex flex-col gap-2 mt-2"
-                            >
-                                <PrimaryButton
-                                    class="w-full py-3"
-                                    :disabled="
-                                        resumePaymentStatus === 'loading'
-                                    "
-                                    @click="showSnap()"
-                                >
-                                    Lanjutkan Pembayaran
-                                </PrimaryButton>
-                                <SecondaryButton
-                                    v-if="payment?.midtrans_response"
-                                    class="w-full py-3"
-                                    :disabled="
-                                        resumePaymentStatus === 'loading'
-                                    "
-                                    @click="changePaymentType()"
-                                >
-                                    Ubah Tipe Pembayaran
-                                </SecondaryButton>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <template #additionalInfo v-if="$slots.additionalInfo">
+                        <slot name="additionalInfo" />
+                    </template>
+                    <template #actions>
+                        <slot name="actions" />
+                    </template>
+                </OrderSummaryCard>
             </div>
         </LandingSection>
     </div>

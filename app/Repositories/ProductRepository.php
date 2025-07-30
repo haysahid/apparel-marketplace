@@ -72,7 +72,7 @@ class ProductRepository
         return $products->paginate($limit);
     }
 
-    public static function createProduct(array $data, $storeId = null)
+    public static function createProduct(array $data)
     {
         try {
             DB::beginTransaction();
@@ -81,7 +81,7 @@ class ProductRepository
                 'sku_prefix' => strtoupper(str_replace(' ', '', $data['sku_prefix'])),
                 'slug' => str($data['name'])->slug(),
                 'discount_type' => 'percentage',
-                'store_id' => $storeId,
+                'store_id' => $data['store_id'],
             ]);
 
             if (isset($data['categories'])) {
@@ -110,6 +110,7 @@ class ProductRepository
             if (isset($data['variants'])) {
                 foreach ($data['variants'] as $variant) {
                     $newVariant = ProductVariant::create([
+                        'store_id' => $data['store_id'],
                         'product_id' => $product->id,
                         'sku' => strtoupper(str_replace(' ', '', $product->sku_prefix . '_' . $variant['motif'] . '_' . $variant['color_id'] . '_' . $variant['size_id'])),
                         'slug' => str($product->name . '-' . $variant['motif'] . '-' . $variant['color_id'] . '-' . $variant['size_id'])->slug(),
