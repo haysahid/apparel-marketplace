@@ -57,7 +57,7 @@ if (props.transaction.payments) {
 
 const showPaymentActions = computed(() => {
     return (
-        props.transaction.status !== "paid" &&
+        props.transaction.status === "pending" &&
         props.transaction.payment_method.slug === "transfer"
     );
 });

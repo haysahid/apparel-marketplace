@@ -423,7 +423,7 @@ setTimeout(() => {
         <!-- Details -->
         <LandingSection class="!flex-col !justify-start !min-h-[56vh]">
             <div
-                class="flex flex-col items-center justify-center w-full gap-5 mx-auto lg:flex-row lg:items-start sm:gap-8 max-w-7xl"
+                class="flex flex-col items-center justify-center w-full gap-5 mx-auto xl:flex-row xl:items-start sm:gap-8 max-w-7xl"
             >
                 <!-- Items -->
                 <div class="flex flex-col w-full gap-4">

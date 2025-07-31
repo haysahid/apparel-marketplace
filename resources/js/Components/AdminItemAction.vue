@@ -2,6 +2,13 @@
 import { computed, getCurrentInstance } from "vue";
 import Dropdown from "./Dropdown.vue";
 
+const props = defineProps({
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
+});
+
 defineEmits(["edit", "delete"]);
 
 const hasEditCallback = computed(() => {
@@ -18,6 +25,7 @@ const hasDeleteCallback = computed(() => {
         <button
             v-if="hasEditCallback"
             type="button"
+            :disabled="props.disabled"
             class="p-2 bg-blue-500 rounded-md hover:bg-blue-600"
             @click="$emit('edit')"
         >
@@ -41,6 +49,7 @@ const hasDeleteCallback = computed(() => {
         <button
             v-if="hasDeleteCallback"
             type="button"
+            :disabled="props.disabled"
             class="p-2 bg-red-500 rounded-md hover:bg-red-600"
             @click="$emit('delete')"
         >
@@ -70,6 +79,7 @@ const hasDeleteCallback = computed(() => {
             <template #trigger>
                 <button
                     type="button"
+                    :disabled="props.disabled"
                     class="p-2 bg-gray-100 rounded-md hover:bg-gray-200"
                 >
                     <svg

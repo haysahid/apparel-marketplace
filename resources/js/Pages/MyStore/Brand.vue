@@ -223,6 +223,12 @@ onMounted(() => {
                         </td>
                         <td>
                             <AdminItemAction
+                                v-if="
+                                    $page.props.auth.user.is_admin ||
+                                    $page.props.auth.user.stores.some(
+                                        (store) => store.id === brand.store_id
+                                    )
+                                "
                                 @edit="
                                     $inertia.visit(
                                         route('my-store.brand.edit', {

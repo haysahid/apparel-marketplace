@@ -26,7 +26,7 @@ function changeStatus(newStatus: string) {
 
     axios
         .put(
-            "/api/admin/change-order-status",
+            "/api/my-store/change-order-status",
             {
                 transaction_id: props.transaction.id,
                 status: newStatus,
@@ -58,14 +58,14 @@ window.onpopstate = function () {
                 :groups="props.groups"
                 class="!px-0 !pt-8 md:!px-11"
             >
-                <!-- <template #actions>
+                <template #actions>
                     <PrimaryButton
                         @click="showChangeStatusDialog = true"
-                        class="w-full"
+                        class="w-full py-3"
                     >
                         Ubah Status
                     </PrimaryButton>
-                </template> -->
+                </template>
             </OrderDetail>
         </DefaultCard>
 

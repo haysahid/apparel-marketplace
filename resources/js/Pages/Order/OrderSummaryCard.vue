@@ -31,7 +31,7 @@ const total = props.groups.reduce(
 
 <template>
     <div
-        class="w-full lg:w-[480px] outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl p-4 gap-y-4 flex flex-col gap-4"
+        class="w-full xl:w-[480px] outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl p-4 gap-y-4 flex flex-col gap-4"
     >
         <h3 class="text-lg font-semibold text-gray-700">Ringkasan Pemesanan</h3>
         <div>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import DialogModal from "@/Components/DialogModal.vue";
-import ColorChip from "@/Components/ColorChip.vue";
 import Chip from "@/Components/Chip.vue";
 
 interface StatusOption {

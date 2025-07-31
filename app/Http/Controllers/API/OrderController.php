@@ -982,4 +982,40 @@ class OrderController extends Controller
             );
         }
     }
+
+    public function changeStatus(Request $request)
+    {
+        $validated = $request->validate([
+            'transaction_id' => 'required|integer|exists:transactions,id',
+            'status' => 'required|string|in:pending,paid,processing,completed,cancelled',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $transaction = Transaction::findOrFail($validated['transaction_id']);
+            $transaction->status = $validated['status'];
+            $transaction->save();
+
+            DB::commit();
+
+            return ResponseFormatter::success(
+                $transaction,
+                'Status transaksi berhasil diubah',
+                200
+            );
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            Log::error('Change status failed: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'transaction_id' => $validated['transaction_id'],
+            ]);
+
+            return ResponseFormatter::error(
+                'Gagal mengubah status transaksi: ' . $e->getMessage(),
+                500
+            );
+        }
+    }
 }
