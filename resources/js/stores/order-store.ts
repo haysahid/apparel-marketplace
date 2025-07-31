@@ -10,8 +10,8 @@ export const useOrderStore = defineStore("order", () => {
             : ({} as OrderDetailFormModel)
     );
 
-    const updateForm = (form: OrderDetailFormModel) => {
-        localStorage.setItem("order_form", JSON.stringify(form));
+    const updateForm = (updatedForm: OrderDetailFormModel) => {
+        localStorage.setItem("order_form", JSON.stringify(updatedForm));
     };
 
     const clearForm = () => {

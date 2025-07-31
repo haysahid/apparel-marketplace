@@ -14,11 +14,19 @@ class Invoice extends Model
         'transaction_id',
         'code',
         'description',
+        'base_amount',
         'shipping_cost',
         'tax',
+        'voucher_id',
+        'voucher_amount',
         'amount',
         'due_date',
         'paid_at',
+        'shipping_estimate',
+        'shipped_at',
+        'picked_up_at',
+        'delivered_at',
+        'status',
     ];
 
     // Relationships
@@ -27,13 +35,13 @@ class Invoice extends Model
         return $this->belongsTo(Store::class);
     }
 
+    public function voucher()
+    {
+        return $this->belongsTo(Voucher::class);
+    }
+
     public function transaction()
     {
         return $this->belongsTo(Transaction::class);
-    }
-
-    public function payments()
-    {
-        return $this->hasMany(Payment::class);
     }
 }

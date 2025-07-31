@@ -23,6 +23,8 @@ class Transaction extends Model
         'subdistrict_name',
         'zip_code',
         'address',
+        'voucher_id',
+        'voucher_amount',
         'shipping_estimate',
         'shipping_cost',
         'paid_at',
@@ -56,6 +58,11 @@ class Transaction extends Model
     public function shipping_method()
     {
         return $this->belongsTo(ShippingMethod::class);
+    }
+
+    public function voucher()
+    {
+        return $this->belongsTo(Voucher::class);
     }
 
     public function invoices()

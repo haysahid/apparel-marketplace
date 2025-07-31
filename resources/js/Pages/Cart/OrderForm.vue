@@ -2,7 +2,6 @@
 import { ref, computed, watch } from "vue";
 import Chip from "@/Components/Chip.vue";
 import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import { useForm } from "@inertiajs/vue3";
@@ -72,8 +71,23 @@ watch(
     }
 );
 
+const form = useForm({
+    payment_method: orderStore.form.payment_method,
+    shipping_method: orderStore.form.shipping_method,
+    destination_id: orderStore.form.destination_id || null,
+    destination: orderStore.form.destination,
+    address: orderStore.form.address,
+    estimated_delivery: null,
+});
+
 function getShippingCost() {
-    if (orderStore.form.shipping_method?.slug !== "courier") {
+    if (form.shipping_method?.slug !== "courier") {
+        cartStore.updateGroups(
+            cartStore.groups.map((group) => {
+                group.shipping = null;
+                return group;
+            })
+        );
         return;
     }
 
@@ -112,15 +126,6 @@ function getShippingCost() {
         });
 }
 
-const form = useForm({
-    payment_method: orderStore.form.payment_method,
-    shipping_method: orderStore.form.shipping_method,
-    destination_id: orderStore.form.destination_id || null,
-    destination: orderStore.form.destination,
-    address: orderStore.form.address,
-    estimated_delivery: null,
-});
-
 const updateLocalForm = () => {
     orderStore.updateForm({
         payment_method: form.payment_method,
@@ -145,9 +150,13 @@ watch(
 
 const total = computed(() => {
     if (form.shipping_method?.slug == "courier") {
-        return cartStore.subTotal + cartStore.totalShippingCost;
+        return (
+            cartStore.subTotal -
+            cartStore.totalGroupDiscount +
+            cartStore.totalShippingCost
+        );
     }
-    return cartStore.subTotal;
+    return cartStore.subTotal - cartStore.totalGroupDiscount;
 });
 
 const showAuthWarning = ref(false);
@@ -166,6 +175,7 @@ const submit = () => {
             {
                 cart_groups: cartStore.groupHasSelectedItems.map((group) => ({
                     store_id: group.store_id,
+                    voucher_code: group.voucher?.code || null,
                     items: group.items
                         .filter((item) => item.selected)
                         .map((item) => ({
@@ -258,7 +268,10 @@ const submit = () => {
                         :key="shipping.id"
                         :label="shipping.name"
                         :selected="form.shipping_method?.id == shipping.id"
-                        @click="form.shipping_method = shipping"
+                        @click="
+                            form.shipping_method = shipping;
+                            getShippingCost();
+                        "
                     />
                 </div>
             </div>
@@ -432,6 +445,24 @@ const submit = () => {
                                 currency: "IDR",
                                 minimumFractionDigits: 0,
                             })
+                        }}
+                    </p>
+                </div>
+
+                <!-- Discount -->
+                <div class="flex items-center justify-between">
+                    <p class="text-gray-700">Diskon</p>
+                    <p class="text-gray-700">
+                        -
+                        {{
+                            cartStore.totalGroupDiscount.toLocaleString(
+                                "id-ID",
+                                {
+                                    style: "currency",
+                                    currency: "IDR",
+                                    minimumFractionDigits: 0,
+                                }
+                            )
                         }}
                     </p>
                 </div>

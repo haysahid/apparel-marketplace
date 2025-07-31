@@ -189,8 +189,8 @@ onMounted(() => {
             <p
                 class="max-w-lg text-sm text-gray-700 text-start sm:text-center sm:text-base"
             >
-                Terima kasih telah melakukan pemesanan di Mustika Collection.
-                Silakan cek detail pesanan Anda di bawah ini.
+                Terima kasih telah melakukan pemesanan. Silakan cek detail
+                pesanan Anda di bawah ini.
             </p>
         </div>
 

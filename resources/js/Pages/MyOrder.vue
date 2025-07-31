@@ -66,8 +66,8 @@ const transactions = props.transactions.data;
                 class="max-w-md text-sm text-gray-700 text-start sm:text-center sm:text-base"
                 v-else
             >
-                Terima kasih telah berbelanja di {{ $page.props.store.name }}.
-                Berikut adalah daftar pesanan Anda.
+                Terima kasih telah melakukan pemesanan. Silakan cek detail
+                pesanan Anda di bawah ini.
             </p>
         </div>
 

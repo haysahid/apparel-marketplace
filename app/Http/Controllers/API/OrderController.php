@@ -16,6 +16,7 @@ use App\Models\Transaction;
 use App\Models\TransactionItem;
 use App\Models\User;
 use App\Repositories\MidtransRepository;
+use App\Repositories\VoucherRepository;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
@@ -36,6 +37,39 @@ class OrderController extends Controller
     {
         $this->rajaongkirRepository = new RajaongkirRepository();
         $this->midtransRepository = new MidtransRepository();
+    }
+
+    public function getVouchers(Request $request)
+    {
+        $storeId = $request->input('store_id');
+
+        $vouchers = VoucherRepository::getAllVouchers($storeId);
+        return ResponseFormatter::success($vouchers);
+    }
+
+    public function checkVoucher(Request $request)
+    {
+        $validated = $request->validate([
+            'code' => 'required|string',
+            'store_id' => 'nullable|exists:stores,id',
+        ]);
+
+        $voucher = VoucherRepository::getVoucherByCode(
+            code: $validated['code'],
+            storeId: $validated['store_id'] ?? null
+        );
+
+        if (!$voucher) {
+            return ResponseFormatter::error(
+                message: 'Voucher diskon tidak ditemukan atau sudah tidak berlaku.',
+                code: 404
+            );
+        }
+
+        return ResponseFormatter::success(
+            $voucher,
+            'Voucher diskon berhasil ditemukan.'
+        );
     }
 
     public function syncCart(Request $request)
@@ -278,6 +312,7 @@ class OrderController extends Controller
         $validated = $request->validate([
             'cart_groups' => 'required|array',
             'cart_groups.*.store_id' => 'required|integer|exists:stores,id',
+            'cart_groups.*.voucher_code' => 'nullable|string|exists:vouchers,code',
             'cart_groups.*.items' => 'required|array',
             'cart_groups.*.items.*.product_id' => 'required|integer|exists:products,id',
             'cart_groups.*.items.*.variant_id' => 'required|integer|exists:product_variants,id',
@@ -293,10 +328,13 @@ class OrderController extends Controller
             'zip_code' => 'nullable|string',
             'address' => 'nullable|string',
             'note' => 'nullable|string',
+            'voucher_code' => 'nullable|string|exists:vouchers,code',
         ], [
             'cart_groups.required' => 'Keranjang harus diisi',
             'cart_groups.*.store_id.required' => 'ID toko harus diisi',
             'cart_groups.*.store_id.exists' => 'Toko tidak ditemukan',
+            'cart_groups.*.voucher_code.string' => 'Kode voucher harus berupa string',
+            'cart_groups.*.voucher_code.exists' => 'Kode voucher tidak ditemukan',
             'cart_groups.*.items.required' => 'Item keranjang harus diisi',
             'cart_groups.*.items.*.product_id.required' => 'ID produk harus diisi',
             'cart_groups.*.items.*.product_id.exists' => 'Produk tidak ditemukan',
@@ -316,10 +354,25 @@ class OrderController extends Controller
             'zip_code.string' => 'Kode pos harus berupa string',
             'address.string' => 'Alamat harus berupa string',
             'note.string' => 'Catatan harus berupa string',
+            'voucher_code.string' => 'Kode voucher harus berupa string',
+            'voucher_code.exists' => 'Kode voucher tidak ditemukan',
         ]);
 
         try {
             DB::beginTransaction();
+
+            // Get transaction voucher if provided
+            $transactionVoucher = null;
+            if (isset($validated['voucher_code'])) {
+                $transactionVoucher = VoucherRepository::getVoucherByCode($validated['voucher_code']);
+                if (!$transactionVoucher) {
+                    DB::rollBack();
+                    return ResponseFormatter::error(
+                        'Voucher tidak ditemukan',
+                        404
+                    );
+                }
+            }
 
             $paymentMethod = PaymentMethod::findOrFail($validated['payment_method_id']);
             $shippingMethod = ShippingMethod::findOrFail($validated['shipping_method_id']);
@@ -426,8 +479,8 @@ class OrderController extends Controller
                 }
 
                 // Calculate total
+                $baseTotal = $subTotal;
                 $total = $subTotal + $shippingCost;
-                $totalPayment += $total;
 
                 // Create invoice
                 if ($paymentMethod->slug === 'transfer') {
@@ -470,6 +523,7 @@ class OrderController extends Controller
                         'code' => 'INV-' . date('YmdHis') . '-' . $key,
                         'shipping_cost' => $shippingCost,
                         'tax' => 0,
+                        'base_amount' => $baseTotal,
                         'amount' => $total,
                         'due_date' => now()->addDays(1),
                         'snap_token' => null,
@@ -481,14 +535,76 @@ class OrderController extends Controller
                         'code' => 'INV-' . date('YmdHis') . '-' . $key,
                         'shipping_cost' => 0,
                         'tax' => 0,
+                        'base_amount' => $baseTotal,
                         'amount' => $total,
                         'due_date' => now()->addDays(1),
                     ])->load('store');
                 }
 
+                // Get store voucher if provided
+                $storeVoucher = null;
+                if (isset($group['voucher_code'])) {
+                    $storeVoucher = VoucherRepository::getVoucherByCode(
+                        code: $group['voucher_code'],
+                        storeId: $store->id,
+                    );
+
+                    if (!$storeVoucher) {
+                        DB::rollBack();
+                        return ResponseFormatter::error(
+                            'Voucher tidak ditemukan',
+                            404
+                        );
+                    }
+                }
+
+                if ($storeVoucher) {
+                    // Apply voucher discount
+                    $discountAmount = VoucherRepository::calculateVoucherAmount(
+                        voucher: $storeVoucher,
+                        amount: $invoice->base_amount,
+                    );
+
+                    // Update invoice with discount
+                    $invoice->voucher_id = $storeVoucher->id;
+                    $invoice->voucher_amount = $discountAmount;
+                    $invoice->amount = $invoice->amount - $discountAmount;
+                    $invoice->save();
+                    $invoice->load('voucher');
+
+                    // Update transaction total payment
+                    $totalPayment = $invoice->amount;
+
+                    $itemDetails[] = [
+                        'id' => $storeVoucher->id,
+                        'price' => -$discountAmount,
+                        'quantity' => 1,
+                        'name' => 'Diskon - ' . $storeVoucher->code,
+                        'brand' => null,
+                        'merchant_name' => $store->name,
+                        'url' => null,
+                    ];
+                }
+
                 $invoices[] = $invoice;
             }
             // [END] Processing each cart group
+
+            if ($transactionVoucher) {
+                // Apply transaction voucher discount
+                $discountAmount = VoucherRepository::calculateVoucherAmount(
+                    voucher: $transactionVoucher,
+                    amount: $totalPayment - $transaction->shipping_cost,
+                );
+
+                $totalPayment = $totalPayment - $discountAmount;
+
+                // Update transaction with discount
+                $transaction->voucher_id = $transactionVoucher->id;
+                $transaction->voucher_amount = $discountAmount;
+                $transaction->save();
+                $transaction->load('voucher');
+            }
 
             // Create payment record
             $customer = User::find(Auth::id());
@@ -511,7 +627,7 @@ class OrderController extends Controller
                 $payment = Payment::create([
                     'transaction_id' => $transaction->id,
                     'payment_method_id' => $paymentMethod->id,
-                    'amount' => $total,
+                    'amount' => $grossAmount,
                     'note' => $validated['note'] ?? null,
                     'status' => 'pending',
                     'midtrans_snap_token' => $snapToken,
@@ -520,7 +636,7 @@ class OrderController extends Controller
                 $payment = Payment::create([
                     'transaction_id' => $transaction->id,
                     'payment_method_id' => $paymentMethod->id,
-                    'amount' => $totalPayment,
+                    'amount' => $grossAmount,
                     'note' => $validated['note'] ?? null,
                     'status' => 'pending',
                 ]);

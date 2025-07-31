@@ -41,6 +41,28 @@ export const useCartStore = defineStore("cart_groups", () => {
         }, 0);
     });
 
+    const totalGroupDiscount = computed(() => {
+        return Math.floor(
+            groupHasSelectedItems.value.reduce((total, group) => {
+                if (!group.voucher) return total;
+
+                const discount = group.voucher.amount || 0;
+                if (group.voucher.type === "percentage") {
+                    const groupTotal = group.items
+                        .filter((item) => item.selected)
+                        .reduce((sum, item) => {
+                            const price =
+                                item.variant?.final_selling_price || 0;
+                            return sum + price * item.quantity;
+                        }, 0);
+                    return total + (groupTotal * discount) / 100;
+                } else {
+                    return total + discount;
+                }
+            }, 0)
+        );
+    });
+
     const totalShippingCost = computed(() => {
         return groupHasSelectedItems.value.reduce((total, group) => {
             const shippingCost = group.shipping?.cost || 0;
@@ -202,6 +224,7 @@ export const useCartStore = defineStore("cart_groups", () => {
         groupHasSelectedItems,
         selectedItems,
         subTotal,
+        totalGroupDiscount,
         totalShippingCost,
         toggleGroup,
         toggleItem,

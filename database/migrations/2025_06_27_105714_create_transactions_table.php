@@ -27,6 +27,8 @@ return new class extends Migration
             $table->string('subdistrict_name')->nullable();
             $table->string('zip_code')->nullable();
             $table->string('address')->nullable();
+            $table->foreignId('voucher_id')->nullable()->constrained('vouchers')->onDelete('set null');
+            $table->integer('voucher_amount')->default(0);
             $table->integer('shipping_cost')->nullable();
             $table->string('shipping_estimate')->nullable();
             $table->timestamp('paid_at')->nullable();

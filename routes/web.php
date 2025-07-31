@@ -5,7 +5,9 @@ use App\Http\Controllers\MyStore\MyStoreCertificateController;
 use App\Http\Controllers\MyStoreController;
 use App\Http\Controllers\MyStore\MyStoreProductController;
 use App\Http\Controllers\MyStore\MyStoreBrandController;
+use App\Http\Controllers\MyStore\MyStoreOrderController;
 use App\Http\Controllers\MyStore\MyStoreTransactionController;
+use App\Http\Controllers\MyStore\MyStoreVoucherController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PublicController;
@@ -108,6 +110,18 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->grou
     // Transaction
     Route::get('/transaction', [MyStoreTransactionController::class, 'index'])->name('transaction');
     Route::get('/transaction/{transaction}', [MyStoreTransactionController::class, 'edit'])->name('transaction.edit');
+
+    // Order
+    Route::get('/order', [MyStoreOrderController::class, 'index'])->name('order');
+    Route::get('/order/{invoice}', [MyStoreOrderController::class, 'edit'])->name('order.edit');
+
+    // Voucher
+    Route::get('/voucher', [MyStoreVoucherController::class, 'index'])->name('voucher');
+    Route::get('/voucher/create', [MyStoreVoucherController::class, 'create'])->name('voucher.create');
+    Route::post('/voucher', [MyStoreVoucherController::class, 'store'])->name('voucher.store');
+    Route::get('/voucher/{voucher}', [MyStoreVoucherController::class, 'edit'])->name('voucher.edit');
+    Route::post('/voucher/{voucher}', [MyStoreVoucherController::class, 'update'])->name('voucher.update');
+    Route::delete('/voucher/{voucher}', [MyStoreVoucherController::class, 'destroy'])->name('voucher.destroy');
 });
 
 // Route::middleware([

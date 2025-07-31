@@ -4,8 +4,8 @@ import OrderStatusChip from "@/Pages/Order/OrderStatusChip.vue";
 import { Link } from "@inertiajs/vue3";
 
 const props = defineProps({
-    transaction: {
-        type: Object as () => TransactionEntity,
+    invoice: {
+        type: Object as () => InvoiceEntity,
         required: true,
     },
 });
@@ -25,46 +25,45 @@ const emit = defineEmits(["edit"]);
                     <Link
                         :href="
                             route('my-store.transaction.edit', {
-                                transaction: transaction,
+                                transaction: invoice,
                             })
                         "
                         class="text-sm font-medium text-gray-900 md:text-base hover:text-primary"
                     >
-                        #{{ transaction.code }}
+                        #{{ invoice.code }}
                     </Link>
                     <OrderStatusChip
-                        :status="transaction.status"
-                        :label="transaction.status.toLocaleUpperCase()"
+                        :status="invoice.transaction.status"
+                        :label="invoice.transaction.status.toLocaleUpperCase()"
                         class="w-fit"
                     />
                 </div>
                 <div class="flex items-end justify-between w-full gap-2">
                     <div>
                         <p class="text-xs text-gray-500">
-                            {{ props.transaction.user.name }}
+                            {{ props.invoice.transaction.user.name }}
                         </p>
                         <p class="text-xs text-gray-500">
-                            {{ props.transaction.items.length }} items
+                            {{ props.invoice.transaction.items.length }} items
                         </p>
                         <p class="text-xs text-gray-500">
                             <span>
-                                {{ props.transaction.payment_method.name }}
+                                {{
+                                    props.invoice.transaction.payment_method
+                                        .name
+                                }}
                             </span>
                             <span class="mx-1">•</span>
                             <span>
-                                {{ props.transaction.shipping_method.name }}
+                                {{
+                                    props.invoice.transaction.shipping_method
+                                        .name
+                                }}
                             </span>
                         </p>
                     </div>
                     <p class="text-sm font-medium text-gray-600">
-                        {{
-                            $formatCurrency(
-                                transaction.items.reduce(
-                                    (total, item) => total + item.subtotal,
-                                    0
-                                )
-                            )
-                        }}
+                        {{ $formatCurrency(invoice.amount) }}
                     </p>
                 </div>
             </div>

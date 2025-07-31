@@ -1,19 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
-import Chip from "@/Components/Chip.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
-import TextAreaInput from "@/Components/TextAreaInput.vue";
-import Dropdown from "@/Components/Dropdown.vue";
-import { useForm } from "@inertiajs/vue3";
-import axios from "axios";
+import { ref } from "vue";
 import { usePage, router } from "@inertiajs/vue3";
 import { useCartStore } from "@/stores/cart-store";
-import { useOrderStore } from "@/stores/order-store";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import BaseDialog from "@/Components/BaseDialog.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
-import useDebounce from "@/plugins/debounce";
 
 const page = usePage();
 const cartStore = useCartStore();

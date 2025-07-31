@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import InputGroup from "@/Components/InputGroup.vue";
 import CheckoutItem from "./CheckoutItem.vue";
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
+import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
+import axios from "axios";
+import ErrorDialog from "@/Components/ErrorDialog.vue";
 
 const props = defineProps({
     cartGroup: {
@@ -9,9 +13,83 @@ const props = defineProps({
     },
 });
 
+const emit = defineEmits(["selectVoucher", "removeVoucher"]);
+
 const selectedItems = computed(() => {
     return props.cartGroup.items?.filter((item) => item.selected) ?? [];
 });
+
+const vouchers = ref([]);
+const searchVoucherCode = ref(null);
+const filteredVouchers = computed(() => {
+    if (!searchVoucherCode.value) return vouchers.value;
+
+    return vouchers.value.filter((voucher) =>
+        voucher.name
+            .toLowerCase()
+            .includes(searchVoucherCode.value.toLowerCase())
+    );
+});
+const selectedVoucher = ref(null);
+const voucherErrorMessage = ref(null);
+
+function getStoreVouchers(storeId = null) {
+    axios
+        .get("/api/vouchers", {
+            params: {
+                store_id: storeId,
+            },
+            headers: {
+                authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+        })
+        .then((response) => {
+            vouchers.value = response.data.result;
+        })
+        .catch((error) => {
+            voucherErrorMessage.value =
+                error.response?.data?.message || "Gagal memuat voucher.";
+        });
+}
+
+function checkVoucherCode(voucherCode: string, storeId = null) {
+    axios
+        .post(
+            route("api.check-voucher"),
+            {
+                code: voucherCode,
+                store_id: storeId,
+            },
+            {
+                headers: {
+                    authorization: `Bearer ${localStorage.getItem(
+                        "access_token"
+                    )}`,
+                },
+            }
+        )
+        .then((response) => {
+            selectedVoucher.value = response.data.result;
+        })
+        .catch((error) => {
+            selectedVoucher.value = null;
+            voucherErrorMessage.value =
+                error.response?.data?.message || "Voucher tidak valid.";
+        });
+}
+
+const showErrorDialog = ref(false);
+const errorMessage = ref("");
+
+function openErrorDialog(message: string) {
+    errorMessage.value = message;
+    showErrorDialog.value = true;
+}
+
+function closeErrorDialog() {
+    showErrorDialog.value = false;
+    errorMessage.value = "";
+}
 
 const sum = computed(() => {
     return selectedItems.value.reduce(
@@ -21,12 +99,26 @@ const sum = computed(() => {
     );
 });
 
+const discount = computed(() => {
+    if (!selectedVoucher.value) return 0;
+
+    if (selectedVoucher.value.type === "percentage") {
+        return Math.floor((sum.value * selectedVoucher.value.amount) / 100);
+    } else {
+        return Math.floor(selectedVoucher.value.amount);
+    }
+});
+
 const shippingCost = computed(() => {
     return props.cartGroup.shipping?.cost ?? 0;
 });
 
 const totalPrice = computed(() => {
-    return sum.value + shippingCost.value;
+    return sum.value - discount.value + shippingCost.value;
+});
+
+onMounted(() => {
+    getStoreVouchers(props.cartGroup.store_id);
 });
 </script>
 
@@ -74,51 +166,118 @@ const totalPrice = computed(() => {
         ></div>
 
         <!-- Summary -->
-        <div class="flex justify-end w-full">
+        <div class="flex flex-col w-full gap-4 sm:flex-row sm:justify-between">
+            <!-- Voucher -->
+            <div>
+                <InputGroup
+                    :id="`${props.cartGroup.store?.id}-voucher`"
+                    label="Pilih Voucher Toko"
+                >
+                    <DropdownSearchInput
+                        :id="`${props.cartGroup.store?.id}-voucher`"
+                        :modelValue="
+                            selectedVoucher
+                                ? {
+                                      label: `${selectedVoucher.name} - ${
+                                          selectedVoucher.type === 'percentage'
+                                              ? selectedVoucher.amount + '%'
+                                              : selectedVoucher.amount
+                                      }`,
+                                      value: selectedVoucher.code,
+                                  }
+                                : null
+                        "
+                        :options="
+                            filteredVouchers.map((voucher) => ({
+                                label: `${voucher.name} - ${
+                                    voucher.type === 'percentage'
+                                        ? voucher.amount + '%'
+                                        : voucher.amount
+                                }`,
+                                value: voucher.code,
+                            }))
+                        "
+                        placeholder="Pilih Voucher"
+                        @update:modelValue="
+                            (option) => {
+                                selectedVoucher = option
+                                    ? vouchers.find(
+                                          (voucher) =>
+                                              voucher.code === option.value
+                                      )
+                                    : null;
+                                if (selectedVoucher) {
+                                    emit('selectVoucher', selectedVoucher);
+                                } else {
+                                    emit('removeVoucher');
+                                }
+                            }
+                        "
+                        @search="searchVoucherCode = $event"
+                        @clear="
+                            selectedVoucher = null;
+                            searchVoucherCode = null;
+                            voucherErrorMessage = null;
+                            emit('removeVoucher');
+                        "
+                    />
+                </InputGroup>
+
+                <p v-if="selectedVoucher" class="mt-1 text-sm text-green-600">
+                    Voucher berhasil diterapkan.
+                </p>
+            </div>
+
+            <!-- Summary -->
             <table class="text-sm sm:text-base">
                 <tbody class="text-gray-800 [&>tr>td]:py-0.5">
                     <tr>
-                        <td class="text-end">Jumlah</td>
+                        <td class="sm:text-end">Jumlah</td>
                         <td class="text-end">
-                            {{
-                                sum.toLocaleString("id-ID", {
-                                    style: "currency",
-                                    currency: "IDR",
-                                    minimumFractionDigits: 0,
-                                })
-                            }}
+                            {{ $formatCurrency(sum) }}
                         </td>
                     </tr>
                     <tr>
-                        <td class="text-end">Biaya Pengiriman</td>
+                        <td class="sm:text-end">Voucher Diskon</td>
                         <td class="text-end">
-                            {{
-                                shippingCost.toLocaleString("id-ID", {
-                                    style: "currency",
-                                    currency: "IDR",
-                                    minimumFractionDigits: 0,
-                                })
-                            }}
+                            - {{ $formatCurrency(discount) }}
                         </td>
                     </tr>
                     <tr>
-                        <td class="text-base font-semibold sm:text-lg text-end">
+                        <td class="sm:text-end">Biaya Pengiriman</td>
+                        <td class="text-end">
+                            {{ $formatCurrency(shippingCost) }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td
+                            class="text-base font-semibold sm:text-lg sm:text-end"
+                        >
                             Total Harga
                         </td>
                         <td
                             class="text-base font-semibold sm:text-lg text-end ps-8"
                         >
-                            {{
-                                totalPrice.toLocaleString("id-ID", {
-                                    style: "currency",
-                                    currency: "IDR",
-                                    minimumFractionDigits: 0,
-                                })
-                            }}
+                            {{ $formatCurrency(totalPrice) }}
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
+
+        <ErrorDialog :show="showErrorDialog" @close="showErrorDialog = false">
+            <template #content>
+                <div>
+                    <div
+                        class="mb-1 text-lg font-medium text-center text-gray-900"
+                    >
+                        Terjadi Kesalahan
+                    </div>
+                    <p class="text-center text-gray-700">
+                        {{ errorMessage }}
+                    </p>
+                </div>
+            </template>
+        </ErrorDialog>
     </div>
 </template>

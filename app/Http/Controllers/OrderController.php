@@ -10,6 +10,7 @@ use App\Models\ShippingMethod;
 use App\Models\Store;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
+use App\Repositories\VoucherRepository;
 use Exception;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
@@ -29,7 +30,7 @@ class OrderController extends Controller
             $transaction = Transaction::with(['payment_method', 'shipping_method', 'payments'])
                 ->where('code', $transaction_code)
                 ->firstOrFail();
-            $invoices = Invoice::with(['store'])->where('transaction_id', $transaction->id)->get();
+            $invoices = Invoice::with(['store', 'voucher'])->where('transaction_id', $transaction->id)->get();
             $groups = $invoices->map(function ($invoice) {
                 $items = TransactionItem::where('transaction_id', $invoice->transaction_id)
                     ->where('store_id', $invoice->store_id)
@@ -102,7 +103,7 @@ class OrderController extends Controller
         ])
             ->where('code', $transaction_code)
             ->firstOrFail();
-        $invoices = Invoice::with(['store'])->where('transaction_id', $transaction->id)->get();
+        $invoices = Invoice::with(['store', 'voucher'])->where('transaction_id', $transaction->id)->get();
         $groups = $invoices->map(function ($invoice) {
             $items = TransactionItem::where('transaction_id', $invoice->transaction_id)
                 ->where('store_id', $invoice->store_id)

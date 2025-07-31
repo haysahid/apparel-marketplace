@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     {{-- Custom Meta --}}
-    <meta name="description" content="Website Resmi Mustika Collection">
+    <meta name="description"
+        content="Website Apparel Marketplace yang menyediakan berbagai produk fashion berkualitas. Temukan koleksi terbaru kami dan nikmati pengalaman berbelanja yang menyenangkan.">
     <meta property="og:image" content="{{ asset('storage/promotion_banner.png') }}">
 
 

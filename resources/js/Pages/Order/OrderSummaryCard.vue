@@ -14,10 +14,15 @@ const props = defineProps({
 });
 
 const subTotal = props.groups.reduce(
-    (total, group) =>
-        total + (group.invoice.amount - group.invoice.shipping_cost),
+    (total, group) => total + group.invoice.base_amount,
     0
 );
+
+const discount = props.groups.reduce(
+    (total, group) => total + group.invoice.voucher_amount,
+    0
+);
+
 const total = props.groups.reduce(
     (total, group) => total + group.invoice.amount,
     0
@@ -72,6 +77,10 @@ const total = props.groups.reduce(
                 <OrderContentRow
                     label="Sub Total"
                     :value="$formatCurrency(subTotal)"
+                />
+                <OrderContentRow
+                    label="Voucher Diskon"
+                    :value="`-${$formatCurrency(discount)}`"
                 />
                 <OrderContentRow
                     label="Biaya Pengiriman"

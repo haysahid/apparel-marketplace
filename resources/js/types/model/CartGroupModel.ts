@@ -9,4 +9,7 @@ interface CartGroupModel {
     // Additional properties for UI state management
     selected?: boolean;
     showDeleteConfirmation?: boolean | null;
+
+    // Voucher
+    voucher?: VoucherEntity | null;
 }

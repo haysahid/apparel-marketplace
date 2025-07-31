@@ -119,6 +119,20 @@ function formatPrice(price = 0) {
                             ) in cartStore.groupHasSelectedItems"
                             :key="index"
                             :cartGroup="cartGroup"
+                            @selectVoucher="
+                                (voucher) => {
+                                    cartStore.updateGroup({
+                                        ...cartGroup,
+                                        voucher: voucher,
+                                    });
+                                }
+                            "
+                            @removeVoucher="
+                                cartStore.updateGroup({
+                                    ...cartGroup,
+                                    voucher: null,
+                                })
+                            "
                         />
                     </div>
 

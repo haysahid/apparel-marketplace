@@ -26,6 +26,9 @@ Route::name('api.')->group(function () {
     Route::get('/shipping-cost', [OrderController::class, 'shippingCost'])->name('shipping-cost');
 
     Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/vouchers', [OrderController::class, 'getVouchers'])->name('vouchers');
+        Route::post('/check-voucher', [OrderController::class, 'checkVoucher'])->name('check-voucher');
+
         Route::post('/checkout', [OrderController::class, 'checkout'])->name('checkout');
         Route::post('/cancel-order', [OrderController::class, 'cancelOrder'])->name('cancel-order');
 

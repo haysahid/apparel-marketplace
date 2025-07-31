@@ -56,20 +56,32 @@ const props = defineProps({
 
         <!-- Summary -->
         <div class="flex justify-end w-full">
-            <table class="text-sm sm:text-base">
+            <table class="w-full text-sm sm:w-auto sm:text-base">
                 <tbody class="text-gray-800 [&>tr>td]:py-0.5">
                     <tr>
-                        <td class="text-end">Jumlah</td>
+                        <td class="sm:text-end">Jumlah</td>
                         <td class="text-end">
                             {{
                                 $formatCurrency(
-                                    props.orderGroup.invoice?.amount ?? 0
+                                    props.orderGroup.invoice?.base_amount ?? 0
                                 )
                             }}
                         </td>
                     </tr>
                     <tr>
-                        <td class="text-end">Biaya Pengiriman</td>
+                        <td class="sm:text-end">Voucher Diskon</td>
+                        <td class="text-end">
+                            -
+                            {{
+                                $formatCurrency(
+                                    props.orderGroup.invoice?.voucher_amount ??
+                                        0
+                                )
+                            }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="sm:text-end">Biaya Pengiriman</td>
                         <td class="text-end">
                             {{
                                 $formatCurrency(
@@ -79,7 +91,9 @@ const props = defineProps({
                         </td>
                     </tr>
                     <tr>
-                        <td class="text-base font-semibold sm:text-lg text-end">
+                        <td
+                            class="text-base font-semibold sm:text-lg sm:text-end"
+                        >
                             Total Harga
                         </td>
                         <td
