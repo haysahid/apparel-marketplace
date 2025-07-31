@@ -2,14 +2,10 @@
 import LandingSection from "@/Components/LandingSection.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import LandingLayout from "@/Layouts/LandingLayout.vue";
-import CartItem from "./Cart/CartItem.vue";
 import { Link } from "@inertiajs/vue3";
 import { useCartStore } from "@/stores/cart-store";
-import OrderForm from "./Cart/OrderForm.vue";
 import axios from "axios";
 import { usePage } from "@inertiajs/vue3";
-import QuantityInput from "@/Components/QuantityInput.vue";
-import DeleteConfirmationDialog from "@/Components/DeleteConfirmationDialog.vue";
 import JoinUs from "@/Components/JoinUs.vue";
 import { router } from "@inertiajs/vue3";
 import CartGroup from "./Cart/CartGroup.vue";

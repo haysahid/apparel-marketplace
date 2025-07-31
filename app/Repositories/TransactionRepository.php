@@ -8,12 +8,17 @@ use App\Models\TransactionItem;
 
 class TransactionRepository
 {
-    public static function getTransactionDetail($transactionCode)
+    public static function getTransactionDetail($transactionCode, $storeId = null)
     {
         $transaction = Transaction::with(['payment_method', 'shipping_method', 'payments'])
             ->where('code', $transactionCode)
             ->firstOrFail();
-        $invoices = Invoice::with(['store'])->where('transaction_id', $transaction->id)->get();
+        $invoices = Invoice::with(['store'])->where(function ($query) use ($transaction, $storeId) {
+            $query->where('transaction_id', $transaction->id);
+            if ($storeId) {
+                $query->where('store_id', $storeId);
+            }
+        })->get();
         $groups = $invoices->map(function ($invoice) {
             $items = TransactionItem::where('transaction_id', $invoice->transaction_id)
                 ->where('store_id', $invoice->store_id)

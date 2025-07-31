@@ -298,10 +298,8 @@ onMounted(() => {
                         <td>
                             <div class="flex items-center justify-center">
                                 <OrderStatusChip
-                                    :status="invoice.transaction.status"
-                                    :label="
-                                        invoice.transaction.status.toLocaleUpperCase()
-                                    "
+                                    :status="invoice.status"
+                                    :label="invoice.status.toLocaleUpperCase()"
                                     class="w-fit"
                                 />
                             </div>

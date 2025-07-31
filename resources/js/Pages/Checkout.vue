@@ -67,7 +67,7 @@ function formatPrice(price = 0) {
 <template>
     <LandingLayout :title="`Checkout`">
         <div
-            class="p-6 sm:p-12 md:px-[100px] md:py-[60px] flex flex-col gap-2 sm:gap-3"
+            class="p-6 sm:p-12 md:px-[100px] md:py-[60px] flex flex-col gap-2 sm:gap-3 bg-secondary-box"
             :class="{
                 'min-h-[60vh] items-center justify-center gap-4':
                     cartStore.groups.length == 0,
@@ -102,7 +102,7 @@ function formatPrice(price = 0) {
         <div
             data-aos="fade-up"
             data-aos-duration="600"
-            class="p-6 !pt-0 sm:p-12 md:p-[100px] flex flex-col gap-12 lg:gap-20"
+            class="p-6 sm:p-12 sm:p-12 md:p-[100px] md:!pt-[80px] flex flex-col gap-12 lg:gap-20"
         >
             <LandingSection
                 v-if="cartStore.groupHasSelectedItems.length > 0"

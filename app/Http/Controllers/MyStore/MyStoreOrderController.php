@@ -12,12 +12,18 @@ use Inertia\Inertia;
 
 class MyStoreOrderController extends Controller
 {
+    protected $storeId;
+
+    public function __construct()
+    {
+        $this->storeId = session('selected_store_id');
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $storeId = $request->input('store_id');
         $limit = $request->input('limit', 5);
         $search = $request->input('search');
         $orderBy = $request->input('order_by', 'created_at');
@@ -25,7 +31,7 @@ class MyStoreOrderController extends Controller
         $brandId = $request->input('brand_id');
 
         $invoices = InvoiceRepository::getInvoices(
-            storeId: $storeId,
+            storeId: $this->storeId,
             limit: $limit,
             search: $search,
             orderBy: $orderBy,
@@ -34,7 +40,7 @@ class MyStoreOrderController extends Controller
         );
 
         $brands = BrandRepository::getBrandDropdown(
-            storeId: $storeId,
+            storeId: $this->storeId,
         );
 
         return Inertia::render('MyStore/Order', [
@@ -72,13 +78,11 @@ class MyStoreOrderController extends Controller
      */
     public function edit(Invoice $invoice)
     {
-        $invoice = Invoice::with([
-            'transaction'
-        ])->findOrFail($invoice->id);
+        $invoiceDetail = InvoiceRepository::getInvoiceDetail(
+            invoiceId: $invoice->id,
+        );
 
-        $transactionDetail = TransactionRepository::getTransactionDetail($invoice->transaction->code);
-
-        return Inertia::render('MyStore/Order/EditOrder', $transactionDetail);
+        return Inertia::render('MyStore/Order/EditInvoice', $invoiceDetail);
     }
 
     /**

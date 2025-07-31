@@ -62,6 +62,7 @@ class InvoiceRepository
     {
         $invoice = Invoice::with([
             'store',
+            'voucher',
             'transaction',
             'transaction.user',
             'transaction.payment_method',

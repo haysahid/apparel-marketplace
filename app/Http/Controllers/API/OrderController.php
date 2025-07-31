@@ -521,9 +521,10 @@ class OrderController extends Controller
                         'store_id' => $store->id,
                         'transaction_id' => $transaction->id,
                         'code' => 'INV-' . date('YmdHis') . '-' . $key,
-                        'shipping_cost' => $shippingCost,
-                        'tax' => 0,
                         'base_amount' => $baseTotal,
+                        'shipping_cost' => $shippingCost,
+                        'shipping_estimate' => $shippingEstimate,
+                        'tax' => 0,
                         'amount' => $total,
                         'due_date' => now()->addDays(1),
                         'snap_token' => null,
@@ -533,9 +534,9 @@ class OrderController extends Controller
                         'store_id' => $store->id,
                         'transaction_id' => $transaction->id,
                         'code' => 'INV-' . date('YmdHis') . '-' . $key,
+                        'base_amount' => $baseTotal,
                         'shipping_cost' => 0,
                         'tax' => 0,
-                        'base_amount' => $baseTotal,
                         'amount' => $total,
                         'due_date' => now()->addDays(1),
                     ])->load('store');
@@ -943,7 +944,10 @@ class OrderController extends Controller
 
                 // Update invoice paid_at
                 Invoice::where('transaction_id', $transaction->id)
-                    ->update(['paid_at' => now()]);
+                    ->update([
+                        'paid_at' => now(),
+                        'status' => 'paid',
+                    ]);
 
                 // Update transaction status
                 $transaction->paid_at = now();
@@ -986,21 +990,21 @@ class OrderController extends Controller
     public function changeStatus(Request $request)
     {
         $validated = $request->validate([
-            'transaction_id' => 'required|integer|exists:transactions,id',
+            'invoice_id' => 'required|integer|exists:invoices,id',
             'status' => 'required|string|in:pending,paid,processing,completed,cancelled',
         ]);
 
         try {
             DB::beginTransaction();
 
-            $transaction = Transaction::findOrFail($validated['transaction_id']);
-            $transaction->status = $validated['status'];
-            $transaction->save();
+            $invoice = Invoice::findOrFail($validated['invoice_id']);
+            $invoice->status = $validated['status'];
+            $invoice->save();
 
             DB::commit();
 
             return ResponseFormatter::success(
-                $transaction,
+                $invoice,
                 'Status transaksi berhasil diubah',
                 200
             );

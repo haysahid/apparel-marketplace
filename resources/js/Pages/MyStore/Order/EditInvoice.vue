@@ -6,14 +6,19 @@ import ChangeTransactionStatusDialog from "./ChangeTransactionStatusDialog.vue";
 import axios from "axios";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
+import InvoiceDetail from "./InvoiceDetail.vue";
 
 const props = defineProps({
-    transaction: {
-        type: Object as () => TransactionEntity,
+    invoice: {
+        type: Object as () => InvoiceEntity,
         required: true,
     },
-    groups: {
-        type: Array as () => OrderGroupModel[],
+    items: {
+        type: Array as () => TransactionItemEntity[],
+        required: true,
+    },
+    payments: {
+        type: Array as () => PaymentEntity[],
         required: true,
     },
 });
@@ -27,7 +32,7 @@ function changeStatus(newStatus: string) {
         .put(
             "/api/my-store/change-order-status",
             {
-                transaction_id: props.transaction.id,
+                invoice_id: props.invoice.id,
                 status: newStatus,
             },
             {
@@ -50,11 +55,11 @@ window.onpopstate = function () {
 </script>
 
 <template>
-    <MyStoreLayout :title="`#${props.transaction.code}`" :showTitle="true">
+    <MyStoreLayout :title="`#${props.invoice.code}`" :showTitle="true">
         <DefaultCard :isMain="true">
-            <OrderDetail
-                :transaction="props.transaction"
-                :groups="props.groups"
+            <InvoiceDetail
+                :invoice="props.invoice"
+                :items="props.items"
                 class="!px-0 !pt-8 md:!px-11"
             >
                 <template #actions>
@@ -65,12 +70,12 @@ window.onpopstate = function () {
                         Ubah Status
                     </PrimaryButton>
                 </template>
-            </OrderDetail>
+            </InvoiceDetail>
         </DefaultCard>
 
         <ChangeTransactionStatusDialog
             :show="showChangeStatusDialog"
-            :currentStatus="props.transaction.status"
+            :currentStatus="props.invoice.status"
             :options="[
                 {
                     value: 'pending',
@@ -100,7 +105,7 @@ window.onpopstate = function () {
             ]"
             @change="
                 showChangeStatusDialog = false;
-                if ($event != props.transaction.status) {
+                if ($event != props.invoice.status) {
                     changeStatus($event);
                 }
             "

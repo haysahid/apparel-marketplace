@@ -178,7 +178,7 @@ onMounted(() => {
 <template>
     <LandingLayout title="Order Success">
         <div
-            class="p-6 sm:p-12 md:px-[100px] md:py-[60px] flex flex-col gap-2 sm:gap-3 sm:items-center"
+            class="p-6 sm:p-12 md:px-[100px] md:py-[60px] flex flex-col gap-2 sm:gap-3 sm:items-center bg-secondary-box"
         >
             <h1
                 class="text-2xl font-bold text-start sm:text-center sm:text-3xl"
@@ -201,6 +201,7 @@ onMounted(() => {
                 !showPaymentActions ||
                 props.transaction.payment_method.slug === 'cod'
             "
+            class="mt-12"
         >
             <template #additionalInfo>
                 <!-- Payment -->
