@@ -11,22 +11,6 @@ import { router } from "@inertiajs/vue3";
 import OrderSummaryCard from "./OrderSummaryCard.vue";
 import axios from "axios";
 
-async function initScript() {
-    const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
-    const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
-
-    const script = document.createElement("script");
-    script.src = snapScript;
-    script.setAttribute("data-client-key", clientKey);
-    script.async = true;
-
-    document.body.appendChild(script);
-
-    return () => {
-        document.body.removeChild(script);
-    };
-}
-
 const props = defineProps({
     transaction: {
         type: Object as () => TransactionEntity,
@@ -36,129 +20,11 @@ const props = defineProps({
         type: Array as () => OrderGroupModel[],
         required: true,
     },
+    showTracking: {
+        type: Boolean,
+        default: true,
+    },
 });
-
-// Check payment
-const payment = ref(null);
-
-async function checkPayment() {
-    await axios
-        .get(`/api/check-payment?transaction_code=${props.transaction.code}`, {
-            headers: {
-                authorization: `Bearer ${localStorage.getItem("access_token")}`,
-            },
-        })
-        .then((response) => {
-            payment.value = response.data.result;
-        });
-}
-
-if (props.transaction.payments) {
-    payment.value = props.transaction.payments[0];
-}
-
-const showPaymentActions = computed(() => {
-    return (
-        props.transaction.status !== "paid" &&
-        props.transaction.payment_method.slug === "transfer"
-    );
-});
-
-if (showPaymentActions.value) {
-    checkPayment();
-}
-
-// Resume Payment
-const resumePaymentStatus = ref(null);
-
-async function showSnap() {
-    resumePaymentStatus.value = "loading";
-
-    if (!window.snap) {
-        await initScript();
-    }
-
-    setTimeout(async () => {
-        const snapToken = payment.value.midtrans_snap_token;
-
-        if (!snapToken) {
-            console.error("Snap token is not available");
-            return;
-        }
-
-        await window.snap.pay(snapToken, {
-            onSuccess: async function (result) {
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
-
-                await axios
-                    .post(
-                        "/api/confirm-payment",
-                        {
-                            payment_id: payment.value.id,
-                        },
-                        {
-                            headers: {
-                                authorization: `Bearer ${localStorage.getItem(
-                                    "access_token"
-                                )}`,
-                            },
-                        }
-                    )
-                    .then((response) => {
-                        resumePaymentStatus.value = "success";
-                        router.visit(
-                            route("my-order.detail", {
-                                transaction_code: props.transaction.code,
-                            })
-                        );
-                    })
-                    .catch((error) => {
-                        resumePaymentStatus.value = "error";
-                    });
-            },
-            onPending: async function (result) {
-                resumePaymentStatus.value = "pending";
-                await checkPayment();
-            },
-            onError: async function (result) {
-                resumePaymentStatus.value = "error";
-                await checkPayment();
-            },
-            onClose: async function () {
-                resumePaymentStatus.value = "error";
-                await checkPayment();
-            },
-        });
-    }, 1000);
-}
-
-// Change Payment Type
-async function changePaymentType() {
-    await axios
-        .put(
-            "/api/change-payment-type",
-            {
-                transaction_code: props.transaction.code,
-            },
-            {
-                headers: {
-                    authorization: `Bearer ${localStorage.getItem(
-                        "access_token"
-                    )}`,
-                },
-            }
-        )
-        .then(async (response) => {
-            payment.value = response.data.result;
-
-            if (payment.value.midtrans_snap_token) {
-                await showSnap();
-            }
-        });
-}
 
 const orderCreated = (date: string | null, status: boolean) => {
     return {
@@ -501,19 +367,6 @@ setTimeout(() => {
             histories.value.length) *
         100;
 }, 100);
-
-onMounted(() => {
-    if (route().params?.transaction_status == "settlement") {
-        // Reload the page
-        router.visit(
-            route("my-order.detail", {
-                transaction_code: props.transaction.code,
-            })
-        );
-    } else if (route().params?.show_snap == 1) {
-        showSnap();
-    }
-});
 </script>
 
 <template>
@@ -524,10 +377,7 @@ onMounted(() => {
     >
         <!-- Tracking -->
         <div
-            v-if="
-                !showPaymentActions ||
-                props.transaction.payment_method.slug === 'cod'
-            "
+            v-if="props.showTracking"
             class="flex flex-col items-center gap-4 mx-auto w-fit sm:gap-6"
         >
             <div
@@ -582,7 +432,7 @@ onMounted(() => {
                 class="flex flex-col items-center justify-center w-full gap-5 mx-auto lg:flex-row lg:items-start sm:gap-8 max-w-7xl"
             >
                 <!-- Items -->
-                <div class="w-full">
+                <div class="flex flex-col w-full gap-4">
                     <OrderGroup
                         v-for="(item, index) in props.groups"
                         :key="index"
@@ -595,8 +445,6 @@ onMounted(() => {
                 <OrderSummaryCard
                     :transaction="props.transaction"
                     :groups="props.groups"
-                    :payment="payment"
-                    :showPaymentActions="showPaymentActions"
                 >
                     <template #additionalInfo v-if="$slots.additionalInfo">
                         <slot name="additionalInfo" />

@@ -330,7 +330,7 @@ class OrderController extends Controller
             $invoices = [];
 
             // [START] Processing each cart group
-            foreach ($validated['cart_groups'] as $group) {
+            foreach ($validated['cart_groups'] as $key => $group) {
                 $store = Store::findOrFail($group['store_id']);
                 $originId = $store->rajaongkir_origin_id;
 
@@ -402,10 +402,6 @@ class OrderController extends Controller
                         'shipping_estimate' => $shippingEstimate,
                         'status' => 'pending',
                     ]);
-                } else {
-                    // If transaction already exists, update the store_id
-                    $transaction->store_id = $store->id;
-                    $transaction->save();
                 }
 
                 // Create transaction items
@@ -471,7 +467,7 @@ class OrderController extends Controller
                     $invoice = Invoice::create([
                         'store_id' => $store->id,
                         'transaction_id' => $transaction->id,
-                        'code' => 'INV-' . date('YmdHis'),
+                        'code' => 'INV-' . date('YmdHis') . '-' . $key,
                         'shipping_cost' => $shippingCost,
                         'tax' => 0,
                         'amount' => $total,
@@ -482,7 +478,7 @@ class OrderController extends Controller
                     $invoice = Invoice::create([
                         'store_id' => $store->id,
                         'transaction_id' => $transaction->id,
-                        'code' => 'INV-' . date('YmdHis'),
+                        'code' => 'INV-' . date('YmdHis') . '-' . $key,
                         'shipping_cost' => 0,
                         'tax' => 0,
                         'amount' => $total,

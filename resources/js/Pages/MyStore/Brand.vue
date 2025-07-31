@@ -240,8 +240,8 @@ onMounted(() => {
             <!-- Mobile View -->
             <div
                 v-if="!screenSize.is('xl')"
-                class="mt-4 min-h-[60vh] flex flex-col gap-3"
-                :class="{ 'min-h-auto h-[60vh]': brands.length == 0 }"
+                class="mt-4 min-h-[68vh] flex flex-col gap-3"
+                :class="{ 'min-h-auto h-[68vh]': brands.length == 0 }"
             >
                 <template v-if="brands.length > 0">
                     <div v-for="(brand, index) in brands" :key="brand.id">
@@ -266,7 +266,7 @@ onMounted(() => {
             </div>
 
             <!-- Pagination -->
-            <div v-if="props.brands.total > 0" class="flex flex-col gap-2 mt-4">
+            <div v-if="props.brands.total > 0" class="flex flex-col gap-2 mt-6">
                 <p class="text-xs text-gray-500 sm:text-sm">
                     Menampilkan {{ props.brands.from }} -
                     {{ props.brands.to }} dari {{ props.brands.total }} item

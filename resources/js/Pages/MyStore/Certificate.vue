@@ -167,8 +167,8 @@ onMounted(() => {
             <!-- Mobile View -->
             <div
                 v-if="!screenSize.is('xl')"
-                class="mt-4 min-h-[60vh] flex flex-col gap-3"
-                :class="{ 'min-h-auto h-[60vh]': certificates.length == 0 }"
+                class="mt-4 min-h-[68vh] flex flex-col gap-3"
+                :class="{ 'min-h-auto h-[68vh]': certificates.length == 0 }"
             >
                 <template v-if="certificates.length > 0">
                     <div
@@ -198,7 +198,7 @@ onMounted(() => {
             <!-- Pagination -->
             <div
                 v-if="props.certificates.total > 0"
-                class="flex flex-col gap-2 mt-4"
+                class="flex flex-col gap-2 mt-6"
             >
                 <p class="text-xs text-gray-500 sm:text-sm">
                     Menampilkan {{ props.certificates.from }} -

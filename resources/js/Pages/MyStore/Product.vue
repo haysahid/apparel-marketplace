@@ -372,8 +372,8 @@ onMounted(() => {
             <!-- Mobile View -->
             <div
                 v-if="!screenSize.is('xl')"
-                class="mt-4 min-h-[60vh] flex flex-col gap-3"
-                :class="{ 'min-h-auto h-[60vh]': products.length == 0 }"
+                class="mt-6 min-h-[68vh] flex flex-col gap-3"
+                :class="{ 'min-h-auto h-[68vh]': products.length == 0 }"
             >
                 <template v-if="products.length > 0">
                     <div v-for="(product, index) in products" :key="product.id">

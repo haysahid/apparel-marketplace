@@ -112,7 +112,7 @@ function formatPrice(price = 0) {
                     class="flex flex-col items-center justify-center w-full gap-5 mx-auto lg:flex-row lg:items-start sm:gap-8 max-w-7xl"
                 >
                     <!-- Cart Items -->
-                    <div class="w-full">
+                    <div class="flex flex-col w-full gap-4">
                         <CheckoutGroup
                             v-for="(
                                 cartGroup, index
