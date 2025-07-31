@@ -1,5 +1,6 @@
 interface TransactionItemEntity {
     id: number;
+    store_id: number;
     transaction_id: number;
     variant_id: number;
     quantity: number;
@@ -17,4 +18,5 @@ interface TransactionItemEntity {
     // Relationships
     transaction?: TransactionEntity | null;
     variant?: ProductVariantEntity | null;
+    store?: StoreEntity | null;
 }

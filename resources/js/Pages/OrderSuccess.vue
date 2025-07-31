@@ -108,11 +108,7 @@ async function showSnap() {
                     )
                     .then((response) => {
                         resumePaymentStatus.value = "success";
-                        router.visit(
-                            route("my-order.detail", {
-                                transaction_code: props.transaction.code,
-                            })
-                        );
+                        router.visit(route("my-order"));
                     })
                     .catch((error) => {
                         resumePaymentStatus.value = "error";
@@ -179,7 +175,7 @@ onMounted(() => {
 <template>
     <LandingLayout title="Berhasil Membuat Pesanan">
         <div
-            class="p-6 sm:p-12 md:px-[100px] md:py-[60px] flex flex-col gap-2 sm:gap-3 bg-secondary-box"
+            class="p-6 sm:p-12 md:px-[100px] md:py-[60px] flex flex-col gap-2 sm:gap-3"
         >
             <h1
                 class="text-2xl font-bold text-start sm:text-center sm:text-3xl"
@@ -202,7 +198,7 @@ onMounted(() => {
                 !showPaymentActions ||
                 props.transaction.payment_method.slug === 'cod'
             "
-            class="mt-12"
+            class="p-6 !pt-0 sm:p-12 md:p-[100px] flex flex-col gap-4 sm:gap-12"
         >
             <template #additionalInfo>
                 <!-- Payment -->

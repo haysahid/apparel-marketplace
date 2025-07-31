@@ -43,7 +43,7 @@ const props = defineProps({
         </div>
 
         <!-- Items -->
-        <div v-if="props.orderGroup.items?.length > 0">
+        <div v-if="props.orderGroup.items?.length > 0" class="w-full">
             <OrderItem
                 v-for="(item, index) in props.orderGroup.items"
                 :key="index"

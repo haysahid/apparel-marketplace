@@ -451,7 +451,7 @@ class OrderController extends Controller
                         'subdistrict_name' => $subdistrictName,
                         'zip_code' => $zipCode,
                         'address' => $address,
-                        'shipping_cost' => $shippingCost,
+                        'shipping_cost' => 0,
                         'shipping_estimate' => $shippingEstimate,
                         'status' => 'pending',
                     ]);
@@ -504,18 +504,6 @@ class OrderController extends Controller
                             'url' => $item->variant->product->url,
                         ];
                     })->toArray();
-
-                    if ($shippingMethod->slug === 'courier') {
-                        $itemDetails[] = [
-                            'id' => 'shipping',
-                            'price' => $shippingCost,
-                            'quantity' => 1,
-                            'name' => 'Biaya Pengiriman',
-                            'brand' => null,
-                            'merchant_name' => null,
-                            'url' => null,
-                        ];
-                    }
 
                     $invoice = Invoice::create([
                         'store_id' => $store->id,
@@ -574,7 +562,7 @@ class OrderController extends Controller
                     $invoice->load('voucher');
 
                     // Update transaction total payment
-                    $totalPayment = $invoice->amount;
+                    $totalPayment = $totalPayment + $invoice->amount;
 
                     $itemDetails[] = [
                         'id' => $storeVoucher->id,
@@ -588,6 +576,22 @@ class OrderController extends Controller
                 }
 
                 $invoices[] = $invoice;
+
+                // Update transaction with shipping cost
+                $transaction->shipping_cost = $transaction->shipping_cost + $shippingCost;
+                $transaction->save();
+
+                if ($shippingMethod->slug === 'courier') {
+                    $itemDetails[] = [
+                        'id' => 'shipping',
+                        'price' => $shippingCost,
+                        'quantity' => 1,
+                        'name' => 'Biaya Pengiriman',
+                        'brand' => null,
+                        'merchant_name' => null,
+                        'url' => null,
+                    ];
+                }
             }
             // [END] Processing each cart group
 

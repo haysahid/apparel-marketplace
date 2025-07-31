@@ -124,7 +124,7 @@ class ProductRepository
                         'discount' => $variant['discount'] ?? 0,
                         'final_selling_price' => $variant['base_selling_price'] - ($variant['base_selling_price'] * ($variant['discount'] ?? 0) / 100),
                         'current_stock_level' => $variant['current_stock_level'],
-                        'unit' => $variant['unit'],
+                        'unit_id' => $variant['unit_id'],
                     ]);
 
                     if (isset($variant['images'])) {

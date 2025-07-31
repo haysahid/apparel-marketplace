@@ -87,7 +87,11 @@ const invoices = props.invoices.data;
                             v-for="(invoice, index) in invoices"
                             :key="index"
                             :invoice="invoice"
-                            :items="invoice.transaction.items"
+                            :items="
+                                invoice.transaction.items.filter(
+                                    (item) => item.store_id === invoice.store_id
+                                )
+                            "
                             :showDivider="false"
                         />
                     </div>

@@ -353,8 +353,8 @@ const submit = () => {
                             variant.current_stock_level
                         );
                         formData.append(
-                            `variants[${index}][unit]`,
-                            variant.unit
+                            `variants[${index}][unit_id]`,
+                            variant.unit_id
                         );
                         variant.images.forEach((image, imgIndex) => {
                             console.log("variant image", image);

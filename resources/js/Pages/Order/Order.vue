@@ -28,7 +28,14 @@ const total = computed(() => {
 
 <template>
     <Link
-        :href="route('my-order.detail', props.invoice.code)"
+        :href="
+            props.invoice.transaction.payment_method?.slug === 'transfer' &&
+            props.invoice.transaction.status === 'pending'
+                ? route('order.success', {
+                      transaction_code: props.invoice.transaction.code,
+                  })
+                : route('my-order.detail', props.invoice.code)
+        "
         class="flex flex-col items-start justify-between gap-4 p-4 transition-all duration-200 ease-in-out border-b rounded-lg sm:p-6 outline -outline-1 outline-gray-200 group hover:outline-primary hover:scale-[1.02]"
         :class="{
             'border-none': !props.showDivider,

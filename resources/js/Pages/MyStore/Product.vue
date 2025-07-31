@@ -341,7 +341,7 @@ onMounted(() => {
                                 />
                             </div>
                         </td>
-                        <td class="!whitespace-normal">
+                        <td>
                             {{ product.brand.name }}
                         </td>
                         <td class="text-center">
