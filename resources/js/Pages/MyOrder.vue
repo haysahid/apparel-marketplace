@@ -7,9 +7,9 @@ import { Link } from "@inertiajs/vue3";
 import JoinUs from "@/Components/JoinUs.vue";
 
 const props = defineProps({
-    transactions: {
+    invoices: {
         type: Object as () => {
-            data: TransactionEntity[];
+            data: InvoiceEntity[];
             links: {
                 url: string | null;
                 label: string;
@@ -25,7 +25,7 @@ const props = defineProps({
     },
 });
 
-const transactions = props.transactions.data;
+const invoices = props.invoices.data;
 </script>
 
 <template>
@@ -34,20 +34,16 @@ const transactions = props.transactions.data;
             class="p-6 sm:p-12 md:px-[100px] md:py-[60px] flex flex-col gap-2 sm:gap-3 sm:items-center"
             :class="{
                 'min-h-[60vh] items-center justify-center gap-4':
-                    transactions.length == 0,
+                    invoices.length == 0,
             }"
         >
             <h1
                 class="text-2xl font-bold text-start sm:text-center sm:text-3xl"
             >
-                {{
-                    transactions.length > 0
-                        ? "Pesanan Saya"
-                        : "Belum Ada Pesanan"
-                }}
+                {{ invoices.length > 0 ? "Pesanan Saya" : "Belum Ada Pesanan" }}
             </h1>
             <div
-                v-if="transactions.length == 0"
+                v-if="invoices.length == 0"
                 class="flex flex-col items-center gap-y-6"
             >
                 <p
@@ -77,18 +73,21 @@ const transactions = props.transactions.data;
             class="p-6 !pt-0 sm:p-12 md:p-[100px] flex flex-col gap-4 sm:gap-12"
         >
             <LandingSection
-                v-if="transactions.length > 0"
+                v-if="invoices.length > 0"
                 class="!flex-col !justify-start !min-h-[56vh]"
             >
                 <div
                     class="flex flex-col items-center justify-center w-full gap-2 mx-auto lg:flex-row lg:items-start sm:gap-12 max-w-7xl"
                 >
                     <!-- Items -->
-                    <div class="flex flex-col gap-4 sm:gap-6">
+                    <div
+                        class="flex flex-col w-full gap-4 lg:max-w-4xl sm:gap-6"
+                    >
                         <Order
-                            v-for="(transaction, index) in transactions"
+                            v-for="(invoice, index) in invoices"
                             :key="index"
-                            :transaction="transaction"
+                            :invoice="invoice"
+                            :items="invoice.transaction.items"
                             :showDivider="false"
                         />
                     </div>

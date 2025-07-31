@@ -10,6 +10,7 @@ use App\Models\ShippingMethod;
 use App\Models\Store;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
+use App\Repositories\InvoiceRepository;
 use App\Repositories\VoucherRepository;
 use Exception;
 use GuzzleHttp\Psr7\Response;
@@ -64,66 +65,33 @@ class OrderController extends Controller
 
     public function myOrder(Request $request)
     {
-        $store = Store::with([
-            'advantages',
-            'certificates' => function ($query) {
-                $query->limit(5);
-            },
-            'social_links',
-        ])->first();
+        $limit = $request->input('limit', 5);
+        $search = $request->input('search');
+        $orderBy = $request->input('order_by', 'created_at');
+        $orderDirection = $request->input('order_direction', 'desc');
 
-        $transactions = Transaction::with(['payment_method', 'shipping_method', 'items'])
-            ->where('user_id', Auth::id())
-            ->where('status', '!=', 'cancelled')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $invoices = InvoiceRepository::getInvoices(
+            userId: Auth::id(),
+            limit: $limit,
+            search: $search,
+            orderBy: $orderBy,
+            orderDirection: $orderDirection,
+        );
 
         return Inertia::render('MyOrder', [
-            'transactions' => $transactions,
-            'store' => $store,
+            'invoices' => $invoices,
         ]);
     }
 
-    public function myOrderDetail(Request $request, $transaction_code)
+    public function myOrderDetail(Request $request, $invoice_code)
     {
-        $store = Store::with([
-            'advantages',
-            'certificates' => function ($query) {
-                $query->limit(5);
-            },
-            'social_links',
-        ])->first();
+        $invoice = Invoice::where('code', $invoice_code)->firstOrFail();
 
-        $transaction = Transaction::with([
-            'payment_method',
-            'shipping_method',
-            'payments' => function ($query) {
-                $query->orderBy('created_at', 'desc');
-            },
-        ])
-            ->where('code', $transaction_code)
-            ->firstOrFail();
-        $invoices = Invoice::with(['store', 'voucher'])->where('transaction_id', $transaction->id)->get();
-        $groups = $invoices->map(function ($invoice) {
-            $items = TransactionItem::where('transaction_id', $invoice->transaction_id)
-                ->where('store_id', $invoice->store_id)
-                ->get();
+        $invoiceDetail = InvoiceRepository::getInvoiceDetail(
+            invoiceId: $invoice->id,
+        );
 
-            return [
-                'store_id' => $invoice->store_id,
-                'store' => $invoice->store,
-                'invoice' => $invoice->makeHidden(['store']),
-                'items' => $items,
-            ];
-        })->filter(function ($item) {
-            return $item['items']->isNotEmpty();
-        });
-
-        return Inertia::render('MyOrderDetail', [
-            'transaction' => $transaction,
-            'groups' => $groups,
-            'store' => $store,
-        ]);
+        return Inertia::render('MyInvoiceDetail', $invoiceDetail);
     }
 
     public function checkout(Request $request)

@@ -10,6 +10,7 @@ class InvoiceRepository
 {
     public static function getInvoices(
         $storeId = null,
+        $userId = null,
         $limit = 5,
         $search = null,
         $orderBy = 'created_at',
@@ -28,6 +29,12 @@ class InvoiceRepository
 
         if ($storeId) {
             $invoices->where('store_id', $storeId);
+        }
+
+        if ($userId) {
+            $invoices->whereHas('transaction', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            });
         }
 
         if ($brandId) {

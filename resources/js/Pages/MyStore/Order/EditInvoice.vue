@@ -60,7 +60,8 @@ window.onpopstate = function () {
             <InvoiceDetail
                 :invoice="props.invoice"
                 :items="props.items"
-                class="!px-0 !pt-8 md:!px-11"
+                class="!px-0 !pt-8 md:!px-0"
+                :showTracking="props.invoice.status !== 'cancelled'"
             >
                 <template #actions>
                     <PrimaryButton

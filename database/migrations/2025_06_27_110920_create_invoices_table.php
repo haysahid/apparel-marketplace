@@ -19,13 +19,13 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->integer('base_amount')->default(0);
             $table->integer('shipping_cost')->default(0);
+            $table->string('shipping_estimate')->nullable();
             $table->integer('tax')->default(0);
             $table->foreignId('voucher_id')->nullable()->constrained('vouchers')->onDelete('set null');
             $table->integer('voucher_amount')->default(0);
             $table->integer('amount')->default(0);
             $table->timestamp('due_date');
             $table->timestamp('paid_at')->nullable();
-            $table->timestamp('shipping_estimate')->nullable();
             $table->timestamp('shipped_at')->nullable();
             $table->timestamp('picked_up_at')->nullable();
             $table->timestamp('delivered_at')->nullable();

@@ -4,7 +4,6 @@ import LandingSection from "@/Components/LandingSection.vue";
 import formatDate from "@/plugins/date-formatter";
 import OrderGroup from "./OrderGroup.vue";
 import InvoiceSummaryCard from "./InvoiceSummaryCard.vue";
-import OrderItem from "./OrderItem.vue";
 
 const props = defineProps({
     invoice: {
@@ -376,23 +375,15 @@ setTimeout(() => {
                 class="flex flex-col items-center justify-center w-full gap-5 mx-auto xl:flex-row xl:items-start sm:gap-8 max-w-7xl"
             >
                 <!-- Items -->
-                <div class="flex flex-col w-full gap-4">
-                    <!-- <OrderGroup
-                        v-for="(item, index) in props.groups"
-                        :key="index"
-                        :orderGroup="item"
-                        :showDivider="index !== props.groups.length - 1"
-                    /> -->
-                    <!-- Items -->
-                    <div v-if="props.items?.length > 0">
-                        <OrderItem
-                            v-for="(item, index) in props.items"
-                            :key="index"
-                            :item="item"
-                            :showDivider="index !== props.items.length - 1"
-                        />
-                    </div>
-                </div>
+                <OrderGroup
+                    :orderGroup="{
+                        store_id: props.invoice.store_id,
+                        store: props.invoice.store,
+                        invoice: props.invoice,
+                        items: props.items,
+                    }"
+                    :showSummary="false"
+                />
 
                 <!-- Summary -->
                 <InvoiceSummaryCard

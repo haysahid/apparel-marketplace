@@ -6,12 +6,16 @@ const props = defineProps({
         type: Object as () => OrderGroupModel,
         required: true,
     },
+    showSummary: {
+        type: Boolean,
+        default: true,
+    },
 });
 </script>
 
 <template>
     <div
-        class="flex flex-col items-start justify-between gap-2 p-4 !pb-2 transition-all duration-200 ease-in-out rounded-2xl sm:p-6 sm:!pb-4 outline outline-1 -outline-offset-1 outline-gray-300"
+        class="flex flex-col items-start justify-between gap-2 p-4 !pb-2 transition-all duration-200 ease-in-out rounded-2xl sm:p-6 sm:!pb-4 outline outline-1 -outline-offset-1 outline-gray-300 w-full"
     >
         <!-- Store Info -->
         <div class="flex items-center justify-between w-full gap-4">
@@ -48,66 +52,70 @@ const props = defineProps({
             />
         </div>
 
-        <!-- Divider -->
-        <div
-            v-if="props.orderGroup.items?.length > 0"
-            class="w-full h-px bg-gray-200"
-        ></div>
+        <template v-if="props.showSummary">
+            <!-- Divider -->
+            <div
+                v-if="props.orderGroup.items?.length > 0"
+                class="w-full h-px bg-gray-200"
+            ></div>
 
-        <!-- Summary -->
-        <div class="flex justify-end w-full">
-            <table class="w-full text-sm sm:w-auto sm:text-base">
-                <tbody class="text-gray-800 [&>tr>td]:py-0.5">
-                    <tr>
-                        <td class="sm:text-end">Jumlah</td>
-                        <td class="text-end">
-                            {{
-                                $formatCurrency(
-                                    props.orderGroup.invoice?.base_amount ?? 0
-                                )
-                            }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="sm:text-end">Voucher Diskon</td>
-                        <td class="text-end">
-                            -
-                            {{
-                                $formatCurrency(
-                                    props.orderGroup.invoice?.voucher_amount ??
-                                        0
-                                )
-                            }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="sm:text-end">Biaya Pengiriman</td>
-                        <td class="text-end">
-                            {{
-                                $formatCurrency(
-                                    props.orderGroup.invoice?.shipping_cost ?? 0
-                                )
-                            }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td
-                            class="text-base font-semibold sm:text-lg sm:text-end"
-                        >
-                            Total Harga
-                        </td>
-                        <td
-                            class="text-base font-semibold sm:text-lg text-end ps-8"
-                        >
-                            {{
-                                $formatCurrency(
-                                    props.orderGroup.invoice?.amount ?? 0
-                                )
-                            }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+            <!-- Summary -->
+            <div class="flex justify-end w-full">
+                <table class="w-full text-sm sm:w-auto sm:text-base">
+                    <tbody class="text-gray-800 [&>tr>td]:py-0.5">
+                        <tr>
+                            <td class="sm:text-end">Jumlah</td>
+                            <td class="text-end">
+                                {{
+                                    $formatCurrency(
+                                        props.orderGroup.invoice?.base_amount ??
+                                            0
+                                    )
+                                }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="sm:text-end">Voucher Diskon</td>
+                            <td class="text-end">
+                                -
+                                {{
+                                    $formatCurrency(
+                                        props.orderGroup.invoice
+                                            ?.voucher_amount ?? 0
+                                    )
+                                }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="sm:text-end">Biaya Pengiriman</td>
+                            <td class="text-end">
+                                {{
+                                    $formatCurrency(
+                                        props.orderGroup.invoice
+                                            ?.shipping_cost ?? 0
+                                    )
+                                }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td
+                                class="text-base font-semibold sm:text-lg sm:text-end"
+                            >
+                                Total Harga
+                            </td>
+                            <td
+                                class="text-base font-semibold sm:text-lg text-end ps-8"
+                            >
+                                {{
+                                    $formatCurrency(
+                                        props.orderGroup.invoice?.amount ?? 0
+                                    )
+                                }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </template>
     </div>
 </template>

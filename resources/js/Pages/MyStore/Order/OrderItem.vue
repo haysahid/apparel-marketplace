@@ -31,12 +31,12 @@ const discount = computed(() => {
 
 <template>
     <div
-        class="flex flex-col items-center justify-between gap-4 py-4 border-b"
+        class="flex flex-col items-center justify-between w-full gap-4 py-4 border-b"
         :class="{
             'border-none': !props.showDivider,
         }"
     >
-        <div class="flex items-start gap-x-4">
+        <div class="flex items-start w-full gap-x-4">
             <div class="flex items-center justify-center flex-shrink-0 gap-4">
                 <!-- Image -->
                 <img
@@ -63,7 +63,7 @@ const discount = computed(() => {
                 </div>
             </div>
 
-            <div class="flex flex-col gap-2">
+            <div class="flex flex-col w-full gap-2">
                 <!-- Detail -->
                 <Link
                     :href="
