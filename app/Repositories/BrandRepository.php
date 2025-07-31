@@ -62,7 +62,7 @@ class BrandRepository
                 'store_id' => $data['store_id'],
                 'name' => $data['name'],
                 'description' => $data['description'],
-                'logo' => $data['logo']->store('brand', 'public'),
+                'logo' => $data['logo'] ? $data['logo']->store('brand', 'public') : null,
             ]);
 
             DB::commit();
