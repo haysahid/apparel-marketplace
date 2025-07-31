@@ -44,12 +44,12 @@ class UserController extends Controller
                 ]);
             }
 
-            if ($user->isAdmin()) {
-                return redirect()->route('admin.dashboard')->with([
-                    'success' => 'Berhasil masuk sebagai admin.',
-                    'access_token' => $accessToken,
-                ]);
-            }
+            // if ($user->isAdmin()) {
+            //     return redirect()->route('admin.dashboard')->with([
+            //         'success' => 'Berhasil masuk sebagai admin.',
+            //         'access_token' => $accessToken,
+            //     ]);
+            // }
 
             return redirect()->route('home')->with([
                 'success' => 'Berhasil masuk.',
