@@ -124,8 +124,8 @@ defineExpose({
                     {
                         'no-arrows':
                             props.hideArrows && props.type === 'number',
+                        'no-date-icon': props.type === 'date',
                     },
-
                     props.bgClass,
                     props.textClass,
                 ]"

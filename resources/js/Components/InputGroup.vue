@@ -18,7 +18,6 @@ const props = defineProps({
         <InputLabel
             :for="props.id"
             :value="props.label"
-            class="text-lg font-bold"
         />
         <slot />
     </div>
