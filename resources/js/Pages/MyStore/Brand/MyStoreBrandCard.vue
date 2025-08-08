@@ -47,7 +47,7 @@ const emit = defineEmits(["edit", "delete"]);
             </p>
         </div>
 
-        <AdminItemAction :showMore="true" class="self-start">
+        <AdminItemAction class="self-start">
             <template #moreContent>
                 <div class="divide-y divide-gray-200">
                     <DropdownLink as="button" @click="emit('edit')">

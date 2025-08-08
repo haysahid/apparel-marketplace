@@ -217,6 +217,7 @@ onMounted(() => {
                         "
                         placeholder="Pilih Brand"
                         class="max-w-48"
+                        :autoResize="true"
                         :error="filters.errors.brand_id"
                         @update:modelValue="
                             (option) => {

@@ -15,6 +15,16 @@ class Category extends Model
         'image',
     ];
 
+    // Additional attributes
+    protected $appends = ['total_products'];
+
+    public function getTotalProductsAttribute()
+    {
+        return Product::whereHas('categories', function ($query) {
+            $query->where('category_id', $this->id)->where('store_id', $this->store_id);
+        })->count();
+    }
+
     // Relationships
     public function store()
     {

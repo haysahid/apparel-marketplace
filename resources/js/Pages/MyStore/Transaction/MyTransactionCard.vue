@@ -71,7 +71,6 @@ const emit = defineEmits(["edit"]);
         </div>
 
         <AdminItemAction
-            :showMore="true"
             class="absolute top-2.5 right-2.5 sm:top-4 sm:right-4"
             @edit="emit('edit')"
         />

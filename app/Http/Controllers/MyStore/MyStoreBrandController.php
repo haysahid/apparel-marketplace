@@ -119,7 +119,7 @@ class MyStoreBrandController extends Controller
 
             return redirect()->route('my-store.brand')->with('success', 'Brand berhasil diperbarui.');
         } catch (Exception $e) {
-            return redirect()->back()->withErrors(['error' => $e]);
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
     }
 
@@ -129,21 +129,11 @@ class MyStoreBrandController extends Controller
     public function destroy(Brand $brand)
     {
         try {
-            DB::beginTransaction();
-
-            // Delete logo if exists
-            if ($brand->logo) {
-                Storage::delete($brand->logo);
-            }
-
-            $brand->delete();
-
-            DB::commit();
+            BrandRepository::deleteBrand($brand);
 
             return redirect()->route('my-store.brand')->with('success', 'Brand berhasil dihapus.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->withErrors(['error' => 'Gagal menghapus brand: ' . $e->getMessage()]);
+        } catch (Exception $e) {
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
     }
 }

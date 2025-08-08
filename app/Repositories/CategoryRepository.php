@@ -49,4 +49,84 @@ class CategoryRepository
 
         return $categoryDropdown->orderBy($orderBy, $orderDirection)->get();
     }
+
+    public static function createCategory($data)
+    {
+        try {
+            DB::beginTransaction();
+
+            $category = new Category();
+            $category->store_id = $data['store_id'] ?? null;
+            $category->name = $data['name'];
+
+            if (isset($data['image'])) {
+                $category->image = $data['image']->store('category');
+            }
+
+            $category->save();
+
+            DB::commit();
+
+            return $category;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal menyimpan kategori: ' . $e);
+            throw new Exception('Gagal menyimpan kategori: ' . $e);
+        }
+    }
+
+    public static function updateCategory(Category $category, $data)
+    {
+        try {
+            DB::beginTransaction();
+
+            $category->name = $data['name'];
+
+            if (isset($data['image'])) {
+                if ($category->image) {
+                    Storage::delete($category->image);
+                }
+                $category->image = $data['image']->store('category');
+            }
+
+            $category->save();
+
+            DB::commit();
+
+            return $category;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal memperbarui kategori: ' . $e);
+            throw new Exception('Gagal memperbarui kategori: ' . $e);
+        }
+    }
+
+    public static function isCategoryExists($name, $storeId)
+    {
+        return Category::where('name', $name)
+            ->where('store_id', $storeId)
+            ->exists();
+    }
+
+    public static function deleteCategory(Category $category)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Delete image if exists
+            if ($category->image) {
+                Storage::delete($category->image);
+            }
+
+            $category->delete();
+
+            DB::commit();
+
+            return true;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal menghapus kategori: ' . $e);
+            throw new Exception('Gagal menghapus kategori: ' . $e);
+        }
+    }
 }

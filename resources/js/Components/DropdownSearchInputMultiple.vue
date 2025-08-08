@@ -51,6 +51,10 @@ const props = defineProps({
         type: String,
         default: null,
     },
+    autoResize: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits(["update:modelValue", "clear", "search"]);
@@ -96,7 +100,9 @@ watch(
                             : (search = $event)
                     "
                     class="w-full"
-                    textClass="text-sm sm:text-base"
+                    :textClass="
+                        props.autoResize ? 'text-sm sm:text-base' : null
+                    "
                     :bgClass="props.bgClass"
                     :placeholder="props.placeholder"
                 >

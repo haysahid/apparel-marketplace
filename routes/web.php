@@ -5,6 +5,7 @@ use App\Http\Controllers\MyStore\MyStoreCertificateController;
 use App\Http\Controllers\MyStoreController;
 use App\Http\Controllers\MyStore\MyStoreProductController;
 use App\Http\Controllers\MyStore\MyStoreBrandController;
+use App\Http\Controllers\MyStore\MyStoreCategoryController;
 use App\Http\Controllers\MyStore\MyStoreOrderController;
 use App\Http\Controllers\MyStore\MyStoreTransactionController;
 use App\Http\Controllers\MyStore\MyStoreVoucherController;
@@ -90,6 +91,14 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->grou
     Route::get('/certificate/{storeCertificate}', [MyStoreCertificateController::class, 'edit'])->name('certificate.edit');
     Route::post('/certificate/{storeCertificate}', [MyStoreCertificateController::class, 'update'])->name('certificate.update');
     Route::delete('/certificate/{storeCertificate}', [MyStoreCertificateController::class, 'destroy'])->name('certificate.destroy');
+
+    // Category
+    Route::get('/category', [MyStoreCategoryController::class, 'index'])->name('category');
+    Route::get('/category/create', [MyStoreCategoryController::class, 'create'])->name('category.create');
+    Route::post('/category', [MyStoreCategoryController::class, 'store'])->name('category.store');
+    Route::get('/category/{category}', [MyStoreCategoryController::class, 'edit'])->name('category.edit');
+    Route::post('/category/{category}', [MyStoreCategoryController::class, 'update'])->name('category.update');
+    Route::delete('/category/{category}', [MyStoreCategoryController::class, 'destroy'])->name('category.destroy');
 
     // Brand
     Route::get('/brand', [MyStoreBrandController::class, 'index'])->name('brand');
