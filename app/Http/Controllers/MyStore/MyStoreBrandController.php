@@ -8,6 +8,7 @@ use App\Repositories\BrandRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -53,6 +54,7 @@ class MyStoreBrandController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'logo' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:2048',
+            'is_dialog' => 'nullable|boolean',
         ]);
 
         try {
@@ -73,6 +75,10 @@ class MyStoreBrandController extends Controller
             ];
 
             BrandRepository::createBrand($data);
+
+            if ($request->input('is_dialog')) {
+                return redirect()->back()->with('success', 'Brand berhasil dibuat.');
+            }
 
             return redirect()->route('my-store.brand')->with('success', 'Brand berhasil dibuat.');
         } catch (Exception $e) {

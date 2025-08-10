@@ -21,6 +21,7 @@ import InputGroup from "@/Components/InputGroup.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import DropdownSearchInputMultiple from "@/Components/DropdownSearchInputMultiple.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import BrandForm from "../Brand/BrandForm.vue";
 
 const props = defineProps({
     product: {
@@ -82,10 +83,10 @@ const drag = ref(false);
 
 const page = usePage();
 
-const brands = page.props.brands || [];
+const brands = ref(page.props.brands || []);
 const brandSearch = ref("");
 const filteredBrands = computed(() => {
-    return brands.filter((brand) =>
+    return brands.value.filter((brand) =>
         brand.name.toLowerCase().includes(brandSearch.value.toLowerCase())
     );
 });
@@ -451,6 +452,9 @@ const draggableVariants = useDraggable(variantsContainer, form.variants, {
     },
 });
 
+const showAddBrandForm = ref(false);
+const showAddCategoryForm = ref(false);
+
 const showSuccessDialog = ref(false);
 const successMessage = ref(null);
 
@@ -511,7 +515,7 @@ const closeErrorDialog = () => {
             </InputGroup>
 
             <!-- Brand -->
-            <InputGroup id="brand_id" label="Nama Brand">
+            <InputGroup id="brand_id" label="Brand">
                 <DropdownSearchInput
                     id="brand_id"
                     :modelValue="
@@ -546,7 +550,20 @@ const closeErrorDialog = () => {
                         form.brand = null;
                         brandSearch = '';
                     "
-                />
+                >
+                    <template #optionHeader>
+                        <div class="flex items-center justify-between gap-2">
+                            <p class="font-semibold">Pilih Brand</p>
+                            <button
+                                type="button"
+                                class="text-sm text-blue-500 hover:underline"
+                                @click="showAddBrandForm = true"
+                            >
+                                Tambah
+                            </button>
+                        </div>
+                    </template>
+                </DropdownSearchInput>
             </InputGroup>
 
             <!-- Images -->
@@ -808,7 +825,6 @@ const closeErrorDialog = () => {
 
         <DialogModal
             :show="showAddVariantForm"
-            title="Tambah Variasi Produk"
             @close="showAddVariantForm = false"
         >
             <template #content>
@@ -824,6 +840,43 @@ const closeErrorDialog = () => {
                         getVariants();
                     "
                 />
+            </template>
+        </DialogModal>
+
+        <DialogModal
+            :show="showAddBrandForm"
+            @close="showAddBrandForm = false"
+            maxWidth="sm"
+        >
+            <template #content>
+                <div class="w-full">
+                    <h2
+                        class="w-full mb-3 text-lg font-medium text-center text-gray-900"
+                    >
+                        Tambah Brand
+                    </h2>
+                    <BrandForm
+                        :isDialog="true"
+                        @onSubmitted="
+                            (brandName) => {
+                                showAddBrandForm = false;
+                                brands = $page.props.brands;
+
+                                const newBrand = brands.find(
+                                    (brand) => brand.name === brandName
+                                );
+                                form.brand_id = newBrand.id;
+                                form.brand = newBrand;
+
+                                openSuccessDialog(
+                                    'Brand berhasil ditambahkan.'
+                                );
+                            }
+                        "
+                        @close="showAddBrandForm = false"
+                        class="w-full"
+                    />
+                </div>
             </template>
         </DialogModal>
 

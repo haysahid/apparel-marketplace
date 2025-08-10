@@ -15,10 +15,7 @@ const props = defineProps({
 
 <template>
     <div class="flex flex-col w-full gap-y-2">
-        <InputLabel
-            :for="props.id"
-            :value="props.label"
-        />
+        <InputLabel :for="props.id" :value="props.label" />
         <slot />
     </div>
 </template>

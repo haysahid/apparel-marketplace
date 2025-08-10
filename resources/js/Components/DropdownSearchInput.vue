@@ -208,27 +208,32 @@ watch(
             </TextAreaInput>
         </template>
         <template #content>
-            <ul class="overflow-y-auto max-h-60">
-                <li
-                    v-for="option in props.options"
-                    :key="option.value"
-                    @click="
-                        emit('update:modelValue', option);
-                        isDropdownOpen = false;
-                        search = '';
-                    "
-                    class="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-100"
-                >
-                    <span v-if="option.icon" class="flex-shrink-0">
-                        <img
-                            :src="option.icon"
-                            :alt="option.label"
-                            class="w-5 h-5 rounded-full"
-                        />
-                    </span>
-                    <span>{{ option.label }}</span>
-                </li>
-            </ul>
+            <div>
+                <div v-if="$slots.optionHeader" class="px-4 py-2">
+                    <slot name="optionHeader" />
+                </div>
+                <ul class="overflow-y-auto max-h-60">
+                    <li
+                        v-for="option in props.options"
+                        :key="option.value"
+                        @click="
+                            emit('update:modelValue', option);
+                            isDropdownOpen = false;
+                            search = '';
+                        "
+                        class="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-100"
+                    >
+                        <span v-if="option.icon" class="flex-shrink-0">
+                            <img
+                                :src="option.icon"
+                                :alt="option.label"
+                                class="w-5 h-5 rounded-full"
+                            />
+                        </span>
+                        <span>{{ option.label }}</span>
+                    </li>
+                </ul>
+            </div>
         </template>
     </Dropdown>
 </template>

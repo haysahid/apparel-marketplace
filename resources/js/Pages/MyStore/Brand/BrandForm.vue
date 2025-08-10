@@ -18,7 +18,13 @@ const props = defineProps({
             logo: null,
         }),
     },
+    isDialog: {
+        type: Boolean,
+        default: false,
+    },
 });
+
+const emit = defineEmits(["onSubmitted", "close"]);
 
 const form = useForm(
     props.brand
@@ -34,7 +40,7 @@ const form = useForm(
 );
 
 const submit = () => {
-    if (props.brand.id) {
+    if (props.brand?.id) {
         form.transform((data) => {
             const formData = new FormData();
             Object.keys(data).forEach((key) => {
@@ -57,15 +63,23 @@ const submit = () => {
                 onError: (errors) => {
                     openErrorDialog(errors.error);
                 },
-                onFinish: () => {
-                    form.reset();
-                },
             }
         );
     } else {
-        form.post(route("my-store.brand.store"), {
+        form.transform((data) => {
+            return {
+                ...data,
+                is_dialog: props.isDialog ? 1 : 0,
+            };
+        }).post(route("my-store.brand.store"), {
+            preserveScroll: props.isDialog,
+            preserveState: props.isDialog,
             onError: (errors) => {
                 openErrorDialog(errors.error);
+            },
+            onSuccess: () => {
+                if (props.isDialog) emit("onSubmitted", form.name);
+                form.reset();
             },
         });
     }
@@ -133,10 +147,14 @@ const openErrorDialog = (message) => {
             <div class="flex items-center gap-4 mt-4">
                 <PrimaryButton type="submit"> Simpan </PrimaryButton>
                 <SecondaryButton
+                    v-if="!isDialog"
                     type="button"
                     @click="$inertia.visit(route('my-store.brand'))"
                 >
                     Kembali
+                </SecondaryButton>
+                <SecondaryButton v-else type="button" @click="emit('close')">
+                    Batalkan
                 </SecondaryButton>
             </div>
         </div>
