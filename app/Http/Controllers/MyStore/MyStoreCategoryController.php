@@ -57,6 +57,7 @@ class MyStoreCategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'image' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:2048',
+            'is_dialog' => 'nullable|boolean',
         ]);
 
         try {
@@ -74,6 +75,10 @@ class MyStoreCategoryController extends Controller
                 'name' => $validated['name'],
                 'image' => $request->file('image') ? $request->file('image') : null,
             ]);
+
+            if ($request->input('is_dialog')) {
+                return redirect()->back()->with('success', 'Kategori berhasil ditambahkan.');
+            }
 
             return redirect()->route('my-store.category')->with('success', 'Kategori berhasil ditambahkan.');
         } catch (Exception $e) {

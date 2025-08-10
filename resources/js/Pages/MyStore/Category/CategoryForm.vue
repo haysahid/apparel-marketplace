@@ -13,7 +13,13 @@ const props = defineProps({
         type: Object,
         default: null,
     },
+    isDialog: {
+        type: Boolean,
+        default: false,
+    },
 });
+
+const emit = defineEmits(["onSubmitted", "close"]);
 
 const form = useForm(
     props.category
@@ -59,9 +65,20 @@ const submit = () => {
             }
         );
     } else {
-        form.post(route("my-store.category.store"), {
+        form.transform((data) => {
+            return {
+                ...data,
+                is_dialog: props.isDialog ? 1 : 0,
+            };
+        }).post(route("my-store.category.store"), {
+            preserveScroll: props.isDialog,
+            preserveState: props.isDialog,
             onError: (errors) => {
                 openErrorDialog(errors.error);
+            },
+            onSuccess: () => {
+                if (props.isDialog) emit("onSubmitted", form.name);
+                form.reset();
             },
         });
     }
@@ -114,10 +131,14 @@ const openErrorDialog = (message) => {
             <div class="flex items-center gap-4 mt-4">
                 <PrimaryButton type="submit"> Simpan </PrimaryButton>
                 <SecondaryButton
+                    v-if="!props.isDialog"
                     type="button"
                     @click="$inertia.visit(route('my-store.category'))"
                 >
                     Kembali
+                </SecondaryButton>
+                <SecondaryButton v-else type="button" @click="emit('close')">
+                    Batalkan
                 </SecondaryButton>
             </div>
         </div>

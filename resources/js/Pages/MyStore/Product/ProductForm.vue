@@ -22,6 +22,7 @@ import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import DropdownSearchInputMultiple from "@/Components/DropdownSearchInputMultiple.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import BrandForm from "../Brand/BrandForm.vue";
+import CategoryForm from "../Category/CategoryForm.vue";
 
 const props = defineProps({
     product: {
@@ -91,10 +92,10 @@ const filteredBrands = computed(() => {
     );
 });
 
-const categories = page.props.categories || [];
+const categories = ref(page.props.categories || []);
 const categorySearch = ref("");
 const filteredCategories = computed(() => {
-    return categories.filter((category) =>
+    return categories.value.filter((category) =>
         category.name.toLowerCase().includes(categorySearch.value.toLowerCase())
     );
 });
@@ -655,7 +656,20 @@ const closeErrorDialog = () => {
                         form.categories = null;
                         categorySearch = '';
                     "
-                />
+                >
+                    <template #optionHeader>
+                        <div class="flex items-center justify-between gap-2">
+                            <p class="font-semibold">Pilih Kategori</p>
+                            <button
+                                type="button"
+                                class="text-sm text-blue-500 hover:underline"
+                                @click="showAddCategoryForm = true"
+                            >
+                                Tambah
+                            </button>
+                        </div>
+                    </template>
+                </DropdownSearchInputMultiple>
             </InputGroup>
 
             <!-- Description -->
@@ -843,6 +857,7 @@ const closeErrorDialog = () => {
             </template>
         </DialogModal>
 
+        <!-- Add Brand Modal -->
         <DialogModal
             :show="showAddBrandForm"
             @close="showAddBrandForm = false"
@@ -874,6 +889,43 @@ const closeErrorDialog = () => {
                             }
                         "
                         @close="showAddBrandForm = false"
+                        class="w-full"
+                    />
+                </div>
+            </template>
+        </DialogModal>
+
+        <!-- Add Category Modal -->
+        <DialogModal
+            :show="showAddCategoryForm"
+            @close="showAddCategoryForm = false"
+            maxWidth="sm"
+        >
+            <template #content>
+                <div class="w-full">
+                    <h2
+                        class="w-full mb-3 text-lg font-medium text-center text-gray-900"
+                    >
+                        Tambah Kategori
+                    </h2>
+                    <CategoryForm
+                        :isDialog="true"
+                        @onSubmitted="
+                            (categoryName) => {
+                                showAddCategoryForm = false;
+                                categories = $page.props.categories;
+
+                                const newCategory = categories.find(
+                                    (category) => category.name === categoryName
+                                );
+                                form.categories.push(newCategory);
+
+                                openSuccessDialog(
+                                    'Kategori berhasil ditambahkan.'
+                                );
+                            }
+                        "
+                        @close="showAddCategoryForm = false"
                         class="w-full"
                     />
                 </div>
