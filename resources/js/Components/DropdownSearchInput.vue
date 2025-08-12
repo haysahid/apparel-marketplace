@@ -68,10 +68,13 @@ watch(
         emit("search", newValue);
     }
 );
+
+const dropdown = ref(null);
 </script>
 
 <template>
     <Dropdown
+        ref="dropdown"
         :id="props.id"
         v-model="props.modelValue"
         :placeholder="props.placeholder"
@@ -101,6 +104,8 @@ watch(
                 :bgClass="props.bgClass"
                 :placeholder="props.placeholder"
                 :error="props.error"
+                @focus="dropdown.open = true"
+                @focusout="dropdown.open = false"
             >
                 <template #suffix>
                     <button
@@ -160,6 +165,8 @@ watch(
                 :rows="props.rows"
                 :preventNewLine="props.preventNewLine"
                 :error="props.error"
+                @focus="dropdown.open = true"
+                @focusout="dropdown.open = false"
             >
                 <template #suffix>
                     <button

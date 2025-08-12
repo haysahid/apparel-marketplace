@@ -75,11 +75,14 @@ watch(
         emit("search", newValue);
     }
 );
+
+const dropdown = ref(null);
 </script>
 
 <template>
     <div>
         <Dropdown
+            ref="dropdown"
             :id="props.id"
             v-model="props.modelValue"
             align="left"
@@ -105,6 +108,9 @@ watch(
                     "
                     :bgClass="props.bgClass"
                     :placeholder="props.placeholder"
+                    :error="props.error"
+                    @focus="dropdown.open = true"
+                    @focusout="dropdown.open = false"
                 >
                     <template #suffix>
                         <svg
