@@ -6,10 +6,6 @@ import DefaultCard from "@/Components/DefaultCard.vue";
 
 <template>
     <MyStoreLayout title="Tambah Produk" :showTitle="true">
-        <div class="max-w-7xl">
-            <DefaultCard>
-                <ProductForm />
-            </DefaultCard>
-        </div>
+        <ProductForm />
     </MyStoreLayout>
 </template>

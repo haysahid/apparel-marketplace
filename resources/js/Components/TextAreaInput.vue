@@ -55,7 +55,7 @@ const props = defineProps({
     modelValue: String,
 });
 
-const emit = defineEmits(["update:modelValue", "focusout"]);
+const emit = defineEmits(["update:modelValue", "focusout", "focus"]);
 
 const input = ref(null);
 
@@ -105,7 +105,6 @@ defineExpose({ focus: () => input.value.focus() });
                 :autofocus="props.autofocus ? true : false"
                 :autocomplete="props.autocomplete"
                 :rows="props.rows"
-                @focusout="emit('focusout')"
                 class="w-full px-4 py-2 border-gray-300 shadow-sm rounded-lg focus:border-primary-light focus:ring-primary-light max-h-[300px]"
                 :class="[
                     {
@@ -118,6 +117,8 @@ defineExpose({ focus: () => input.value.focus() });
                 ]"
                 :value="props.modelValue"
                 @input="updateValue($event.target.value)"
+                @focus="emit('focus')"
+                @focusout="emit('focusout')"
             />
             <slot name="suffix"></slot>
         </label>

@@ -66,7 +66,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "focusout", "focus"]);
 
 const input = ref(null);
 
@@ -131,6 +131,8 @@ defineExpose({
                 ]"
                 :value="props.modelValue"
                 @input="updateValue($event.target.value)"
+                @focus="emit('focus')"
+                @focusout="emit('focusout')"
             />
             <slot name="suffix"></slot>
         </label>

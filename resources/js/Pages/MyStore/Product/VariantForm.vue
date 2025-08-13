@@ -90,7 +90,6 @@ const page = usePage();
 
 const colors = (page.props.colors as ColorEntity[]) || [];
 const colorSearch = ref("");
-const isColorDropdownOpen = ref(false);
 const filteredColors = computed(() => {
     return colors.filter((color) =>
         color.name.toLowerCase().includes(colorSearch.value.toLowerCase())
@@ -99,7 +98,6 @@ const filteredColors = computed(() => {
 
 const sizes = (page.props.sizes as SizeEntity[]) || [];
 const sizeSearch = ref("");
-const isSizeDropdownOpen = ref(false);
 const filteredSizes = computed(() => {
     return sizes.filter((size) =>
         size.name.toLowerCase().includes(sizeSearch.value.toLowerCase())
@@ -108,7 +106,6 @@ const filteredSizes = computed(() => {
 
 const units = (page.props.units as UnitEntity[]) || [];
 const unitSearch = ref("");
-const isUnitDropdownOpen = ref(false);
 const filteredUnits = computed(() => {
     return units.filter((unit) =>
         unit.name.toLowerCase().includes(unitSearch.value.toLowerCase())
@@ -164,16 +161,12 @@ function uploadNewImage(image, index) {
     formData.append("order", index);
 
     axios
-        .post(
-            `${page.props.ziggy.url}/api/my-store/product-variant-image`,
-            formData,
-            {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: token,
-                },
-            }
-        )
+        .post("/api/my-store/product-variant-image", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: token,
+            },
+        })
         .then((response) => {
             form.images[index] = {
                 ...response.data.result,
@@ -202,16 +195,12 @@ function updateImage(index, image) {
     formData.append("order", index);
 
     axios
-        .post(
-            `${page.props.ziggy.url}/api/my-store/product-variant-image/${image.id}`,
-            formData,
-            {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: token,
-                },
-            }
-        )
+        .post(`/api/my-store/product-variant-image/${image.id}`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: token,
+            },
+        })
         .then((response) => {
             form.images[index] = {
                 ...response.data.result,
@@ -243,14 +232,11 @@ function deleteImages() {
 
     images.forEach((imageId) => {
         axios
-            .delete(
-                `${page.props.ziggy.url}/api/my-store/product-variant-image/${imageId}`,
-                {
-                    headers: {
-                        Authorization: token,
-                    },
-                }
-            )
+            .delete(`/api/my-store/product-variant-image/${imageId}`, {
+                headers: {
+                    Authorization: token,
+                },
+            })
             .then(() => {
                 imagesToDelete.value = imagesToDelete.value.filter(
                     (id) => id !== imageId
@@ -281,16 +267,12 @@ function updateVariant() {
     const token = `Bearer ${localStorage.getItem("access_token")}`;
 
     axios
-        .post(
-            `${page.props.ziggy.url}/api/my-store/product-variant/${props.variant.id}`,
-            formData,
-            {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: token,
-                },
-            }
-        )
+        .post(`/api/my-store/product-variant/${props.variant.id}`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: token,
+            },
+        })
         .then((response) => {
             if (response.data?.meta?.message) {
                 emit("submitted", response.data?.meta?.message);
@@ -329,16 +311,12 @@ function createVariant() {
     const token = `Bearer ${localStorage.getItem("access_token")}`;
 
     axios
-        .post(
-            `${page.props.ziggy.url}/api/my-store/product-variant`,
-            formData,
-            {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: token,
-                },
-            }
-        )
+        .post("/api/my-store/product-variant", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: token,
+            },
+        })
         .then((response) => {
             if (response.data?.meta?.message) {
                 emit("submitted", response.data?.meta?.message);
@@ -527,49 +505,6 @@ const openErrorDialog = (message) => {
                 />
             </InputGroup>
 
-            <!-- Images -->
-            <InputGroup id="images" label="Gambar Produk">
-                <div ref="imagesContainer" class="flex flex-wrap w-full gap-2">
-                    <ImageInput
-                        v-for="(image, index) in form.images"
-                        :key="index"
-                        :id="`image-${image.id}`"
-                        :modelValue="image.image"
-                        type="file"
-                        accept="image/*"
-                        placeholder="Upload Produk"
-                        class="!w-auto mt-1"
-                        width="!w-[180px]"
-                        height="h-[120px]"
-                        :showDeleteButton="true"
-                        :error="form.errors.images?.[index]"
-                        :isDragging="drag"
-                        @update:modelValue="
-                            if (isNewImage(image)) {
-                                if (image.image == null) {
-                                    form.images.push({
-                                        id: `new-${countNewImages + 1}`,
-                                        image: null,
-                                    });
-                                }
-
-                                image.image = $event;
-                            } else {
-                                image.image = $event;
-                            }
-                        "
-                        @delete="
-                            if (isNewImage(image)) {
-                                form.images.splice(index, 1);
-                            } else {
-                                imagesToDelete.push(image.id);
-                                form.images.splice(index, 1);
-                            }
-                        "
-                    />
-                </div>
-            </InputGroup>
-
             <!-- Base Selling Price -->
             <InputGroup id="base_selling_price" label="Harga Dasar">
                 <TextInput
@@ -651,10 +586,53 @@ const openErrorDialog = (message) => {
                 />
             </InputGroup>
 
+            <!-- Images -->
+            <InputGroup id="images" label="Gambar Produk">
+                <div ref="imagesContainer" class="flex flex-wrap w-full gap-2">
+                    <ImageInput
+                        v-for="(image, index) in form.images"
+                        :key="index"
+                        :id="`image-${image.id}`"
+                        :modelValue="image.image"
+                        type="file"
+                        accept="image/*"
+                        placeholder="Upload Produk"
+                        class="!w-auto mt-1"
+                        width="!w-[180px]"
+                        height="h-[120px]"
+                        :showDeleteButton="true"
+                        :error="form.errors.images?.[index]"
+                        :isDragging="drag"
+                        @update:modelValue="
+                            if (isNewImage(image)) {
+                                if (image.image == null) {
+                                    form.images.push({
+                                        id: `new-${countNewImages + 1}`,
+                                        image: null,
+                                    });
+                                }
+
+                                image.image = $event;
+                            } else {
+                                image.image = $event;
+                            }
+                        "
+                        @delete="
+                            if (isNewImage(image)) {
+                                form.images.splice(index, 1);
+                            } else {
+                                imagesToDelete.push(image.id);
+                                form.images.splice(index, 1);
+                            }
+                        "
+                    />
+                </div>
+            </InputGroup>
+
             <div class="flex items-center justify-start w-full gap-4 mt-4">
                 <PrimaryButton type="submit"> Simpan Data </PrimaryButton>
                 <SecondaryButton type="button" @click="$emit('close')">
-                    Tutup
+                    Batalkan
                 </SecondaryButton>
             </div>
         </div>

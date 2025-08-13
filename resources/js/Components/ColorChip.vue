@@ -18,6 +18,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    radioClasses: {
+        type: [String, Object, Array],
+        default: "",
+    },
 });
 
 const emit = defineEmits(["click"]);
@@ -58,8 +62,10 @@ const onClick = () => {
     >
         <div
             class="rounded-full size-4 sm:size-5 shrink-0"
+            :class="props.radioClasses"
             :style="radioStyle"
         ></div>
         <span>{{ props.label }}</span>
+        <slot name="suffix" />
     </div>
 </template>

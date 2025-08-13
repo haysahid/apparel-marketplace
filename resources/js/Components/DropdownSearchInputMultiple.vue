@@ -77,14 +77,18 @@ watch(
 );
 
 const dropdown = ref(null);
+
+function onFocusout() {
+    setTimeout(() => {
+        dropdown.value.open = false;
+    }, 100);
+}
 </script>
 
 <template>
     <div>
         <Dropdown
             ref="dropdown"
-            :id="props.id"
-            v-model="props.modelValue"
             align="left"
             width="full"
             required
@@ -110,7 +114,7 @@ const dropdown = ref(null);
                     :placeholder="props.placeholder"
                     :error="props.error"
                     @focus="dropdown.open = true"
-                    @focusout="dropdown.open = false"
+                    @focusout="onFocusout"
                 >
                     <template #suffix>
                         <svg
@@ -169,16 +173,16 @@ const dropdown = ref(null);
 
         <div
             v-if="props.modelValue && props.modelValue.length > 0"
-            class="flex flex-wrap gap-2 mt-2"
+            class="flex flex-wrap gap-2 mt-2.5"
         >
             <div v-for="(option, index) in props.modelValue" :key="index">
                 <div
-                    class="flex items-center gap-2 py-2 pl-4 pr-2 text-sm bg-gray-100 rounded"
+                    class="flex items-center gap-2 py-2 pl-4 pr-2 text-sm bg-gray-100 rounded-lg"
                 >
                     <p>{{ option.label }}</p>
                     <button
                         type="button"
-                        class="text-gray-500 hover:text-red-700"
+                        class="text-gray-400 hover:text-gray-500"
                         @click="
                             emit(
                                 'update:modelValue',

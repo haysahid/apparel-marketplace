@@ -74,7 +74,7 @@ const hasDeleteCallback = computed(() => {
             v-if="$slots.moreContent"
             align="right"
             width="32"
-            :showBackdrop="true"
+            :showBackdrop="false"
         >
             <template #trigger>
                 <button

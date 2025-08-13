@@ -70,19 +70,21 @@ watch(
 );
 
 const dropdown = ref(null);
+
+function onFocusout() {
+    setTimeout(() => {
+        dropdown.value.open = false;
+    }, 100);
+}
 </script>
 
 <template>
     <Dropdown
         ref="dropdown"
-        :id="props.id"
-        v-model="props.modelValue"
-        :placeholder="props.placeholder"
         align="left"
         width="full"
         required
         class="w-full"
-        :error="props.error"
         @onOpen="isDropdownOpen = true"
         @onClose="isDropdownOpen = false"
     >
@@ -105,7 +107,7 @@ const dropdown = ref(null);
                 :placeholder="props.placeholder"
                 :error="props.error"
                 @focus="dropdown.open = true"
-                @focusout="dropdown.open = false"
+                @focusout="onFocusout"
             >
                 <template #suffix>
                     <button
@@ -166,7 +168,7 @@ const dropdown = ref(null);
                 :preventNewLine="props.preventNewLine"
                 :error="props.error"
                 @focus="dropdown.open = true"
-                @focusout="dropdown.open = false"
+                @focusout="onFocusout"
             >
                 <template #suffix>
                     <button

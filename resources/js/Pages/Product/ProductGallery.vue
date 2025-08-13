@@ -65,7 +65,7 @@ const goToNextImage = () => {
             <img
                 :src="'/storage/' + image.image"
                 :alt="props.altText"
-                class="object-cover w-full transition-all duration-300 ease-in-out rounded-xl aspect-square"
+                class="object-cover w-full transition-all duration-300 ease-in-out rounded-xl aspect-square group-hover:scale-105"
             />
             <button
                 v-if="canGoToPreviousImage"

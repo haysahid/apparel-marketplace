@@ -23,6 +23,8 @@ import DropdownSearchInputMultiple from "@/Components/DropdownSearchInputMultipl
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import BrandForm from "../Brand/BrandForm.vue";
 import CategoryForm from "../Category/CategoryForm.vue";
+import DefaultCard from "@/Components/DefaultCard.vue";
+import VariantList from "./VariantList.vue";
 
 const props = defineProps({
     product: {
@@ -218,10 +220,6 @@ function deleteVariant(variant) {
             }
         )
         .then((response) => {
-            variantsToDelete.value = variantsToDelete.value.filter(
-                (id) => id !== variant.id
-            );
-
             openSuccessDialog(response.data.meta.message);
             getVariants();
         })
@@ -378,6 +376,8 @@ const submit = () => {
                 console.error(errors);
                 if (errors.error) {
                     openErrorDialog(errors.error);
+                } else if (errors.variants) {
+                    openErrorDialog(errors.variants);
                 }
             },
         });
@@ -434,25 +434,6 @@ const draggableLinks = useDraggable(linksContainer, form.links, {
     },
 });
 
-const showAddVariantForm = ref(false);
-const openAddVariantForm = () => {
-    showAddVariantForm.value = true;
-};
-const variantsContainer = ref(null);
-const draggableVariants = useDraggable(variantsContainer, form.variants, {
-    animation: 150,
-    onStart: (event) => {
-        drag.value = true;
-        const item = event.item;
-        item.style.opacity = "0.2";
-    },
-    onEnd: (event) => {
-        drag.value = false;
-        const item = event.item;
-        item.style.opacity = "1";
-    },
-});
-
 const showAddBrandForm = ref(false);
 const showAddCategoryForm = ref(false);
 
@@ -466,7 +447,6 @@ const openSuccessDialog = (message) => {
 
 const closeSuccessDialog = () => {
     showSuccessDialog.value = false;
-    successMessage.value = null;
 };
 
 const showErrorDialog = ref(false);
@@ -484,341 +464,393 @@ const closeErrorDialog = () => {
 </script>
 
 <template>
-    <form @submit.prevent="submit" class="max-w-3xl">
-        <div class="flex flex-col items-start gap-4">
-            <h2 class="text-lg font-semibold">Informasi Produk</h2>
-
-            <!-- Name -->
-            <InputGroup id="name" label="Nama Produk">
-                <TextInput
-                    id="name"
-                    v-model="form.name"
-                    type="text"
-                    placeholder="Masukkan Nama Produk"
-                    required
-                    :autofocus="true"
-                    :error="form.errors.username"
-                    @update:modelValue="form.errors.username = null"
-                />
-            </InputGroup>
-
-            <!-- SKU Prefix -->
-            <InputGroup id="sku_prefix" label="SKU Prefix">
-                <TextInput
-                    id="sku_prefix"
-                    v-model="form.sku_prefix"
-                    type="text"
-                    placeholder="Masukkan SKU Prefix"
-                    required
-                    :error="form.errors.sku_prefix"
-                    @update:modelValue="form.errors.sku_prefix = null"
-                />
-            </InputGroup>
-
-            <!-- Brand -->
-            <InputGroup id="brand_id" label="Brand">
-                <DropdownSearchInput
-                    id="brand_id"
-                    :modelValue="
-                        form.brand_id
-                            ? {
-                                  label: form.brand?.name,
-                                  value: form.brand_id,
-                              }
-                            : null
-                    "
-                    :options="
-                        filteredBrands.map((brand) => ({
-                            label: brand.name,
-                            value: brand.id,
-                        }))
-                    "
-                    placeholder="Pilih Brand"
-                    :error="form.errors.brand_id"
-                    @update:modelValue="
-                        (option) => {
-                            form.brand_id = option?.value;
-                            form.brand = option
-                                ? filteredBrands.find(
-                                      (brand) => brand.id === option.value
-                                  )
-                                : null;
-                        }
-                    "
-                    @search="brandSearch = $event"
-                    @clear="
-                        form.brand_id = null;
-                        form.brand = null;
-                        brandSearch = '';
-                    "
-                >
-                    <template #optionHeader>
-                        <div class="flex items-center justify-between gap-2">
-                            <p class="font-semibold">Pilih Brand</p>
-                            <button
-                                type="button"
-                                class="text-sm text-blue-500 hover:underline"
-                                @click="showAddBrandForm = true"
-                            >
-                                Tambah
-                            </button>
-                        </div>
-                    </template>
-                </DropdownSearchInput>
-            </InputGroup>
-
-            <!-- Images -->
-            <InputGroup label="Gambar Produk">
-                <div ref="imagesContainer" class="flex flex-wrap w-full gap-2">
-                    <ImageInput
-                        v-for="(image, index) in form.images"
-                        :key="image.id"
-                        :id="`image-${image.id}`"
-                        :modelValue="image.image"
-                        type="file"
-                        accept="image/*"
-                        placeholder="Upload Produk"
-                        class="!w-auto"
-                        width="!w-[180px]"
-                        height="h-[120px]"
-                        :showDeleteButton="true"
-                        :error="form.errors.images?.[index]"
-                        :isDragging="drag"
-                        @update:modelValue="
-                            if (isNewImage(image)) {
-                                if (image.image == null) {
-                                    form.images.push({
-                                        id: `new-${countNewImages + 1}`,
-                                        image: null,
-                                    });
-                                }
-
-                                image.image = $event;
-                            } else {
-                                image.image = $event;
-                            }
-                        "
-                        @delete="
-                            if (isNewImage(image)) {
-                                form.images.splice(index, 1);
-                            } else {
-                                imagesToDelete.push(image.id);
-                                form.images.splice(index, 1);
-                            }
-                        "
-                    />
+    <form @submit.prevent="submit">
+        <div class="flex flex-col items-start sm:gap-4">
+            <DefaultCard :isMain="true" class="flex w-full gap-4">
+                <div class="w-full">
+                    <h2 class="text-lg font-semibold">Produk & Variasi</h2>
+                    <p class="text-sm text-gray-500">
+                        Isi informasi produk dan variasi.
+                    </p>
                 </div>
-            </InputGroup>
-
-            <!-- Discount -->
-            <InputGroup id="discount" label="Diskon (%)">
-                <TextInput
-                    id="discount"
-                    v-model.number="form.discount"
-                    type="number"
-                    placeholder="Masukkan Diskon"
-                    required
-                    autocomplete="discount"
-                    :error="form.errors.discount"
-                    @update:modelValue="form.errors.discount = null"
-                />
-            </InputGroup>
-
-            <!-- Categories -->
-            <InputGroup id="categories" label="Kategori Produk">
-                <DropdownSearchInputMultiple
-                    id="categories"
-                    :modelValue="
-                        form.categories?.map((category) => ({
-                            label: category.name,
-                            value: category.id,
-                        }))
-                    "
-                    :options="
-                        filteredCategories.map((category) => ({
-                            label: category.name,
-                            value: category.id,
-                        }))
-                    "
-                    placeholder="Cari Kategori"
-                    :error="form.errors.categories"
-                    @update:modelValue="
-                        (options) => {
-                            form.categories = options.map((option) =>
-                                categories.find(
-                                    (category) => category.id === option.value
-                                )
-                            );
-                        }
-                    "
-                    @search="categorySearch = $event"
-                    @clear="
-                        form.categories = null;
-                        categorySearch = '';
-                    "
-                >
-                    <template #optionHeader>
-                        <div class="flex items-center justify-between gap-2">
-                            <p class="font-semibold">Pilih Kategori</p>
-                            <button
-                                type="button"
-                                class="text-sm text-blue-500 hover:underline"
-                                @click="showAddCategoryForm = true"
-                            >
-                                Tambah
-                            </button>
-                        </div>
-                    </template>
-                </DropdownSearchInputMultiple>
-            </InputGroup>
-
-            <!-- Description -->
-            <InputGroup id="description" label="Deskripsi Produk">
-                <TextAreaInput
-                    id="description"
-                    v-model="form.description"
-                    type="text"
-                    placeholder="Masukkan Deskripsi"
-                    class="block w-full mt-1"
-                    required
-                    autocomplete="description"
-                    :error="form.errors.description"
-                    @update:modelValue="form.errors.description = null"
-                />
-            </InputGroup>
-
-            <!-- Links -->
-            <div class="flex flex-col items-start w-full gap-2 mt-4">
-                <h2 class="text-lg font-semibold">Tautan Produk</h2>
-                <div
-                    ref="linksContainer"
-                    class="flex flex-col items-start w-full gap-2"
-                >
-                    <div
-                        v-for="(link, index) in form.links"
-                        :key="index"
-                        class="w-full"
+                <div class="flex items-center gap-4">
+                    <SecondaryButton
+                        type="button"
+                        @click="$inertia.visit(route('my-store.product'))"
                     >
-                        <LinkItem
-                            :name="link.name"
-                            :url="link.url"
-                            :icon="link.platform?.icon"
-                            :index="index"
-                            :drag="drag"
-                            :showDeleteButton="true"
-                            @click="link.showEditForm = true"
-                            @delete="form.links.splice(index, 1)"
-                        />
-                        <DialogModal
-                            :show="link.showEditForm"
-                            title="Tambah Tautan Produk"
-                            maxWidth="sm"
-                            @close="link.showEditForm = false"
-                        >
-                            <template #content>
-                                <ProductLinkForm
-                                    :link="link"
-                                    @submit="form.links[index] = $event"
-                                    @close="link.showEditForm = false"
+                        Kembali
+                    </SecondaryButton>
+                    <PrimaryButton type="submit"> Simpan </PrimaryButton>
+                </div>
+            </DefaultCard>
+
+            <div class="flex flex-col items-start w-full gap-4 lg:flex-row">
+                <div class="flex flex-col items-start w-full gap-4">
+                    <DefaultCard
+                        :isMain="true"
+                        class="flex flex-col w-full max-w-3xl gap-4"
+                    >
+                        <h2 class="font-semibold">Informasi Produk</h2>
+
+                        <!-- Name -->
+                        <InputGroup id="name" label="Nama Produk">
+                            <TextAreaInput
+                                id="name"
+                                v-model="form.name"
+                                type="text"
+                                placeholder="Masukkan Nama Produk"
+                                required
+                                :rows="1"
+                                :autofocus="true"
+                                :error="form.errors.username"
+                                @update:modelValue="form.errors.username = null"
+                            />
+                        </InputGroup>
+
+                        <!-- SKU Prefix -->
+                        <InputGroup id="sku_prefix" label="SKU Prefix">
+                            <TextInput
+                                id="sku_prefix"
+                                v-model="form.sku_prefix"
+                                type="text"
+                                placeholder="Masukkan SKU Prefix"
+                                required
+                                :error="form.errors.sku_prefix"
+                                @update:modelValue="
+                                    form.errors.sku_prefix = null
+                                "
+                            />
+                        </InputGroup>
+
+                        <!-- Brand -->
+                        <InputGroup id="brand_id" label="Brand">
+                            <DropdownSearchInput
+                                id="brand_id"
+                                :modelValue="
+                                    form.brand_id
+                                        ? {
+                                              label: form.brand?.name,
+                                              value: form.brand_id,
+                                          }
+                                        : null
+                                "
+                                :options="
+                                    filteredBrands.map((brand) => ({
+                                        label: brand.name,
+                                        value: brand.id,
+                                    }))
+                                "
+                                placeholder="Pilih Brand"
+                                :error="form.errors.brand_id"
+                                @update:modelValue="
+                                    (option) => {
+                                        form.brand_id = option?.value;
+                                        form.brand = option
+                                            ? filteredBrands.find(
+                                                  (brand) =>
+                                                      brand.id === option.value
+                                              )
+                                            : null;
+                                    }
+                                "
+                                @search="brandSearch = $event"
+                                @clear="
+                                    form.brand_id = null;
+                                    form.brand = null;
+                                    brandSearch = '';
+                                "
+                            >
+                                <template #optionHeader>
+                                    <div
+                                        class="flex items-center justify-between gap-2"
+                                    >
+                                        <p class="font-semibold">Pilih Brand</p>
+                                        <button
+                                            type="button"
+                                            class="text-sm text-blue-500 hover:underline"
+                                            @click="showAddBrandForm = true"
+                                        >
+                                            Tambah
+                                        </button>
+                                    </div>
+                                </template>
+                            </DropdownSearchInput>
+                        </InputGroup>
+
+                        <!-- Discount -->
+                        <InputGroup id="discount" label="Diskon (%)">
+                            <TextInput
+                                id="discount"
+                                v-model.number="form.discount"
+                                type="number"
+                                placeholder="Masukkan Diskon"
+                                required
+                                autocomplete="discount"
+                                :error="form.errors.discount"
+                                @update:modelValue="form.errors.discount = null"
+                            />
+                        </InputGroup>
+
+                        <!-- Categories -->
+                        <InputGroup id="categories" label="Kategori Produk">
+                            <DropdownSearchInputMultiple
+                                id="categories"
+                                :modelValue="
+                                    form.categories?.map((category) => ({
+                                        label: category.name,
+                                        value: category.id,
+                                    }))
+                                "
+                                :options="
+                                    filteredCategories.map((category) => ({
+                                        label: category.name,
+                                        value: category.id,
+                                    }))
+                                "
+                                placeholder="Cari Kategori"
+                                :error="form.errors.categories"
+                                @update:modelValue="
+                                    (options) => {
+                                        form.categories = options.map(
+                                            (option) =>
+                                                categories.find(
+                                                    (category) =>
+                                                        category.id ===
+                                                        option.value
+                                                )
+                                        );
+                                    }
+                                "
+                                @search="categorySearch = $event"
+                                @clear="
+                                    form.categories = null;
+                                    categorySearch = '';
+                                "
+                            >
+                                <template #optionHeader>
+                                    <div
+                                        class="flex items-center justify-between gap-2"
+                                    >
+                                        <p class="font-semibold">
+                                            Pilih Kategori
+                                        </p>
+                                        <button
+                                            type="button"
+                                            class="text-sm text-blue-500 hover:underline"
+                                            @click="showAddCategoryForm = true"
+                                        >
+                                            Tambah
+                                        </button>
+                                    </div>
+                                </template>
+                            </DropdownSearchInputMultiple>
+                        </InputGroup>
+
+                        <!-- Description -->
+                        <InputGroup id="description" label="Deskripsi Produk">
+                            <TextAreaInput
+                                id="description"
+                                v-model="form.description"
+                                type="text"
+                                placeholder="Masukkan Deskripsi"
+                                class="block w-full mt-1"
+                                required
+                                autocomplete="description"
+                                :error="form.errors.description"
+                                @update:modelValue="
+                                    form.errors.description = null
+                                "
+                            />
+                        </InputGroup>
+
+                        <!-- Images -->
+                        <InputGroup label="Gambar Produk">
+                            <div
+                                ref="imagesContainer"
+                                class="flex flex-wrap w-full gap-2"
+                            >
+                                <ImageInput
+                                    v-for="(image, index) in form.images"
+                                    :key="image.id"
+                                    :id="`image-${image.id}`"
+                                    :modelValue="image.image"
+                                    type="file"
+                                    accept="image/*"
+                                    placeholder="Upload Produk"
+                                    class="!w-auto"
+                                    width="!w-[180px]"
+                                    height="h-[120px]"
+                                    :showDeleteButton="true"
+                                    :error="form.errors.images?.[index]"
+                                    :isDragging="drag"
+                                    @update:modelValue="
+                                        if (isNewImage(image)) {
+                                            if (image.image == null) {
+                                                form.images.push({
+                                                    id: `new-${
+                                                        countNewImages + 1
+                                                    }`,
+                                                    image: null,
+                                                });
+                                            }
+
+                                            image.image = $event;
+                                        } else {
+                                            image.image = $event;
+                                        }
+                                    "
+                                    @delete="
+                                        if (isNewImage(image)) {
+                                            form.images.splice(index, 1);
+                                        } else {
+                                            imagesToDelete.push(image.id);
+                                            form.images.splice(index, 1);
+                                        }
+                                    "
                                 />
-                            </template>
-                        </DialogModal>
-                    </div>
+                            </div>
+                        </InputGroup>
+
+                        <hr class="w-full my-2 border-gray-200" />
+
+                        <!-- Links -->
+                        <div class="flex flex-col items-start w-full gap-2">
+                            <div
+                                class="flex items-start justify-between w-full gap-4"
+                            >
+                                <div>
+                                    <h2 class="font-semibold">Tautan Produk</h2>
+                                    <p class="mt-1 text-sm text-gray-500">
+                                        Tambahkan tautan untuk meningkatkan
+                                        visibilitas produk.
+                                    </p>
+                                </div>
+                                <SecondaryButton
+                                    type="button"
+                                    class="text-nowrap"
+                                    @click="openAddLinkForm"
+                                >
+                                    Tambah Tautan
+                                </SecondaryButton>
+                            </div>
+                            <div
+                                v-show="form.links.length > 0"
+                                ref="linksContainer"
+                                class="flex flex-col items-start w-full gap-2 mt-1.5"
+                            >
+                                <div
+                                    v-for="(link, index) in form.links"
+                                    :key="index"
+                                    class="w-full"
+                                >
+                                    <LinkItem
+                                        :name="link.name"
+                                        :url="link.url"
+                                        :icon="link.platform?.icon"
+                                        :index="index"
+                                        :drag="drag"
+                                        :showDeleteButton="true"
+                                        @click="link.showEditForm = true"
+                                        @delete="form.links.splice(index, 1)"
+                                    />
+                                    <DialogModal
+                                        :show="link.showEditForm"
+                                        title="Tambah Tautan Produk"
+                                        maxWidth="sm"
+                                        @close="link.showEditForm = false"
+                                    >
+                                        <template #content>
+                                            <ProductLinkForm
+                                                :link="link"
+                                                @submit="
+                                                    form.links[index] = $event
+                                                "
+                                                @close="
+                                                    link.showEditForm = false
+                                                "
+                                            />
+                                        </template>
+                                    </DialogModal>
+                                </div>
+                            </div>
+                        </div>
+                    </DefaultCard>
                 </div>
-
-                <PrimaryButton
-                    type="button"
-                    class="!px-3 !py-2 text-xs !text-orange-500 bg-yellow-50 hover:bg-yellow-100/80 active:bg-yellow-100/90 focus:bg-yellow-100 focus:ring-yellow-100 outline outline-orange-200 mt-0.5"
-                    @click="openAddLinkForm"
-                >
-                    + Tambah Tautan Produk
-                </PrimaryButton>
-            </div>
-
-            <!-- Variants -->
-            <div class="flex flex-col items-start w-full gap-2 mt-4">
-                <h2 class="text-lg font-semibold">
-                    Variasi Produk ({{ form.variants.length }})
-                </h2>
-                <div
-                    ref="variantsContainer"
-                    class="grid w-full grid-cols-1 gap-2 lg:grid-cols-2"
-                >
-                    <div
-                        v-for="(variant, index) in form.variants"
-                        :key="index"
-                        class="w-full"
+                <div class="flex flex-col items-start w-full gap-4">
+                    <DefaultCard
+                        :isMain="true"
+                        class="flex flex-col w-full gap-4"
                     >
-                        <VariantCard
-                            :name="`${variant.motif} - ${variant.color?.name} - ${variant.size?.name}`"
-                            :variant="variant"
-                            :index="index"
-                            @click="variant.showEditForm = true"
-                            @delete="
-                                if (props.product) {
-                                    variant.showDeleteConfirmation = true;
-                                } else {
-                                    form.variants.splice(index, 1);
-                                    if (variant.id) {
-                                        variantsToDelete.push(variant.id);
+                        <!-- Variants -->
+                        <VariantList
+                            :isEdit="props.product != null"
+                            :product="
+                                props.product
+                                    ? {
+                                          ...props.product,
+                                          variants: undefined,
+                                      }
+                                    : null
+                            "
+                            :variants="form.variants"
+                            @onAdd="
+                                (variant) => {
+                                    form.variants.push(variant);
+                                }
+                            "
+                            @onAdded="
+                                (message) => {
+                                    openSuccessDialog(message);
+                                    getVariants();
+                                }
+                            "
+                            @onEdit="
+                                (variant) => {
+                                    const index = form.variants.findIndex(
+                                        (v) =>
+                                            v.motif === variant.motif &&
+                                            v.color_id === variant.color_id &&
+                                            v.size_id === variant.size_id
+                                    );
+                                    if (index !== -1) {
+                                        form.variants[index] = {
+                                            ...variant,
+                                            showEditForm: false,
+                                        };
+                                    }
+                                }
+                            "
+                            @onEditted="
+                                (message) => {
+                                    openSuccessDialog(message);
+                                    getVariants();
+                                }
+                            "
+                            @onDelete="
+                                (variant) => {
+                                    if (
+                                        props.product != null &&
+                                        variant.id != null
+                                    ) {
+                                        deleteVariant(variant);
+                                    } else {
+                                        const index = form.variants.findIndex(
+                                            (v) =>
+                                                v.motif === variant.motif &&
+                                                v.color_id ===
+                                                    variant.color_id &&
+                                                v.size_id === variant.size_id
+                                        );
+                                        form.variants.splice(index, 1);
+                                        openSuccessDialog(
+                                            'Varian produk berhasil dihapus.'
+                                        );
                                     }
                                 }
                             "
                         />
-                        <DialogModal
-                            :show="variant.showEditForm"
-                            title="Ubah Variasi Produk"
-                            @close="variant.showEditForm = false"
-                        >
-                            <template #content>
-                                <VariantForm
-                                    :isEdit="props.product != null"
-                                    :product="form.data()"
-                                    :variant="variant"
-                                    @submit="
-                                        form.variants[index] = {
-                                            ...$event,
-                                            showEditForm: false,
-                                        }
-                                    "
-                                    @close="variant.showEditForm = false"
-                                    @submitted="
-                                        variant.showEditForm = false;
-                                        openSuccessDialog($event);
-                                        getVariants();
-                                    "
-                                />
-                            </template>
-                        </DialogModal>
-                        <DeleteConfirmationDialog
-                            :title="`Hapus Varian Produk <b>${variant.name}</b>?`"
-                            :show="variant.showDeleteConfirmation"
-                            @close="variant.showDeleteConfirmation = false"
-                            @delete="
-                                variant.showDeleteConfirmation = false;
-                                deleteVariant(variant);
-                            "
-                        />
-                    </div>
+                    </DefaultCard>
                 </div>
-
-                <PrimaryButton
-                    type="button"
-                    class="!px-3 !py-2 text-xs !text-orange-500 bg-yellow-50 hover:bg-yellow-100/80 active:bg-yellow-100/90 focus:bg-yellow-100 focus:ring-yellow-100 outline outline-orange-200 mt-0.5"
-                    @click="openAddVariantForm"
-                >
-                    + Tambah Variasi Produk
-                </PrimaryButton>
-            </div>
-
-            <div class="flex items-center gap-4 mt-4">
-                <PrimaryButton type="submit"> Simpan </PrimaryButton>
-                <SecondaryButton
-                    type="button"
-                    @click="$inertia.visit(route('my-store.product'))"
-                >
-                    Kembali
-                </SecondaryButton>
             </div>
         </div>
 
@@ -833,26 +865,6 @@ const closeErrorDialog = () => {
                     :link="null"
                     @submit="form.links.push($event)"
                     @close="showAddLinkForm = false"
-                />
-            </template>
-        </DialogModal>
-
-        <DialogModal
-            :show="showAddVariantForm"
-            @close="showAddVariantForm = false"
-        >
-            <template #content>
-                <VariantForm
-                    :isEdit="props.product != null"
-                    :product="form.data()"
-                    :variant="null"
-                    @submit="form.variants.push($event)"
-                    @close="showAddVariantForm = false"
-                    @submitted="
-                        showAddVariantForm = false;
-                        openSuccessDialog($event);
-                        getVariants();
-                    "
                 />
             </template>
         </DialogModal>

@@ -13,10 +13,6 @@ const props = defineProps({
 
 <template>
     <MyStoreLayout title="Ubah Produk" :showTitle="true">
-        <div class="max-w-7xl">
-            <DefaultCard>
-                <ProductForm :product="props.product" />
-            </DefaultCard>
-        </div>
+        <ProductForm :product="props.product" />
     </MyStoreLayout>
 </template>
