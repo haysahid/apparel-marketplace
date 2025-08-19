@@ -258,11 +258,7 @@ onMounted(() => {
             </DefaultTable>
 
             <!-- Mobile View -->
-            <div
-                v-if="!screenSize.is('xl')"
-                class="mt-4 min-h-[68vh] flex flex-col gap-3"
-                :class="{ 'min-h-auto h-[68vh]': categories.length == 0 }"
-            >
+            <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <div
                     v-if="categories.length > 0"
                     class="grid grid-cols-1 gap-3 sm:grid-cols-2"
@@ -285,7 +281,7 @@ onMounted(() => {
                         @delete="openDeleteCategoryDialog(category)"
                     />
                 </div>
-                <div v-else class="flex items-center justify-center h-[90%]">
+                <div v-else class="flex items-center justify-center h-[40vh]">
                     <p class="text-sm text-center text-gray-500">
                         Data tidak ditemukan.
                     </p>

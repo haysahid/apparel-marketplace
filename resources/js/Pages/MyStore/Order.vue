@@ -320,11 +320,7 @@ onMounted(() => {
             </DefaultTable>
 
             <!-- Mobile View -->
-            <div
-                v-if="!screenSize.is('xl')"
-                class="mt-6 min-h-[68vh] flex flex-col gap-3"
-                :class="{ 'min-h-auto h-[68vh]': invoices.length == 0 }"
-            >
+            <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-6">
                 <template v-if="invoices.length > 0">
                     <div v-for="(invoice, index) in invoices" :key="invoice.id">
                         <MyOrderCard
@@ -339,7 +335,7 @@ onMounted(() => {
                         />
                     </div>
                 </template>
-                <div v-else class="flex items-center justify-center h-[90%]">
+                <div v-else class="flex items-center justify-center h-[40vh]">
                     <p class="text-sm text-center text-gray-500">
                         Data tidak ditemukan.
                     </p>
