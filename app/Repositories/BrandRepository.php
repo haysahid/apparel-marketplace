@@ -53,8 +53,26 @@ class BrandRepository
         return $brandDropdown->orderBy($orderBy, $orderDirection)->get();
     }
 
+    public static function isBrandExists($name, $storeId = null, $excludeId = null)
+    {
+        return Brand::where('name', $name)
+            ->where('store_id', $storeId)
+            ->where('id', '!=', $excludeId)
+            ->exists();
+    }
+
     public static function createBrand(array $data)
     {
+        $isExists = self::isBrandExists(
+            name: $data['name'],
+            storeId: $data['store_id'] ?? null,
+        );
+
+        if ($isExists) {
+            Log::error('Brand dengan nama ini sudah ada: ' . $data['name']);
+            throw new Exception('Brand dengan nama ini sudah ada.', 409);
+        }
+
         try {
             DB::beginTransaction();
 
@@ -77,6 +95,17 @@ class BrandRepository
 
     public static function updateBrand(Brand $brand, array $data)
     {
+        $isExists = self::isBrandExists(
+            name: $data['name'],
+            storeId: $data['store_id'] ?? null,
+            excludeId: $brand->id,
+        );
+
+        if ($isExists) {
+            Log::error('Brand dengan nama ini sudah ada: ' . $data['name']);
+            throw new Exception('Brand dengan nama ini sudah ada.', 409);
+        }
+
         try {
             DB::beginTransaction();
 

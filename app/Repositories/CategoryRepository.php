@@ -50,8 +50,26 @@ class CategoryRepository
         return $categoryDropdown->orderBy($orderBy, $orderDirection)->get();
     }
 
+    public static function isCategoryExists($name, $storeId = null, $excludeId = null)
+    {
+        return Category::where('name', $name)
+            ->where('store_id', $storeId)
+            ->where('id', '!=', $excludeId)
+            ->exists();
+    }
+
     public static function createCategory($data)
     {
+        $isExists = self::isCategoryExists(
+            name: $data['name'],
+            storeId: $data['store_id'] ?? null
+        );
+
+        if ($isExists) {
+            Log::error('Kategori dengan nama ini sudah ada: ' . $data['name']);
+            throw new Exception('Kategori dengan nama ini sudah ada.', 409);
+        }
+
         try {
             DB::beginTransaction();
 
@@ -77,6 +95,17 @@ class CategoryRepository
 
     public static function updateCategory(Category $category, $data)
     {
+        $isExists = self::isCategoryExists(
+            name: $data['name'],
+            storeId: $data['store_id'] ?? null,
+            excludeId: $category->id
+        );
+
+        if ($isExists) {
+            Log::error('Kategori dengan nama ini sudah ada: ' . $data['name']);
+            throw new Exception('Kategori dengan nama ini sudah ada.', 409);
+        }
+
         try {
             DB::beginTransaction();
 
@@ -99,13 +128,6 @@ class CategoryRepository
             Log::error('Gagal memperbarui kategori: ' . $e);
             throw new Exception('Gagal memperbarui kategori: ' . $e);
         }
-    }
-
-    public static function isCategoryExists($name, $storeId = null)
-    {
-        return Category::where('name', $name)
-            ->where('store_id', $storeId)
-            ->exists();
     }
 
     public static function deleteCategory(Category $category)

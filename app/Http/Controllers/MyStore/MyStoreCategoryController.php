@@ -68,15 +68,6 @@ class MyStoreCategoryController extends Controller
         ]);
 
         try {
-            $isCategoryExists = CategoryRepository::isCategoryExists(
-                name: $validated['name'],
-                storeId: $this->storeId
-            );
-
-            if ($isCategoryExists) {
-                return redirect()->back()->withErrors(['name' => 'Kategori dengan nama ini sudah ada.']);
-            }
-
             CategoryRepository::createCategory([
                 'store_id' => $this->storeId,
                 'name' => $validated['name'],

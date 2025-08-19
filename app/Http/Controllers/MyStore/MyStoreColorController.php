@@ -68,15 +68,6 @@ class MyStoreColorController extends Controller
         ]);
 
         try {
-            $isColorExists = ColorRepository::isColorExists(
-                name: $validated['name'],
-                storeId: $this->storeId
-            );
-
-            if ($isColorExists) {
-                return redirect()->back()->withErrors(['name' => 'Warna sudah ada.']);
-            }
-
             ColorRepository::createColor([
                 'store_id' => $this->storeId,
                 'name' => $validated['name'],
@@ -129,7 +120,8 @@ class MyStoreColorController extends Controller
         ]);
 
         try {
-            $color->update([
+            ColorRepository::updateColor($color, [
+                'store_id' => $this->storeId,
                 'name' => $validated['name'],
                 'hex_code' => $validated['hex_code'],
             ]);

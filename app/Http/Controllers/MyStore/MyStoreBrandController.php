@@ -14,6 +14,13 @@ use Inertia\Inertia;
 
 class MyStoreBrandController extends Controller
 {
+    protected $storeId;
+
+    public function __construct()
+    {
+        $this->storeId = session('selected_store_id');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -25,7 +32,7 @@ class MyStoreBrandController extends Controller
         $orderDirection = $request->input('order_direction', 'desc');
 
         $brands = BrandRepository::getBrands(
-            storeId: session('selected_store_id'),
+            storeId: $this->storeId,
             limit: $limit,
             search: $search,
             orderBy: $orderBy,
@@ -55,17 +62,13 @@ class MyStoreBrandController extends Controller
             'description' => 'nullable|string',
             'logo' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:2048',
             'is_dialog' => 'nullable|boolean',
+        ], [
+            'name.required' => 'Nama brand harus diisi.',
+            'logo.mimes' => 'Logo harus berupa file dengan format jpg, jpeg, png, atau webp.',
+            'logo.max' => 'Ukuran logo tidak boleh lebih dari 2MB.',
         ]);
 
         try {
-            $isBrandExists = Brand::where('name', $validated['name'])
-                ->where('store_id', session('selected_store_id'))
-                ->exists();
-
-            if ($isBrandExists) {
-                return redirect()->back()->withErrors(['name' => 'Brand dengan nama ini sudah ada.']);
-            }
-
             $data = [
                 'store_id' => session('selected_store_id'),
                 'name' => $validated['name'],

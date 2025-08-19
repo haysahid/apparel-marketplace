@@ -56,8 +56,26 @@ class ColorRepository
         return $colorDropdown->orderBy($orderBy, $orderDirection)->get();
     }
 
+    public static function isColorExists($name, $storeId = null, $excludeId = null)
+    {
+        return Color::where('name', $name)
+            ->where('store_id', $storeId)
+            ->where('id', '!=', $excludeId)
+            ->exists();
+    }
+
     public static function createColor($data)
     {
+        $isExists = self::isColorExists(
+            name: $data['name'],
+            storeId: $data['store_id'] ?? null
+        );
+
+        if ($isExists) {
+            Log::error('Warna dengan nama ini sudah ada: ' . $data['name']);
+            throw new Exception('Warna dengan nama ini sudah ada.', 409);
+        }
+
         try {
             DB::beginTransaction();
 
@@ -84,6 +102,17 @@ class ColorRepository
 
     public static function updateColor(Color $color, $data)
     {
+        $isExists = self::isColorExists(
+            name: $data['name'],
+            storeId: $data['store_id'] ?? null,
+            excludeId: $color->id
+        );
+
+        if ($isExists) {
+            Log::error('Warna dengan nama ini sudah ada: ' . $data['name']);
+            throw new Exception('Warna dengan nama ini sudah ada.', 409);
+        }
+
         try {
             DB::beginTransaction();
 
@@ -99,13 +128,6 @@ class ColorRepository
             Log::error('Gagal memperbarui warna: ' . $e);
             throw new Exception('Gagal memperbarui warna: ' . $e);
         }
-    }
-
-    public static function isColorExists($name, $storeId = null)
-    {
-        return Color::where('name', $name)
-            ->where('store_id', $storeId)
-            ->exists();
     }
 
     public static function deleteColor(Color $color)

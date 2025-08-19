@@ -8,6 +8,7 @@ use App\Http\Controllers\MyStore\MyStoreBrandController;
 use App\Http\Controllers\MyStore\MyStoreCategoryController;
 use App\Http\Controllers\MyStore\MyStoreColorController;
 use App\Http\Controllers\MyStore\MyStoreOrderController;
+use App\Http\Controllers\MyStore\MyStoreSizeController;
 use App\Http\Controllers\MyStore\MyStoreTransactionController;
 use App\Http\Controllers\MyStore\MyStoreVoucherController;
 use App\Http\Controllers\OrderController;
@@ -108,6 +109,14 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->grou
     Route::get('/color/{color}', [MyStoreColorController::class, 'edit'])->name('color.edit');
     Route::post('/color/{color}', [MyStoreColorController::class, 'update'])->name('color.update');
     Route::delete('/color/{color}', [MyStoreColorController::class, 'destroy'])->name('color.destroy');
+
+    // Size
+    Route::get('/size', [MyStoreSizeController::class, 'index'])->name('size');
+    Route::get('/size/create', [MyStoreSizeController::class, 'create'])->name('size.create');
+    Route::post('/size', [MyStoreSizeController::class, 'store'])->name('size.store');
+    Route::get('/size/{size}', [MyStoreSizeController::class, 'edit'])->name('size.edit');
+    Route::post('/size/{size}', [MyStoreSizeController::class, 'update'])->name('size.update');
+    Route::delete('/size/{size}', [MyStoreSizeController::class, 'destroy'])->name('size.destroy');
 
     // Brand
     Route::get('/brand', [MyStoreBrandController::class, 'index'])->name('brand');

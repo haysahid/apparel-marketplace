@@ -8,9 +8,9 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="border border-gray-200 rounded-md overflow-x-auto h-[68vh]">
+    <div class="border border-gray-200 rounded-md">
         <table class="table-default">
-            <thead v-if="$slots.thead" class="sticky top-0">
+            <thead v-if="$slots.thead" class="">
                 <slot name="thead" />
             </thead>
             <tbody v-if="!isEmpty">
@@ -19,7 +19,7 @@ const props = defineProps({
         </table>
 
         <!-- Empty State -->
-        <div v-if="isEmpty" class="flex items-center justify-center h-[90%]">
+        <div v-if="isEmpty" class="flex items-center justify-center h-[40vh]">
             <div class="flex flex-col items-center justify-center gap-2">
                 <p class="text-sm text-center text-gray-500">
                     Data tidak ditemukan.
