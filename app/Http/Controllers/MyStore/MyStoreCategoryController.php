@@ -58,6 +58,13 @@ class MyStoreCategoryController extends Controller
             'name' => 'required|string|max:255',
             'image' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:2048',
             'is_dialog' => 'nullable|boolean',
+        ], [
+            'name.required' => 'Nama kategori harus diisi.',
+            'name.string' => 'Nama kategori harus berupa string.',
+            'name.max' => 'Nama kategori tidak boleh lebih dari 255 karakter.',
+            'image.file' => 'File gambar harus valid.',
+            'image.mimes' => 'Gambar harus berupa file dengan format jpg, jpeg, png, atau webp.',
+            'image.max' => 'Ukuran gambar tidak boleh lebih dari 2MB.',
         ]);
 
         try {
@@ -112,6 +119,13 @@ class MyStoreCategoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'image' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:2048',
+        ], [
+            'name.required' => 'Nama kategori harus diisi.',
+            'name.string' => 'Nama kategori harus berupa string.',
+            'name.max' => 'Nama kategori tidak boleh lebih dari 255 karakter.',
+            'image.file' => 'File gambar harus valid.',
+            'image.mimes' => 'Gambar harus berupa file dengan format jpg, jpeg, png, atau webp.',
+            'image.max' => 'Ukuran gambar tidak boleh lebih dari 2MB.',
         ]);
 
         try {

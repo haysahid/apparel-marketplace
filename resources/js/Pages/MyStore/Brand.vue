@@ -14,6 +14,8 @@ import DefaultCard from "@/Components/DefaultCard.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import MyStoreBrandCard from "./Brand/MyStoreBrandCard.vue";
+import AdminItemCard from "@/Components/AdminItemCard.vue";
+import InfoTooltip from "@/Components/InfoTooltip.vue";
 
 const screenSize = useScreenSize();
 
@@ -116,6 +118,13 @@ const openErrorDialog = (message) => {
 };
 
 const page = usePage();
+
+function canEdit(brand) {
+    return (
+        page.props.auth.user.is_admin ||
+        page.props.auth.user.stores.some((store) => store.id === brand.store_id)
+    );
+}
 
 onMounted(() => {
     if (page.props.flash.success) {
@@ -224,12 +233,7 @@ onMounted(() => {
                         </td>
                         <td>
                             <AdminItemAction
-                                v-if="
-                                    $page.props.auth.user.is_admin ||
-                                    $page.props.auth.user.stores.some(
-                                        (store) => store.id === brand.store_id
-                                    )
-                                "
+                                v-if="canEdit(brand)"
                                 @edit="
                                     $inertia.visit(
                                         route('my-store.brand.edit', {
@@ -238,6 +242,11 @@ onMounted(() => {
                                     )
                                 "
                                 @delete="openDeleteBrandDialog(brand)"
+                            />
+                            <InfoTooltip
+                                v-if="!canEdit(brand)"
+                                :id="`table-tooltip-hint-${brand.id}`"
+                                text="Brand bawaan sistem"
                             />
                         </td>
                     </tr>
@@ -250,21 +259,29 @@ onMounted(() => {
                 class="mt-4 min-h-[68vh] flex flex-col gap-3"
                 :class="{ 'min-h-auto h-[68vh]': brands.length == 0 }"
             >
-                <template v-if="brands.length > 0">
-                    <div v-for="(brand, index) in brands" :key="brand.id">
-                        <MyStoreBrandCard
-                            :brand="brand"
-                            @edit="
-                                $inertia.visit(
-                                    route('my-store.brand.edit', {
-                                        brand: brand,
-                                    })
-                                )
-                            "
-                            @delete="openDeleteBrandDialog(brand)"
-                        />
-                    </div>
-                </template>
+                <div
+                    v-if="brands.length > 0"
+                    class="grid grid-cols-1 gap-3 sm:grid-cols-2"
+                >
+                    <AdminItemCard
+                        v-for="(brand, index) in brands"
+                        :key="brand.id"
+                        :name="brand.name"
+                        :description="brand.description"
+                        :image="brand.logo"
+                        :showImage="true"
+                        :hideActions="!canEdit(brand)"
+                        disabledHint="Brand bawaan sistem"
+                        @edit="
+                            $inertia.visit(
+                                route('my-store.brand.edit', {
+                                    brand: brand,
+                                })
+                            )
+                        "
+                        @delete="openDeleteBrandDialog(brand)"
+                    />
+                </div>
                 <div v-else class="flex items-center justify-center h-[90%]">
                     <p class="text-sm text-center text-gray-500">
                         Data tidak ditemukan.
@@ -273,7 +290,7 @@ onMounted(() => {
             </div>
 
             <!-- Pagination -->
-            <div v-if="props.brands.total > 0" class="flex flex-col gap-2 mt-6">
+            <div v-if="props.brands.total > 0" class="flex flex-col gap-2 mt-4">
                 <p class="text-xs text-gray-500 sm:text-sm">
                     Menampilkan {{ props.brands.from }} -
                     {{ props.brands.to }} dari {{ props.brands.total }} item

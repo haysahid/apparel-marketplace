@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('colors', function (Blueprint $table) {
             $table->id();
             $table->foreignId('store_id')->nullable()->constrained('stores')->onDelete('cascade')->default(null);
-            $table->string('name')->unique();
-            $table->string('hex_code')->unique();
+            $table->string('name');
+            $table->string('hex_code')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -28,7 +28,12 @@ class ColorRepository
         }
 
         if ($search) {
-            $colors->where('name', 'like', '%' . $search . '%');
+            $colors->where(
+                function ($query) use ($search) {
+                    $query->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('hex_code', 'like', '%' . $search . '%');
+                }
+            );
         }
 
         $colors->orderBy($orderBy, $orderDirection);
@@ -49,5 +54,70 @@ class ColorRepository
         }
 
         return $colorDropdown->orderBy($orderBy, $orderDirection)->get();
+    }
+
+    public static function createColor($data)
+    {
+        try {
+            DB::beginTransaction();
+
+            $color = new Color();
+            $color->store_id = $data['store_id'] ?? null;
+            $color->name = $data['name'];
+            $color->hex_code = $data['hex_code'];
+
+            if (isset($data['image'])) {
+                $color->image = Storage::putFile('colors', $data['image']);
+            }
+
+            $color->save();
+
+            DB::commit();
+
+            return $color;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal menyimpan warna: ' . $e);
+            throw new Exception('Gagal menyimpan warna: ' . $e);
+        }
+    }
+
+    public static function updateColor(Color $color, $data)
+    {
+        try {
+            DB::beginTransaction();
+
+            $color->name = $data['name'];
+            $color->hex_code = $data['hex_code'];
+            $color->save();
+
+            DB::commit();
+
+            return $color;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal memperbarui warna: ' . $e);
+            throw new Exception('Gagal memperbarui warna: ' . $e);
+        }
+    }
+
+    public static function isColorExists($name, $storeId = null)
+    {
+        return Color::where('name', $name)
+            ->where('store_id', $storeId)
+            ->exists();
+    }
+
+    public static function deleteColor(Color $color)
+    {
+        try {
+            DB::beginTransaction();
+            $color->delete();
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal menghapus warna: ' . $e);
+            throw new Exception('Gagal menghapus warna: ' . $e);
+        }
     }
 }

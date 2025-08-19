@@ -13,20 +13,18 @@ import DefaultTable from "@/Components/DefaultTable.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
-import MyStoreBrandCard from "./Brand/MyStoreBrandCard.vue";
 import AdminItemCard from "@/Components/AdminItemCard.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
 
 const screenSize = useScreenSize();
 
 const props = defineProps({
-    categories: null,
+    colors: null,
 });
 
-const categories = ref(
-    props.categories.data.map((category) => ({
-        ...category,
-        image: category.image ? "/storage/" + category.image : null,
+const colors = ref(
+    props.colors.data.map((color) => ({
+        ...color,
         showDeleteModal: false,
     }))
 );
@@ -40,60 +38,59 @@ const getQueryParams = () => {
 };
 getQueryParams();
 
-function getCategories() {
+function getColors() {
     let queryParams = {};
 
     if (filters.search) queryParams.search = filters.search;
 
-    router.get(route("my-store.category"), queryParams, {
+    router.get(route("my-store.color"), queryParams, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
             getQueryParams();
-            categories.value = props.categories.data.map((category) => ({
-                ...category,
-                image: category.image ? "/storage/" + category.image : null,
+            colors.value = props.colors.data.map((color) => ({
+                ...color,
                 showDeleteModal: false,
             }));
         },
     });
 }
 
-const selectedCategory = ref(null);
-const showDeleteCategoryDialog = ref(false);
+const selectedColor = ref(null);
+const showDeleteColorDialog = ref(false);
 
-const openDeleteCategoryDialog = (category) => {
-    if (category) {
-        selectedCategory.value = category;
-        showDeleteCategoryDialog.value = true;
+const openDeleteColorDialog = (color) => {
+    if (color) {
+        selectedColor.value = color;
+        showDeleteColorDialog.value = true;
     }
 };
 
-const closeDeleteCategoryDialog = (result) => {
-    showDeleteCategoryDialog.value = false;
+const closeDeleteColorDialog = (result) => {
+    showDeleteColorDialog.value = false;
     if (result) {
-        selectedCategory.value = null;
+        selectedColor.value = null;
         openSuccessDialog("Data Berhasil Dihapus");
-        categories.value = categories.value.filter(
-            (b) => b.id !== selectedCategory.value?.id
+        colors.value = colors.value.filter(
+            (b) => b.id !== selectedColor.value?.id
         );
     }
 };
 
-const deleteCategory = () => {
-    if (selectedCategory.value) {
+const deleteColor = () => {
+    if (selectedColor.value) {
         const form = useForm();
         form.delete(
-            route("my-store.category.destroy", {
-                category: selectedCategory.value,
+            route("my-store.color.destroy", {
+                color: selectedColor.value,
             }),
             {
                 onError: (errors) => {
                     openErrorDialog(errors.error);
                 },
                 onSuccess: () => {
-                    closeDeleteCategoryDialog(true);
-                    getCategories();
+                    closeDeleteColorDialog(true);
+                    getColors();
                 },
             }
         );
@@ -118,12 +115,10 @@ const openErrorDialog = (message) => {
 
 const page = usePage();
 
-function canEdit(category) {
+function canEdit(color) {
     return (
         page.props.auth.user.is_admin ||
-        page.props.auth.user.stores.some(
-            (store) => store.id === category.store_id
-        )
+        page.props.auth.user.stores.some((store) => store.id === color.store_id)
     );
 }
 
@@ -135,22 +130,22 @@ onMounted(() => {
 </script>
 
 <template>
-    <MyStoreLayout title="Kategori" :showTitle="true">
+    <MyStoreLayout title="Warna" :showTitle="true">
         <DefaultCard :isMain="true">
             <div class="flex items-center justify-between gap-4">
                 <PrimaryButton
                     type="button"
                     class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
-                    @click="$inertia.visit(route('my-store.category.create'))"
+                    @click="$inertia.visit(route('my-store.color.create'))"
                 >
                     Tambah
                 </PrimaryButton>
                 <TextInput
                     v-model="filters.search"
-                    placeholder="Cari kategori..."
+                    placeholder="Cari warna..."
                     textClass="text-sm sm:text-base"
                     class="max-w-48"
-                    @keyup.enter="getCategories()"
+                    @keyup.enter="getColors()"
                 >
                     <template #suffix>
                         <svg
@@ -178,78 +173,61 @@ onMounted(() => {
             <!-- Table -->
             <DefaultTable
                 v-if="screenSize.is('xl')"
-                :isEmpty="categories.length === 0"
+                :isEmpty="colors.length === 0"
                 class="mt-6"
             >
                 <template #thead>
                     <tr>
                         <th class="w-12">No</th>
-                        <th class="w-24">Gambar</th>
-                        <th>Nama Kategori</th>
-                        <th>Jumlah Produk</th>
+                        <th>Warna</th>
+                        <th>Kode Warna</th>
                         <th class="w-24">Aksi</th>
                     </tr>
                 </template>
                 <template #tbody>
-                    <tr
-                        v-for="(category, index) in categories"
-                        :key="category.id"
-                    >
+                    <tr v-for="(color, index) in colors" :key="color.id">
                         <td>
                             {{
                                 index +
                                 1 +
-                                (props.categories.current_page - 1) *
-                                    props.categories.per_page
+                                (props.colors.current_page - 1) *
+                                    props.colors.per_page
                             }}
                         </td>
                         <td>
-                            <img
-                                v-if="category.image"
-                                :src="category.image"
-                                alt="Logo Brand"
-                                class="object-contain h-[60px] rounded aspect-[3/2]"
-                            />
+                            {{ color.name }}
+                        </td>
+                        <td>
                             <div
-                                v-else
-                                class="flex items-center justify-center h-[60px] bg-gray-100 rounded aspect-[3/2]"
+                                v-if="color.hex_code"
+                                class="flex items-center gap-2"
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    class="size-6 fill-gray-400"
-                                >
-                                    <path
-                                        d="M5 21C4.45 21 3.97933 20.8043 3.588 20.413C3.19667 20.0217 3.00067 19.5507 3 19V5C3 4.45 3.196 3.97933 3.588 3.588C3.98 3.19667 4.45067 3.00067 5 3H19C19.55 3 20.021 3.196 20.413 3.588C20.805 3.98 21.0007 4.45067 21 5V19C21 19.55 20.8043 20.021 20.413 20.413C20.0217 20.805 19.5507 21.0007 19 21H5ZM6 17H18L14.25 12L11.25 16L9 13L6 17Z"
-                                    />
-                                </svg>
+                                <span
+                                    class="inline-block w-4 h-4 rounded-full"
+                                    :style="{
+                                        backgroundColor: color.hex_code,
+                                    }"
+                                ></span>
+                                <p>{{ color.hex_code }}</p>
                             </div>
-                        </td>
-                        <td>
-                            {{ category.name }}
-                        </td>
-                        <td>
-                            {{ category.total_products }}
                         </td>
                         <td>
                             <div class="flex items-center justify-start gap-2">
                                 <AdminItemAction
-                                    v-if="canEdit(category)"
+                                    v-if="canEdit(color)"
                                     @edit="
                                         $inertia.visit(
-                                            route('my-store.category.edit', {
-                                                category: category,
+                                            route('my-store.color.edit', {
+                                                color: color,
                                             })
                                         )
                                     "
-                                    @delete="openDeleteCategoryDialog(category)"
+                                    @delete="openDeleteColorDialog(color)"
                                 />
                                 <InfoTooltip
-                                    v-if="!canEdit(category)"
-                                    :id="`table-tooltip-hint-${category.id}`"
-                                    text="Kategori bawaan sistem"
+                                    v-if="!canEdit(color)"
+                                    :id="`table-tooltip-hint-${color.id}`"
+                                    text="Warna bawaan sistem"
                                 />
                             </div>
                         </td>
@@ -261,29 +239,38 @@ onMounted(() => {
             <div
                 v-if="!screenSize.is('xl')"
                 class="mt-4 min-h-[68vh] flex flex-col gap-3"
-                :class="{ 'min-h-auto h-[68vh]': categories.length == 0 }"
+                :class="{ 'min-h-auto h-[68vh]': colors.length == 0 }"
             >
                 <div
-                    v-if="categories.length > 0"
-                    class="grid grid-cols-1 gap-3 sm:grid-cols-2"
+                    v-if="colors.length > 0"
+                    class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
                 >
                     <AdminItemCard
-                        v-for="(category, index) in categories"
-                        :key="category.id"
-                        :name="category.name"
-                        :description="`${category.total_products} Produk`"
-                        :image="category.image"
-                        :hideActions="!canEdit(category)"
-                        disabledHint="Kategori bawaan sistem"
+                        v-for="(color, index) in colors"
+                        :key="color.id"
+                        :name="color.name"
+                        :showImage="false"
+                        :description="color.hex_code"
+                        :hideActions="!canEdit(color)"
+                        disabledHint="Warna bawaan sistem"
                         @edit="
                             $inertia.visit(
-                                route('my-store.category.edit', {
-                                    category: category,
+                                route('my-store.color.edit', {
+                                    color: color,
                                 })
                             )
                         "
-                        @delete="openDeleteCategoryDialog(category)"
-                    />
+                        @delete="openDeleteColorDialog(color)"
+                    >
+                        <template #leading>
+                            <div
+                                class="inline-block rounded-full size-6 aspect-square"
+                                :style="{
+                                    backgroundColor: color.hex_code,
+                                }"
+                            ></div>
+                        </template>
+                    </AdminItemCard>
                 </div>
                 <div v-else class="flex items-center justify-center h-[90%]">
                     <p class="text-sm text-center text-gray-500">
@@ -293,24 +280,20 @@ onMounted(() => {
             </div>
 
             <!-- Pagination -->
-            <div
-                v-if="props.categories.total > 0"
-                class="flex flex-col gap-2 mt-4"
-            >
+            <div v-if="props.colors.total > 0" class="flex flex-col gap-2 mt-4">
                 <p class="text-xs text-gray-500 sm:text-sm">
-                    Menampilkan {{ props.categories.from }} -
-                    {{ props.categories.to }} dari
-                    {{ props.categories.total }} item
+                    Menampilkan {{ props.colors.from }} -
+                    {{ props.colors.to }} dari {{ props.colors.total }} item
                 </p>
-                <DefaultPagination :links="props.categories.links" />
+                <DefaultPagination :links="props.colors.links" />
             </div>
         </DefaultCard>
 
         <DeleteConfirmationDialog
-            :show="showDeleteCategoryDialog"
-            :title="`Hapus Kategori <b>${selectedCategory?.name}</b>?`"
-            @close="closeDeleteCategoryDialog()"
-            @delete="deleteCategory()"
+            :show="showDeleteColorDialog"
+            :title="`Hapus Kategori <b>${selectedColor?.name}</b>?`"
+            @close="closeDeleteColorDialog()"
+            @delete="deleteColor()"
         />
 
         <SuccessDialog

@@ -101,7 +101,7 @@ class CategoryRepository
         }
     }
 
-    public static function isCategoryExists($name, $storeId)
+    public static function isCategoryExists($name, $storeId = null)
     {
         return Category::where('name', $name)
             ->where('store_id', $storeId)

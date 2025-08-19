@@ -6,6 +6,7 @@ use App\Http\Controllers\MyStoreController;
 use App\Http\Controllers\MyStore\MyStoreProductController;
 use App\Http\Controllers\MyStore\MyStoreBrandController;
 use App\Http\Controllers\MyStore\MyStoreCategoryController;
+use App\Http\Controllers\MyStore\MyStoreColorController;
 use App\Http\Controllers\MyStore\MyStoreOrderController;
 use App\Http\Controllers\MyStore\MyStoreTransactionController;
 use App\Http\Controllers\MyStore\MyStoreVoucherController;
@@ -99,6 +100,14 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->grou
     Route::get('/category/{category}', [MyStoreCategoryController::class, 'edit'])->name('category.edit');
     Route::post('/category/{category}', [MyStoreCategoryController::class, 'update'])->name('category.update');
     Route::delete('/category/{category}', [MyStoreCategoryController::class, 'destroy'])->name('category.destroy');
+
+    // Color
+    Route::get('/color', [MyStoreColorController::class, 'index'])->name('color');
+    Route::get('/color/create', [MyStoreColorController::class, 'create'])->name('color.create');
+    Route::post('/color', [MyStoreColorController::class, 'store'])->name('color.store');
+    Route::get('/color/{color}', [MyStoreColorController::class, 'edit'])->name('color.edit');
+    Route::post('/color/{color}', [MyStoreColorController::class, 'update'])->name('color.update');
+    Route::delete('/color/{color}', [MyStoreColorController::class, 'destroy'])->name('color.destroy');
 
     // Brand
     Route::get('/brand', [MyStoreBrandController::class, 'index'])->name('brand');

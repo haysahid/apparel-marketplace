@@ -26,6 +26,7 @@
         "aos": "^2.3.4",
         "flowbite": "^3.1.2",
         "pinia": "^3.0.3",
-        "vue-draggable-plus": "^0.6.0"
+        "vue-draggable-plus": "^0.6.0",
+        "vue3-colorpicker": "^2.3.0"
     }
 }

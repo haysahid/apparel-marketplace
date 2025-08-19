@@ -198,7 +198,7 @@ onMounted(() => {
             <!-- Pagination -->
             <div
                 v-if="props.certificates.total > 0"
-                class="flex flex-col gap-2 mt-6"
+                class="flex flex-col gap-2 mt-4"
             >
                 <p class="text-xs text-gray-500 sm:text-sm">
                     Menampilkan {{ props.certificates.from }} -

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import AdminItemAction from "@/Components/AdminItemAction.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
+import Tooltip from "@/Components/Tooltip.vue";
+import InfoTooltip from "@/Components/InfoTooltip.vue";
 
 const props = defineProps({
     name: {
@@ -23,6 +25,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    disabledHint: {
+        type: String,
+        default: null,
+    },
 });
 
 const emit = defineEmits(["edit", "delete"]);
@@ -32,6 +38,8 @@ const emit = defineEmits(["edit", "delete"]);
     <div
         class="flex items-center justify-between gap-2.5 p-2.5 sm:gap-3 sm:p-4 transition-all duration-300 ease-in-out border border-gray-200 rounded-lg hover:border-primary-light hover:ring-1 hover:ring-primary-light"
     >
+        <slot name="leading" />
+
         <template v-if="props.showImage">
             <img
                 v-if="props.image"
@@ -85,5 +93,11 @@ const emit = defineEmits(["edit", "delete"]);
                 </div>
             </template>
         </AdminItemAction>
+        <InfoTooltip
+            v-else
+            :id="`tooltip-hint-${props.name}`"
+            :text="props.disabledHint"
+            class="self-start"
+        />
     </div>
 </template>
