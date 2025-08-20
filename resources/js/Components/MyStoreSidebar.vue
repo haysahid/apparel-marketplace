@@ -193,14 +193,13 @@ const menus = [
 
 <template>
     <aside
-        class="fixed top-0 left-0 w-0 h-screen overflow-y-hidden transition-all duration-300 ease-in-out md:w-64"
+        class="fixed top-0 left-0 w-0 h-screen overflow-y-hidden transition-all duration-300 ease-in-out bg-white md:w-64"
         :class="{
             '!static w-full': props.responsive,
-            'border-r border-gray-100': !props.responsive,
         }"
     >
         <nav
-            class="h-full bg-white"
+            class="h-full"
             :class="{
                 '!py-4': props.responsive,
             }"

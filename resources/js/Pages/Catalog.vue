@@ -150,10 +150,12 @@ function onChangeSearch() {
                 class="flex flex-col items-center w-full py-12 text-center gap-9"
             >
                 <div>
-                    <h1 class="mb-4 text-3xl font-bold text-center sm:text-4xl">
+                    <h1 class="mb-4 text-3xl font-bold text-center">
                         Katalog Produk
                     </h1>
-                    <p>Silahkan cari produk disini.</p>
+                    <p class="text-sm text-gray-700">
+                        Silahkan cari produk disini.
+                    </p>
                 </div>
                 <div class="w-full max-w-2xl mx-auto">
                     <form

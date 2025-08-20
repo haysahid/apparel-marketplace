@@ -18,6 +18,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    closeWhenSelect: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const emit = defineEmits(["onOpen", "onClose"]);
@@ -114,7 +118,11 @@ defineExpose({
                 class="absolute z-[999] w-full mt-2 rounded-md shadow-lg"
                 :class="[widthClass, alignmentClasses]"
                 style="display: none"
-                @click="open = false"
+                @click="
+                    if (props.closeWhenSelect) {
+                        open = false;
+                    }
+                "
             >
                 <div
                     class="rounded-md ring-1 ring-black ring-opacity-5"

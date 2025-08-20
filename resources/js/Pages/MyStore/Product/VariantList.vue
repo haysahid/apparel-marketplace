@@ -59,10 +59,6 @@ const filteredVariants = computed(() => {
         return matchesMotif && matchesColor;
     });
 
-    if (!showAllVariants.value) {
-        return variants.slice(0, 5);
-    }
-
     return variants;
 });
 
@@ -70,14 +66,12 @@ const showAddVariantForm = ref(false);
 const openAddVariantForm = () => {
     showAddVariantForm.value = true;
 };
-
-const showAllVariants = ref(false);
 </script>
 
 <template>
     <div class="flex flex-col items-start w-full gap-2">
         <!-- Header -->
-        <div class="flex items-start justify-between w-full">
+        <div class="flex items-start justify-between w-full gap-2">
             <div>
                 <h2 class="font-semibold">
                     Variasi Produk ({{ props.variants.length }})
@@ -102,13 +96,14 @@ const showAllVariants = ref(false);
                 <Dropdown
                     v-if="props.variants.length > 0"
                     align="right"
-                    width="md"
+                    width="sm"
+                    :closeWhenSelect="false"
                 >
                     <template #trigger>
                         <SecondaryButton
                             type="button"
                             :disabled="props.disabled"
-                            class="!p-2.5 group"
+                            class="!p-2 group"
                             :class="{
                                 'border-primary hover:bg-primary/10':
                                     selectedMotif || selectedColor,
@@ -133,9 +128,23 @@ const showAllVariants = ref(false);
                     </template>
                     <template #content>
                         <div class="flex flex-col gap-2 p-4">
-                            <h3 class="text-sm font-semibold">
-                                Filter Variasi Produk
-                            </h3>
+                            <div
+                                class="flex items-center justify-between gap-2"
+                            >
+                                <h3 class="text-sm font-semibold">
+                                    Filter Variasi Produk
+                                </h3>
+                                <button
+                                    type="button"
+                                    class="text-sm text-red-700 hover:underline w-fit"
+                                    @click="
+                                        selectedMotif = null;
+                                        selectedColor = null;
+                                    "
+                                >
+                                    Hapus Filter
+                                </button>
+                            </div>
                             <InputGroup label="Motif">
                                 <div class="flex flex-wrap gap-2">
                                     <Chip
@@ -159,6 +168,7 @@ const showAllVariants = ref(false);
                                         v-for="(color, index) in colors"
                                         :key="index"
                                         :label="color.name"
+                                        :hexCode="color.hex_code"
                                         :selected="
                                             selectedColor?.id == color.id
                                         "
@@ -181,73 +191,85 @@ const showAllVariants = ref(false);
         <!-- Active Filter -->
         <div
             v-if="selectedMotif || selectedColor"
-            class="flex items-center gap-2 mb-1"
+            class="flex items-center justify-between w-full gap-2 mt-1"
         >
-            <Chip
-                v-if="selectedMotif"
-                :label="selectedMotif"
-                :selected="true"
-                class="!py-1 pr-1 !gap-0.5 !cursor-default text-sm"
-            >
-                <template #suffix>
-                    <button
-                        type="button"
-                        class="p-[7px] text-gray-400 hover:text-primary rounded-full transition-all duration-300 ease-in-out"
-                        @click="
-                            selectedMotif = null;
-                            $event.stopPropagation();
-                        "
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            class="size-5"
+            <div class="flex items-center gap-2">
+                <Chip
+                    v-if="selectedMotif"
+                    :label="selectedMotif"
+                    :selected="true"
+                    class="pr-2 !gap-1 !cursor-default text-sm"
+                >
+                    <template #suffix>
+                        <button
+                            type="button"
+                            class="text-gray-500 transition-all duration-300 ease-in-out rounded-full hover:text-red-700"
+                            @click="
+                                selectedMotif = null;
+                                $event.stopPropagation();
+                            "
                         >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </button>
-                </template>
-            </Chip>
-            <ColorChip
-                v-if="selectedColor"
-                :label="selectedColor.name"
-                :selected="true"
-                class="!py-1 pr-1 !gap-0.5 !cursor-default text-sm"
-                radioClasses="!size-4 mr-1"
-            >
-                <template #suffix>
-                    <button
-                        type="button"
-                        class="p-[7px] text-gray-400 hover:text-primary rounded-full transition-all duration-300 ease-in-out"
-                        @click="
-                            selectedColor = null;
-                            $event.stopPropagation();
-                        "
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            class="size-5"
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                class="size-5"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </button>
+                    </template>
+                </Chip>
+                <ColorChip
+                    v-if="selectedColor"
+                    :label="selectedColor.name"
+                    :selected="true"
+                    class="pr-2 !gap-1 !cursor-default text-sm"
+                    radioClasses="!size-4 mr-0.5"
+                >
+                    <template #suffix>
+                        <button
+                            type="button"
+                            class="text-gray-500 transition-all duration-300 ease-in-out rounded-full hover:text-red-700"
+                            @click="
+                                selectedColor = null;
+                                $event.stopPropagation();
+                            "
                         >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"
-                            />
-                        </svg>
-                    </button>
-                </template>
-            </ColorChip>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                class="size-5"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </button>
+                    </template>
+                </ColorChip>
+            </div>
+            <button
+                type="button"
+                class="text-sm text-red-700 hover:underline w-fit"
+                @click="
+                    selectedMotif = null;
+                    selectedColor = null;
+                "
+            >
+                Hapus Filter
+            </button>
         </div>
 
         <!-- List -->
@@ -328,23 +350,6 @@ const showAllVariants = ref(false);
                 />
             </div>
         </div>
-
-        <button
-            v-if="props.variants.length > 5 && !showAllVariants"
-            type="button"
-            class="mt-2 text-primary hover:underline"
-            @click="showAllVariants = true"
-        >
-            Tampilkan semua
-        </button>
-        <button
-            v-if="showAllVariants"
-            type="button"
-            class="mt-2 text-primary hover:underline"
-            @click="showAllVariants = false"
-        >
-            Tampilkan lebih sedikit
-        </button>
 
         <DialogModal
             :show="showAddVariantForm"

@@ -59,13 +59,14 @@ const goToNextImage = () => {
         v-if="props.images.length > 0"
         class="flex flex-col items-start justify-start"
     >
+        <!-- Main Images -->
         <div
-            class="relative flex items-center justify-center w-full overflow-hidden transition-all duration-300 ease-in-out group rounded-xl outline outline-1 -outline-offset-1 outline-gray-200"
+            class="relative flex items-center justify-center w-full overflow-hidden transition-all duration-300 ease-in-out rounded-lg group"
         >
             <img
                 :src="'/storage/' + image.image"
                 :alt="props.altText"
-                class="object-cover w-full transition-all duration-300 ease-in-out rounded-xl aspect-square group-hover:scale-105"
+                class="object-cover w-full transition-all duration-300 ease-in-out rounded-lg aspect-square group-hover:scale-105"
             />
             <button
                 v-if="canGoToPreviousImage"
@@ -114,14 +115,14 @@ const goToNextImage = () => {
             </div>
         </div>
 
-        <!--  -->
+        <!-- Other Images -->
         <div class="flex items-center gap-4 py-4 overflow-x-auto">
             <img
                 v-for="(img, index) in props.images"
                 :key="index"
                 :src="'/storage/' + img.image"
                 :alt="props.altText"
-                class="w-[80px] sm:w-[120px] h-[60px] sm:h-[80px] object-cover rounded-lg cursor-pointer transition duration-200 hover:scale-105 outline outline-1 -outline-offset-1 outline-gray-200"
+                class="h-[50px] aspect-[3/2] object-cover rounded cursor-pointer transition duration-200 hover:scale-105"
                 :class="{
                     'opacity-50 !cursor-default hover:!scale-100':
                         image.image == img.image,

@@ -73,9 +73,7 @@ function formatPrice(price = 0) {
                     cartStore.groups.length == 0,
             }"
         >
-            <h1
-                class="text-2xl font-bold text-start sm:text-center sm:text-3xl"
-            >
+            <h1 class="text-2xl font-bold text-start sm:text-center">
                 {{
                     cartStore.groups.length > 0
                         ? `Keranjang Saya (${cartStore.groups.length} item)`
@@ -95,10 +93,7 @@ function formatPrice(price = 0) {
                     </PrimaryButton>
                 </Link>
             </div>
-            <p
-                class="text-sm text-gray-700 text-start sm:text-center sm:text-base"
-                v-else
-            >
+            <p class="text-sm text-gray-700 text-start sm:text-center" v-else>
                 Periksa kembali sebelum buat pesanan.
             </p>
         </div>

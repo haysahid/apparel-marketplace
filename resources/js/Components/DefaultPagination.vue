@@ -18,27 +18,27 @@ const props = defineProps({
 <template>
     <div class="flex justify-start">
         <nav
-            class="flex items-center gap-2 sm:gap-2.5 text-gray-600 [&>*]:rounded-md [&>*]:size-8 [&>*]:sm:size-10 [&>*]:aspect-square [&>*]:sm:rounded-lg [&>*]:sm:font-medium"
+            class="flex items-center gap-2 sm:gap-2.5 text-gray-600 [&>*]:rounded-md [&>*]:size-[38px] [&>*]:aspect-square [&>*]:sm:rounded-lg [&>*]:sm:font-medium"
         >
             <template v-for="(link, index) in props.links" :key="index">
                 <Link
-                    v-if="link.label.includes('Previous') && link.url !== null"
-                    :href="link.active ? '#' : link.url"
-                    class="flex items-center justify-center transition duration-300 aspect-square text-primary hover:bg-secondary-box/80"
-                    :class="
-                        link.active
-                            ? 'bg-primary text-white  active:bg-primary/90 focus:bg-primary focus:ring-primary'
-                            : 'text-primary bg-secondary-box hover:bg-secondary-box/80'
-                    "
+                    v-if="link.label.includes('Previous')"
+                    :href="link.url === null ? '#' : link.url"
+                    class="flex items-center justify-center transition duration-300 aspect-square hover:bg-primary/10 text-primary bg-secondary-box group"
+                    :class="{
+                        'text-gray-500 !bg-secondary-box cursor-default':
+                            link.active || link.url === null,
+                    }"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="20"
                         height="20"
                         viewBox="0 0 20 20"
-                        class="fill-gray-500"
+                        class="fill-gray-300"
                         :class="{
-                            'fill-gray-300': !link.url,
+                            '!fill-gray-500 group-hover:!fill-primary':
+                                link.url != null,
                         }"
                     >
                         <path
@@ -51,37 +51,36 @@ const props = defineProps({
                 <Link
                     v-if="
                         !link.label.includes('Next') &&
-                        !link.label.includes('Previous') &&
-                        link.url !== null
+                        !link.label.includes('Previous')
                     "
-                    :href="link.active ? '#' : link.url"
+                    :href="link.active || link.url === null ? '#' : link.url"
                     :class="[
                         'aspect-square flex items-center justify-center transition duration-300',
                         link.active
                             ? 'bg-primary text-white  active:bg-primary/90 focus:bg-primary focus:ring-primary'
-                            : 'text-gray-500 bg-secondary-box hover:bg-secondary-box/80',
+                            : 'text-gray-500 bg-secondary-box  hover:bg-primary/10 hover:text-primary',
                     ]"
                 >
                     <span v-html="link.label" />
                 </Link>
                 <Link
-                    v-if="link.label.includes('Next') && link.url !== null"
-                    :href="link.active ? '#' : link.url"
-                    class="flex items-center justify-center transition duration-300 aspect-square text-primary hover:bg-secondary-box/80"
-                    :class="
-                        link.active
-                            ? 'bg-primary text-white  active:bg-primary/90 focus:bg-primary focus:ring-primary'
-                            : 'text-primary bg-secondary-box hover:bg-secondary-box/80'
-                    "
+                    v-if="link.label.includes('Next')"
+                    :href="link.active || link.url === null ? '#' : link.url"
+                    class="flex items-center justify-center transition duration-300 aspect-square hover:bg-primary/10 text-primary bg-secondary-box group"
+                    :class="{
+                        'text-gray-500 !bg-secondary-box cursor-default':
+                            link.active || link.url === null,
+                    }"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="20"
                         height="20"
                         viewBox="0 0 20 20"
-                        class="fill-gray-500"
+                        class="fill-gray-300"
                         :class="{
-                            'fill-gray-300': !link.url,
+                            '!fill-gray-500 group-hover:!fill-primary':
+                                link.url != null,
                         }"
                     >
                         <path

@@ -148,7 +148,6 @@ onMounted(() => {
                 <TextInput
                     v-model="filters.search"
                     placeholder="Cari kategori..."
-                    textClass="text-sm sm:text-base"
                     class="max-w-48"
                     @keyup.enter="getCategories()"
                 >

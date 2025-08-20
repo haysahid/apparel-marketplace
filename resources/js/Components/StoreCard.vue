@@ -9,7 +9,7 @@ const props = defineProps({
 
 <template>
     <div
-        class="flex items-center justify-start w-full gap-2 p-4 rounded-lg outline outline-1 -outline-offset-1 outline-gray-300"
+        class="flex items-center justify-start w-full gap-2 p-4 rounded-lg outline outline-1 -outline-offset-1 outline-gray-300 h-fit"
     >
         <img
             v-if="props.store.logo"
@@ -30,7 +30,7 @@ const props = defineProps({
             />
         </svg>
         <div>
-            <p class="text-sm font-semibold sm:text-lg">
+            <p class="text-sm font-semibold sm:text-base">
                 {{ props.store?.name }}
             </p>
             <p class="text-xs text-gray-500 sm:text-sm">

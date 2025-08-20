@@ -180,15 +180,11 @@ onMounted(() => {
         <div
             class="p-6 sm:p-12 md:px-[100px] md:py-[60px] flex flex-col gap-2 sm:gap-3 sm:items-center bg-secondary-box"
         >
-            <h1
-                class="text-2xl font-bold text-start sm:text-center sm:text-3xl"
-            >
+            <h1 class="text-2xl font-bold text-start sm:text-center">
                 Detail Pesanan Anda
             </h1>
 
-            <p
-                class="max-w-lg text-sm text-gray-700 text-start sm:text-center sm:text-base"
-            >
+            <p class="max-w-lg text-sm text-gray-700 text-start sm:text-center">
                 Terima kasih telah melakukan pemesanan. Silakan cek detail
                 pesanan Anda di bawah ini.
             </p>

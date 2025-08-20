@@ -38,42 +38,63 @@ function updateValue(value: number) {
 </script>
 
 <template>
-    <div class="flex gap-4">
+    <div class="flex items-center gap-4">
         <InputLabel
             v-if="label"
             for="quantity"
             :value="label"
-            class="!text-gray-500 min-w-[80px] py-3 h-min !text-base"
+            class="!text-gray-500 min-w-[80px] h-min"
         />
         <div class="flex items-center gap-4">
             <TextInput
                 id="quantity"
-                :modelValue="modelValue"
+                :modelValue="props.modelValue"
                 type="number"
                 min="1"
                 :hide-arrows="true"
-                class="w-[120px] sm:w-[140px] grow-0"
+                class="w-[120px] grow-0"
                 :bgClass="
-                    'rounded-lg bg-white px-3.5 py-2 sm:py-3 border-gray-400 ' +
-                    bgClass
+                    'rounded-lg bg-white px-3.5 border-gray-400 ' + bgClass
                 "
                 textClass="text-center"
                 placeholder="0"
                 errorClass="px-0"
                 :error="
-                    !modelValue || (props.max && modelValue <= 0)
+                    !props.modelValue || (props.max && props.modelValue <= 0)
                         ? 'Jumlah tidak valid'
-                        : props.max && modelValue > props.max
+                        : props.max && props.modelValue > props.max
                         ? 'Stok tidak cukup'
                         : ''
+                "
+                @keydown="
+                    (event) => {
+                        if (/^[eE\-\+]$/.test(event.key)) {
+                            event.preventDefault();
+                        }
+                    }
+                "
+                @paste="
+                    (event) => {
+                        const value = event.clipboardData.getData('text');
+                        const parsedValue = parseInt(value, 10);
+
+                        if (value === '' || isNaN(parsedValue)) {
+                            updateValue(1);
+                        } else if (parsedValue < 1) {
+                            updateValue(parsedValue * -1);
+                        } else {
+                            updateValue(parsedValue);
+                        }
+                        event.preventDefault();
+                    }
                 "
                 @input="updateValue($event.target.valueAsNumber)"
             >
                 <template #prefix>
                     <button
                         class="absolute p-1 text-gray-600 left-2 hover:text-gray-800 disabled:opacity-30"
-                        @click="updateValue(modelValue - 1)"
-                        :disabled="modelValue <= 1"
+                        @click="updateValue(props.modelValue - 1)"
+                        :disabled="props.modelValue <= 1"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -95,8 +116,8 @@ function updateValue(value: number) {
                 <template #suffix>
                     <button
                         class="absolute p-1 text-gray-600 right-2 size-6 hover:text-gray-800 disabled:opacity-30"
-                        @click="updateValue(modelValue + 1)"
-                        :disabled="props.max && modelValue >= props.max"
+                        @click="updateValue(props.modelValue + 1)"
+                        :disabled="props.max && props.modelValue >= props.max"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -117,7 +138,10 @@ function updateValue(value: number) {
                 </template>
             </TextInput>
 
-            <p v-if="props.max && props.showAvailability" class="text-gray-600">
+            <p
+                v-if="props.max && props.showAvailability"
+                class="text-sm text-gray-600"
+            >
                 Tersedia {{ props.max }}
                 {{ props.unit }}
             </p>

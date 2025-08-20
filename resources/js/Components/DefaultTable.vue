@@ -8,7 +8,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="border border-gray-200 rounded-md">
+    <div class="rounded-md outline outline-1 outline-gray-200">
         <table class="table-default">
             <thead v-if="$slots.thead" class="">
                 <slot name="thead" />

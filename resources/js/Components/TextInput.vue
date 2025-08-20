@@ -113,11 +113,11 @@ defineExpose({
                 :autocomplete="props.autocomplete"
                 :required="props.required"
                 :readonly="props.readonly"
-                class="w-full px-4 py-2 border-gray-300 rounded-lg shadow-sm focus:border-primary-light focus:ring-primary-light overflow-ellipsis"
+                class="w-full px-4 py-2 text-sm border-gray-200 rounded-lg shadow-sm focus:border-primary-light focus:ring-primary-light overflow-ellipsis"
                 :class="[
                     {
-                        'pl-11': hasPrefix,
-                        'pr-11': hasSuffix,
+                        'pl-8': hasPrefix,
+                        'pr-8': hasSuffix,
                         'border-red-500 focus:border-red-500 focus:ring-red-500':
                             props.error,
                     },

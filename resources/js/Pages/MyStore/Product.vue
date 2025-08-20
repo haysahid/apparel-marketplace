@@ -241,7 +241,6 @@ onMounted(() => {
                     <TextInput
                         v-model="filters.search"
                         placeholder="Cari produk..."
-                        textClass="text-sm sm:text-base"
                         class="max-w-48"
                         @keyup.enter="getProducts()"
                     >
@@ -331,15 +330,15 @@ onMounted(() => {
                                 v-if="product.discount > 0"
                                 class="flex items-center justify-start gap-2 mt-1"
                             >
-                                <p class="text-sm text-gray-500 line-through">
-                                    {{ basePrice(product) }}
-                                </p>
                                 <DiscountTag
                                     v-if="product.discount > 0"
                                     :discount-type="product.discount_type"
                                     :discount="product.discount"
                                     class="!text-xs !px-1.5 !py-0.5"
                                 />
+                                <p class="text-sm text-gray-500 line-through">
+                                    {{ basePrice(product) }}
+                                </p>
                             </div>
                         </td>
                         <td>

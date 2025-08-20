@@ -10,6 +10,7 @@ export default {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
         './resources/js/**/*.vue',
+        "./node_modules/flowbite/**/*.js",
     ],
 
     theme: {
@@ -19,16 +20,21 @@ export default {
             },
             colors: {
                 primary: '#C28C42',
+                'primary-hover': '#B07A36',
                 'primary-dark': '#8B5B29',
                 'primary-light': '#DDC3AA',
                 secondary: '#F0E0FF',
                 'primary-box': '#232027',
-                'secondary-box': '#F2F2F2',
+                'secondary-box': '#F9F9F9',
             },
         },
     },
 
     darkMode: 'false',
 
-    plugins: [forms, typography],
+    plugins: [
+        forms,
+        typography,
+        require('flowbite/plugin'),
+    ],
 };

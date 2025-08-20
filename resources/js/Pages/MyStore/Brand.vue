@@ -13,7 +13,6 @@ import DefaultTable from "@/Components/DefaultTable.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
-import MyStoreBrandCard from "./Brand/MyStoreBrandCard.vue";
 import AdminItemCard from "@/Components/AdminItemCard.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
 
@@ -147,7 +146,6 @@ onMounted(() => {
                 <TextInput
                     v-model="filters.search"
                     placeholder="Cari brand..."
-                    textClass="text-sm sm:text-base"
                     class="max-w-48"
                     @keyup.enter="getBrands()"
                 >

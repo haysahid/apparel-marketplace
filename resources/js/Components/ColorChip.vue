@@ -52,7 +52,7 @@ const onClick = () => {
 
 <template>
     <div
-        class="flex items-center justify-center gap-2 cursor-pointer px-3.5 py-2 sm:py-3 rounded-lg hover:bg-gray-50 outline outline-1 -outline-offset-1 outline-gray-400 min-w-[60px] h-fit"
+        class="flex items-center justify-center gap-2 cursor-pointer px-3.5 py-2 text-sm rounded-lg hover:bg-gray-50 outline outline-1 -outline-offset-1 outline-gray-400 min-w-[60px] h-fit"
         :class="{
             '!outline-2 !-outline-offset-2 outline-primary bg-primary/10 hover:bg-primary/10':
                 props.selected,
@@ -61,7 +61,7 @@ const onClick = () => {
         @click="onClick"
     >
         <div
-            class="rounded-full size-4 sm:size-5 shrink-0"
+            class="rounded-full size-4 shrink-0"
             :class="props.radioClasses"
             :style="radioStyle"
         ></div>

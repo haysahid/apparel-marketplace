@@ -107,7 +107,7 @@ const colorPicker = ref(null);
             <InputGroup id="hex_code" label="Pilih Warna">
                 <button
                     type="button"
-                    class="flex items-center p-2 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-1 focus:border-primary-light focus:ring-primary-light w-fit"
+                    class="flex items-center p-1.5 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-1 focus:border-primary-light focus:ring-primary-light w-fit"
                     @click="colorPicker.showPicker = true"
                 >
                     <ColorPicker

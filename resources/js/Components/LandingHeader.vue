@@ -93,7 +93,7 @@ onMounted(() => {
                                 :key="menu.name"
                                 :href="menu.href"
                                 :active="menu.active"
-                                class="font-normal"
+                                class="text-sm font-normal"
                                 :class="{
                                     '!text-primary': menu.active,
                                     '!text-gray-500 hover:!text-gray-600':
@@ -154,7 +154,7 @@ onMounted(() => {
                                         :key="menu.name"
                                         :href="menu.href"
                                         :active="menu.active"
-                                        class="font-normal"
+                                        class="text-sm font-normal"
                                         :class="{
                                             '!text-primary': menu.active,
                                             '!text-gray-500 hover:!text-gray-600':

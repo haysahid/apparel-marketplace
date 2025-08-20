@@ -167,94 +167,93 @@ const images = computed(() => {
 
 <template>
     <LandingLayout title="Detail Produk">
-        <div class="p-6 sm:p-12 md:p-[100px] flex flex-col gap-12 lg:gap-20">
+        <div
+            class="p-6 sm:p-12 md:px-[100px] md:py-[60px] flex flex-col gap-12 lg:gap-20"
+        >
             <!-- Detail -->
-            <div
+            <section
                 data-aos="fade-up"
                 data-aos-duration="600"
-                class="grid grid-cols-1 gap-8 mx-auto lg:grid-cols-2 lg:gap-14 max-w-7xl"
+                class="flex flex-col gap-8 mx-auto max-w-7xl"
             >
-                <ProductGallery
-                    :images="images"
-                    :altText="
-                        orderForm?.selectedVariant?.name || props.product.name
-                    "
-                />
+                <div
+                    class="grid grid-cols-1 gap-8 mx-auto lg:grid-cols-2 lg:gap-14"
+                >
+                    <ProductGallery
+                        :images="images"
+                        :altText="
+                            orderForm?.selectedVariant?.name ||
+                            props.product.name
+                        "
+                    />
 
-                <div class="flex flex-col justify-start py-4">
-                    <h1 class="mb-4 text-2xl font-bold sm:text-3xl">
-                        {{ props.product.name }}
-                    </h1>
-                    <div class="flex flex-col items-start gap-2.5 mb-6">
-                        <p class="text-xl font-bold sm:text-2xl text-primary">
-                            {{ finalPrice }}
-                        </p>
-                        <div
-                            v-if="props.product.discount"
-                            class="flex items-center gap-2"
-                        >
-                            <p
-                                class="text-sm text-gray-500 line-through strike sm:text-base"
-                            >
-                                {{ basePrice }}
+                    <div class="flex flex-col justify-start py-4">
+                        <h1 class="mb-3 text-xl font-bold">
+                            {{ props.product.name }}
+                        </h1>
+                        <div class="flex flex-col items-start gap-2.5 mb-6">
+                            <p class="text-2xl font-bold text-primary">
+                                {{ finalPrice }}
                             </p>
-                            <DiscountTag
+                            <div
                                 v-if="props.product.discount"
-                                :discount-type="props.product.discount_type"
-                                :discount="props.product.discount"
-                                class="!px-1.5 !py-0.5 !rounded-md !text-sm !font-medium"
+                                class="flex items-center gap-2"
+                            >
+                                <DiscountTag
+                                    v-if="props.product.discount"
+                                    :discount-type="props.product.discount_type"
+                                    :discount="props.product.discount"
+                                    class="!px-1 !py-0 !rounded-md !text-[12px] !font-medium"
+                                />
+                                <p
+                                    class="text-sm text-gray-500 line-through strike"
+                                >
+                                    {{ basePrice }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-6">
+                            <ProductSelectionForm
+                                ref="orderForm"
+                                :product="props.product"
+                                :accumulated-stock="props.accumulatedStock"
+                                :min-order="props.minOrder"
+                                :motifs="props.motifs"
+                                :colors="props.colors"
+                                :sizes="props.sizes"
                             />
                         </div>
                     </div>
-                    <div class="flex flex-col gap-6">
-                        <ProductSelectionForm
-                            ref="orderForm"
-                            :product="props.product"
-                            :accumulated-stock="props.accumulatedStock"
-                            :min-order="props.minOrder"
-                            :motifs="props.motifs"
-                            :colors="props.colors"
-                            :sizes="props.sizes"
-                        />
+                </div>
 
-                        <!-- Table Details -->
-                        <div>
-                            <h3
-                                class="mb-2 text-lg font-semibold text-gray-700"
-                            >
-                                Rincian
-                            </h3>
-                            <div
-                                class="relative overflow-x-auto rounded-lg w-full max-w-[600px] border border-gray-300"
-                            >
-                                <ProductDetailTable :rows="tableRows" />
-                            </div>
-                        </div>
+                <!-- Information -->
+                <div class="flex flex-col gap-8">
+                    <!-- Store -->
+                    <StoreCard :store="props.product.store" />
 
-                        <!-- Store -->
-                        <div>
-                            <h3
-                                class="mb-2 text-lg font-semibold text-gray-700"
-                            >
-                                Toko
-                            </h3>
-                            <StoreCard :store="props.product.store" />
-                        </div>
-
-                        <!-- Description -->
-                        <div>
-                            <h3
-                                class="mb-2 text-lg font-semibold text-gray-700"
-                            >
-                                Deskripsi
-                            </h3>
-                            <p class="text-gray-700">
-                                {{ props.product.description }}
-                            </p>
+                    <!-- Table Details -->
+                    <div>
+                        <h3 class="mb-2 font-semibold text-gray-700">
+                            Rincian
+                        </h3>
+                        <div
+                            class="relative overflow-x-auto rounded-lg w-full max-w-[600px] border border-gray-300"
+                        >
+                            <ProductDetailTable :rows="tableRows" />
                         </div>
                     </div>
+
+                    <!-- Description -->
+                    <div>
+                        <h3 class="mb-2 font-semibold text-gray-700">
+                            Deskripsi
+                        </h3>
+                        <p class="text-sm text-gray-700 whitespace-pre-line">
+                            {{ props.product.description }}
+                        </p>
+                    </div>
                 </div>
-            </div>
+            </section>
 
             <!-- Related Products -->
             <LandingSection
@@ -266,15 +265,17 @@ const images = computed(() => {
                     data-aos-duration="600"
                     class="flex flex-col items-start justify-center gap-4 mx-auto max-w-7xl"
                 >
-                    <div class="flex items-center justify-between w-full gap-4">
-                        <h1 class="mb-4 text-2xl font-bold sm:text-3xl">
+                    <div
+                        class="flex items-center justify-between w-full gap-4 mb-4"
+                    >
+                        <h1 class="text-xl font-bold sm:text-3xl">
                             Produk Terkait
                         </h1>
                         <TextInput
                             placeholder="Cari produk..."
                             bgClass="bg-gray-100"
                             textClass="text-sm sm:text-base !ps-4"
-                            class="relative w-full max-w-sm"
+                            class="relative max-w-sm"
                             @keyup.enter="
                                 (e) => {
                                     $inertia.get(route('catalog'), {

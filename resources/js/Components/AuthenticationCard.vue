@@ -15,7 +15,7 @@
         <div
             data-aos="fade-up"
             data-aos-duration="300"
-            class="z-10 w-full max-w-sm px-8 py-8 bg-white shadow-md rounded-2xl"
+            class="z-10 w-full max-w-xs px-8 py-8 bg-white shadow-md rounded-2xl"
         >
             <div class="w-full mx-auto">
                 <slot name="logo" />

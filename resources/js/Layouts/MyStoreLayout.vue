@@ -6,6 +6,10 @@ import MyStoreSidebar from "@/Components/MyStoreSidebar.vue";
 
 defineProps({
     title: String,
+    subtitle: {
+        type: String,
+        default: null,
+    },
     showTitle: {
         type: Boolean,
         default: false,
@@ -33,12 +37,16 @@ defineProps({
                         <div
                             class="flex items-center justify-between gap-4 rounded-lg"
                         >
-                            <div
-                                class="flex items-center gap-2 sm:gap-4 max-w-7xl"
-                            >
-                                <h1 class="text-lg font-semibold sm:text-xl">
+                            <div class="flex flex-col items-start max-w-7xl">
+                                <h1 class="text-lg font-semibold">
                                     {{ title }}
                                 </h1>
+                                <p
+                                    v-if="subtitle"
+                                    class="text-xs text-gray-500"
+                                >
+                                    {{ subtitle }}
+                                </p>
                             </div>
                             <slot name="trailing"></slot>
                         </div>

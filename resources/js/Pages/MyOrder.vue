@@ -37,18 +37,14 @@ const invoices = props.invoices.data;
                     invoices.length == 0,
             }"
         >
-            <h1
-                class="text-2xl font-bold text-start sm:text-center sm:text-3xl"
-            >
+            <h1 class="text-2xl font-bold text-start sm:text-center">
                 {{ invoices.length > 0 ? "Pesanan Saya" : "Belum Ada Pesanan" }}
             </h1>
             <div
                 v-if="invoices.length == 0"
                 class="flex flex-col items-center gap-y-6"
             >
-                <p
-                    class="max-w-md text-sm text-center text-gray-700 sm:text-base"
-                >
+                <p class="max-w-md text-sm text-center text-gray-700">
                     Saat ini Anda belum memiliki pesanan. Silakan mulai belanja
                     untuk melihat pesanan Anda di sini.
                 </p>

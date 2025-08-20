@@ -8,6 +8,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import { createPinia } from 'pinia'
 import AOS from 'aos';
+// import { initFlowbite } from "flowbite";
 
 // My plugins
 import formatDate from './plugins/date-formatter';
@@ -15,6 +16,7 @@ import { formatCurrency } from './plugins/number-formatter';
 
 
 AOS.init();
+// initFlowbite();
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 

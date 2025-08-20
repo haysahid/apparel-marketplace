@@ -73,14 +73,14 @@ const props = defineProps({
                             class="flex items-center justify-between w-full gap-12 mb-4"
                         >
                             <h1
-                                class="text-xl font-bold sm:text-2xl lg:text-3xl text-nowrap"
+                                class="text-xl font-bold sm:text-2xl text-nowrap"
                             >
                                 Produk Terlaris
                             </h1>
                             <TextInput
                                 placeholder="Cari produk..."
                                 bgClass="bg-gray-100 focus:bg-white"
-                                textClass="text-sm sm:text-base !ps-4"
+                                textClass="text-sm !ps-4"
                                 class="relative w-full max-w-md"
                                 @keyup.enter="
                                     (e) => {
@@ -151,9 +151,7 @@ const props = defineProps({
                     <div
                         class="flex items-center justify-between w-full gap-12 mb-4"
                     >
-                        <h1
-                            class="text-2xl font-bold text-center sm:text-3xl text-nowrap"
-                        >
+                        <h1 class="text-xl font-bold sm:text-2xl text-nowrap">
                             Kategori Populer
                         </h1>
                         <!-- Selengkapnya -->

@@ -413,84 +413,6 @@ const openErrorDialog = (message) => {
                 />
             </InputGroup>
 
-            <!-- Color -->
-            <InputGroup id="color_id" label="Warna">
-                <DropdownSearchInput
-                    id="color_id"
-                    :modelValue="
-                        form.color_id
-                            ? {
-                                  label: form.color?.name,
-                                  value: form.color_id,
-                              }
-                            : null
-                    "
-                    :options="
-                        filteredColors.map((color) => ({
-                            label: color.name,
-                            value: color.id,
-                        }))
-                    "
-                    placeholder="Pilih Warna"
-                    :error="form.errors.color_id"
-                    @update:modelValue="
-                        (option) => {
-                            form.color_id = option?.value;
-                            form.color = option
-                                ? filteredColors.find(
-                                      (color) => color.id === option.value
-                                  )
-                                : null;
-                        }
-                    "
-                    @search="colorSearch = $event"
-                    @clear="
-                        form.color_id = null;
-                        form.color = null;
-                        colorSearch = '';
-                    "
-                />
-            </InputGroup>
-
-            <!-- Size -->
-            <InputGroup id="size_id" label="Ukuran">
-                <DropdownSearchInput
-                    id="size_id"
-                    :modelValue="
-                        form.size_id
-                            ? {
-                                  label: form.size?.name,
-                                  value: form.size_id,
-                              }
-                            : null
-                    "
-                    :options="
-                        filteredSizes.map((size) => ({
-                            label: size.name,
-                            value: size.id,
-                        }))
-                    "
-                    placeholder="Pilih Ukuran"
-                    :error="form.errors.size_id"
-                    @update:modelValue="
-                        (option) => {
-                            form.size_id = option?.value;
-                            form.size = option
-                                ? filteredSizes.find(
-                                      (size) => size.id === option.value
-                                  )
-                                : null;
-                        }
-                    "
-                    @search="sizeSearch = $event"
-                    @clear="
-                        form.size_id = null;
-                        form.size = null;
-                        sizeSearch = '';
-                    "
-                />
-            </InputGroup>
-
             <!-- Material -->
             <InputGroup id="material" label="Jenis Bahan">
                 <TextInput
@@ -505,86 +427,174 @@ const openErrorDialog = (message) => {
                 />
             </InputGroup>
 
-            <!-- Base Selling Price -->
-            <InputGroup id="base_selling_price" label="Harga Dasar">
-                <TextInput
-                    id="base_selling_price"
-                    v-model.number="form.base_selling_price"
-                    type="number"
-                    placeholder="Masukkan Harga"
-                    required
-                    autocomplete="base_selling_price"
-                    :error="form.errors.base_selling_price"
-                    @update:modelValue="form.errors.base_selling_price = null"
-                />
-            </InputGroup>
+            <div class="flex items-center w-full gap-4">
+                <!-- Color -->
+                <InputGroup id="color_id" label="Warna">
+                    <DropdownSearchInput
+                        id="color_id"
+                        :modelValue="
+                            form.color_id
+                                ? {
+                                      label: form.color?.name,
+                                      value: form.color_id,
+                                  }
+                                : null
+                        "
+                        :options="
+                            filteredColors.map((color) => ({
+                                label: color.name,
+                                value: color.id,
+                            }))
+                        "
+                        placeholder="Pilih Warna"
+                        :error="form.errors.color_id"
+                        @update:modelValue="
+                            (option) => {
+                                form.color_id = option?.value;
+                                form.color = option
+                                    ? filteredColors.find(
+                                          (color) => color.id === option.value
+                                      )
+                                    : null;
+                            }
+                        "
+                        @search="colorSearch = $event"
+                        @clear="
+                            form.color_id = null;
+                            form.color = null;
+                            colorSearch = '';
+                        "
+                    />
+                </InputGroup>
 
-            <!-- Discount -->
-            <InputGroup id="discount" label="Diskon (%)">
-                <TextInput
-                    id="discount"
-                    v-model.number="form.discount"
-                    type="number"
-                    placeholder="Masukkan Diskon"
-                    required
-                    autocomplete="discount"
-                    :error="form.errors.discount"
-                    @update:modelValue="form.errors.discount = null"
-                />
-            </InputGroup>
+                <!-- Size -->
+                <InputGroup id="size_id" label="Ukuran">
+                    <DropdownSearchInput
+                        id="size_id"
+                        :modelValue="
+                            form.size_id
+                                ? {
+                                      label: form.size?.name,
+                                      value: form.size_id,
+                                  }
+                                : null
+                        "
+                        :options="
+                            filteredSizes.map((size) => ({
+                                label: size.name,
+                                value: size.id,
+                            }))
+                        "
+                        placeholder="Pilih Ukuran"
+                        :error="form.errors.size_id"
+                        @update:modelValue="
+                            (option) => {
+                                form.size_id = option?.value;
+                                form.size = option
+                                    ? filteredSizes.find(
+                                          (size) => size.id === option.value
+                                      )
+                                    : null;
+                            }
+                        "
+                        @search="sizeSearch = $event"
+                        @clear="
+                            form.size_id = null;
+                            form.size = null;
+                            sizeSearch = '';
+                        "
+                    />
+                </InputGroup>
+            </div>
 
-            <!-- Stock -->
-            <InputGroup id="current_stock_level" label="Stok">
-                <TextInput
-                    id="current_stock_level"
-                    v-model.number="form.current_stock_level"
-                    type="number"
-                    placeholder="Masukkan Stok"
-                    required
-                    autocomplete="current_stock_level"
-                    :error="form.errors.current_stock_level"
-                    @update:modelValue="form.errors.current_stock_level = null"
-                />
-            </InputGroup>
+            <div class="flex items-center w-full gap-4">
+                <!-- Unit -->
+                <InputGroup id="unit" label="Satuan">
+                    <DropdownSearchInput
+                        id="unit_id"
+                        :modelValue="
+                            form.unit_id
+                                ? {
+                                      label: form.unit?.name,
+                                      value: form.unit_id,
+                                  }
+                                : null
+                        "
+                        :options="
+                            filteredUnits.map((unit) => ({
+                                label: unit.name,
+                                value: unit.id,
+                            }))
+                        "
+                        placeholder="Pilih Satuan"
+                        :error="form.errors.unit_id"
+                        @update:modelValue="
+                            (option) => {
+                                form.unit_id = option?.value;
+                                form.unit = option
+                                    ? filteredUnits.find(
+                                          (unit) => unit.id === option.value
+                                      )
+                                    : null;
+                            }
+                        "
+                        @search="unitSearch = $event"
+                        @clear="
+                            form.unit_id = null;
+                            form.unit = null;
+                            unitSearch = '';
+                        "
+                    />
+                </InputGroup>
 
-            <!-- Unit -->
-            <InputGroup id="unit" label="Satuan">
-                <DropdownSearchInput
-                    id="unit_id"
-                    :modelValue="
-                        form.unit_id
-                            ? {
-                                  label: form.unit?.name,
-                                  value: form.unit_id,
-                              }
-                            : null
-                    "
-                    :options="
-                        filteredUnits.map((unit) => ({
-                            label: unit.name,
-                            value: unit.id,
-                        }))
-                    "
-                    placeholder="Pilih Satuan"
-                    :error="form.errors.unit_id"
-                    @update:modelValue="
-                        (option) => {
-                            form.unit_id = option?.value;
-                            form.unit = option
-                                ? filteredUnits.find(
-                                      (unit) => unit.id === option.value
-                                  )
-                                : null;
-                        }
-                    "
-                    @search="unitSearch = $event"
-                    @clear="
-                        form.unit_id = null;
-                        form.unit = null;
-                        unitSearch = '';
-                    "
-                />
-            </InputGroup>
+                <!-- Stock -->
+                <InputGroup id="current_stock_level" label="Stok">
+                    <TextInput
+                        id="current_stock_level"
+                        v-model.number="form.current_stock_level"
+                        type="number"
+                        placeholder="Masukkan Stok"
+                        required
+                        autocomplete="current_stock_level"
+                        :error="form.errors.current_stock_level"
+                        @update:modelValue="
+                            form.errors.current_stock_level = null
+                        "
+                    />
+                </InputGroup>
+            </div>
+
+            <div class="flex items-center w-full gap-4">
+                <!-- Base Selling Price -->
+                <InputGroup id="base_selling_price" label="Harga Dasar">
+                    <TextInput
+                        id="base_selling_price"
+                        v-model.number="form.base_selling_price"
+                        type="number"
+                        placeholder="Masukkan Harga"
+                        required
+                        autocomplete="base_selling_price"
+                        :error="form.errors.base_selling_price"
+                        @update:modelValue="
+                            form.errors.base_selling_price = null
+                        "
+                    />
+                </InputGroup>
+
+                <!-- Discount -->
+                <InputGroup id="discount" label="Diskon (%)">
+                    <TextInput
+                        id="discount"
+                        v-model.number="form.discount"
+                        type="number"
+                        placeholder="Masukkan Diskon"
+                        required
+                        autocomplete="discount"
+                        :error="form.errors.discount"
+                        @update:modelValue="form.errors.discount = null"
+                    />
+                </InputGroup>
+            </div>
 
             <!-- Images -->
             <InputGroup id="images" label="Gambar Produk">
@@ -596,10 +606,10 @@ const openErrorDialog = (message) => {
                         :modelValue="image.image"
                         type="file"
                         accept="image/*"
-                        placeholder="Upload Produk"
+                        placeholder="Upload gambar"
                         class="!w-auto mt-1"
-                        width="!w-[180px]"
-                        height="h-[120px]"
+                        width="!w-[100px]"
+                        height="h-[100px]"
                         :showDeleteButton="true"
                         :error="form.errors.images?.[index]"
                         :isDragging="drag"

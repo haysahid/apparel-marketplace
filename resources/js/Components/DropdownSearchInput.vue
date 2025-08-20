@@ -102,7 +102,6 @@ function onFocusout() {
                         : (search = $event)
                 "
                 class="w-full"
-                :textClass="props.autoResize ? 'text-sm sm:text-base' : null"
                 :bgClass="props.bgClass"
                 :placeholder="props.placeholder"
                 :error="props.error"
