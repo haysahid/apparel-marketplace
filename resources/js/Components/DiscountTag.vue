@@ -28,7 +28,6 @@ const discountText = computed(() => {
 
 <template>
     <div
-        v-if="props.discount"
         class="px-1.5 py-0.5 text-xs sm:text-sm text-white bg-red-500 rounded-md h-fit font-normal sm:font-medium w-fit"
     >
         {{ discountText }}

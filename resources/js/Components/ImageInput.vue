@@ -73,7 +73,7 @@ defineExpose({ clearImage });
                     />
                     <div
                         v-if="!props.isDragging"
-                        class="absolute inset-0 flex flex-col items-center justify-center w-full h-full p-2 duration-300 ease-linear bg-black bg-opacity-0 rounded-lg group-hover:bg-opacity-70"
+                        class="absolute inset-0 flex flex-col items-center justify-center w-full h-full gap-1 p-2 duration-300 ease-linear bg-black bg-opacity-0 rounded-lg group-hover:bg-opacity-70"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +101,7 @@ defineExpose({ clearImage });
                     <button
                         v-if="props.showDeleteButton"
                         type="button"
-                        class="absolute p-[7px] text-gray-300 bg-gray-300/0 rounded-full top-1 right-1 hover:bg-gray-300/20 hover:text-gray-300 group-hover:text-gray-300 transition-all duration-300 ease-in-out opacity-0 group-hover:opacity-100"
+                        class="absolute p-1 text-gray-300 transition-all duration-300 ease-in-out rounded-full opacity-0 bg-gray-300/0 top-1 right-1 hover:bg-gray-300/20 hover:text-gray-300 group-hover:text-gray-300 group-hover:opacity-100"
                         @click.prevent="
                             clearImage();
                             emit('delete');
@@ -127,7 +127,7 @@ defineExpose({ clearImage });
                 <!-- Placeholder -->
                 <div
                     v-else
-                    class="flex items-center justify-center w-full h-32 text-gray-400 duration-300 border border-gray-200 rounded-lg shadow-sm group-hover:bg-gray-300/50 dark:bg-form-input dark:group-hover:bg-form-input/10 dark:group-hover:border-gray-600 dark:border-gray-600"
+                    class="flex items-center justify-center w-full h-32 text-gray-400 duration-300 border border-gray-200 rounded-lg shadow-sm group-hover:bg-gray-300/20 dark:bg-form-input dark:group-hover:bg-form-input/10 dark:group-hover:border-gray-600 dark:border-gray-600"
                     :class="[props.height, props.width]"
                 >
                     <div class="flex flex-col items-center gap-1 p-2">

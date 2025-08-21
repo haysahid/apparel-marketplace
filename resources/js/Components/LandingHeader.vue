@@ -18,11 +18,6 @@ const showingNavigationDropdown = ref(false);
 
 const menus = [
     {
-        name: "Tentang Kami",
-        href: route().current("home") ? "#about" : route("home") + "#about",
-        active: route().current("home"),
-    },
-    {
         name: "Katalog",
         href: route("catalog"),
         active: route().current("catalog"),
@@ -58,7 +53,7 @@ onMounted(() => {
 
 <template>
     <nav
-        class="sticky top-0 z-50 py-1 bg-white sm:px-12 md:px-[100px] w-full transition-all duration-300 ease-in-out border-b border-gray-100"
+        class="sticky top-0 z-50 py-1 bg-white sm:px-12 lg:px-[100px] w-full transition-all duration-300 ease-in-out border-b border-gray-100"
         :class="{
             'border-b border-primary-box !bg-primary-box': scrolled,
         }"
@@ -77,7 +72,7 @@ onMounted(() => {
                                         : `/storage/${$page.props.setting.logo_black}`
                                 "
                                 alt="Logo"
-                                class="w-auto h-8 sm:h-12"
+                                class="w-auto h-9 sm:h-10"
                             />
                         </Link>
                     </div>

@@ -101,6 +101,21 @@ const openErrorDialog = (message) => {
                 />
             </InputGroup>
 
+            <!-- Description -->
+            <InputGroup id="description" label="Deskripsi Sertifikat">
+                <TextAreaInput
+                    id="description"
+                    v-model="form.description"
+                    type="text"
+                    placeholder="Masukkan Deskripsi"
+                    class="block w-full mt-1"
+                    required
+                    autocomplete="description"
+                    :error="form.errors.description"
+                    @update:modelValue="form.errors.description = null"
+                />
+            </InputGroup>
+
             <!-- Image -->
             <InputGroup id="image" label="Gambar Sertifikat">
                 <ImageInput
@@ -115,21 +130,6 @@ const openErrorDialog = (message) => {
                     required
                     :error="form.errors.image"
                     @update:modelValue="form.errors.image = null"
-                />
-            </InputGroup>
-
-            <!-- Description -->
-            <InputGroup id="description" label="Deskripsi Sertifikat">
-                <TextAreaInput
-                    id="description"
-                    v-model="form.description"
-                    type="text"
-                    placeholder="Masukkan Deskripsi"
-                    class="block w-full mt-1"
-                    required
-                    autocomplete="description"
-                    :error="form.errors.description"
-                    @update:modelValue="form.errors.description = null"
                 />
             </InputGroup>
 

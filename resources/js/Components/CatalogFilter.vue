@@ -22,7 +22,7 @@ defineExpose({
     <div>
         <!-- Primary Filter -->
         <div class="hidden md:block">
-            <h2 class="mb-4 text-2xl font-bold">Kategori</h2>
+            <h2 class="mb-4 text-xl font-bold">Kategori</h2>
             <div
                 v-if="filters?.categories"
                 class="hidden gap-4 md:flex md:flex-col"

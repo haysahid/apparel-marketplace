@@ -51,7 +51,7 @@ const loadFile = (file) => {
 <template>
     <button
         type="button"
-        class="flex items-center justify-start w-full gap-3 pl-3.5 pr-2 py-2.5 bg-white outline outline-gray-300 rounded-xl hover:outline-primary-light transition-all duration-200 ease-in-out cursor-pointer -outline-offset-2"
+        class="flex items-center justify-start w-full gap-3 pl-3.5 pr-2 py-2.5 bg-white outline outline-gray-200 rounded-xl hover:outline-primary-light transition-all duration-200 ease-in-out cursor-pointer -outline-offset-2"
         :class="{
             'hover:outline-gray-300 ': drag,
             'pr-3.5': !showDeleteButton,
@@ -101,19 +101,19 @@ const loadFile = (file) => {
             <p class="text-xs text-gray-800 sm:text-sm">
                 {{ formatPrice(props.variant.final_selling_price) }}
             </p>
-            <div class="flex items-center gap-x-1">
+            <div class="flex items-center gap-x-1 mt-0.5">
+                <DiscountTag
+                    v-if="props.variant.discount > 0"
+                    :discount-type="props.variant.discount_type"
+                    :discount="props.variant.discount"
+                    class="!px-1 !py-0 !rounded-md !text-[10px] !font-medium"
+                />
                 <p
                     v-if="props.variant.discount > 0"
                     class="text-xs text-gray-500 line-through"
                 >
                     {{ formatPrice(props.variant.base_selling_price) }}
                 </p>
-                <DiscountTag
-                    v-if="props.variant.discount > 0"
-                    :discount-type="props.variant.discount_type"
-                    :discount="props.variant.discount"
-                    class="!text-xs"
-                />
             </div>
         </div>
 

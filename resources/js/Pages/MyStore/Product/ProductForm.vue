@@ -463,7 +463,7 @@ const closeErrorDialog = () => {
     errorMessage.value = null;
 };
 
-const tabs = ref([
+const tabs = computed(() => [
     {
         title: "Informasi Produk",
         icon: `
@@ -625,7 +625,9 @@ const tabIndex = ref(0);
                                             <div
                                                 class="flex items-center justify-between gap-2"
                                             >
-                                                <p class="font-semibold">
+                                                <p
+                                                    class="text-sm font-semibold"
+                                                >
                                                     Pilih Brand
                                                 </p>
                                                 <button
@@ -698,7 +700,7 @@ const tabIndex = ref(0);
                                         <div
                                             class="flex items-center justify-between gap-2"
                                         >
-                                            <p class="font-semibold">
+                                            <p class="text-sm font-semibold">
                                                 Pilih Kategori
                                             </p>
                                             <button

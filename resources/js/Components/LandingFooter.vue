@@ -17,7 +17,9 @@ const isHome = route().current("home");
 </script>
 
 <template>
-    <footer class="bg-primary-box px-6 pt-12 sm:pt-20 pb-6 sm:px-12 md:px-[100px]">
+    <footer
+        class="bg-primary-box px-6 pt-12 sm:pt-20 pb-6 sm:px-12 lg:px-[100px]"
+    >
         <div class="mx-auto max-w-7xl">
             <div
                 class="flex flex-col items-start justify-between gap-8 mb-12 sm:flex-row"
@@ -36,9 +38,9 @@ const isHome = route().current("home");
 
                     <Link :href="route('home')">
                         <h2
-                            class="mb-4 text-2xl font-semibold text-yellow-400 sm:hidden"
+                            class="mb-4 text-2xl font-semibold text-white sm:hidden"
                         >
-                            {{ setting.name }}
+                            {{ setting.site_name }}
                         </h2>
                     </Link>
 

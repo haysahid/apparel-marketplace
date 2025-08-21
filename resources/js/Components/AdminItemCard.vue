@@ -84,10 +84,18 @@ const emit = defineEmits(["edit", "delete"]);
         <AdminItemAction v-if="!props.hideActions" class="self-start">
             <template #moreContent>
                 <div class="divide-y divide-gray-200">
-                    <DropdownLink as="button" @click="emit('edit')">
+                    <DropdownLink
+                        as="button"
+                        class="!text-blue-500"
+                        @click="emit('edit')"
+                    >
                         Ubah
                     </DropdownLink>
-                    <DropdownLink as="button" @click="emit('delete')">
+                    <DropdownLink
+                        as="button"
+                        class="!text-red-500"
+                        @click="emit('delete')"
+                    >
                         Hapus
                     </DropdownLink>
                 </div>

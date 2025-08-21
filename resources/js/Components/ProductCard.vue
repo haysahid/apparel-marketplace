@@ -67,9 +67,9 @@ function formatPrice(price) {
             <div
                 class="flex flex-col justify-between gap-1 px-3 py-4 md:pb-5 md:pt-4 md:px-5"
             >
-                <div class="flex flex-col h-[72px] sm:h-[80px] gap-1">
+                <div class="flex flex-col h-[84px] sm:h-[100px] gap-1">
                     <h3
-                        class="font-bold sm:text-lg line-clamp-2 overflow-ellipsis"
+                        class="text-sm font-bold sm:text-base line-clamp-3 overflow-ellipsis"
                     >
                         {{ props.name }}
                     </h3>
@@ -83,13 +83,15 @@ function formatPrice(price) {
                     class="flex flex-wrap items-center justify-between mt-1 gap-y-1 gap-x-2"
                 >
                     <div>
-                        <p class="font-semibold sm:text-lg text-primary">
+                        <p
+                            class="text-sm font-semibold sm:text-base text-primary"
+                        >
                             {{ formatPrice(props.finalPrice) }}
                         </p>
 
                         <p
                             v-if="props.discount"
-                            class="text-sm text-gray-500 line-through"
+                            class="text-xs text-gray-500 line-through sm:text-sm"
                         >
                             {{ formatPrice(props.basePrice) }}
                         </p>

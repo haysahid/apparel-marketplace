@@ -150,7 +150,7 @@ function onChangeSearch() {
                 class="flex flex-col items-center w-full py-12 text-center gap-9"
             >
                 <div>
-                    <h1 class="mb-4 text-3xl font-bold text-center">
+                    <h1 class="mb-2 text-2xl font-bold text-center">
                         Katalog Produk
                     </h1>
                     <p class="text-sm text-gray-700">
@@ -173,11 +173,11 @@ function onChangeSearch() {
                                 name="search"
                                 placeholder="Cari produk..."
                                 :autofocus="route().params.search"
-                                class="w-full py-4 pl-8 pr-24 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-light overflow-ellipsis focus:border-primary-light"
+                                class="w-full py-4 pl-8 pr-24 border border-primary-light rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-light overflow-ellipsis focus:border-primary-light"
                             />
                             <button
                                 type="submit"
-                                class="absolute flex items-center justify-center px-4 py-2 text-white transition duration-200 rounded-lg bg-primary hover:bg-primary-dark right-3"
+                                class="absolute flex items-center justify-center px-4 py-2 text-white transition duration-200 rounded-lg bg-primary hover:bg-primary-hover right-3"
                             >
                                 Cari
                             </button>

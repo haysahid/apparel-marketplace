@@ -116,15 +116,15 @@ const goToNextImage = () => {
         </div>
 
         <!-- Other Images -->
-        <div class="flex items-center gap-4 py-4 overflow-x-auto">
+        <div class="flex items-center gap-2 py-4 overflow-x-auto">
             <img
                 v-for="(img, index) in props.images"
                 :key="index"
                 :src="'/storage/' + img.image"
                 :alt="props.altText"
-                class="h-[50px] aspect-[3/2] object-cover rounded cursor-pointer transition duration-200 hover:scale-105"
+                class="h-[50px] aspect-[3/2] object-cover rounded cursor-pointer transition duration-200 hover:scale-105 m-0.5"
                 :class="{
-                    'opacity-50 !cursor-default hover:!scale-100':
+                    '!cursor-default hover:!scale-100 outline outline-2 outline-primary':
                         image.image == img.image,
                 }"
                 @click="changeImage(index)"

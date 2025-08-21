@@ -229,7 +229,7 @@ function onFocusout() {
                             isDropdownOpen = false;
                             search = '';
                         "
-                        class="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-100"
+                        class="flex items-center gap-2 px-4 py-2 text-sm cursor-pointer hover:bg-gray-100"
                     >
                         <span v-if="option.icon" class="flex-shrink-0">
                             <img

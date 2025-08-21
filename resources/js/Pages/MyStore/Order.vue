@@ -274,7 +274,7 @@ onMounted(() => {
                                         invoice: invoice,
                                     })
                                 "
-                                class="font-semibold text-center hover:text-primary"
+                                class="hover:underline"
                             >
                                 #{{ invoice.code }}
                             </Link>

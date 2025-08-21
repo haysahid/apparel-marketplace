@@ -597,7 +597,7 @@ const openErrorDialog = (message) => {
             </div>
 
             <!-- Images -->
-            <InputGroup id="images" label="Gambar Produk">
+            <InputGroup id="images" label="Gambar Variasi Produk">
                 <div ref="imagesContainer" class="flex flex-wrap w-full gap-2">
                     <ImageInput
                         v-for="(image, index) in form.images"

@@ -88,17 +88,17 @@ const finalPrice = computed(() => {
                             </p>
                             <div
                                 v-if="props.product.discount"
-                                class="flex items-center gap-2"
+                                class="flex items-center gap-1.5 mt-0.5"
                             >
-                                <p class="text-xs text-gray-500 line-through">
-                                    {{ basePrice }}
-                                </p>
                                 <DiscountTag
                                     v-if="props.product.discount"
                                     :discount-type="props.product.discount_type"
                                     :discount="props.product.discount"
                                     class="!px-1 !py-0 !rounded-md !text-[10px] !font-medium"
                                 />
+                                <p class="text-xs text-gray-500 line-through">
+                                    {{ basePrice }}
+                                </p>
                             </div>
                         </div>
                         <div
@@ -119,15 +119,21 @@ const finalPrice = computed(() => {
             </div>
         </div>
 
-        <AdminItemAction
-            class="absolute top-2.5 right-2.5 sm:top-4 sm:right-4"
-        >
+        <AdminItemAction class="absolute top-2.5 right-2.5 sm:top-4 sm:right-4">
             <template #moreContent>
                 <div class="divide-y divide-gray-200">
-                    <DropdownLink as="button" @click="emit('edit')">
+                    <DropdownLink
+                        as="button"
+                        class="!text-blue-500"
+                        @click="emit('edit')"
+                    >
                         Ubah
                     </DropdownLink>
-                    <DropdownLink as="button" @click="emit('delete')">
+                    <DropdownLink
+                        as="button"
+                        class="!text-red-500"
+                        @click="emit('delete')"
+                    >
                         Hapus
                     </DropdownLink>
                 </div>

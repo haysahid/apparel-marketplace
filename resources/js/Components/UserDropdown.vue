@@ -24,15 +24,15 @@ const logout = () => {
 <template>
     <Dropdown align="right" width="48">
         <template #trigger>
-            <span
-                class="inline-flex rounded-md"
+            <div
+                class="flex rounded-md"
                 :class="{
                     'px-1': props.responsive,
                 }"
             >
                 <button
                     type="button"
-                    class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 transition duration-150 ease-in-out bg-transparent border border-transparent rounded-md text-gray-500/90 hover:text-gray-500 focus:outline-none hover:bg-gray-500/10 focus:bg-gray-500/10 active:bg-gray-500/20 group"
+                    class="flex items-center justify-start w-full gap-2 px-4 py-2 text-sm font-medium leading-4 transition duration-150 ease-in-out bg-transparent border border-transparent rounded-none sm:rounded-md sm:px-3 text-start sm:w-auto text-gray-500/90 hover:text-gray-500 focus:outline-none hover:bg-gray-500/10 focus:bg-gray-500/10 active:bg-gray-500/20 group"
                     :class="{
                         '!text-white/80 hover:bg-white/10 focus:bg-white/10':
                             props.invert,
@@ -40,7 +40,7 @@ const logout = () => {
                 >
                     <img
                         v-if="$page.props.auth.user.avatar"
-                        class="object-cover rounded-full size-8 me-2"
+                        class="object-cover rounded-full size-8"
                         :src="$page.props.auth.user.avatar"
                         :alt="$page.props.auth.user.name"
                     />
@@ -50,7 +50,7 @@ const logout = () => {
                         width="44"
                         height="44"
                         viewBox="0 0 44 44"
-                        class="fill-gray-400 size-8 me-1.5 transition duration-150 ease-in-out"
+                        class="transition duration-150 ease-in-out fill-gray-400 size-8"
                         :class="{
                             'fill-white/80 group-hover:fill-white/80 group-focus:fill-white/80':
                                 props.invert,
@@ -63,10 +63,12 @@ const logout = () => {
                         />
                     </svg>
 
-                    {{ $page.props.auth.user.name }}
+                    <span class="w-full sm:w-auto sm:hidden md:inline">
+                        {{ $page.props.auth.user.name }}
+                    </span>
 
                     <svg
-                        class="ms-2 -me-0.5 size-4"
+                        class="size-4 sm:hidden md:inline"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -80,7 +82,7 @@ const logout = () => {
                         />
                     </svg>
                 </button>
-            </span>
+            </div>
         </template>
 
         <template #content>

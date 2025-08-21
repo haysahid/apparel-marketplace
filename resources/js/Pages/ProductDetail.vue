@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { Link } from "@inertiajs/vue3";
 import LandingLayout from "@/Layouts/LandingLayout.vue";
 import LandingSection from "@/Components/LandingSection.vue";
@@ -163,12 +163,23 @@ const images = computed(() => {
         (img, idx, arr) => arr.findIndex((i) => i.image === img.image) === idx
     );
 });
+
+const scrolled = ref(false);
+const scrollThreshold = 0;
+
+const handleScroll = () => {
+    scrolled.value = window.scrollY > scrollThreshold;
+};
+
+onMounted(() => {
+    window.addEventListener("scroll", handleScroll);
+});
 </script>
 
 <template>
     <LandingLayout title="Detail Produk">
         <div
-            class="p-6 sm:p-12 md:px-[100px] md:py-[60px] flex flex-col gap-12 lg:gap-20"
+            class="p-6 sm:p-12 lg:px-[100px] lg:py-[60px] flex flex-col gap-12 lg:gap-20"
         >
             <!-- Detail -->
             <section
@@ -177,7 +188,7 @@ const images = computed(() => {
                 class="flex flex-col gap-8 mx-auto max-w-7xl"
             >
                 <div
-                    class="grid grid-cols-1 gap-8 mx-auto lg:grid-cols-2 lg:gap-14"
+                    class="grid justify-center grid-cols-1 mx-auto gap-x-8 gap-y-4 md:grid-cols-2 md:gap-14"
                 >
                     <ProductGallery
                         :images="images"
@@ -185,9 +196,13 @@ const images = computed(() => {
                             orderForm?.selectedVariant?.name ||
                             props.product.name
                         "
+                        class="top-0 p-2 lg:sticky h-fit"
+                        :class="{
+                            'lg:top-[132px]': scrolled,
+                        }"
                     />
 
-                    <div class="flex flex-col justify-start py-4">
+                    <div class="flex flex-col justify-start py-2">
                         <h1 class="mb-3 text-xl font-bold">
                             {{ props.product.name }}
                         </h1>
@@ -212,7 +227,7 @@ const images = computed(() => {
                                 </p>
                             </div>
                         </div>
-                        <div class="flex flex-col gap-6">
+                        <div class="flex flex-col gap-8">
                             <ProductSelectionForm
                                 ref="orderForm"
                                 :product="props.product"
@@ -222,35 +237,41 @@ const images = computed(() => {
                                 :colors="props.colors"
                                 :sizes="props.sizes"
                             />
+
+                            <!-- Information -->
+                            <div class="flex flex-col gap-8">
+                                <!-- Store -->
+                                <StoreCard :store="props.product.store" />
+
+                                <!-- Table Details -->
+                                <div>
+                                    <h3
+                                        class="mb-2 font-semibold text-gray-700"
+                                    >
+                                        Rincian
+                                    </h3>
+                                    <div
+                                        class="relative overflow-x-auto rounded-lg w-full max-w-[600px] border border-gray-300"
+                                    >
+                                        <ProductDetailTable :rows="tableRows" />
+                                    </div>
+                                </div>
+
+                                <!-- Description -->
+                                <div>
+                                    <h3
+                                        class="mb-2 font-semibold text-gray-700"
+                                    >
+                                        Deskripsi
+                                    </h3>
+                                    <p
+                                        class="text-sm text-gray-700 whitespace-pre-line"
+                                    >
+                                        {{ props.product.description }}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Information -->
-                <div class="flex flex-col gap-8">
-                    <!-- Store -->
-                    <StoreCard :store="props.product.store" />
-
-                    <!-- Table Details -->
-                    <div>
-                        <h3 class="mb-2 font-semibold text-gray-700">
-                            Rincian
-                        </h3>
-                        <div
-                            class="relative overflow-x-auto rounded-lg w-full max-w-[600px] border border-gray-300"
-                        >
-                            <ProductDetailTable :rows="tableRows" />
-                        </div>
-                    </div>
-
-                    <!-- Description -->
-                    <div>
-                        <h3 class="mb-2 font-semibold text-gray-700">
-                            Deskripsi
-                        </h3>
-                        <p class="text-sm text-gray-700 whitespace-pre-line">
-                            {{ props.product.description }}
-                        </p>
                     </div>
                 </div>
             </section>
