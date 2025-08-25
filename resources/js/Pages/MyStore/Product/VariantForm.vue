@@ -12,6 +12,9 @@ import axios from "axios";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import InputGroup from "@/Components/InputGroup.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
+import SuccessDialog from "@/Components/SuccessDialog.vue";
+import DialogModal from "@/Components/DialogModal.vue";
+import ColorForm from "../Color/ColorForm.vue";
 
 const props = defineProps({
     product: {
@@ -88,26 +91,26 @@ const drag = ref(false);
 
 const page = usePage();
 
-const colors = (page.props.colors as ColorEntity[]) || [];
+const colors = ref((page.props.colors as ColorEntity[]) || []);
 const colorSearch = ref("");
 const filteredColors = computed(() => {
-    return colors.filter((color) =>
+    return colors.value.filter((color) =>
         color.name.toLowerCase().includes(colorSearch.value.toLowerCase())
     );
 });
 
-const sizes = (page.props.sizes as SizeEntity[]) || [];
+const sizes = ref((page.props.sizes as SizeEntity[]) || []);
 const sizeSearch = ref("");
 const filteredSizes = computed(() => {
-    return sizes.filter((size) =>
+    return sizes.value.filter((size) =>
         size.name.toLowerCase().includes(sizeSearch.value.toLowerCase())
     );
 });
 
-const units = (page.props.units as UnitEntity[]) || [];
+const units = ref((page.props.units as UnitEntity[]) || []);
 const unitSearch = ref("");
 const filteredUnits = computed(() => {
-    return units.filter((unit) =>
+    return units.value.filter((unit) =>
         unit.name.toLowerCase().includes(unitSearch.value.toLowerCase())
     );
 });
@@ -381,6 +384,22 @@ const draggable = useDraggable(imagesContainer, form.images, {
 
 const imagesToDelete = ref([]);
 
+const showSuccessDialog = ref(false);
+const successMessage = ref(null);
+
+const showAddColorForm = ref(false);
+const showAddSizeForm = ref(false);
+const showAddUnitForm = ref(false);
+
+const openSuccessDialog = (message) => {
+    successMessage.value = message;
+    showSuccessDialog.value = true;
+};
+
+const closeSuccessDialog = () => {
+    showSuccessDialog.value = false;
+};
+
 const showErrorDialog = ref(false);
 const errorMessage = ref(null);
 
@@ -464,7 +483,22 @@ const openErrorDialog = (message) => {
                             form.color = null;
                             colorSearch = '';
                         "
-                    />
+                    >
+                        <template #optionHeader>
+                            <div
+                                class="flex items-center justify-between gap-2"
+                            >
+                                <p class="text-sm font-semibold">Pilih Warna</p>
+                                <button
+                                    type="button"
+                                    class="text-sm text-blue-500 hover:underline"
+                                    @click="showAddColorForm = true"
+                                >
+                                    Tambah
+                                </button>
+                            </div>
+                        </template>
+                    </DropdownSearchInput>
                 </InputGroup>
 
                 <!-- Size -->
@@ -503,7 +537,24 @@ const openErrorDialog = (message) => {
                             form.size = null;
                             sizeSearch = '';
                         "
-                    />
+                    >
+                        <template #optionHeader>
+                            <div
+                                class="flex items-center justify-between gap-2"
+                            >
+                                <p class="text-sm font-semibold">
+                                    Pilih Ukuran
+                                </p>
+                                <button
+                                    type="button"
+                                    class="text-sm text-blue-500 hover:underline"
+                                    @click="showAddSizeForm = true"
+                                >
+                                    Tambah
+                                </button>
+                            </div>
+                        </template>
+                    </DropdownSearchInput>
                 </InputGroup>
             </div>
 
@@ -544,7 +595,24 @@ const openErrorDialog = (message) => {
                             form.unit = null;
                             unitSearch = '';
                         "
-                    />
+                    >
+                        <template #optionHeader>
+                            <div
+                                class="flex items-center justify-between gap-2"
+                            >
+                                <p class="text-sm font-semibold">
+                                    Pilih Satuan
+                                </p>
+                                <button
+                                    type="button"
+                                    class="text-sm text-blue-500 hover:underline"
+                                    @click="showAddColorForm = true"
+                                >
+                                    Tambah
+                                </button>
+                            </div>
+                        </template>
+                    </DropdownSearchInput>
                 </InputGroup>
 
                 <!-- Stock -->
@@ -646,6 +714,52 @@ const openErrorDialog = (message) => {
                 </SecondaryButton>
             </div>
         </div>
+
+        <!-- Add Color Modal -->
+        <DialogModal
+            :show="showAddColorForm"
+            @close="showAddColorForm = false"
+            maxWidth="sm"
+        >
+            <template #content>
+                <div class="w-full">
+                    <h2
+                        class="w-full mb-3 text-lg font-medium text-center text-gray-900"
+                    >
+                        Tambah Warna
+                    </h2>
+                    <ColorForm
+                        :isDialog="true"
+                        @onSubmitted="
+                            (brandName) => {
+                                showAddColorForm = false;
+                                colorSearch = '';
+
+                                colors = $page.props.colors as ColorEntity[];
+                                
+                                const newColor = colors.find(
+                                    (color) => color.name === brandName
+                                );
+                                form.color_id = newColor.id;
+                                form.color = newColor;
+
+                                openSuccessDialog(
+                                    'Warna berhasil ditambahkan.'
+                                );
+                            }
+                        "
+                        @close="showAddColorForm = false"
+                        class="w-full"
+                    />
+                </div>
+            </template>
+        </DialogModal>
+
+        <SuccessDialog
+            :show="showSuccessDialog"
+            :title="successMessage"
+            @close="closeSuccessDialog"
+        />
 
         <ErrorDialog :show="showErrorDialog" @close="showErrorDialog = false">
             <template #content>

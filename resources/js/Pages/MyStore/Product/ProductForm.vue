@@ -1,21 +1,15 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed } from "vue";
 import { useForm, usePage } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
-import InputLabel from "@/Components/InputLabel.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import ImageInput from "@/Components/ImageInput.vue";
-import Dropdown from "@/Components/Dropdown.vue";
-import Checkbox from "@/Components/Checkbox.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import { useDraggable } from "vue-draggable-plus";
 import ProductLinkForm from "./ProductLinkForm.vue";
 import DialogModal from "@/Components/DialogModal.vue";
 import LinkItem from "@/Components/LinkItem.vue";
-import VariantCard from "./VariantCard.vue";
-import VariantForm from "./VariantForm.vue";
-import DeleteConfirmationDialog from "@/Components/DeleteConfirmationDialog.vue";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import InputGroup from "@/Components/InputGroup.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";

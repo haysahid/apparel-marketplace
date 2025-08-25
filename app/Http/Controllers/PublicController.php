@@ -114,7 +114,7 @@ class PublicController extends Controller
         return Inertia::render('Catalog', [
             'products' => $products->paginate($limit),
             'filters' => [
-                'brands' => Brand::get(),
+                'brands' => Brand::withCount('products')->get(),
                 'colors' => Color::get(),
                 'categories' => Category::orderBy('name', 'asc')->get(),
                 'sizes' => Size::get(),

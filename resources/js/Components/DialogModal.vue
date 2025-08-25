@@ -21,6 +21,10 @@ defineProps({
         type: Boolean,
         default: false,
     },
+    containerClass: {
+        type: String,
+        default: "",
+    },
 });
 
 const close = () => {
@@ -64,7 +68,7 @@ const hasFooterSlot = !!slots.footer;
                     />
                 </svg>
             </button>
-            <div class="flex flex-col items-center p-6">
+            <div class="flex flex-col items-center p-6" :class="containerClass">
                 <div
                     v-if="hasIconSlot"
                     class="mb-2 text-lg font-medium text-center text-gray-900"

@@ -17,8 +17,14 @@ class Brand extends Model
         'website',
     ];
 
+    // Relationships
     public function store()
     {
         return $this->belongsTo(Store::class);
+    }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
     }
 }

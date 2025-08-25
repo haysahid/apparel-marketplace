@@ -176,7 +176,6 @@ function openSuccessDialog(message) {
 
 function closeSuccessDialog() {
     showSuccessDialog.value = false;
-    successMessage.value = null;
 }
 
 const showErrorDialog = ref(false);

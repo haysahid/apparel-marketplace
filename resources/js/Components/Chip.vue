@@ -35,6 +35,7 @@ const onClick = () => {
         }"
         @click="onClick"
     >
+        <slot name="prefix" />
         {{ props.label }}
         <slot name="suffix" />
     </div>

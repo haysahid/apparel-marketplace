@@ -14,6 +14,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    fillRadio: {
+        type: Boolean,
+        default: false,
+    },
     disabled: {
         type: Boolean,
         default: false,
@@ -27,7 +31,7 @@ const props = defineProps({
 const emit = defineEmits(["click"]);
 
 const radioStyle = computed(() => {
-    return props.selected
+    return props.selected || props.fillRadio
         ? {
               outlineStyle: "solid",
               outlineWidth: "2px",
