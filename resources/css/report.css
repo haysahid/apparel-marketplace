@@ -1,0 +1,83 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap");
+
+body {
+    margin-bottom: 1rem;
+    font-family: "Roboto", sans-serif !important;
+}
+
+h1 {
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+p {
+    font-size: 0.75rem;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.table-report {
+    min-width: 100%;
+    border-collapse: collapse;
+}
+
+.table-report thead {
+    background-color: #f3f4f6;
+}
+
+.table-report th {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    color: #000;
+    border: 1px solid #000;
+}
+
+.table-report tbody {
+    background-color: #fff;
+}
+
+.table-report td {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    font-size: 0.75rem;
+    border: 1px solid #000;
+    white-space: nowrap;
+}
+
+.table-report tfoot {
+    background-color: #f3f4f6;
+}
+
+.table-report tfoot td {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: right;
+    color: #000;
+    border: 1px solid #000;
+    white-space: nowrap;
+}
+
+.table-report tfoot td:first-child {
+    text-align: center !important;
+}

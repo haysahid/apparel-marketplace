@@ -135,8 +135,11 @@ onMounted(() => {
                             {{ voucher.name }}
                         </td>
                         <td>
-                            {{ voucher.amount }}
-                            {{ voucher.type === "percentage" ? "%" : "Rp" }}
+                            {{
+                                voucher.type === "percentage"
+                                    ? `${voucher.amount}%`
+                                    : $formatCurrency(voucher.amount)
+                            }}
                         </td>
                         <td>
                             {{ voucher.usage_limit }}

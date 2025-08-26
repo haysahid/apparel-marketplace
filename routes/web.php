@@ -11,6 +11,7 @@ use App\Http\Controllers\MyStore\MyStoreOrderController;
 use App\Http\Controllers\MyStore\MyStoreSizeController;
 use App\Http\Controllers\MyStore\MyStoreTransactionController;
 use App\Http\Controllers\MyStore\MyStoreVoucherController;
+use App\Http\Controllers\MyStore\MyStoreReportController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PublicController;
@@ -149,6 +150,10 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->grou
     Route::get('/voucher/{voucher}', [MyStoreVoucherController::class, 'edit'])->name('voucher.edit');
     Route::post('/voucher/{voucher}', [MyStoreVoucherController::class, 'update'])->name('voucher.update');
     Route::delete('/voucher/{voucher}', [MyStoreVoucherController::class, 'destroy'])->name('voucher.destroy');
+
+    // Report
+    Route::get('/report', [MyStoreReportController::class, 'index'])->name('report');
+    Route::get('/report/preview', [MyStoreReportController::class, 'reportPreview'])->name('report.preview');
 });
 
 // Route::middleware([

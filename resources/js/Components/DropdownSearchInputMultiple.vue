@@ -80,7 +80,9 @@ const dropdown = ref(null);
 
 function onFocusout() {
     setTimeout(() => {
-        dropdown.value.open = false;
+        if (dropdown.value != null) {
+            dropdown.value.open = false;
+        }
     }, 100);
 }
 </script>

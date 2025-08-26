@@ -319,7 +319,7 @@ onMounted(() => {
             </DefaultTable>
 
             <!-- Mobile View -->
-            <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-6">
+            <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <template v-if="invoices.length > 0">
                     <div v-for="(invoice, index) in invoices" :key="invoice.id">
                         <MyOrderCard

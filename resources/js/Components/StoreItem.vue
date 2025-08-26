@@ -18,7 +18,7 @@ const props = defineProps({
 <template>
     <button
         type="button"
-        class="flex items-center justify-start w-full gap-3 pl-3.5 pr-2 py-2.5 bg-white outline outline-gray-200 rounded-xl hover:outline-primary-light transition-all duration-200 ease-in-out cursor-pointer -outline-offset-2 relative"
+        class="flex items-center justify-start w-full gap-3 pl-3.5 pr-2 py-2.5 bg-white outline outline-gray-200 rounded-xl hover:outline-primary-light transition-all duration-200 ease-in-out cursor-pointer -outline-offset-2"
         @click="$emit('click')"
     >
         <img
@@ -46,7 +46,7 @@ const props = defineProps({
             </p>
             <p
                 v-if="props.description"
-                class="flex-1 text-xs text-gray-800 line-clamp-1 overflow-ellipsis text-start"
+                class="flex-1 text-xs text-gray-500 line-clamp-2 overflow-ellipsis text-start"
             >
                 {{ props.description }}
             </p>

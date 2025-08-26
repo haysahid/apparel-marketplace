@@ -75,14 +75,11 @@ const showStoreOptionsDialog = ref(false);
                         :description="
                             $page.props.selected_store.rajaongkir_origin_label
                         "
-                        :icon="$page.props.selected_store.icon"
+                        :icon="`/storage/${$page.props.selected_store.logo}`"
                         @click="showStoreOptionsDialog = true"
                     >
                         <template #trailing>
-                            <button
-                                type="button"
-                                class="absolute p-2 right-1.5"
-                            >
+                            <button type="button" class="p-2">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     width="24"

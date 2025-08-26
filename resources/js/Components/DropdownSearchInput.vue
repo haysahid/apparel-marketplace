@@ -55,6 +55,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    required: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits(["update:modelValue", "clear", "search"]);
@@ -73,7 +77,9 @@ const dropdown = ref(null);
 
 function onFocusout() {
     setTimeout(() => {
-        dropdown.value.open = false;
+        if (dropdown.value != null) {
+            dropdown.value.open = false;
+        }
     }, 100);
 }
 </script>
@@ -110,7 +116,11 @@ function onFocusout() {
             >
                 <template #suffix>
                     <button
-                        v-if="props.modelValue && !isDropdownOpen"
+                        v-if="
+                            props.modelValue &&
+                            !isDropdownOpen &&
+                            !props.required
+                        "
                         type="button"
                         class="absolute p-[7px] text-gray-400 bg-white rounded-full right-1 hover:bg-gray-100 transition-all duration-300 ease-in-out"
                         @click="

@@ -185,11 +185,6 @@ const openErrorDialog = (message) => {
                             v-model="form.start_date"
                             type="date"
                             placeholder="Tanggal Mulai"
-                            :textClass="
-                                form.start_date
-                                    ? 'text-sm sm:text-base'
-                                    : '!text-gray-500 text-sm sm:text-base'
-                            "
                             :error="form.errors.start_date"
                             @change="form.errors.start_date = null"
                         >
@@ -226,11 +221,6 @@ const openErrorDialog = (message) => {
                             v-model="form.end_date"
                             type="date"
                             placeholder="Tanggal Berakhir"
-                            :textClass="
-                                form.end_date
-                                    ? 'text-sm sm:text-base'
-                                    : '!text-gray-500 text-sm sm:text-base'
-                            "
                             :error="form.errors.end_date"
                             @change="form.errors.end_date = null"
                         >

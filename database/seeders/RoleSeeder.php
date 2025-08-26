@@ -21,6 +21,7 @@ class RoleSeeder extends Seeder
             ['name' => 'Reseller', 'slug' => 'reseller'],
             ['name' => 'Member', 'slug' => 'member'],
             ['name' => 'Pemilik Toko', 'slug' => 'store-owner'],
+            ['name' => 'Tamu', 'slug' => 'guest'],
         ]);
     }
 }

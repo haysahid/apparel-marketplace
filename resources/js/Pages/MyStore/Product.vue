@@ -372,7 +372,7 @@ onMounted(() => {
             <!-- Mobile View -->
             <div
                 v-if="!screenSize.is('xl')"
-                class="flex flex-col gap-3 mt-6"
+                class="flex flex-col gap-3 mt-4"
                 :class="{ 'min-h-auto h-[68vh]': products.length == 0 }"
             >
                 <template v-if="products.length > 0">
