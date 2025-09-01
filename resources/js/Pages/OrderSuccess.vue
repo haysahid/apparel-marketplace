@@ -190,10 +190,7 @@ onMounted(() => {
         <OrderDetail
             :transaction="props.transaction"
             :groups="props.groups"
-            :showTracking="
-                !showPaymentActions ||
-                props.transaction.payment_method.slug === 'cod'
-            "
+            :showTracking="false"
             class="p-6 !pt-0 sm:p-12 md:p-[100px] flex flex-col gap-4 sm:gap-12"
         >
             <template #additionalInfo>

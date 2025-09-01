@@ -28,6 +28,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    reverseButton: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits(["close", "positiveClicked", "negativeClicked"]);
@@ -51,7 +55,12 @@ const close = () => {
         </template>
         <slot />
         <template #footer>
-            <div class="flex gap-4 text-base">
+            <div
+                class="flex gap-4 text-base"
+                :class="{
+                    'flex-row-reverse': props.reverseButton,
+                }"
+            >
                 <SecondaryButton
                     v-if="props.showNegativeButton"
                     type="button"

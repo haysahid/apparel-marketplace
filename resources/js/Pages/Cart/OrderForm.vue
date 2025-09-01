@@ -13,17 +13,17 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import BaseDialog from "@/Components/BaseDialog.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import useDebounce from "@/plugins/debounce";
+import InputGroup from "@/Components/InputGroup.vue";
+import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
+import DetailRow from "@/Components/DetailRow.vue";
 
 const page = usePage();
 const cartStore = useCartStore();
 const orderStore = useOrderStore();
 
+const isGuest = computed(() => !page.props.isGuest);
+
 const checkoutStatus = ref(null);
-const checkoutResponse = ref({
-    transaction: null,
-    invoices: [],
-    payment: null,
-});
 
 const showErrorDialog = ref(false);
 const errorMessage = ref(null);
@@ -35,14 +35,12 @@ function openErrorDialog(message: string) {
 
 function closeErrorDialog() {
     showErrorDialog.value = false;
-    errorMessage.value = null;
 }
 
 const paymentMethods = page.props.paymentMethods as PaymentMethodEntity[];
 const shippingMethods = page.props.shippingMethods as ShippingMethodEntity[];
 
 const destinationSearch = ref("");
-const isDestinationDropdownOpen = ref(false);
 const destinations = ref([]);
 
 function getDestinations(search) {
@@ -162,58 +160,59 @@ const total = computed(() => {
 const showAuthWarning = ref(false);
 
 const submit = () => {
-    if (!page.props.auth.user) {
+    if (route().current("checkout") && !page.props.auth.user) {
         showAuthWarning.value = true;
         return;
     }
 
     checkoutStatus.value = "loading";
 
-    axios
-        .post(
-            `${page.props.ziggy.url}/api/checkout`,
-            {
-                cart_groups: cartStore.groupHasSelectedItems.map((group) => ({
-                    store_id: group.store_id,
-                    voucher_code: group.voucher?.code || null,
-                    items: group.items
-                        .filter((item) => item.selected)
-                        .map((item) => ({
-                            product_id: item.product_id,
-                            variant_id: item.variant_id,
-                            quantity: item.quantity,
-                        })),
+    const data = {
+        cart_groups: cartStore.groupHasSelectedItems.map((group) => ({
+            store_id: group.store_id,
+            voucher_code: group.voucher?.code || null,
+            items: group.items
+                .filter((item) => item.selected)
+                .map((item) => ({
+                    product_id: item.product_id,
+                    variant_id: item.variant_id,
+                    quantity: item.quantity,
                 })),
-                payment_method_id: form.payment_method?.id,
-                shipping_method_id: form.shipping_method?.id,
-                destination_id: form.destination_id,
-                destination_label: form.destination?.label,
-                province_name: form.destination?.province_name,
-                city_name: form.destination?.city_name,
-                district_name: form.destination?.district_name,
-                subdistrict_name: form.destination?.subdistrict_name,
-                zip_code: form.destination?.zip_code,
-                address: form.address,
+        })),
+        payment_method_id: form.payment_method?.id,
+        shipping_method_id: form.shipping_method?.id,
+        destination_id: form.destination_id,
+        destination_label: form.destination?.label,
+        province_name: form.destination?.province_name,
+        city_name: form.destination?.city_name,
+        district_name: form.destination?.district_name,
+        subdistrict_name: form.destination?.subdistrict_name,
+        zip_code: form.destination?.zip_code,
+        address: form.address,
+    };
+
+    if (isGuest) {
+        data["guest_name"] = orderStore.form.guest_name;
+        data["guest_email"] = orderStore.form.guest_email;
+        data["guest_phone"] = orderStore.form.guest_phone;
+    }
+
+    axios
+        .post(isGuest ? "/api/checkout-guest" : "/api/checkout", data, {
+            headers: {
+                authorization: `Bearer ${localStorage.getItem("access_token")}`,
             },
-            {
-                headers: {
-                    authorization: `Bearer ${localStorage.getItem(
-                        "access_token"
-                    )}`,
-                },
-            }
-        )
+        })
         .then((response) => {
-            checkoutResponse.value = response.data.result;
+            const result = response.data.result;
             cartStore.removeSelectedItems();
 
             checkoutStatus.value = "success";
 
             router.visit(
-                route("order.success", {
-                    transaction_code: checkoutResponse.value.transaction.code,
-                    show_snap: checkoutResponse.value.payment
-                        .midtrans_snap_token
+                route(isGuest ? "order.success.guest" : "order.success", {
+                    transaction_code: result.transaction.code,
+                    show_snap: result.payment.midtrans_snap_token
                         ? true
                         : false,
                 })
@@ -224,7 +223,9 @@ const submit = () => {
             if (error.response.status == 422) {
                 form.errors = error.response.data.errors || {};
             } else {
-                openErrorDialog("Terjadi kesalahan");
+                openErrorDialog(
+                    error.response.data.meta.message || "Terjadi kesalahan"
+                );
             }
         });
 };
@@ -232,18 +233,13 @@ const submit = () => {
 
 <template>
     <div
-        class="w-full lg:w-[480px] outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl p-4 gap-y-4 flex flex-col gap-4"
+        class="flex flex-col w-full gap-4 p-4 outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl gap-y-4"
     >
-        <h3 class="text-lg font-semibold text-gray-700">Detail Pemesanan</h3>
+        <h3 class="font-semibold text-gray-800">Detail Pemesanan</h3>
 
-        <div class="flex flex-col gap-y-3">
+        <div class="flex flex-col gap-y-4">
             <!-- Payment Method -->
-            <div class="flex flex-col gap-y-2">
-                <InputLabel
-                    for="payment-method"
-                    value="Metode Pembayaran"
-                    class="!text-gray-500"
-                />
+            <InputGroup id="payment-method" label="Metode Pembayaran">
                 <div class="flex flex-wrap gap-2">
                     <Chip
                         v-for="payment in paymentMethods"
@@ -253,15 +249,10 @@ const submit = () => {
                         @click="form.payment_method = payment"
                     />
                 </div>
-            </div>
+            </InputGroup>
 
             <!-- Shipping Method -->
-            <div class="flex flex-col gap-y-2">
-                <InputLabel
-                    for="shipping-method"
-                    value="Metode Pengiriman"
-                    class="!text-gray-500"
-                />
+            <InputGroup id="shipping-method" label="Metode Pengiriman">
                 <div class="flex flex-wrap gap-2">
                     <Chip
                         v-for="shipping in shippingMethods"
@@ -274,141 +265,53 @@ const submit = () => {
                         "
                     />
                 </div>
-            </div>
+            </InputGroup>
 
             <template v-if="form.shipping_method?.slug == 'courier'">
                 <!-- Destination -->
-                <div class="flex flex-col gap-y-2">
-                    <InputLabel
-                        for="destination"
-                        value="Alamat Pengiriman"
-                        class="!text-gray-500"
-                    />
-                    <Dropdown
-                        v-if="destinations"
+                <InputGroup id="destination" label="Alamat Pengiriman">
+                    <DropdownSearchInput
                         id="destination"
-                        v-model="form.destination_id"
-                        :options="destinations"
-                        option-label="name"
-                        option-value="id"
-                        placeholder="Pilih Alamat Pengiriman"
-                        align="left"
+                        :modelValue="
+                            form.destination_id
+                                ? {
+                                      label: form.destination?.label,
+                                      value: form.destination_id,
+                                  }
+                                : null
+                        "
+                        :options="
+                            destinations.map((destination) => ({
+                                label: destination.label,
+                                value: destination.id,
+                            }))
+                        "
+                        placeholder="Cari Alamat Pengiriman"
                         required
+                        type="textarea"
                         :error="form.errors.destination_id"
-                        @update:modelValue="form.errors.destination_id = null"
-                        @onOpen="isDestinationDropdownOpen = true"
-                        @onClose="isDestinationDropdownOpen = false"
-                    >
-                        <template #trigger>
-                            <TextAreaInput
-                                :modelValue="
-                                    form.destination_id &&
-                                    !isDestinationDropdownOpen
-                                        ? form.destination?.label
-                                        : destinationSearch
-                                "
-                                @update:modelValue="
-                                    form.destination_id &&
-                                    !isDestinationDropdownOpen
-                                        ? null
-                                        : (destinationSearch = $event)
-                                "
-                                class="w-full"
-                                placeholder="Cari Alamat Pengiriman"
-                                :rows="1"
-                                :preventNewLine="true"
-                                :error="
-                                    form.errors?.destination_id
-                                        ? form.errors?.destination_id[0] || null
-                                        : null
-                                "
-                            >
-                                <template #suffix>
-                                    <button
-                                        v-if="
-                                            form.destination_id &&
-                                            !isDestinationDropdownOpen
-                                        "
-                                        type="button"
-                                        class="absolute p-[7px] text-gray-400 bg-white rounded-full top-1 right-1 hover:bg-gray-100 transition-all duration-300 ease-in-out"
-                                        @click="
-                                            form.destination_id = null;
-                                            destinationSearch = '';
-                                            cartStore.updateGroups(
-                                                cartStore.groups.map(
-                                                    (group) => {
-                                                        group.shipping = null;
-                                                        return group;
-                                                    }
-                                                )
-                                            );
-                                        "
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            class="size-5"
-                                        >
-                                            <path
-                                                stroke-linecap="round"
-                                                stroke-linejoin="round"
-                                                stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12"
-                                            />
-                                        </svg>
-                                    </button>
-                                    <button
-                                        v-else
-                                        type="button"
-                                        class="absolute p-2 top-1.5 right-1"
-                                    >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            class="size-4 fill-gray-400"
-                                        >
-                                            <path
-                                                d="M18.6054 7.3997C18.4811 7.273 18.3335 7.17248 18.1709 7.10389C18.0084 7.0353 17.8342 7 17.6583 7C17.4823 7 17.3081 7.0353 17.1456 7.10389C16.9831 7.17248 16.8355 7.273 16.7112 7.3997L11.4988 12.7028L6.28648 7.3997C6.03529 7.14415 5.69462 7.00058 5.33939 7.00058C4.98416 7.00058 4.64348 7.14415 4.3923 7.3997C4.14111 7.65526 4 8.00186 4 8.36327C4 8.72468 4.14111 9.07129 4.3923 9.32684L10.5585 15.6003C10.6827 15.727 10.8304 15.8275 10.9929 15.8961C11.1554 15.9647 11.3296 16 11.5055 16C11.6815 16 11.8557 15.9647 12.0182 15.8961C12.1807 15.8275 12.3284 15.727 12.4526 15.6003L18.6188 9.32684C19.1293 8.80747 19.1293 7.93274 18.6054 7.3997Z"
-                                            />
-                                        </svg>
-                                    </button>
-                                </template>
-                            </TextAreaInput>
-                        </template>
-                        <template #content>
-                            <ul class="overflow-y-auto max-h-60">
-                                <li
-                                    v-for="destination in destinations"
-                                    :key="destination.id"
-                                    @click="
-                                        isDestinationDropdownOpen = false;
+                        @update:modelValue="
+                            (option) => {
+                                form.destination_id = option.value;
+                                form.destination = destinations.find(
+                                    (d) => d.id === option.value
+                                );
+                                form.errors.destination_id = null;
 
-                                        form.destination_id = destination.id;
-                                        form.destination = destination;
-                                        destinationSearch = '';
-
-                                        getShippingCost();
-                                    "
-                                    class="px-4 py-2 cursor-pointer hover:bg-gray-100"
-                                >
-                                    {{ destination.label }}
-                                </li>
-                            </ul>
-                        </template>
-                    </Dropdown>
-                </div>
+                                getShippingCost();
+                            }
+                        "
+                        @search="destinationSearch = $event"
+                        @clear="
+                            form.destination_id = null;
+                            form.destination = null;
+                            form.errors.destination_id = null;
+                        "
+                    />
+                </InputGroup>
 
                 <!-- Address -->
-                <div class="flex flex-col gap-y-2">
-                    <InputLabel
-                        for="address"
-                        value="Alamat Lengkap"
-                        class="!text-gray-500"
-                    />
+                <InputGroup id="address" label="Alamat Lengkap">
                     <TextAreaInput
                         id="address"
                         v-model="form.address"
@@ -427,7 +330,7 @@ const submit = () => {
                     >
                         *Estimasi {{ form.estimated_delivery }} hari kerja
                     </p>
-                </div>
+                </InputGroup>
             </template>
 
             <!-- Divider -->
@@ -436,59 +339,50 @@ const submit = () => {
             <!-- Summary -->
             <div class="flex flex-col gap-y-2">
                 <!-- Sub Total -->
-                <div class="flex items-center justify-between">
-                    <p class="text-gray-700">Sub Total</p>
-                    <p class="font-semibold text-gray-700">
-                        {{
-                            cartStore.subTotal.toLocaleString("id-ID", {
-                                style: "currency",
-                                currency: "IDR",
-                                minimumFractionDigits: 0,
-                            })
-                        }}
-                    </p>
-                </div>
+                <DetailRow
+                    name="Sub Total"
+                    :value="
+                        cartStore.subTotal.toLocaleString('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR',
+                            minimumFractionDigits: 0,
+                        })
+                    "
+                />
 
                 <!-- Discount -->
-                <div class="flex items-center justify-between">
-                    <p class="text-gray-700">Diskon</p>
-                    <p class="text-gray-700">
-                        -
-                        {{
-                            cartStore.totalGroupDiscount.toLocaleString(
-                                "id-ID",
-                                {
-                                    style: "currency",
-                                    currency: "IDR",
-                                    minimumFractionDigits: 0,
-                                }
-                            )
-                        }}
-                    </p>
-                </div>
+                <DetailRow
+                    name="Diskon"
+                    :value="`- ${cartStore.totalGroupDiscount.toLocaleString(
+                        'id-ID',
+                        {
+                            style: 'currency',
+                            currency: 'IDR',
+                            minimumFractionDigits: 0,
+                        }
+                    )}`"
+                />
 
                 <!-- Shipping Cost -->
-                <div class="flex items-center justify-between">
-                    <p class="text-gray-700">Biaya Pengiriman</p>
-                    <p class="text-gray-700">
-                        {{
-                            (cartStore.selectedItems.length > 0 &&
-                            form.shipping_method?.slug == "courier"
-                                ? cartStore.totalShippingCost
-                                : 0
-                            ).toLocaleString("id-ID", {
-                                style: "currency",
-                                currency: "IDR",
-                                minimumFractionDigits: 0,
-                            })
-                        }}
-                    </p>
-                </div>
+                <DetailRow
+                    name="Biaya Pengiriman"
+                    :value="
+                        (cartStore.selectedItems.length > 0 &&
+                        form.shipping_method?.slug == 'courier'
+                            ? cartStore.totalShippingCost
+                            : 0
+                        ).toLocaleString('id-ID', {
+                            style: 'currency',
+                            currency: 'IDR',
+                            minimumFractionDigits: 0,
+                        })
+                    "
+                />
 
                 <!-- Total -->
                 <div class="flex items-center justify-between">
-                    <p class="text-lg font-bold text-gray-700">Total</p>
-                    <p class="text-lg font-bold text-primary">
+                    <p class="font-bold text-gray-700">Total</p>
+                    <p class="font-bold text-primary">
                         {{
                             (cartStore.selectedItems.length > 0
                                 ? total
@@ -558,7 +452,6 @@ const submit = () => {
         />
 
         <ErrorDialog
-            v-if="showErrorDialog"
             :title="errorMessage"
             :show="showErrorDialog"
             @close="closeErrorDialog"

@@ -5,6 +5,8 @@ namespace App\Repositories;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\TransactionItem;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class InvoiceRepository
 {
@@ -92,5 +94,16 @@ class InvoiceRepository
             'items' => $items,
             'payments' => $payments,
         ];
+    }
+
+    public static function createInvoice(array $data): Invoice
+    {
+        try {
+            $invoice = Invoice::create($data);
+            return $invoice;
+        } catch (Exception $e) {
+            Log::error("Gagal membuat invoice: " . $e);
+            throw new Exception('Gagal membuat invoice: ' . $e);
+        }
     }
 }

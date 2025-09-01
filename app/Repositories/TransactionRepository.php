@@ -5,6 +5,8 @@ namespace App\Repositories;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class TransactionRepository
 {
@@ -38,5 +40,27 @@ class TransactionRepository
             'transaction' => $transaction,
             'groups' => $groups,
         ];
+    }
+
+    public static function createTransaction(array $data): Transaction
+    {
+        try {
+            $transaction = Transaction::create($data);
+            return $transaction;
+        } catch (Exception $e) {
+            Log::error('Error creating transaction: ' . $e);
+            throw new Exception('Gagal membuat transaksi: ' . $e);
+        }
+    }
+
+    public static function createTransactionItem(array $data): TransactionItem
+    {
+        try {
+            $transactionItem = TransactionItem::create($data);
+            return $transactionItem;
+        } catch (Exception $e) {
+            Log::error('Error creating transaction item: ' . $e);
+            throw new Exception('Gagal membuat item transaksi: ' . $e);
+        }
     }
 }

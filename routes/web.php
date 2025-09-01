@@ -38,6 +38,9 @@ Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 Route::post('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
+Route::get('/checkout-guest', [OrderController::class, 'checkoutGuest'])->name('checkout.guest');
+Route::get('/order-success-guest', [OrderController::class, 'orderSuccessGuest'])->name('order.success.guest');
+
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
     Route::get('/order-success', [OrderController::class, 'orderSuccess'])->name('order.success');

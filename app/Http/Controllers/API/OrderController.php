@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Core\DataFailure;
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Repositories\RajaongkirRepository;
@@ -17,6 +18,7 @@ use App\Models\TransactionItem;
 use App\Models\User;
 use App\Repositories\MidtransRepository;
 use App\Repositories\VoucherRepository;
+use App\UseCases\CheckoutUseCase;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
@@ -27,6 +29,8 @@ use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
+    private CheckoutUseCase $checkoutUseCase;
+
     protected $rajaongkirRepository;
     protected $midtransRepository;
 
@@ -35,6 +39,7 @@ class OrderController extends Controller
 
     public function __construct()
     {
+        $this->checkoutUseCase = new CheckoutUseCase();
         $this->rajaongkirRepository = new RajaongkirRepository();
         $this->midtransRepository = new MidtransRepository();
     }
@@ -358,319 +363,85 @@ class OrderController extends Controller
             'voucher_code.exists' => 'Kode voucher tidak ditemukan',
         ]);
 
-        try {
-            DB::beginTransaction();
+        return $this->checkoutUseCase->execute(
+            data: $validated,
+            isGuestCheckout: false,
+        )->fold(
+            onSuccess: fn($data, $code) => ResponseFormatter::success($data, 'Pesanan berhasil dibuat', $code),
+            onError: fn($error, $code) => ResponseFormatter::error($error, $code)
+        );
+    }
 
-            // Get transaction voucher if provided
-            $transactionVoucher = null;
-            if (isset($validated['voucher_code'])) {
-                $transactionVoucher = VoucherRepository::getVoucherByCode($validated['voucher_code']);
-                if (!$transactionVoucher) {
-                    DB::rollBack();
-                    return ResponseFormatter::error(
-                        'Voucher tidak ditemukan',
-                        404
-                    );
-                }
-            }
+    public function checkoutGuest(Request $request)
+    {
+        $validated = $request->validate([
+            'cart_groups' => 'required|array',
+            'cart_groups.*.store_id' => 'required|integer|exists:stores,id',
+            'cart_groups.*.voucher_code' => 'nullable|string|exists:vouchers,code',
+            'cart_groups.*.items' => 'required|array',
+            'cart_groups.*.items.*.product_id' => 'required|integer|exists:products,id',
+            'cart_groups.*.items.*.variant_id' => 'required|integer|exists:product_variants,id',
+            'cart_groups.*.items.*.quantity' => 'required|integer|min:1',
+            'payment_method_id' => 'required|integer|exists:payment_methods,id',
+            'shipping_method_id' => 'required|integer|exists:shipping_methods,id',
+            'destination_id' => 'nullable|integer',
+            'destination_label' => 'nullable|string',
+            'province_name' => 'nullable|string',
+            'city_name' => 'nullable|string',
+            'district_name' => 'nullable|string',
+            'subdistrict_name' => 'nullable|string',
+            'zip_code' => 'nullable|string',
+            'address' => 'nullable|string',
+            'note' => 'nullable|string',
+            'voucher_code' => 'nullable|string|exists:vouchers,code',
+            'guest_name' => 'required|string|max:255',
+            'guest_email' => 'required|email|max:255',
+            'guest_phone' => 'required|string|max:20',
+        ], [
+            'cart_groups.required' => 'Keranjang harus diisi',
+            'cart_groups.*.store_id.required' => 'ID toko harus diisi',
+            'cart_groups.*.store_id.exists' => 'Toko tidak ditemukan',
+            'cart_groups.*.voucher_code.string' => 'Kode voucher harus berupa string',
+            'cart_groups.*.voucher_code.exists' => 'Kode voucher tidak ditemukan',
+            'cart_groups.*.items.required' => 'Item keranjang harus diisi',
+            'cart_groups.*.items.*.product_id.required' => 'ID produk harus diisi',
+            'cart_groups.*.items.*.product_id.exists' => 'Produk tidak ditemukan',
+            'cart_groups.*.items.*.variant_id.required' => 'ID varian produk harus diisi',
+            'cart_groups.*.items.*.variant_id.exists' => 'Varian produk tidak ditemukan',
+            'cart_groups.*.items.*.quantity.min' => 'Jumlah produk minimal 1',
+            'payment_method_id.required' => 'Metode pembayaran harus diisi',
+            'payment_method_id.exists' => 'Metode pembayaran tidak ditemukan',
+            'shipping_method_id.required' => 'Metode pengiriman harus diisi',
+            'shipping_method_id.exists' => 'Metode pengiriman tidak ditemukan',
+            'destination_id.integer' => 'ID tujuan harus berupa angka',
+            'destination_label.string' => 'Label tujuan harus berupa string',
+            'province_name.string' => 'Nama provinsi harus berupa string',
+            'city_name.string' => 'Nama kota harus berupa string',
+            'district_name.string' => 'Nama kecamatan harus berupa string',
+            'subdistrict_name.string' => 'Nama kelurahan harus berupa string',
+            'zip_code.string' => 'Kode pos harus berupa string',
+            'address.string' => 'Alamat harus berupa string',
+            'note.string' => 'Catatan harus berupa string',
+            'voucher_code.string' => 'Kode voucher harus berupa string',
+            'voucher_code.exists' => 'Kode voucher tidak ditemukan',
+            'guest_name.required' => 'Nama harus diisi',
+            'guest_name.string' => 'Nama harus berupa string',
+            'guest_name.max' => 'Nama maksimal 255 karakter',
+            'guest_email.required' => 'Email harus diisi',
+            'guest_email.email' => 'Email tidak valid',
+            'guest_email.max' => 'Email maksimal 255 karakter',
+            'guest_phone.required' => 'Nomor telepon harus diisi',
+            'guest_phone.string' => 'Nomor telepon harus berupa string',
+            'guest_phone.max' => 'Nomor telepon maksimal 20 karakter',
+        ]);
 
-            $paymentMethod = PaymentMethod::findOrFail($validated['payment_method_id']);
-            $shippingMethod = ShippingMethod::findOrFail($validated['shipping_method_id']);
-
-            $transaction = null;
-            $totalPayment = 0;
-            $itemDetails = [];
-            $invoices = [];
-
-            // [START] Processing each cart group
-            foreach ($validated['cart_groups'] as $key => $group) {
-                $store = Store::findOrFail($group['store_id']);
-                $originId = $store->rajaongkir_origin_id;
-
-                $cartItems = $group['items'];
-
-                if ($shippingMethod->slug === 'courier') {
-                    $rajaongkirShipping = $request->validate([
-                        'destination_id' => 'required|integer',
-                        'address' => 'required|string',
-                    ], [
-                        'destination_id.required' => 'ID tujuan harus diisi',
-                        'destination_id.integer' => 'ID tujuan harus berupa angka',
-                        'address.required' => 'Alamat harus diisi',
-                        'address.string' => 'Alamat harus berupa string',
-                    ]);
-
-                    // Get shipping cost
-                    $weight = $this->weight;
-                    $courier = $this->courier;
-                    $destinationId = $rajaongkirShipping['destination_id'];
-                    $shipping = $this->rajaongkirRepository->getShipping($originId, $destinationId, $weight, $courier);
-
-                    if (!$shipping) {
-                        throw new Exception('Gagal mendapatkan biaya pengiriman');
-                    }
-
-                    $rajaongkirDestinationId = $validated['destination_id'] ?? null;
-                    $rajaongkirDestinationLabel = $validated['destination_label'] ?? null;
-                    $provinceName = $validated['province_name'] ?? null;
-                    $cityName = $validated['city_name'] ?? null;
-                    $districtName = $validated['district_name'] ?? null;
-                    $subdistrictName = $validated['subdistrict_name'] ?? null;
-                    $zipCode = $validated['zip_code'] ?? null;
-                    $address = $validated['address'] ?? null;
-                    $shippingCost = $shipping['cost'] ?? 0;
-                    $shippingEstimate = $shipping['etd'] ?? null;
-                } else {
-                    // For non-courier shipping methods, set default values
-                    $rajaongkirDestinationId = null;
-                    $rajaongkirDestinationLabel = null;
-                    $provinceName = null;
-                    $cityName = null;
-                    $districtName = null;
-                    $subdistrictName = null;
-                    $zipCode = null;
-                    $address = null;
-                    $shippingCost = 0;
-                    $shippingEstimate = null;
-                }
-
-                // Create transaction
-                if (!$transaction) {
-                    $transaction = Transaction::create([
-                        'user_id' => Auth::id(),
-                        'type_id' => 2, // sale
-                        'code' => 'SL-' . date('YmdHis'),
-                        'note' => $validated['note'] ?? null,
-                        'payment_method_id' => $validated['payment_method_id'],
-                        'shipping_method_id' => $validated['shipping_method_id'],
-                        'rajaongkir_destination_id' => $rajaongkirDestinationId,
-                        'rajaongkir_destination_label' => $rajaongkirDestinationLabel,
-                        'province_name' => $provinceName,
-                        'city_name' => $cityName,
-                        'district_name' => $districtName,
-                        'subdistrict_name' => $subdistrictName,
-                        'zip_code' => $zipCode,
-                        'address' => $address,
-                        'shipping_cost' => 0,
-                        'shipping_estimate' => $shippingEstimate,
-                        'status' => 'pending',
-                    ]);
-                }
-
-                // Create transaction items
-                $subTotal = 0;
-                foreach ($cartItems as $item) {
-                    $variant = ProductVariant::findOrFail($item['variant_id']);
-                    $itemSubTotal = $item['quantity'] * $variant->final_selling_price;
-                    $subTotal += $itemSubTotal;
-
-                    TransactionItem::create([
-                        'store_id' => $store->id,
-                        'transaction_id' => $transaction->id,
-                        'variant_id' => $variant->id,
-                        'quantity' => $item['quantity'],
-                        'unit_base_price' => $variant->base_selling_price,
-                        'unit_discount_type' => $variant->discount_type,
-                        'unit_discount' => $variant->discount,
-                        'unit_final_price' => $variant->final_selling_price,
-                        'subtotal' => $itemSubTotal,
-                        'fullfillment_status' => 'pending',
-                    ]);
-                }
-
-                // Calculate total
-                $baseTotal = $subTotal;
-                $total = $subTotal + $shippingCost;
-
-                // Create invoice
-                if ($paymentMethod->slug === 'transfer') {
-                    $itemDetails = TransactionItem::with(
-                        [
-                            'variant.product' => function ($query) {
-                                $query->with('brand', 'categories');
-                            },
-                            'store' => function ($query) {
-                                $query->select('id', 'name');
-                            },
-                        ]
-                    )->where('transaction_id', $transaction->id)->get()->map(function ($item) {
-                        return [
-                            'id' => $item->variant_id,
-                            'price' => $item->unit_final_price,
-                            'quantity' => $item->quantity,
-                            'name' => $item->variant->sku,
-                            'brand' => $item->variant->product->brand->name ?? null,
-                            'merchant_name' => $item->store->name,
-                            'url' => $item->variant->product->url,
-                        ];
-                    })->toArray();
-
-                    $invoice = Invoice::create([
-                        'store_id' => $store->id,
-                        'transaction_id' => $transaction->id,
-                        'code' => 'INV-' . date('YmdHis') . '-' . $key,
-                        'base_amount' => $baseTotal,
-                        'shipping_cost' => $shippingCost,
-                        'shipping_estimate' => $shippingEstimate,
-                        'tax' => 0,
-                        'amount' => $total,
-                        'due_date' => now()->addDays(1),
-                        'snap_token' => null,
-                    ])->load('store');
-                } else {
-                    $invoice = Invoice::create([
-                        'store_id' => $store->id,
-                        'transaction_id' => $transaction->id,
-                        'code' => 'INV-' . date('YmdHis') . '-' . $key,
-                        'base_amount' => $baseTotal,
-                        'shipping_cost' => 0,
-                        'tax' => 0,
-                        'amount' => $total,
-                        'due_date' => now()->addDays(1),
-                    ])->load('store');
-                }
-
-                // Get store voucher if provided
-                $storeVoucher = null;
-                if (isset($group['voucher_code'])) {
-                    $storeVoucher = VoucherRepository::getVoucherByCode(
-                        code: $group['voucher_code'],
-                        storeId: $store->id,
-                    );
-
-                    if (!$storeVoucher) {
-                        DB::rollBack();
-                        return ResponseFormatter::error(
-                            'Voucher tidak ditemukan',
-                            404
-                        );
-                    }
-                }
-
-                if ($storeVoucher) {
-                    // Apply voucher discount
-                    $discountAmount = VoucherRepository::calculateVoucherAmount(
-                        voucher: $storeVoucher,
-                        amount: $invoice->base_amount,
-                    );
-
-                    // Update invoice with discount
-                    $invoice->voucher_id = $storeVoucher->id;
-                    $invoice->voucher_amount = $discountAmount;
-                    $invoice->amount = $invoice->amount - $discountAmount;
-                    $invoice->save();
-                    $invoice->load('voucher');
-
-                    // Update transaction total payment
-                    $totalPayment = $totalPayment + $invoice->amount;
-
-                    $itemDetails[] = [
-                        'id' => $storeVoucher->id,
-                        'price' => -$discountAmount,
-                        'quantity' => 1,
-                        'name' => 'Diskon - ' . $storeVoucher->code,
-                        'brand' => null,
-                        'merchant_name' => $store->name,
-                        'url' => null,
-                    ];
-                }
-
-                $invoices[] = $invoice;
-
-                // Update transaction with shipping cost
-                $transaction->shipping_cost = $transaction->shipping_cost + $shippingCost;
-                $transaction->save();
-
-                if ($shippingMethod->slug === 'courier') {
-                    $itemDetails[] = [
-                        'id' => 'shipping',
-                        'price' => $shippingCost,
-                        'quantity' => 1,
-                        'name' => 'Biaya Pengiriman',
-                        'brand' => null,
-                        'merchant_name' => null,
-                        'url' => null,
-                    ];
-                }
-            }
-            // [END] Processing each cart group
-
-            if ($transactionVoucher) {
-                // Apply transaction voucher discount
-                $discountAmount = VoucherRepository::calculateVoucherAmount(
-                    voucher: $transactionVoucher,
-                    amount: $totalPayment - $transaction->shipping_cost,
-                );
-
-                $totalPayment = $totalPayment - $discountAmount;
-
-                // Update transaction with discount
-                $transaction->voucher_id = $transactionVoucher->id;
-                $transaction->voucher_amount = $discountAmount;
-                $transaction->save();
-                $transaction->load('voucher');
-            }
-
-            // Create payment record
-            $customer = User::find(Auth::id());
-            $grossAmount = $totalPayment;
-
-            if ($paymentMethod->slug === 'transfer') {
-                // Create snap token for Midtrans
-                $snapToken = $this->midtransRepository->createSnapToken(
-                    $transaction->code,
-                    $itemDetails,
-                    $customer,
-                    $grossAmount
-                );
-
-                if (!$snapToken) {
-                    throw new Exception('Gagal mendapatkan token Snap');
-                }
-
-                // Create payment record
-                $payment = Payment::create([
-                    'transaction_id' => $transaction->id,
-                    'payment_method_id' => $paymentMethod->id,
-                    'amount' => $grossAmount,
-                    'note' => $validated['note'] ?? null,
-                    'status' => 'pending',
-                    'midtrans_snap_token' => $snapToken,
-                ]);
-            } else {
-                $payment = Payment::create([
-                    'transaction_id' => $transaction->id,
-                    'payment_method_id' => $paymentMethod->id,
-                    'amount' => $grossAmount,
-                    'note' => $validated['note'] ?? null,
-                    'status' => 'pending',
-                ]);
-            }
-
-            DB::commit();
-
-            return ResponseFormatter::success(
-                [
-                    'transaction' => $transaction,
-                    'invoices' => $invoices,
-                    'payment' => $payment,
-                ],
-                'Pesanan berhasil dibuat',
-                201
-            );
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            Log::error('Checkout failed: ' . $e->getMessage(), [
-                'user_id' => Auth::id(),
-                'request_data' => $request->all(),
-            ]);
-
-            return ResponseFormatter::error(
-                'Checkout failed' . $e->getMessage(),
-                500
-            );
-        }
+        return $this->checkoutUseCase->execute(
+            data: $validated,
+            isGuestCheckout: true,
+        )->fold(
+            onSuccess: fn($data, $code) => ResponseFormatter::success($data, 'Pesanan berhasil dibuat', $code),
+            onError: fn($error, $code) => ResponseFormatter::error($error, $code)
+        );
     }
 
     public function cancelOrder(Request $request)

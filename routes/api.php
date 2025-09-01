@@ -19,12 +19,12 @@ Route::name('api.')->group(function () {
     // Deprecated routes, kept for reference
     Route::get('/provinces', [OrderController::class, 'provinces'])->name('provinces');
 
-    // Deprecated code, kept for reference
+    // Deprecated routes, kept for reference
     Route::get('/cities', [OrderController::class, 'cities'])->name('cities');
 
     Route::get('/destinations', [OrderController::class, 'destinations'])->name('destinations');
-
     Route::get('/shipping-cost', [OrderController::class, 'shippingCost'])->name('shipping-cost');
+    Route::post('/checkout-guest', [OrderController::class, 'checkoutGuest'])->name('checkout-guest');
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/vouchers', [OrderController::class, 'getVouchers'])->name('vouchers');

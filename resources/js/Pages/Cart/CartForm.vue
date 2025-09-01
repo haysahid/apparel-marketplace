@@ -5,6 +5,8 @@ import { useCartStore } from "@/stores/cart-store";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import BaseDialog from "@/Components/BaseDialog.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
+import DialogModal from "@/Components/DialogModal.vue";
+import GuestForm from "./GuestForm.vue";
 
 const page = usePage();
 const cartStore = useCartStore();
@@ -23,6 +25,7 @@ function closeErrorDialog() {
 }
 
 const showAuthWarning = ref(false);
+const showGuestForm = ref(false);
 
 const submit = () => {
     if (!page.props.auth.user) {
@@ -43,7 +46,7 @@ const submit = () => {
     <div
         class="w-full lg:w-[480px] outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl p-4 gap-y-4 flex flex-col gap-4"
     >
-        <h3 class="text-lg font-semibold text-gray-700">Ringkasan Pemesanan</h3>
+        <h3 class="text-lg font-semibold text-gray-800">Ringkasan Pemesanan</h3>
 
         <!-- Summary -->
         <div class="flex flex-col gap-y-2">
@@ -72,10 +75,11 @@ const submit = () => {
 
         <BaseDialog
             :show="showAuthWarning"
-            title="Masuk untuk Melanjutkan"
-            description="Anda harus masuk untuk melanjutkan pemesanan. Silakan masuk atau daftar akun terlebih dahulu."
+            title="Masuk atau Lanjutkan Sebagai Tamu?"
+            description="Silakan pilih untuk masuk atau melanjutkan sebagai tamu."
             positiveButtonText="Masuk"
-            negativeButtonText="Daftar"
+            negativeButtonText="Sebagai Tamu"
+            :reverseButton="true"
             @close="showAuthWarning = false"
             @positiveClicked="
                 showAuthWarning = false;
@@ -85,15 +89,24 @@ const submit = () => {
                     })
                 );
             "
-            @negativeClicked="
-                showAuthWarning = false;
-                $inertia.visit(
-                    route('register', {
-                        redirect: route('my-cart'),
-                    })
-                );
-            "
+            @negativeClicked="showGuestForm = true"
         />
+
+        <DialogModal
+            :show="showGuestForm"
+            maxWidth="sm"
+            @close="showGuestForm = false"
+        >
+            <template #content>
+                <GuestForm
+                    @submit="
+                        showAuthWarning = false;
+                        showGuestForm = false;
+                        $inertia.visit(route('checkout.guest'));
+                    "
+                />
+            </template>
+        </DialogModal>
 
         <ErrorDialog
             v-if="showErrorDialog"

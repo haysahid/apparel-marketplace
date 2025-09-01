@@ -66,21 +66,21 @@ function formatPrice(price = 0) {
                     class="w-full"
                 >
                     <h3
-                        class="w-full text-sm font-medium text-gray-800 sm:text-base lg:text-lg hover:text-primary-dark"
+                        class="w-full text-sm font-medium text-gray-800 sm:text-base hover:text-primary-dark"
                     >
                         {{ props.item.variant.name }}
                     </h3>
                 </Link>
 
                 <div class="flex items-center gap-x-2">
-                    <p class="text-sm text-gray-800 sm:text-base">
+                    <p class="text-sm text-gray-800">
                         {{
                             formatPrice(props.item.variant.final_selling_price)
                         }}
                     </p>
                     <p
                         v-if="props.item.variant.discount > 0"
-                        class="text-xs text-gray-500 line-through sm:text-sm"
+                        class="text-xs text-gray-500 line-through"
                     >
                         {{ formatPrice(props.item.variant.base_selling_price) }}
                     </p>
@@ -88,20 +88,17 @@ function formatPrice(price = 0) {
                         v-if="props.item.variant.discount > 0"
                         :discount-type="props.item.variant.discount_type"
                         :discount="props.item.variant.discount"
+                        class="!text-xs !px-1 !py-0.5"
                     />
                 </div>
             </div>
 
             <!-- Quantity and Total Price -->
             <div class="flex items-center justify-between">
-                <p
-                    class="text-sm sm:text-base font-semibold text-gray-800 text-start w-[110px]"
-                >
+                <p class="text-sm font-semibold text-gray-800 text-start">
                     x {{ props.item.quantity }} {{ props.item.variant?.unit }}
                 </p>
-                <p
-                    class="text-sm sm:text-base font-semibold text-gray-800 text-end w-[110px]"
-                >
+                <p class="text-sm font-semibold text-gray-800 text-end">
                     {{
                         formatPrice(
                             item.variant.final_selling_price * item.quantity

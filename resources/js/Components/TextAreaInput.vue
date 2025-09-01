@@ -93,7 +93,13 @@ defineExpose({ focus: () => input.value.focus() });
         <label
             :for="id"
             class="relative grid after:px-4 after:py-2 [&>textarea]:text-inherit after:text-inherit [&>textarea]:resize-none [&>textarea]:overflow-auto [&>textarea]:[grid-area:1/1/2/2] after:[grid-area:1/1/2/2] after:whitespace-pre-wrap after:invisible after:content-[attr(data-cloned-val)_'_'] after:border max-h-[300px] text-sm"
-            :class="[props.height]"
+            :class="[
+                props.height,
+                {
+                    'after:pl-11': hasPrefix,
+                    'after:pr-11': hasSuffix,
+                },
+            ]"
         >
             <slot name="prefix"></slot>
             <textarea

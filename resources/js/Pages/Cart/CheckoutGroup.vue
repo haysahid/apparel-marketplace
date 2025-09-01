@@ -139,10 +139,10 @@ onMounted(() => {
                     />
                 </svg>
                 <div>
-                    <h2 class="text-sm font-semibold sm:text-lg">
+                    <h2 class="text-sm font-semibold">
                         {{ props.cartGroup.store?.name }}
                     </h2>
-                    <p class="text-xs text-gray-500 sm:text-sm">
+                    <p class="text-xs text-gray-500">
                         {{ props.cartGroup.store?.rajaongkir_origin_label }}
                     </p>
                 </div>
@@ -229,7 +229,7 @@ onMounted(() => {
             </div>
 
             <!-- Summary -->
-            <table class="text-sm sm:text-base">
+            <table class="text-sm">
                 <tbody class="text-gray-800 [&>tr>td]:py-0.5">
                     <tr>
                         <td class="sm:text-end">Jumlah</td>
@@ -250,14 +250,8 @@ onMounted(() => {
                         </td>
                     </tr>
                     <tr>
-                        <td
-                            class="text-base font-semibold sm:text-lg sm:text-end"
-                        >
-                            Total Harga
-                        </td>
-                        <td
-                            class="text-base font-semibold sm:text-lg text-end ps-8"
-                        >
+                        <td class="font-semibold sm:text-end">Total Harga</td>
+                        <td class="font-semibold text-end ps-8">
                             {{ $formatCurrency(totalPrice) }}
                         </td>
                     </tr>

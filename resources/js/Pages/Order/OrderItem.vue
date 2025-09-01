@@ -72,21 +72,21 @@ const discount = computed(() => {
                     "
                 >
                     <h3
-                        class="text-base font-medium text-gray-800 sm:text-lg hover:text-primary-dark"
+                        class="text-sm font-medium text-gray-800 sm:text-base hover:text-primary-dark"
                     >
                         {{ props.item.variant.name }}
                     </h3>
                 </Link>
 
                 <div class="flex items-center w-full gap-x-2">
-                    <p class="text-sm text-gray-800 sm:text-base">
+                    <p class="text-sm text-gray-800">
                         {{
                             formatPrice(props.item.variant.final_selling_price)
                         }}
                     </p>
                     <p
                         v-if="props.item.variant.discount > 0"
-                        class="text-xs text-gray-500 line-through sm:text-sm"
+                        class="text-xs text-gray-500 line-through"
                     >
                         {{ formatPrice(props.item.variant.base_selling_price) }}
                     </p>
@@ -98,11 +98,11 @@ const discount = computed(() => {
                 </div>
 
                 <div class="flex items-center justify-between w-full gap-x-4">
-                    <p class="text-base font-semibold text-gray-800 text-end">
+                    <p class="text-sm font-semibold text-gray-800 text-start">
                         x {{ props.item.quantity }}
                         {{ props.item.variant.unit }}
                     </p>
-                    <p class="text-base font-semibold text-gray-800 text-end">
+                    <p class="text-sm font-semibold text-gray-800 text-end">
                         {{ $formatCurrency(props.item.subtotal) }}
                     </p>
                 </div>

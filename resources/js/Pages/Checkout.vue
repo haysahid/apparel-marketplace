@@ -10,6 +10,11 @@ import { usePage } from "@inertiajs/vue3";
 import JoinUs from "@/Components/JoinUs.vue";
 import { router } from "@inertiajs/vue3";
 import CheckoutGroup from "./Cart/CheckoutGroup.vue";
+import GuestForm from "./Cart/GuestForm.vue";
+import { useOrderStore } from "@/stores/order-store";
+import { computed, ref } from "vue";
+import DialogModal from "@/Components/DialogModal.vue";
+import DetailRow from "@/Components/DetailRow.vue";
 
 const page = usePage();
 if (page.props.flash.access_token) {
@@ -55,13 +60,23 @@ function syncCart() {
 }
 syncCart();
 
-function formatPrice(price = 0) {
-    return price.toLocaleString("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    });
-}
+const orderStore = useOrderStore();
+
+const customer = computed(() => {
+    return page.props.auth.user
+        ? {
+              name: page.props.auth.user.name,
+              email: page.props.auth.user.email,
+              phone: page.props.auth.user.phone,
+          }
+        : {
+              name: orderStore.form.guest_name,
+              email: orderStore.form.guest_email,
+              phone: orderStore.form.guest_phone,
+          };
+});
+
+const showGuestForm = ref(false);
 </script>
 
 <template>
@@ -73,16 +88,14 @@ function formatPrice(price = 0) {
                     cartStore.groups.length == 0,
             }"
         >
-            <h1
-                class="text-2xl font-bold text-start sm:text-center sm:text-3xl"
-            >
+            <h1 class="text-2xl font-bold text-start sm:text-center">
                 Checkout Keranjang
             </h1>
             <div
                 v-if="cartStore.groups.length == 0"
                 class="flex flex-col items-center gap-y-6"
             >
-                <p class="text-sm text-center text-gray-700 sm:text-base">
+                <p class="text-sm text-center text-gray-700">
                     Anda belum menambahkan produk ke keranjang.
                 </p>
                 <Link :href="route('catalog')">
@@ -91,10 +104,7 @@ function formatPrice(price = 0) {
                     </PrimaryButton>
                 </Link>
             </div>
-            <p
-                class="text-sm text-gray-700 text-start sm:text-center sm:text-base"
-                v-else
-            >
+            <p class="text-sm text-gray-700 text-start sm:text-center" v-else>
                 Periksa kembali sebelum buat pesanan.
             </p>
         </div>
@@ -137,7 +147,29 @@ function formatPrice(price = 0) {
                     </div>
 
                     <!-- Detail Order -->
-                    <OrderForm />
+                    <div class="flex flex-col w-full gap-6 lg:max-w-sm">
+                        <div
+                            class="flex flex-col w-full p-4 outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl gap-y-3"
+                        >
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-semibold text-gray-800">
+                                    Data Pemesan
+                                </h3>
+                                <button
+                                    v-if="!page.props.auth.user"
+                                    class="text-sm text-blue-500 hover:underline"
+                                    @click="showGuestForm = true"
+                                >
+                                    Ubah
+                                </button>
+                            </div>
+                            <DetailRow name="Nama" :value="customer.name" />
+                            <DetailRow name="Email" :value="customer.email" />
+                            <DetailRow name="No. HP" :value="customer.phone" />
+                        </div>
+
+                        <OrderForm />
+                    </div>
                 </div>
             </LandingSection>
 
@@ -146,5 +178,15 @@ function formatPrice(price = 0) {
                 <JoinUs />
             </LandingSection>
         </div>
+
+        <DialogModal
+            :show="showGuestForm"
+            maxWidth="sm"
+            @close="showGuestForm = false"
+        >
+            <template #content>
+                <GuestForm :isEdit="true" @submit="showGuestForm = false" />
+            </template>
+        </DialogModal>
     </LandingLayout>
 </template>

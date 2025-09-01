@@ -60,7 +60,7 @@ class VoucherRepository
         return $vouchers;
     }
 
-    public static function getVoucherByCode($code, $storeId = null)
+    public static function getVoucherByCode($code, $storeId = null): ?Voucher
     {
         $voucher = Voucher::where('code', $code);
 
@@ -98,7 +98,7 @@ class VoucherRepository
         return true;
     }
 
-    public static function calculateVoucherAmount($voucher, $amount)
+    public static function calculateVoucherAmount($voucher, $amount): int
     {
         if (!$voucher) {
             return 0;
@@ -113,7 +113,7 @@ class VoucherRepository
         return 0;
     }
 
-    public static function applyVoucherToInvoice($invoice, $voucher)
+    public static function applyVoucherToInvoice($invoice, $voucher): void
     {
         if (self::isVoucherValid($voucher, $invoice->amount)) {
             $voucherAmount = self::calculateVoucherAmount($voucher, $invoice->amount);
@@ -124,7 +124,7 @@ class VoucherRepository
         }
     }
 
-    public static function removeVoucherFromInvoice($invoice)
+    public static function removeVoucherFromInvoice($invoice): void
     {
         if ($invoice->voucher_id) {
             $invoice->amount += $invoice->voucher_amount;
@@ -134,7 +134,7 @@ class VoucherRepository
         }
     }
 
-    public static function getVoucherById($id, $storeId = null)
+    public static function getVoucherById($id, $storeId = null): ?Voucher
     {
         $query = Voucher::where('id', $id);
 
@@ -166,13 +166,13 @@ class VoucherRepository
         return Voucher::create($data);
     }
 
-    public static function updateVoucher(Voucher $voucher, array $data)
+    public static function updateVoucher(Voucher $voucher, array $data): Voucher
     {
         $voucher->update($data);
         return $voucher;
     }
 
-    public static function deleteVoucher(Voucher $voucher)
+    public static function deleteVoucher(Voucher $voucher): bool
     {
         return $voucher->delete();
     }

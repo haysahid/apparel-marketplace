@@ -4,6 +4,7 @@ import LandingSection from "@/Components/LandingSection.vue";
 import formatDate from "@/plugins/date-formatter";
 import OrderGroup from "./OrderGroup.vue";
 import OrderSummaryCard from "./OrderSummaryCard.vue";
+import DetailRow from "@/Components/DetailRow.vue";
 
 const props = defineProps({
     transaction: {
@@ -435,18 +436,41 @@ setTimeout(() => {
                     />
                 </div>
 
-                <!-- Summary -->
-                <OrderSummaryCard
-                    :transaction="props.transaction"
-                    :groups="props.groups"
-                >
-                    <template #additionalInfo v-if="$slots.additionalInfo">
-                        <slot name="additionalInfo" />
-                    </template>
-                    <template #actions>
-                        <slot name="actions" />
-                    </template>
-                </OrderSummaryCard>
+                <div class="flex flex-col w-full gap-6 lg:max-w-sm">
+                    <!-- Summary -->
+                    <div
+                        class="flex flex-col w-full p-4 outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl gap-y-3"
+                    >
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-semibold text-gray-800">
+                                Data Pemesan
+                            </h3>
+                        </div>
+                        <DetailRow
+                            name="Nama"
+                            :value="props.transaction.user.name"
+                        />
+                        <DetailRow
+                            name="Email"
+                            :value="props.transaction.user.email"
+                        />
+                        <DetailRow
+                            name="No. HP"
+                            :value="props.transaction.user.phone"
+                        />
+                    </div>
+                    <OrderSummaryCard
+                        :transaction="props.transaction"
+                        :groups="props.groups"
+                    >
+                        <template #additionalInfo v-if="$slots.additionalInfo">
+                            <slot name="additionalInfo" />
+                        </template>
+                        <template #actions>
+                            <slot name="actions" />
+                        </template>
+                    </OrderSummaryCard>
+                </div>
             </div>
         </LandingSection>
     </div>

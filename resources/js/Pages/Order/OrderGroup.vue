@@ -28,10 +28,10 @@ const props = defineProps({
                     />
                 </svg>
                 <div>
-                    <h2 class="text-sm font-semibold sm:text-lg">
+                    <h2 class="text-sm font-semibold">
                         {{ props.orderGroup.store?.name }}
                     </h2>
-                    <p class="text-xs text-gray-500 sm:text-sm">
+                    <p class="text-xs text-gray-500">
                         {{ props.orderGroup.store?.rajaongkir_origin_label }}
                     </p>
                 </div>
@@ -39,7 +39,7 @@ const props = defineProps({
         </div>
 
         <!-- Items -->
-        <div v-if="props.orderGroup.items?.length > 0">
+        <div v-if="props.orderGroup.items?.length > 0" class="w-full">
             <OrderItem
                 v-for="(item, index) in props.orderGroup.items"
                 :key="index"
@@ -56,7 +56,7 @@ const props = defineProps({
 
         <!-- Summary -->
         <div class="flex justify-end w-full">
-            <table class="w-full text-sm sm:w-auto sm:text-base">
+            <table class="text-sm">
                 <tbody class="text-gray-800 [&>tr>td]:py-0.5">
                     <tr>
                         <td class="sm:text-end">Jumlah</td>
@@ -91,14 +91,8 @@ const props = defineProps({
                         </td>
                     </tr>
                     <tr>
-                        <td
-                            class="text-base font-semibold sm:text-lg sm:text-end"
-                        >
-                            Total Harga
-                        </td>
-                        <td
-                            class="text-base font-semibold sm:text-lg text-end ps-8"
-                        >
+                        <td class="font-semibold sm:text-end">Total Harga</td>
+                        <td class="font-semibold text-end ps-8">
                             {{
                                 $formatCurrency(
                                     props.orderGroup.invoice?.amount ?? 0
