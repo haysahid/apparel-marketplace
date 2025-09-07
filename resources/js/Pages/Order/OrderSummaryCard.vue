@@ -134,7 +134,7 @@ const isCopied = ref(false);
                 />
                 <OrderContentRow
                     label="Voucher Diskon"
-                    :value="`-${$formatCurrency(discount)}`"
+                    :value="`- ${$formatCurrency(discount)}`"
                 />
                 <OrderContentRow
                     label="Biaya Pengiriman"

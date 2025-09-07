@@ -365,11 +365,7 @@ setTimeout(() => {
 </script>
 
 <template>
-    <div
-        data-aos="fade-up"
-        data-aos-duration="600"
-        class="p-6 !pt-0 sm:p-12 md:p-[100px] flex flex-col gap-5 sm:gap-12"
-    >
+    <div class="p-6 !pt-0 sm:p-12 md:p-[100px] flex flex-col gap-5 sm:gap-12">
         <!-- Tracking -->
         <div
             v-if="props.showTracking"
@@ -424,7 +420,7 @@ setTimeout(() => {
         <!-- Details -->
         <LandingSection class="!flex-col !justify-start !min-h-[56vh]">
             <div
-                class="flex flex-col items-center justify-center w-full gap-5 mx-auto xl:flex-row xl:items-start sm:gap-8 max-w-7xl"
+                class="flex flex-col-reverse items-center justify-center w-full gap-5 mx-auto xl:flex-row xl:items-start sm:gap-8 max-w-7xl"
             >
                 <!-- Items -->
                 <div class="flex flex-col w-full gap-4">
@@ -436,7 +432,7 @@ setTimeout(() => {
                     />
                 </div>
 
-                <div class="flex flex-col w-full gap-6 lg:max-w-sm">
+                <div class="flex flex-col w-full gap-5 xl:gap-6 xl:max-w-sm">
                     <!-- Summary -->
                     <div
                         class="flex flex-col w-full p-4 outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl gap-y-3"

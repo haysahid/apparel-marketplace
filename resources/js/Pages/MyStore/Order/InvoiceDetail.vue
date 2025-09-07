@@ -2,8 +2,9 @@
 import { ref, computed, onMounted } from "vue";
 import LandingSection from "@/Components/LandingSection.vue";
 import formatDate from "@/plugins/date-formatter";
-import OrderGroup from "./OrderGroup.vue";
+import OrderGroup from "@/Pages/Order/OrderGroup.vue";
 import InvoiceSummaryCard from "./InvoiceSummaryCard.vue";
+import DetailRow from "@/Components/DetailRow.vue";
 
 const props = defineProps({
     invoice: {
@@ -328,7 +329,7 @@ setTimeout(() => {
             >
                 <div
                     v-for="(history, index) in histories"
-                    :key="history.date"
+                    :key="index"
                     class="flex flex-col items-center gap-2.5 sm:gap-4"
                 >
                     <div
@@ -372,7 +373,7 @@ setTimeout(() => {
         <!-- Details -->
         <LandingSection class="!flex-col !justify-start !min-h-[56vh]">
             <div
-                class="flex flex-col items-center justify-center w-full gap-5 mx-auto xl:flex-row xl:items-start sm:gap-8 max-w-7xl"
+                class="flex flex-col-reverse items-center justify-center w-full gap-5 mx-auto xl:flex-row xl:items-start sm:gap-8 max-w-7xl"
             >
                 <!-- Items -->
                 <OrderGroup
@@ -385,18 +386,41 @@ setTimeout(() => {
                     :showSummary="false"
                 />
 
-                <!-- Summary -->
-                <InvoiceSummaryCard
-                    :invoice="props.invoice"
-                    :items="props.items"
-                >
-                    <template #additionalInfo v-if="$slots.additionalInfo">
-                        <slot name="additionalInfo" />
-                    </template>
-                    <template #actions>
-                        <slot name="actions" />
-                    </template>
-                </InvoiceSummaryCard>
+                <div class="flex flex-col w-full gap-5 xl:gap-6 xl:max-w-sm">
+                    <!-- Summary -->
+                    <div
+                        class="flex flex-col w-full p-4 outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl gap-y-3"
+                    >
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-semibold text-gray-800">
+                                Data Pemesan
+                            </h3>
+                        </div>
+                        <DetailRow
+                            name="Nama"
+                            :value="props.invoice.transaction.user.name"
+                        />
+                        <DetailRow
+                            name="Email"
+                            :value="props.invoice.transaction.user.email"
+                        />
+                        <DetailRow
+                            name="No. HP"
+                            :value="props.invoice.transaction.user.phone"
+                        />
+                    </div>
+                    <InvoiceSummaryCard
+                        :invoice="props.invoice"
+                        :items="props.items"
+                    >
+                        <template #additionalInfo v-if="$slots.additionalInfo">
+                            <slot name="additionalInfo" />
+                        </template>
+                        <template #actions>
+                            <slot name="actions" />
+                        </template>
+                    </InvoiceSummaryCard>
+                </div>
             </div>
         </LandingSection>
     </div>

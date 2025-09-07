@@ -11,8 +11,14 @@ class UserRepository
     public static function createGuestUser(array $data)
     {
         try {
-            if (User::where('email', $data['email'])->exists()) {
-                throw new Exception('Email sudah terdaftar.', 409);
+            $existingGuest = User::where('email', $data['email'])
+                ->where('role_id', 8)
+                ->first();
+
+            if ($existingGuest) {
+                // Update existing guest user data
+                $existingGuest->update($data);
+                return $existingGuest;
             }
 
             $user = User::create([

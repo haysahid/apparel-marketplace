@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
 import Chip from "@/Components/Chip.vue";
-import InputLabel from "@/Components/InputLabel.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
-import Dropdown from "@/Components/Dropdown.vue";
 import { useForm } from "@inertiajs/vue3";
 import axios from "axios";
 import { usePage, router } from "@inertiajs/vue3";
@@ -126,6 +124,7 @@ function getShippingCost() {
 
 const updateLocalForm = () => {
     orderStore.updateForm({
+        ...orderStore.form,
         payment_method: form.payment_method,
         shipping_method: form.shipping_method,
         destination_id: form.destination_id,

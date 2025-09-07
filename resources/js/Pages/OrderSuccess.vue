@@ -8,6 +8,7 @@ import axios from "axios";
 import { router } from "@inertiajs/vue3";
 import OrderContentRow from "@/Components/OrderContentRow.vue";
 import OrderStatusChip from "./Order/OrderStatusChip.vue";
+import SuccessView from "@/Components/SuccessView.vue";
 
 async function initScript() {
     const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
@@ -33,6 +34,11 @@ const props = defineProps({
     groups: {
         type: Array as () => OrderGroupModel[],
         required: true,
+    },
+    isGuest: {
+        type: Boolean,
+        required: false,
+        default: false,
     },
 });
 
@@ -108,7 +114,11 @@ async function showSnap() {
                     )
                     .then((response) => {
                         resumePaymentStatus.value = "success";
-                        router.visit(route("my-order"));
+                        if (props.isGuest) {
+                            router.reload();
+                        } else {
+                            router.visit(route("my-order"));
+                        }
                     })
                     .catch((error) => {
                         resumePaymentStatus.value = "error";
@@ -157,12 +167,15 @@ async function changePaymentType() {
 
 onMounted(() => {
     if (route().params?.transaction_status == "settlement") {
-        // Reload the page
-        router.visit(
-            route("my-order.detail", {
-                transaction_code: props.transaction.code,
-            })
-        );
+        if (props.isGuest) {
+            router.reload();
+        } else {
+            router.visit(
+                route("my-order.detail", {
+                    transaction_code: props.transaction.code,
+                })
+            );
+        }
     } else if (
         route().params?.show_snap == 1 &&
         props.transaction.status == "pending"
@@ -175,19 +188,19 @@ onMounted(() => {
 <template>
     <LandingLayout title="Berhasil Membuat Pesanan">
         <div
-            class="p-6 sm:p-12 md:px-[100px] md:py-[60px] flex flex-col gap-2 sm:gap-3"
+            class="p-6 sm:px-12 md:px-[100px] flex items-center justify-center"
         >
-            <h1 class="text-2xl font-bold text-start sm:text-center">
-                Pesanan Berhasil Dibuat
-            </h1>
-
-            <p class="text-sm text-gray-700 text-start sm:text-center">
-                Terima kasih telah melakukan pemesanan. Pesanan Anda telah
-                berhasil dibuat.
-            </p>
+            <SuccessView
+                :order-number="props.transaction.code"
+                title="Pesanan Berhasil Dibuat!"
+                subtitle="Terima kasih telah melakukan pemesanan. Pesanan Anda telah berhasil dibuat."
+            />
         </div>
 
         <OrderDetail
+            data-aos="fade-up"
+            data-aos-delay="2000"
+            data-aos-duration="600"
             :transaction="props.transaction"
             :groups="props.groups"
             :showTracking="false"
