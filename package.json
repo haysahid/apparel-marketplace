@@ -24,9 +24,11 @@
     },
     "dependencies": {
         "aos": "^2.3.4",
+        "apexcharts": "^5.3.5",
         "flowbite": "^3.1.2",
         "pinia": "^3.0.3",
         "vue-draggable-plus": "^0.6.0",
+        "vue3-apexcharts": "^1.8.0",
         "vue3-colorpicker": "^2.3.0"
     }
 }

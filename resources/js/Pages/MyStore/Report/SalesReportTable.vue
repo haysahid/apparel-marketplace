@@ -27,7 +27,7 @@ const props = defineProps({
                 <td>{{ index + 1 }}</td>
                 <td>{{ transaction.date }}</td>
                 <td>{{ transaction.code }}</td>
-                <td>{{ transaction.customer }}</td>
+                <td class="!whitespace-normal">{{ transaction.customer }}</td>
                 <td class="text-center">
                     {{ transaction.total_items }}
                 </td>

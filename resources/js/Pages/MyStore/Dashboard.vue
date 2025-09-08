@@ -17,6 +17,35 @@ const props = defineProps({
 
 const page = usePage();
 
+const chartData = {
+    options: {
+        chart: {
+            id: "vuechart-example",
+        },
+        xaxis: {
+            categories: [
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+            ],
+        },
+        colors: ["#CE4DB1"],
+        stroke: {
+            width: 3,
+        },
+        markers: {
+            size: 6,
+        },
+    },
+    series: [
+        {
+            name: "series-1",
+            data: Array.from({ length: 30 }, (_, i) =>
+                Math.round(50 + i * 2 + Math.random() * 10)
+            ),
+        },
+    ],
+};
+
 onMounted(() => {
     if (page.props.selected_store_id) {
         localStorage.setItem("selected_store_id", page.props.selected_store_id);
@@ -93,6 +122,37 @@ onMounted(() => {
                             </svg>
                         </template>
                     </SummaryCard>
+                </div>
+
+                <div class="p-4 bg-white rounded-lg shadow">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold sm:text-xl">
+                            Traffic Pengunjung
+                        </h3>
+                        <div
+                            class="flex items-center gap-2 py-2 pl-4 pr-2 border rounded-lg bg-secondary border-primary/80"
+                        >
+                            <p class="font-medium text-primary">Bulan</p>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                class="size-4 fill-primary"
+                            >
+                                <path
+                                    d="M18.6054 7.3997C18.4811 7.273 18.3335 7.17248 18.1709 7.10389C18.0084 7.0353 17.8342 7 17.6583 7C17.4823 7 17.3081 7.0353 17.1456 7.10389C16.9831 7.17248 16.8355 7.273 16.7112 7.3997L11.4988 12.7028L6.28648 7.3997C6.03529 7.14415 5.69462 7.00058 5.33939 7.00058C4.98416 7.00058 4.64348 7.14415 4.3923 7.3997C4.14111 7.65526 4 8.00186 4 8.36327C4 8.72468 4.14111 9.07129 4.3923 9.32684L10.5585 15.6003C10.6827 15.727 10.8304 15.8275 10.9929 15.8961C11.1554 15.9647 11.3296 16 11.5055 16C11.6815 16 11.8557 15.9647 12.0182 15.8961C12.1807 15.8275 12.3284 15.727 12.4526 15.6003L18.6188 9.32684C19.1293 8.80747 19.1293 7.93274 18.6054 7.3997Z"
+                                />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <apexchart
+                        type="line"
+                        height="360"
+                        :options="chartData.options"
+                        :series="chartData.series"
+                    ></apexchart>
                 </div>
             </div>
         </div>

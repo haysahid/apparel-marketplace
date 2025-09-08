@@ -7,16 +7,14 @@ import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import { createPinia } from 'pinia'
+import VueApexCharts from "vue3-apexcharts";
 import AOS from 'aos';
-// import { initFlowbite } from "flowbite";
 
 // My plugins
 import formatDate from './plugins/date-formatter';
 import { formatCurrency } from './plugins/number-formatter';
 
-
 AOS.init();
-// initFlowbite();
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -29,7 +27,8 @@ createInertiaApp({
         const app = createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(ZiggyVue)
-            .use(pinia);
+            .use(pinia)
+            .use(VueApexCharts);
 
         app.config.globalProperties.$formatDate = formatDate;
         app.config.globalProperties.$formatCurrency = formatCurrency;
