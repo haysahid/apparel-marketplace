@@ -3,9 +3,12 @@
 namespace App\Repositories;
 
 use App\Models\Invoice;
+use App\Models\Payment;
+use App\Models\ProductVariant;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class TransactionRepository
@@ -61,6 +64,42 @@ class TransactionRepository
         } catch (Exception $e) {
             Log::error('Error creating transaction item: ' . $e);
             throw new Exception('Gagal membuat item transaksi: ' . $e);
+        }
+    }
+
+    public static function setPaidNow(Transaction $transaction): void
+    {
+        try {
+            DB::beginTransaction();
+
+            // Update invoice paid_at
+            Invoice::where('transaction_id', $transaction->id)
+                ->update(['paid_at' => now()]);
+            $transaction->paid_at = now();
+            $transaction->status = 'paid';
+            $transaction->save();
+
+            // Update transaction status
+            $transaction->paid_at = now();
+            $transaction->status = 'paid';
+            $transaction->save();
+
+            // Update transaction items status
+            TransactionItem::where('transaction_id', $transaction->id)
+                ->update(['fullfillment_status' => 'paid']);
+
+            // Update stock for each transaction item
+            foreach ($transaction->items as $item) {
+                $variant = ProductVariant::findOrFail($item->variant_id);
+                $variant->current_stock_level -= $item->quantity;
+                $variant->save();
+            }
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal mengubah status transaksi menjadi dibayar: ' . $e);
+            throw new Exception('Gagal mengubah status transaksi menjadi dibayar: ' . $e);
         }
     }
 }

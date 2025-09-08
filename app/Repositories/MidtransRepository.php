@@ -28,4 +28,13 @@ class MidtransRepository
 
         return \Midtrans\Snap::getSnapToken($params);
     }
+
+    public static function getTransactionStatus($transactionCode): object
+    {
+        \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+        \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
+        \Midtrans\Config::$is3ds = true;
+
+        return (object) \Midtrans\Transaction::status($transactionCode);
+    }
 }

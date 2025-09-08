@@ -19,6 +19,7 @@ use App\Models\User;
 use App\Repositories\MidtransRepository;
 use App\Repositories\VoucherRepository;
 use App\UseCases\CheckoutUseCase;
+use App\UseCases\ValidateTransactionPaymentUseCase;
 use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
@@ -30,6 +31,7 @@ use Illuminate\Support\Facades\Log;
 class OrderController extends Controller
 {
     private CheckoutUseCase $checkoutUseCase;
+    private ValidateTransactionPaymentUseCase $validateTransactionPaymentUseCase;
 
     protected $rajaongkirRepository;
     protected $midtransRepository;
@@ -40,6 +42,7 @@ class OrderController extends Controller
     public function __construct()
     {
         $this->checkoutUseCase = new CheckoutUseCase();
+        $this->validateTransactionPaymentUseCase = new ValidateTransactionPaymentUseCase();
         $this->rajaongkirRepository = new RajaongkirRepository();
         $this->midtransRepository = new MidtransRepository();
     }
@@ -496,90 +499,10 @@ class OrderController extends Controller
             'transaction_code' => 'required|string',
         ]);
 
-        try {
-            DB::beginTransaction();
-
-            $transaction = Transaction::with(['payments'])->where('code', $validated['transaction_code'])->first();
-            $payment = Payment::where('transaction_id', $transaction->id)->first();
-
-            if (!$payment) {
-                return ResponseFormatter::error(
-                    'Pembayaran tidak ditemukan',
-                    404
-                );
-            }
-
-            $transactionCode = $transaction->code;
-
-            if ($transaction->payments->count() > 1) {
-                $transactionCode = $transaction->code . '-' . ($transaction->payments->count() - 1);
-            }
-
-            \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-            \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
-            \Midtrans\Config::$is3ds = true;
-
-            $response = (object) \Midtrans\Transaction::status($transactionCode);
-
-            $paymentStatusBefore = $payment->status;
-
-            // Update payment
-            $payment->midtrans_response = json_encode($response);
-            $paymentStatusAfter = $response->transaction_status == 'settlement'
-                ? 'completed'
-                : ($response->transaction_status == 'failed' ? 'failed' : 'pending');
-
-            // Update invoice paid_at if payment is completed
-            if ($paymentStatusAfter === 'completed' && ($paymentStatusBefore !== 'completed' || $transaction->status === 'pending')) {
-                // Update payment status
-                $payment->status = $paymentStatusAfter;
-                $payment->save();
-
-                // Update invoice paid_at
-                Invoice::where('transaction_id', $transaction->id)
-                    ->update(['paid_at' => now()]);
-                $transaction->paid_at = now();
-                $transaction->status = 'paid';
-                $transaction->save();
-
-                // Update transaction status
-                $transaction->paid_at = now();
-                $transaction->status = 'paid';
-                $transaction->save();
-
-                // Update transaction items status
-                TransactionItem::where('transaction_id', $transaction->id)
-                    ->update(['fullfillment_status' => 'paid']);
-
-                // Update stock for each transaction item
-                foreach ($transaction->items as $item) {
-                    $variant = ProductVariant::findOrFail($item->variant_id);
-                    $variant->current_stock_level -= $item->quantity;
-                    $variant->save();
-                }
-            }
-
-            DB::commit();
-
-            $payment->midtrans_response = json_decode($payment->midtrans_response, true);
-
-            return ResponseFormatter::success(
-                $payment,
-                'Status pembayaran berhasil diperiksa',
-                200
-            );
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::error('Check payment failed: ' . $e->getMessage(), [
-                'user_id' => Auth::id(),
-                'transaction_code' => $validated['transaction_code'],
-            ]);
-
-            return ResponseFormatter::error(
-                'Gagal memeriksa status pembayaran: ' . $e->getMessage(),
-                500
-            );
-        }
+        return $this->validateTransactionPaymentUseCase->validate($validated['transaction_code'])->fold(
+            onSuccess: fn($data, $code) => ResponseFormatter::success($data, 'Status pembayaran berhasil diperiksa', $code),
+            onError: fn($error, $code) => ResponseFormatter::error($error, $code)
+        );
     }
 
     public function changePaymentType(Request $request)
@@ -702,43 +625,7 @@ class OrderController extends Controller
 
             // Check midtrans payment status
             if ($transaction->payment_method->slug === 'transfer') {
-                \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-                \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
-                \Midtrans\Config::$is3ds = true;
-
-                $response = (object) \Midtrans\Transaction::status($transaction->code);
-
-                if ($response->transaction_status !== 'settlement') {
-                    throw new Exception('Pembayaran belum terkonfirmasi');
-                }
-
-                // Update payment status
-                $payment->midtrans_response = json_encode($response);
-                $payment->status = 'completed';
-                $payment->save();
-
-                // Update invoice paid_at
-                Invoice::where('transaction_id', $transaction->id)
-                    ->update([
-                        'paid_at' => now(),
-                        'status' => 'paid',
-                    ]);
-
-                // Update transaction status
-                $transaction->paid_at = now();
-                $transaction->status = 'paid';
-                $transaction->save();
-
-                // Update transaction items status
-                TransactionItem::where('transaction_id', $transaction->id)
-                    ->update(['fullfillment_status' => 'paid']);
-
-                // Update stock for each transaction item
-                foreach ($transaction->items as $item) {
-                    $variant = ProductVariant::findOrFail($item->variant_id);
-                    $variant->current_stock_level -= $item->quantity;
-                    $variant->save();
-                }
+                $this->validateTransactionPaymentUseCase->validate($transaction->code);
             }
 
             DB::commit();

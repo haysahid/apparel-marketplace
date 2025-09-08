@@ -45,15 +45,30 @@ const props = defineProps({
 // Check payment
 const payment = ref(null);
 
-async function checkPayment() {
+async function checkPayment(autoReload = false) {
     await axios
-        .get(`/api/check-payment?transaction_code=${props.transaction.code}`, {
-            headers: {
-                authorization: `Bearer ${localStorage.getItem("access_token")}`,
-            },
-        })
+        .get(
+            props.isGuest
+                ? `/api/check-payment-guest?transaction_code=${props.transaction.code}`
+                : `/api/check-payment?transaction_code=${props.transaction.code}`,
+            {
+                headers: {
+                    authorization: `Bearer ${localStorage.getItem(
+                        "access_token"
+                    )}`,
+                },
+            }
+        )
         .then((response) => {
             payment.value = response.data.result;
+
+            if (autoReload) {
+                if (props.isGuest) {
+                    router.reload();
+                } else {
+                    router.visit(route("my-order"));
+                }
+            }
         });
 }
 
@@ -98,31 +113,8 @@ async function showSnap() {
                     behavior: "smooth",
                 });
 
-                await axios
-                    .post(
-                        "/api/confirm-payment",
-                        {
-                            payment_id: payment.value.id,
-                        },
-                        {
-                            headers: {
-                                authorization: `Bearer ${localStorage.getItem(
-                                    "access_token"
-                                )}`,
-                            },
-                        }
-                    )
-                    .then((response) => {
-                        resumePaymentStatus.value = "success";
-                        if (props.isGuest) {
-                            router.reload();
-                        } else {
-                            router.visit(route("my-order"));
-                        }
-                    })
-                    .catch((error) => {
-                        resumePaymentStatus.value = "error";
-                    });
+                resumePaymentStatus.value = "success";
+                await checkPayment(true);
             },
             onPending: async function (result) {
                 resumePaymentStatus.value = "pending";
