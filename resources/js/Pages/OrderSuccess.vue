@@ -197,6 +197,7 @@ onMounted(() => {
             :groups="props.groups"
             :showTracking="false"
             class="p-6 !pt-0 sm:p-12 md:p-[100px] flex flex-col gap-4 sm:gap-12"
+            @continuePayment="showSnap()"
         >
             <template #additionalInfo>
                 <!-- Payment -->

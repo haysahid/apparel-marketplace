@@ -72,12 +72,12 @@ class TransactionRepository
         try {
             DB::beginTransaction();
 
-            // Update invoice paid_at
+            // Update invoice status
             Invoice::where('transaction_id', $transaction->id)
-                ->update(['paid_at' => now()]);
-            $transaction->paid_at = now();
-            $transaction->status = 'paid';
-            $transaction->save();
+                ->update([
+                    'paid_at' => now(),
+                    'status' => 'paid',
+                ]);
 
             // Update transaction status
             $transaction->paid_at = now();

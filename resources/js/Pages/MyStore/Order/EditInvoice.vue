@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import OrderDetail from "@/Pages/Order/OrderDetail.vue";
 import ChangeTransactionStatusDialog from "./ChangeTransactionStatusDialog.vue";
 import axios from "axios";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
