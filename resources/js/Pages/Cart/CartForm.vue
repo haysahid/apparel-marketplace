@@ -46,14 +46,14 @@ const submit = () => {
     <div
         class="w-full lg:w-[480px] outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl p-4 gap-y-4 flex flex-col gap-4"
     >
-        <h3 class="text-lg font-semibold text-gray-800">Ringkasan Pemesanan</h3>
+        <h3 class="font-semibold text-gray-800">Ringkasan Pemesanan</h3>
 
         <!-- Summary -->
         <div class="flex flex-col gap-y-2">
             <!-- Sub Total -->
             <div class="flex items-center justify-between">
                 <p class="text-gray-700">Sub Total</p>
-                <p class="font-semibold text-gray-700">
+                <p class="font-semibold text-primary">
                     {{
                         cartStore.subTotal.toLocaleString("id-ID", {
                             style: "currency",

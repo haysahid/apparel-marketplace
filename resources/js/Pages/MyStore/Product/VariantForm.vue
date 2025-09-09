@@ -456,6 +456,7 @@ const openErrorDialog = (message) => {
                                 ? {
                                       label: form.color?.name,
                                       value: form.color_id,
+                                      hexCode: form.color?.hex_code,
                                   }
                                 : null
                         "
@@ -463,6 +464,7 @@ const openErrorDialog = (message) => {
                             filteredColors.map((color) => ({
                                 label: color.name,
                                 value: color.id,
+                                hexCode: color.hex_code,
                             }))
                         "
                         placeholder="Pilih Warna"
@@ -559,6 +561,22 @@ const openErrorDialog = (message) => {
             </div>
 
             <div class="flex items-center w-full gap-4">
+                <!-- Stock -->
+                <InputGroup id="current_stock_level" label="Stok">
+                    <TextInput
+                        id="current_stock_level"
+                        v-model.number="form.current_stock_level"
+                        type="number"
+                        placeholder="Masukkan Stok"
+                        required
+                        autocomplete="current_stock_level"
+                        :error="form.errors.current_stock_level"
+                        @update:modelValue="
+                            form.errors.current_stock_level = null
+                        "
+                    />
+                </InputGroup>
+
                 <!-- Unit -->
                 <InputGroup id="unit" label="Satuan">
                     <DropdownSearchInput
@@ -613,22 +631,6 @@ const openErrorDialog = (message) => {
                             </div>
                         </template>
                     </DropdownSearchInput>
-                </InputGroup>
-
-                <!-- Stock -->
-                <InputGroup id="current_stock_level" label="Stok">
-                    <TextInput
-                        id="current_stock_level"
-                        v-model.number="form.current_stock_level"
-                        type="number"
-                        placeholder="Masukkan Stok"
-                        required
-                        autocomplete="current_stock_level"
-                        :error="form.errors.current_stock_level"
-                        @update:modelValue="
-                            form.errors.current_stock_level = null
-                        "
-                    />
                 </InputGroup>
             </div>
 

@@ -79,6 +79,12 @@ const discount = computed(() => {
                 </Link>
 
                 <div class="flex items-center gap-x-2">
+                    <DiscountTag
+                        v-if="props.item.variant.discount > 0"
+                        :discount-type="props.item.variant.discount_type"
+                        :discount="props.item.variant.discount"
+                        class="!text-xs !px-1"
+                    />
                     <p class="text-sm text-gray-800 sm:text-base">
                         {{
                             formatPrice(props.item.variant.final_selling_price)
@@ -90,11 +96,6 @@ const discount = computed(() => {
                     >
                         {{ formatPrice(props.item.variant.base_selling_price) }}
                     </p>
-                    <DiscountTag
-                        v-if="props.item.variant.discount > 0"
-                        :discount-type="props.item.variant.discount_type"
-                        :discount="props.item.variant.discount"
-                    />
                 </div>
 
                 <div class="flex items-center justify-between w-full gap-x-4">

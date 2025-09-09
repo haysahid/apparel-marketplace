@@ -17,22 +17,12 @@ const showingFilterDropdown = ref(false);
 // Brands
 const showAllBrands = false;
 const showBrandsModal = ref(false);
-const brandSearch = ref("");
 const brands = computed(() => {
     if (showAllBrands) {
         return filters.value.brands;
     }
 
     return filters.value.brands.slice(0, 5);
-});
-const filteredBrands = computed(() => {
-    if (!brandSearch.value) {
-        return props.filters.brands;
-    }
-
-    return props.filters.brands.filter((brand) =>
-        brand.name.toLowerCase().includes(brandSearch.value.toLowerCase())
-    );
 });
 
 // Category
@@ -49,22 +39,12 @@ const categories = computed(() => {
 // Color
 const showAllColors = false;
 const showColorsModal = ref(false);
-const colorSearch = ref("");
 const colors = computed(() => {
     if (showAllColors) {
         return filters.value.colors;
     }
 
     return filters.value.colors.slice(0, 5);
-});
-const filteredColors = computed(() => {
-    if (!colorSearch.value) {
-        return props.filters.colors;
-    }
-
-    return props.filters.colors.filter((color) =>
-        color.name.toLowerCase().includes(colorSearch.value.toLowerCase())
-    );
 });
 
 const emit = defineEmits(["changeBrands", "changeCategories", "changeColors"]);
@@ -231,6 +211,11 @@ defineExpose({
                             :hexCode="color.hex_code"
                             :selected="color.selected"
                             class="!justify-start"
+                            :class="
+                                color.selected
+                                    ? '!outline-priamry'
+                                    : '!outline-gray-200'
+                            "
                             @click="
                                 color.selected
                                     ? (color.selected = false)
@@ -410,6 +395,11 @@ defineExpose({
                             :hexCode="color.hex_code"
                             :selected="color.selected"
                             class="!justify-start"
+                            :class="
+                                color.selected
+                                    ? '!outline-priamry'
+                                    : '!outline-gray-200'
+                            "
                             @click="
                                 color.selected
                                     ? (color.selected = false)

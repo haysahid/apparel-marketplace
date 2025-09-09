@@ -19,7 +19,7 @@ const page = usePage();
 const cartStore = useCartStore();
 const orderStore = useOrderStore();
 
-const isGuest = computed(() => !page.props.isGuest);
+const isGuest = page.props.isGuest == true;
 
 const checkoutStatus = ref(null);
 

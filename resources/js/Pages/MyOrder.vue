@@ -5,6 +5,8 @@ import LandingLayout from "@/Layouts/LandingLayout.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { Link } from "@inertiajs/vue3";
 import JoinUs from "@/Components/JoinUs.vue";
+import CatalogPagination from "@/Components/CatalogPagination.vue";
+import DefaultPagination from "@/Components/DefaultPagination.vue";
 
 const props = defineProps({
     invoices: {
@@ -15,11 +17,10 @@ const props = defineProps({
                 label: string;
                 active: boolean;
             }[];
-            meta: {
-                current_page: number;
-                from: number;
-                last_page: number;
-            };
+            total: number;
+            last_page: number;
+            to: number;
+            from: number;
         },
         required: true,
     },
@@ -37,7 +38,7 @@ const invoices = props.invoices.data;
                     invoices.length == 0,
             }"
         >
-            <h1 class="text-2xl font-bold text-start sm:text-center">
+            <h1 class="text-xl font-bold text-start sm:text-center">
                 {{ invoices.length > 0 ? "Pesanan Saya" : "Belum Ada Pesanan" }}
             </h1>
             <div
@@ -90,6 +91,19 @@ const invoices = props.invoices.data;
                             "
                             :showDivider="false"
                         />
+
+                        <!-- Pagination -->
+                        <div
+                            v-if="props.invoices.total > 0"
+                            class="flex flex-col gap-4 mt-4"
+                        >
+                            <p class="text-xs text-gray-500 sm:text-sm">
+                                Menampilkan {{ props.invoices.from }} -
+                                {{ props.invoices.to }} dari
+                                {{ props.invoices.total }} item
+                            </p>
+                            <CatalogPagination :links="props.invoices.links" />
+                        </div>
                     </div>
                 </div>
             </LandingSection>

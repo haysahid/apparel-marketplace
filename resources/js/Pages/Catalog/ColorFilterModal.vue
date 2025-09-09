@@ -77,6 +77,11 @@ const filteredColors = computed(() => {
                         :hexCode="color.hex_code"
                         :selected="color.selected"
                         class="min-h-14 !justify-start"
+                        :class="
+                            color.selected
+                                ? '!outline-priamry'
+                                : '!outline-gray-200'
+                        "
                         @click="
                             color.selected
                                 ? (color.selected = false)

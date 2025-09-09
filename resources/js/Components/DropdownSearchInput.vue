@@ -8,6 +8,7 @@ interface DropdownOption {
     label: string;
     value: string | number;
     icon?: string | null;
+    hexCode?: string | null;
 }
 
 const props = defineProps({
@@ -109,11 +110,19 @@ function onFocusout() {
                 "
                 class="w-full"
                 :bgClass="props.bgClass"
+                :textClass="props.modelValue?.hexCode ? 'pl-10' : ''"
                 :placeholder="props.placeholder"
                 :error="props.error"
                 @focus="dropdown.open = true"
                 @focusout="onFocusout"
             >
+                <template v-if="props.modelValue?.hexCode" #prefix>
+                    <span
+                        class="absolute w-5 h-5 border rounded-full left-3"
+                        :style="`background-color: ${props.modelValue.hexCode}`"
+                    ></span>
+                </template>
+
                 <template #suffix>
                     <button
                         v-if="
@@ -248,6 +257,11 @@ function onFocusout() {
                                 class="w-5 h-5 rounded-full"
                             />
                         </span>
+                        <span
+                            v-else-if="option.hexCode"
+                            class="w-5 h-5 border rounded-full"
+                            :style="`background-color: ${option.hexCode}`"
+                        ></span>
                         <span>{{ option.label }}</span>
                     </li>
                 </ul>

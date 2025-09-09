@@ -73,7 +73,7 @@ function formatPrice(price = 0) {
                     cartStore.groups.length == 0,
             }"
         >
-            <h1 class="text-2xl font-bold text-start sm:text-center">
+            <h1 class="text-xl font-bold text-start sm:text-center">
                 {{
                     cartStore.groups.length > 0
                         ? `Keranjang Saya (${cartStore.groups.length} item)`

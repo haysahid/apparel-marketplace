@@ -20,12 +20,6 @@ function formatPrice(price = 0) {
         minimumFractionDigits: 0,
     });
 }
-
-const discount = computed(() => {
-    return props.item.variant.discount_type === "percentage"
-        ? `${props.item.variant.discount}%`
-        : formatPrice(props.item.variant.discount);
-});
 </script>
 
 <template>

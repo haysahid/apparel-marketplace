@@ -16,7 +16,7 @@ interface ProductVariantEntity {
     final_selling_price: number;
     current_stock_level: number;
     last_stock_update: string | null;
-    unit: string;
+    unit_id: number;
     disabled_at: string | null;
     created_at: string | null;
     updated_at: string | null;
@@ -28,6 +28,7 @@ interface ProductVariantEntity {
     product: ProductEntity | null;
     color: ColorEntity | null;
     size: SizeEntity | null;
+    unit: UnitEntity | null;
     images: ProductVariantImageEntity[];
     transaction_items: TransactionItemEntity[];
 }

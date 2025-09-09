@@ -104,14 +104,20 @@ const hasActions = computed(() => {
                         class="w-full"
                     >
                         <h3
-                            class="w-full text-sm font-medium text-gray-800 sm:text-base lg:text-lg hover:text-primary-dark"
+                            class="text-sm font-medium text-gray-800 sm:text-base hover:text-primary-dark"
                         >
                             {{ props.item.variant.name }}
                         </h3>
                     </Link>
 
                     <div class="flex items-center mt-2 gap-x-2">
-                        <p class="text-sm text-gray-800 sm:text-base">
+                        <DiscountTag
+                            v-if="props.item.variant.discount > 0"
+                            :discount-type="props.item.variant.discount_type"
+                            :discount="props.item.variant.discount"
+                            class="!text-xs !px-1"
+                        />
+                        <p class="text-sm text-gray-800">
                             {{
                                 formatPrice(
                                     props.item.variant.final_selling_price
@@ -120,7 +126,7 @@ const hasActions = computed(() => {
                         </p>
                         <p
                             v-if="props.item.variant.discount > 0"
-                            class="text-xs text-gray-500 line-through sm:text-sm"
+                            class="text-xs text-gray-500 line-through"
                         >
                             {{
                                 formatPrice(
@@ -128,11 +134,6 @@ const hasActions = computed(() => {
                                 )
                             }}
                         </p>
-                        <DiscountTag
-                            v-if="props.item.variant.discount > 0"
-                            :discount-type="props.item.variant.discount_type"
-                            :discount="props.item.variant.discount"
-                        />
                     </div>
                 </div>
 

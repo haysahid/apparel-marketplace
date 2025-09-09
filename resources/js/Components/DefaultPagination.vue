@@ -26,7 +26,7 @@ const props = defineProps({
                     :href="link.url === null ? '#' : link.url"
                     class="flex items-center justify-center transition duration-300 aspect-square hover:bg-primary/10 text-primary bg-secondary-box group"
                     :class="{
-                        'text-gray-500 !bg-secondary-box cursor-default':
+                        'text-gray-500 !bg-secondary-box cursor-default pointer-events-none':
                             link.active || link.url === null,
                     }"
                 >
@@ -57,7 +57,7 @@ const props = defineProps({
                     :class="[
                         'aspect-square flex items-center justify-center transition duration-300',
                         link.active
-                            ? 'bg-primary text-white  active:bg-primary/90 focus:bg-primary focus:ring-primary'
+                            ? 'bg-primary text-white  active:bg-primary/90 focus:bg-primary focus:ring-primary pointer-events-none'
                             : 'text-gray-500 bg-secondary-box  hover:bg-primary/10 hover:text-primary',
                     ]"
                 >
@@ -68,7 +68,7 @@ const props = defineProps({
                     :href="link.active || link.url === null ? '#' : link.url"
                     class="flex items-center justify-center transition duration-300 aspect-square hover:bg-primary/10 text-primary bg-secondary-box group"
                     :class="{
-                        'text-gray-500 !bg-secondary-box cursor-default':
+                        'text-gray-500 !bg-secondary-box cursor-default pointer-events-none':
                             link.active || link.url === null,
                     }"
                 >

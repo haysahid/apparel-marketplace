@@ -180,7 +180,7 @@ onMounted(() => {
         <div
             class="p-6 sm:p-12 md:px-[100px] md:py-[60px] flex flex-col gap-2 sm:gap-3 sm:items-center bg-secondary-box"
         >
-            <h1 class="text-2xl font-bold text-start sm:text-center">
+            <h1 class="text-xl font-bold text-start sm:text-center">
                 Detail Pesanan Anda
             </h1>
 

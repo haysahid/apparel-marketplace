@@ -16,7 +16,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <div class="flex justify-start mt-6">
+    <div class="flex justify-start">
         <nav class="flex items-center gap-4 text-gray-600">
             <template v-for="(link, index) in props.links" :key="index">
                 <Link

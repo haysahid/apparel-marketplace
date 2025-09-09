@@ -237,8 +237,8 @@ function onChangeSearch() {
                                 type="text"
                                 name="search"
                                 placeholder="Cari produk..."
-                                :autofocus="route().params.search"
-                                class="w-full py-4 pl-8 pr-24 transition duration-150 ease-in-out border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-light overflow-ellipsis focus:border-primary-light"
+                                :autofocus="true"
+                                class="w-full py-4 pl-8 pr-24 transition duration-150 ease-in-out border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-primary-light overflow-ellipsis focus:border-primary-light"
                             />
                             <button
                                 type="submit"
@@ -510,10 +510,19 @@ function onChangeSearch() {
                             </div>
 
                             <!-- Pagination -->
-                            <CatalogPagination
-                                v-if="props.products.data.length > 0"
-                                :links="props.products.links"
-                            />
+                            <div
+                                v-if="props.products.total > 0"
+                                class="flex flex-col gap-4 mt-4"
+                            >
+                                <p class="text-xs text-gray-500 sm:text-sm">
+                                    Menampilkan {{ props.products.from }} -
+                                    {{ props.products.to }} dari
+                                    {{ props.products.total }} item
+                                </p>
+                                <CatalogPagination
+                                    :links="props.products.links"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

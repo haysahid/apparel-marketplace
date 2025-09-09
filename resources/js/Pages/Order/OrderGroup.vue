@@ -15,7 +15,7 @@ const props = defineProps({
 
 <template>
     <div
-        class="flex flex-col items-start justify-between gap-2 p-4 !pb-2 transition-all duration-200 ease-in-out rounded-2xl sm:p-6 sm:!pb-4 outline outline-1 -outline-offset-1 outline-gray-300"
+        class="flex flex-col items-start justify-between gap-2 p-4 !pb-2 transition-all duration-200 ease-in-out rounded-2xl sm:p-6 sm:!pb-4 outline outline-1 -outline-offset-1 outline-gray-300 w-full"
     >
         <!-- Store Info -->
         <div class="flex items-center justify-between w-full gap-4">

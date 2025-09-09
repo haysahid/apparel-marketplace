@@ -117,26 +117,40 @@ const loadFile = (file) => {
             </div>
         </div>
 
-        <button
-            v-if="showDeleteButton"
-            type="button"
-            class="p-[7px] text-gray-400 bg-white rounded-full hover:bg-gray-100 transition-all duration-300 ease-in-out"
-            @click.stop="emit('delete')"
-        >
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="size-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+        <div class="flex flex-col items-end gap-2 shrink-0">
+            <button
+                v-if="showDeleteButton"
+                type="button"
+                class="p-[7px] text-gray-400 bg-white rounded-full hover:bg-gray-100 transition-all duration-300 ease-in-out"
+                @click.stop="emit('delete')"
             >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                />
-            </svg>
-        </button>
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="size-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                    />
+                </svg>
+            </button>
+
+            <div
+                class="flex items-center gap-2 py-1.5 px-2 bg-gray-100 rounded-md"
+            >
+                <p class="text-sm font-medium text-gray-600">
+                    {{
+                        props.variant.current_stock_level +
+                        " " +
+                        props.variant.unit?.name
+                    }}
+                </p>
+            </div>
+        </div>
     </button>
 </template>

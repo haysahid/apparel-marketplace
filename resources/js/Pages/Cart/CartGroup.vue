@@ -39,10 +39,10 @@ function formatPrice(price = 0) {
                     />
                 </svg>
                 <div>
-                    <h2 class="text-sm font-semibold sm:text-lg">
+                    <h2 class="text-sm font-semibold">
                         {{ props.cartGroup.store?.name }}
                     </h2>
-                    <p class="text-xs text-gray-500 sm:text-sm">
+                    <p class="text-xs text-gray-500">
                         {{ props.cartGroup.store?.rajaongkir_origin_label }}
                     </p>
                 </div>
@@ -110,7 +110,7 @@ function formatPrice(price = 0) {
                                 />
 
                                 <p
-                                    class="text-sm sm:text-base font-semibold text-gray-800 text-end w-[110px]"
+                                    class="text-sm font-semibold text-gray-800 text-end w-[110px]"
                                 >
                                     {{
                                         formatPrice(
