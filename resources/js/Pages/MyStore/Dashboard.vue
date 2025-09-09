@@ -3,6 +3,7 @@ import SummaryCard from "@/Components/SummaryCard.vue";
 import { onMounted } from "vue";
 import { usePage } from "@inertiajs/vue3";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
+import DefaultCard from "@/Components/DefaultCard.vue";
 
 const props = defineProps({
     productCount: {
@@ -28,7 +29,7 @@ const chartData = {
                 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
             ],
         },
-        colors: ["#CE4DB1"],
+        colors: ["#C28C42"],
         stroke: {
             width: 3,
         },
@@ -124,13 +125,13 @@ onMounted(() => {
                     </SummaryCard>
                 </div>
 
-                <div class="p-4 bg-white rounded-lg shadow">
+                <DefaultCard>
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-bold sm:text-xl">
                             Traffic Pengunjung
                         </h3>
                         <div
-                            class="flex items-center gap-2 py-2 pl-4 pr-2 border rounded-lg bg-secondary border-primary/80"
+                            class="flex items-center gap-2 py-2 pl-4 pr-2 bg-white border rounded-lg border-primary/80"
                         >
                             <p class="font-medium text-primary">Bulan</p>
                             <svg
@@ -153,7 +154,7 @@ onMounted(() => {
                         :options="chartData.options"
                         :series="chartData.series"
                     ></apexchart>
-                </div>
+                </DefaultCard>
             </div>
         </div>
     </MyStoreLayout>

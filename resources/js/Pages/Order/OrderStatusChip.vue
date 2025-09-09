@@ -2,7 +2,7 @@
 const props = defineProps({
     status: {
         type: String,
-        required: true,
+        default: null,
     },
     label: {
         type: String,
@@ -21,6 +21,7 @@ const props = defineProps({
             'text-indigo-500 bg-indigo-100': props.status === 'processing',
             'text-green-500 bg-green-100': props.status === 'completed',
             'text-red-500 bg-red-100': props.status === 'cancelled',
+            'text-gray-500 bg-gray-100': props.status === null,
         }"
     >
         {{ props.label }}

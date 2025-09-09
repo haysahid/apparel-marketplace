@@ -120,7 +120,7 @@ const page = usePage();
 
 function canEdit(category) {
     return (
-        page.props.auth.user.is_admin ||
+        page.props.auth.is_admin ||
         page.props.auth.user.stores.some(
             (store) => store.id === category.store_id
         )

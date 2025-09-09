@@ -176,7 +176,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <LandingLayout title="Order Success">
+    <LandingLayout title="Detail Pesanan">
         <div
             class="p-6 sm:p-12 md:px-[100px] md:py-[60px] flex flex-col gap-2 sm:gap-3 sm:items-center bg-secondary-box"
         >

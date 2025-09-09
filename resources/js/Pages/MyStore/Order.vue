@@ -7,7 +7,6 @@ import AdminItemAction from "@/Components/AdminItemAction.vue";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Dropdown from "@/Components/Dropdown.vue";
-import OrderStatusChip from "../Order/OrderStatusChip.vue";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
@@ -16,7 +15,8 @@ import { useScreenSize } from "@/plugins/screen-size";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import MyTransactionCard from "./Transaction/MyTransactionCard.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
-import MyOrderCard from "./Order/ MyOrderCard.vue";
+import MyOrderCard from "./Order/MyOrderCard.vue";
+import OrderStatusChip from "./Order/OrderStatusChip.vue";
 
 const screenSize = useScreenSize();
 
@@ -276,22 +276,22 @@ onMounted(() => {
                                 "
                                 class="hover:underline"
                             >
-                                #{{ invoice.code }}
+                                {{ invoice.code }}
                             </Link>
                         </td>
-                        <td class="text-center">
+                        <td class="!whitespace-normal">
                             {{ invoice.transaction.user.name }}
                         </td>
-                        <td class="text-center">
+                        <td>
                             {{ invoice.transaction.items.length }}
                         </td>
-                        <td class="text-center">
+                        <td>
                             {{ invoice.transaction.payment_method.name }}
                         </td>
-                        <td class="text-center">
+                        <td>
                             {{ invoice.transaction.shipping_method.name }}
                         </td>
-                        <td class="text-center">
+                        <td>
                             {{ $formatCurrency(invoice.amount) }}
                         </td>
                         <td>

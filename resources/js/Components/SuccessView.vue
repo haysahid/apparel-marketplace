@@ -1,5 +1,4 @@
 <script setup>
-// Props
 const props = defineProps({
     title: {
         type: String,
@@ -11,12 +10,6 @@ const props = defineProps({
             "Thank you for your purchase! Your order has been successfully placed and you'll receive a confirmation email shortly.",
     },
 });
-
-// Computed order details
-const orderDetails = {
-    orderNumber: `Order #${props.orderNumber}`,
-    deliveryEstimate: props.deliveryEstimate,
-};
 </script>
 
 <template>

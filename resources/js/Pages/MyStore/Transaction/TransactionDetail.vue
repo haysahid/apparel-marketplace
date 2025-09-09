@@ -51,7 +51,7 @@ window.onpopstate = function () {
 </script>
 
 <template>
-    <MyStoreLayout :title="`#${props.transaction.code}`" :showTitle="true">
+    <MyStoreLayout :title="`${props.transaction.code}`" :showTitle="true">
         <DefaultCard :isMain="true">
             <OrderDetail
                 :transaction="props.transaction"

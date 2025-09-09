@@ -7,6 +7,7 @@ use App\Http\Controllers\MyStore\MyStoreProductController;
 use App\Http\Controllers\MyStore\MyStoreBrandController;
 use App\Http\Controllers\MyStore\MyStoreCategoryController;
 use App\Http\Controllers\MyStore\MyStoreColorController;
+use App\Http\Controllers\MyStore\MyStoreCustomerController;
 use App\Http\Controllers\MyStore\MyStoreOrderController;
 use App\Http\Controllers\MyStore\MyStoreSizeController;
 use App\Http\Controllers\MyStore\MyStoreTransactionController;
@@ -153,6 +154,9 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->grou
     Route::get('/voucher/{voucher}', [MyStoreVoucherController::class, 'edit'])->name('voucher.edit');
     Route::post('/voucher/{voucher}', [MyStoreVoucherController::class, 'update'])->name('voucher.update');
     Route::delete('/voucher/{voucher}', [MyStoreVoucherController::class, 'destroy'])->name('voucher.destroy');
+
+    // Customer
+    Route::get('/customer', [MyStoreCustomerController::class, 'index'])->name('customer');
 
     // Report
     Route::get('/report', [MyStoreReportController::class, 'index'])->name('report');

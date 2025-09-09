@@ -15,16 +15,18 @@ import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import AdminItemCard from "@/Components/AdminItemCard.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
+import MyCustomerCard from "./Customer/MyCustomerCard.vue";
 
 const screenSize = useScreenSize();
 
 const props = defineProps({
-    colors: null,
+    customers: null,
 });
 
-const colors = ref(
-    props.colors.data.map((color) => ({
-        ...color,
+const customers = ref(
+    props.customers.data.map((customer) => ({
+        ...customer,
+        avatar: customer.avatar ? "/storage/" + customer.avatar : null,
         showDeleteModal: false,
     }))
 );
@@ -38,59 +40,60 @@ const getQueryParams = () => {
 };
 getQueryParams();
 
-function getColors() {
+function getCustomers() {
     let queryParams = {};
 
     if (filters.search) queryParams.search = filters.search;
 
-    router.get(route("my-store.color"), queryParams, {
+    router.get(route("my-store.customer"), queryParams, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
             getQueryParams();
-            colors.value = props.colors.data.map((color) => ({
-                ...color,
+            customers.value = props.customers.data.map((brand) => ({
+                ...brand,
+                avatar: brand.avatar ? "/storage/" + brand.avatar : null,
                 showDeleteModal: false,
             }));
         },
     });
 }
 
-const selectedColor = ref(null);
-const showDeleteColorDialog = ref(false);
+const selectedCustomer = ref(null);
+const showDeleteCustomerDialog = ref(false);
 
-const openDeleteColorDialog = (color) => {
-    if (color) {
-        selectedColor.value = color;
-        showDeleteColorDialog.value = true;
+const openDeleteCustomerDialog = (customer) => {
+    if (customer) {
+        selectedCustomer.value = customer;
+        showDeleteCustomerDialog.value = true;
     }
 };
 
-const closeDeleteColorDialog = (result) => {
-    showDeleteColorDialog.value = false;
+const closeDeleteCustomerDialog = (result) => {
+    showDeleteCustomerDialog.value = false;
     if (result) {
-        selectedColor.value = null;
+        selectedCustomer.value = null;
         openSuccessDialog("Data Berhasil Dihapus");
-        colors.value = colors.value.filter(
-            (b) => b.id !== selectedColor.value?.id
+        customers.value = customers.value.filter(
+            (b) => b.id !== selectedCustomer.value?.id
         );
     }
 };
 
-const deleteColor = () => {
-    if (selectedColor.value) {
+const deleteCustomer = () => {
+    if (selectedCustomer.value) {
         const form = useForm();
         form.delete(
-            route("my-store.color.destroy", {
-                color: selectedColor.value,
+            route("my-store.brand.destroy", {
+                brand: selectedCustomer.value,
             }),
             {
                 onError: (errors) => {
                     openErrorDialog(errors.error);
                 },
                 onSuccess: () => {
-                    closeDeleteColorDialog(true);
-                    getColors();
+                    closeDeleteCustomerDialog(true);
+                    getCustomers();
                 },
             }
         );
@@ -115,11 +118,9 @@ const openErrorDialog = (message) => {
 
 const page = usePage();
 
-function canEdit(color) {
-    return (
-        page.props.auth.is_admin ||
-        page.props.auth.user.stores.some((store) => store.id === color.store_id)
-    );
+function canEdit(customer) {
+    return false;
+    // return page.props.auth.is_admin;
 }
 
 onMounted(() => {
@@ -130,21 +131,21 @@ onMounted(() => {
 </script>
 
 <template>
-    <MyStoreLayout title="Warna" :showTitle="true">
+    <MyStoreLayout title="Pelanggan" :showTitle="true">
         <DefaultCard :isMain="true">
-            <div class="flex items-center justify-between gap-4">
-                <PrimaryButton
+            <div class="flex items-center justify-end gap-4">
+                <!-- <PrimaryButton
                     type="button"
                     class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
-                    @click="$inertia.visit(route('my-store.color.create'))"
+                    @click="$inertia.visit(route('my-store.brand.create'))"
                 >
                     Tambah
-                </PrimaryButton>
+                </PrimaryButton> -->
                 <TextInput
                     v-model="filters.search"
-                    placeholder="Cari warna..."
+                    placeholder="Cari pelanggan..."
                     class="max-w-48"
-                    @keyup.enter="getColors()"
+                    @keyup.enter="getCustomers()"
                 >
                     <template #suffix>
                         <svg
@@ -172,102 +173,113 @@ onMounted(() => {
             <!-- Table -->
             <DefaultTable
                 v-if="screenSize.is('xl')"
-                :isEmpty="colors.length === 0"
+                :isEmpty="customers.length === 0"
                 class="mt-6"
             >
                 <template #thead>
                     <tr>
                         <th class="w-12">No</th>
-                        <th>Warna</th>
-                        <th>Kode Warna</th>
+                        <th>Pelanggan</th>
+                        <th>Email</th>
+                        <th>No. HP</th>
+                        <th>Jenis</th>
                         <th class="w-24">Aksi</th>
                     </tr>
                 </template>
                 <template #tbody>
-                    <tr v-for="(color, index) in colors" :key="color.id">
+                    <tr
+                        v-for="(customer, index) in customers"
+                        :key="customer.id"
+                    >
                         <td>
                             {{
                                 index +
                                 1 +
-                                (props.colors.current_page - 1) *
-                                    props.colors.per_page
+                                (props.customers.current_page - 1) *
+                                    props.customers.per_page
                             }}
                         </td>
                         <td>
-                            {{ color.name }}
-                        </td>
-                        <td>
-                            <div
-                                v-if="color.hex_code"
-                                class="flex items-center gap-2"
-                            >
-                                <span
-                                    class="inline-block w-4 h-4 rounded-full"
-                                    :style="{
-                                        backgroundColor: color.hex_code,
-                                    }"
-                                ></span>
-                                <p>{{ color.hex_code }}</p>
+                            <div class="flex items-center gap-3">
+                                <img
+                                    v-if="customer.avatar"
+                                    :src="customer.avatar"
+                                    alt="Foto Pelanggan"
+                                    class="object-contain rounded-full size-8"
+                                />
+                                <svg
+                                    v-else
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="44"
+                                    height="44"
+                                    viewBox="0 0 44 44"
+                                    class="size-8 fill-gray-400"
+                                >
+                                    <path
+                                        fill-rule="evenodd"
+                                        clip-rule="evenodd"
+                                        d="M40.3333 22.0003C40.3333 32.1258 32.1255 40.3337 22 40.3337C11.8745 40.3337 3.66663 32.1258 3.66663 22.0003C3.66663 11.8748 11.8745 3.66699 22 3.66699C32.1255 3.66699 40.3333 11.8748 40.3333 22.0003ZM27.5 16.5003C27.5 17.959 26.9205 19.358 25.889 20.3894C24.8576 21.4209 23.4586 22.0003 22 22.0003C20.5413 22.0003 19.1423 21.4209 18.1109 20.3894C17.0794 19.358 16.5 17.959 16.5 16.5003C16.5 15.0416 17.0794 13.6427 18.1109 12.6112C19.1423 11.5798 20.5413 11.0003 22 11.0003C23.4586 11.0003 24.8576 11.5798 25.889 12.6112C26.9205 13.6427 27.5 15.0416 27.5 16.5003ZM22 37.5837C25.1465 37.5887 28.2201 36.6366 30.8128 34.8538C31.9201 34.093 32.3931 32.6447 31.7478 31.4658C30.415 29.022 27.665 27.5003 22 27.5003C16.335 27.5003 13.585 29.022 12.2503 31.4658C11.6068 32.6447 12.0798 34.093 13.1871 34.8538C15.7798 36.6366 18.8535 37.5887 22 37.5837Z"
+                                    />
+                                </svg>
+                                <p>{{ customer.name }}</p>
                             </div>
                         </td>
+                        <td class="!whitespace-normal">
+                            {{ customer.email }}
+                        </td>
+                        <td class="!whitespace-normal">
+                            {{ customer.phone }}
+                        </td>
+                        <td class="!whitespace-normal">
+                            {{ customer.role.name }}
+                        </td>
                         <td>
-                            <div class="flex items-center justify-start gap-2">
-                                <AdminItemAction
-                                    v-if="canEdit(color)"
-                                    @edit="
-                                        $inertia.visit(
-                                            route('my-store.color.edit', {
-                                                color: color,
-                                            })
-                                        )
-                                    "
-                                    @delete="openDeleteColorDialog(color)"
-                                />
-                                <InfoTooltip
-                                    v-if="!canEdit(color)"
-                                    :id="`table-tooltip-hint-${color.id}`"
-                                    text="Warna bawaan sistem"
-                                />
-                            </div>
+                            <AdminItemAction
+                                v-if="canEdit(customer)"
+                                @edit="
+                                    $inertia.visit(
+                                        route('my-store.brand.edit', {
+                                            brand: customer,
+                                        })
+                                    )
+                                "
+                                @delete="openDeleteCustomerDialog(customer)"
+                            />
+                            <InfoTooltip
+                                v-if="!canEdit(customer)"
+                                :id="`table-tooltip-hint-${customer.id}`"
+                                text="Pelanggan tidak dapat diedit atau dihapus"
+                            />
                         </td>
                     </tr>
                 </template>
             </DefaultTable>
 
             <!-- Mobile View -->
-            <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
+            <div
+                v-if="!screenSize.is('xl')"
+                class="flex flex-col gap-3 mt-4"
+                :class="{ 'min-h-auto h-[68vh]': customers.length == 0 }"
+            >
                 <div
-                    v-if="colors.length > 0"
-                    class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+                    v-if="customers.length > 0"
+                    class="grid grid-cols-1 gap-3 sm:grid-cols-2"
                 >
-                    <AdminItemCard
-                        v-for="(color, index) in colors"
-                        :key="color.id"
-                        :name="color.name"
-                        :showImage="false"
-                        :description="color.hex_code"
-                        :hideActions="!canEdit(color)"
-                        disabledHint="Warna bawaan sistem"
+                    <MyCustomerCard
+                        v-for="(customer, index) in customers"
+                        :key="customer.id"
+                        :customer="customer"
                         @edit="
                             $inertia.visit(
-                                route('my-store.color.edit', {
-                                    color: color,
+                                route('my-store.brand.edit', {
+                                    brand: customer,
                                 })
                             )
                         "
-                        @delete="openDeleteColorDialog(color)"
-                    >
-                        <template #leading>
-                            <div
-                                class="inline-block rounded-full size-6 aspect-square"
-                                :style="{
-                                    backgroundColor: color.hex_code,
-                                }"
-                            ></div>
-                        </template>
-                    </AdminItemCard>
+                        @delete="openDeleteCustomerDialog(customer)"
+                    />
                 </div>
-                <div v-else class="flex items-center justify-center h-[40vh]">
+                <div v-else class="flex items-center justify-center h-[90%]">
                     <p class="text-sm text-center text-gray-500">
                         Data tidak ditemukan.
                     </p>
@@ -275,20 +287,24 @@ onMounted(() => {
             </div>
 
             <!-- Pagination -->
-            <div v-if="props.colors.total > 0" class="flex flex-col gap-2 mt-4">
+            <div
+                v-if="props.customers.total > 0"
+                class="flex flex-col gap-2 mt-4"
+            >
                 <p class="text-xs text-gray-500 sm:text-sm">
-                    Menampilkan {{ props.colors.from }} -
-                    {{ props.colors.to }} dari {{ props.colors.total }} item
+                    Menampilkan {{ props.customers.from }} -
+                    {{ props.customers.to }} dari
+                    {{ props.customers.total }} item
                 </p>
-                <DefaultPagination :links="props.colors.links" />
+                <DefaultPagination :links="props.customers.links" />
             </div>
         </DefaultCard>
 
         <DeleteConfirmationDialog
-            :show="showDeleteColorDialog"
-            :title="`Hapus Kategori <b>${selectedColor?.name}</b>?`"
-            @close="closeDeleteColorDialog()"
-            @delete="deleteColor()"
+            :show="showDeleteCustomerDialog"
+            :title="`Hapus Pelanggan <b>${selectedCustomer?.name}</b>?`"
+            @close="closeDeleteCustomerDialog()"
+            @delete="deleteCustomer()"
         />
 
         <SuccessDialog

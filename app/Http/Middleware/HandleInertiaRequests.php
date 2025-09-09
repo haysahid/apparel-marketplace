@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Role;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -37,6 +38,9 @@ class HandleInertiaRequests extends Middleware
             'stores',
         ])->find($request->user()?->id);
 
+        $selectedStore = $user?->stores->firstWhere('id', session('selected_store_id'));
+        $selectedStoreRole = $selectedStore ? Role::find($selectedStore->pivot->role_id) : null;
+
         return [
             ...parent::share($request),
             'auth' => [
@@ -59,9 +63,8 @@ class HandleInertiaRequests extends Middleware
                 return Setting::all()->pluck('value', 'key');
             },
             'selected_store_id' => session('selected_store_id'),
-            'selected_store' => function () use ($user) {
-                return $user?->stores->firstWhere('id', session('selected_store_id'));
-            },
+            'selected_store' => $selectedStore,
+            'selected_store_role' => $selectedStoreRole,
         ];
     }
 }

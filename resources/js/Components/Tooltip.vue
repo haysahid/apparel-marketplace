@@ -22,7 +22,7 @@ onMounted(() => {
     <div
         :data-tooltip-target="props.id"
         :data-tooltip-placement="props.placement"
-        class="relative"
+        class="relative w-fit"
     >
         <slot></slot>
         <div

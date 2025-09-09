@@ -31,4 +31,24 @@ class UserRepository
             throw $e;
         }
     }
+
+    public static function getCustomers(
+        $storeId,
+        $limit = 10,
+        $search = null,
+        $orderBy = 'created_at',
+        $orderDirection = 'desc'
+    ) {
+        $query = User::with(['role'])->where('role_id', 8);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('email', 'like', "%$search%");
+            });
+        }
+
+        return $query->orderBy($orderBy, $orderDirection)
+            ->paginate($limit);
+    }
 }
