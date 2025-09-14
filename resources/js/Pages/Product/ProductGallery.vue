@@ -61,7 +61,7 @@ const goToNextImage = () => {
     >
         <!-- Main Images -->
         <div
-            class="relative flex items-center justify-center w-full overflow-hidden transition-all duration-300 ease-in-out rounded-lg group"
+            class="relative flex items-center justify-center w-full overflow-hidden transition-all duration-300 ease-in-out border border-gray-100 rounded-lg group"
         >
             <img
                 :src="'/storage/' + image.image"

@@ -69,7 +69,14 @@ window.onpopstate = function () {
 </script>
 
 <template>
-    <MyStoreLayout :title="`${props.invoice.code}`" :showTitle="true">
+    <MyStoreLayout
+        :title="`${props.invoice.code}`"
+        :showTitle="true"
+        :breadcrumbs="[
+            { text: 'Pesanan', url: '/my-store/order', active: false },
+            { text: props.invoice.code, active: true },
+        ]"
+    >
         <DefaultCard :isMain="true">
             <InvoiceDetail
                 :invoice="props.invoice"

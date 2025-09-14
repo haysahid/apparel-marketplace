@@ -12,7 +12,14 @@ const props = defineProps({
 </script>
 
 <template>
-    <MyStoreLayout title="Ubah Ukuran" :showTitle="true">
+    <MyStoreLayout
+        title="Ubah Ukuran"
+        :showTitle="true"
+        :breadcrumbs="[
+            { text: 'Ukuran', url: '/my-store/size', active: false },
+            { text: 'Ubah Ukuran', active: true },
+        ]"
+    >
         <div class="max-w-7xl">
             <DefaultCard>
                 <CategoryForm :size="props.size" />

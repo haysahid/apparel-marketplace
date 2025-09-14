@@ -5,7 +5,14 @@ import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 </script>
 
 <template>
-    <MyStoreLayout title="Tambah Sertifikat" :showTitle="true">
+    <MyStoreLayout
+        title="Tambah Sertifikat"
+        :showTitle="true"
+        :breadcrumbs="[
+            { text: 'Sertifikat', url: '/my-store/certificate', active: false },
+            { text: 'Tambah Sertifikat', active: true },
+        ]"
+    >
         <div class="max-w-7xl">
             <DefaultCard>
                 <CertificateForm />

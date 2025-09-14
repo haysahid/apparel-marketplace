@@ -51,7 +51,14 @@ window.onpopstate = function () {
 </script>
 
 <template>
-    <MyStoreLayout :title="`${props.transaction.code}`" :showTitle="true">
+    <MyStoreLayout
+        :title="`${props.transaction.code}`"
+        :showTitle="true"
+        :breadcrumbs="[
+            { text: 'Transaksi', url: '/my-store/transaction', active: false },
+            { text: props.transaction.code, active: true },
+        ]"
+    >
         <DefaultCard :isMain="true">
             <OrderDetail
                 :transaction="props.transaction"

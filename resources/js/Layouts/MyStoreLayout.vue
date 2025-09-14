@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Head } from "@inertiajs/vue3";
 import Banner from "@/Components/Banner.vue";
 import MyStoreHeader from "@/Components/MyStoreHeader.vue";
@@ -13,6 +13,10 @@ defineProps({
     showTitle: {
         type: Boolean,
         default: false,
+    },
+    breadcrumbs: {
+        type: Array as () => BreadcrumbItemModel[],
+        default: null,
     },
 });
 </script>
@@ -34,21 +38,49 @@ defineProps({
                 <!-- Header -->
                 <MyStoreHeader>
                     <template v-if="showTitle" #leading>
-                        <div
-                            class="flex items-center justify-between gap-4 rounded-lg"
-                        >
-                            <div class="flex flex-col items-start max-w-7xl">
-                                <h1 class="text-lg font-semibold">
-                                    {{ title }}
-                                </h1>
-                                <p
-                                    v-if="subtitle"
-                                    class="text-xs text-gray-500"
+                        <div>
+                            <!-- Title -->
+                            <div
+                                class="flex items-center justify-between gap-4 rounded-lg"
+                            >
+                                <div
+                                    class="flex flex-col items-start max-w-7xl"
                                 >
-                                    {{ subtitle }}
-                                </p>
+                                    <h1 class="text-lg font-semibold">
+                                        {{ title }}
+                                    </h1>
+                                    <p
+                                        v-if="subtitle"
+                                        class="text-xs text-gray-500"
+                                    >
+                                        {{ subtitle }}
+                                    </p>
+                                </div>
+                                <slot name="trailing"></slot>
                             </div>
-                            <slot name="trailing"></slot>
+
+                            <!-- Breadcrumbs -->
+                            <p
+                                v-if="breadcrumbs && breadcrumbs.length > 0"
+                                class="text-xs text-gray-500"
+                            >
+                                <template
+                                    v-for="(breadcrumb, index) in breadcrumbs"
+                                    :key="index"
+                                >
+                                    <span v-if="index > 0" class="mx-1">/</span>
+                                    <a
+                                        v-if="breadcrumb.url"
+                                        :href="breadcrumb.url"
+                                        class="text-gray-500 hover:underline"
+                                    >
+                                        {{ breadcrumb.text }}
+                                    </a>
+                                    <span v-else class="text-gray-500">
+                                        {{ breadcrumb.text }}
+                                    </span>
+                                </template>
+                            </p>
                         </div>
                     </template>
                 </MyStoreHeader>

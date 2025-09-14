@@ -12,7 +12,14 @@ const props = defineProps({
 </script>
 
 <template>
-    <MyStoreLayout title="Ubah Kategori" :showTitle="true">
+    <MyStoreLayout
+        title="Ubah Kategori"
+        :showTitle="true"
+        :breadcrumbs="[
+            { text: 'Kategori', url: '/my-store/category', active: false },
+            { text: 'Ubah Kategori', active: true },
+        ]"
+    >
         <div class="max-w-7xl">
             <DefaultCard>
                 <CategoryForm :category="props.category" />

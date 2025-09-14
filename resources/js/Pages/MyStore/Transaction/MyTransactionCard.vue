@@ -30,7 +30,7 @@ const emit = defineEmits(["edit"]);
                         "
                         class="text-sm font-medium text-gray-900 md:text-base hover:text-primary"
                     >
-                        #{{ transaction.code }}
+                        {{ transaction.code }}
                     </Link>
                     <OrderStatusChip
                         :status="transaction.status"

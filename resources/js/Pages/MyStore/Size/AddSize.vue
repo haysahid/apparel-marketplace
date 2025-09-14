@@ -5,7 +5,14 @@ import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 </script>
 
 <template>
-    <MyStoreLayout title="Tambah Ukuran" :showTitle="true">
+    <MyStoreLayout
+        title="Tambah Ukuran"
+        :showTitle="true"
+        :breadcrumbs="[
+            { text: 'Ukuran', url: '/my-store/size', active: false },
+            { text: 'Tambah Ukuran', active: true },
+        ]"
+    >
         <div class="max-w-7xl">
             <DefaultCard>
                 <CategoryForm />

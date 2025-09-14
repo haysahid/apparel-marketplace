@@ -12,7 +12,14 @@ const props = defineProps({
 </script>
 
 <template>
-    <MyStoreLayout title="Ubah Brand" :showTitle="true">
+    <MyStoreLayout
+        title="Ubah Brand"
+        :showTitle="true"
+        :breadcrumbs="[
+            { text: 'Brand', url: '/my-store/brand', active: false },
+            { text: 'Ubah Brand', active: true },
+        ]"
+    >
         <div class="max-w-7xl">
             <DefaultCard>
                 <BrandForm :brand="props.brand" />

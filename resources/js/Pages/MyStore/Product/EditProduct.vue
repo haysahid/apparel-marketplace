@@ -12,7 +12,14 @@ const props = defineProps({
 </script>
 
 <template>
-    <MyStoreLayout title="Ubah Produk" :showTitle="true">
+    <MyStoreLayout
+        title="Ubah Produk"
+        :showTitle="true"
+        :breadcrumbs="[
+            { text: 'Produk', url: '/my-store/product', active: false },
+            { text: 'Ubah Produk', active: true },
+        ]"
+    >
         <ProductForm :product="props.product" />
     </MyStoreLayout>
 </template>

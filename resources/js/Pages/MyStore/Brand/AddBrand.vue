@@ -5,7 +5,14 @@ import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 </script>
 
 <template>
-    <MyStoreLayout title="Tambah Brand" :showTitle="true">
+    <MyStoreLayout
+        title="Tambah Brand"
+        :showTitle="true"
+        :breadcrumbs="[
+            { text: 'Brand', url: '/my-store/brand', active: false },
+            { text: 'Tambah Brand', active: true },
+        ]"
+    >
         <div class="max-w-7xl">
             <DefaultCard>
                 <BrandForm />

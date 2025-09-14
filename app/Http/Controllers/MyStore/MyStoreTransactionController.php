@@ -24,53 +24,17 @@ class MyStoreTransactionController extends Controller
         $brandId = $request->input('brand_id');
         $search = $request->input('search');
 
-        $transactions = Transaction::query()->with([
-            'user',
-            'payment_method',
-            'shipping_method',
-            'items.variant.product.brand',
-        ]);
-
-        if ($brandId) {
-            $transactions->whereHas('items.variant.product.brand', function ($query) use ($brandId) {
-                $query->where('id', $brandId);
-            });
-        }
-
-        if ($search) {
-            $transactions->where(function ($query) use ($search) {
-                $query->whereHas('invoices', function ($q) use ($search) {
-                    $q->where('code', 'like', '%' . $search . '%');
-                })
-                    ->orWhereHas('user', function ($q) use ($search) {
-                        $q->where('name', 'like', '%' . $search . '%');
-                    })
-                    ->orWhereHas('items.variant', function ($q) use ($search) {
-                        $q->where('motif', 'like', '%' . $search . '%')
-                            ->orWhereHas('color', function ($q) use ($search) {
-                                $q->where('name', 'like', '%' . $search . '%');
-                            })
-                            ->orWhereHas('size', function ($q) use ($search) {
-                                $q->where('name', 'like', '%' . $search . '%');
-                            })
-                            ->where('material', 'like', '%' . $search . '%');
-                    })
-                    ->orWhereHas('items.variant.product', function ($q) use ($search) {
-                        $q->where('name', 'like', '%' . $search . '%')
-                            ->orWhereHas('brand', function ($q) use ($search) {
-                                $q->where('name', 'like', '%' . $search . '%');
-                            })
-                            ->orWhereHas('categories', function ($q) use ($search) {
-                                $q->where('name', 'like', '%' . $search . '%');
-                            });
-                    });
-            });
-        }
-
-        $transactions->orderBy($orderBy, $orderDirection);
+        $transactions = TransactionRepository::getTransactions(
+            storeId: session('selected_store_id'),
+            limit: $limit,
+            search: $search,
+            orderBy: $orderBy,
+            orderDirection: $orderDirection,
+            brandId: $brandId,
+        );
 
         return Inertia::render('MyStore/Transaction', [
-            'transactions' => $transactions->paginate($limit)->withQueryString(),
+            'transactions' => $transactions,
             'brands' => Brand::orderBy('name', 'asc')->get(),
         ]);
     }

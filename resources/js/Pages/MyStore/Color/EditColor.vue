@@ -12,7 +12,14 @@ const props = defineProps({
 </script>
 
 <template>
-    <MyStoreLayout title="Ubah Warna" :showTitle="true">
+    <MyStoreLayout
+        title="Ubah Warna"
+        :showTitle="true"
+        :breadcrumbs="[
+            { text: 'Warna', url: '/my-store/color', active: false },
+            { text: 'Ubah Warna', active: true },
+        ]"
+    >
         <div class="max-w-7xl">
             <DefaultCard>
                 <ColorForm :color="props.color" />

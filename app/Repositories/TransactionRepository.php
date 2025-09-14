@@ -13,9 +13,66 @@ use Illuminate\Support\Facades\Log;
 
 class TransactionRepository
 {
+    public static function getTransactions(
+        $storeId = null,
+        $limit = 10,
+        $search = null,
+        $orderBy = 'created_at',
+        $orderDirection = 'desc',
+        $brandId = null,
+    ) {
+        $transactions = Transaction::query();
+
+        $transactions->with([
+            'user',
+            'payment_method',
+            'shipping_method',
+            'items.variant.product.brand',
+            'invoices' => function ($query) use ($storeId) {
+                if ($storeId) {
+                    $query->where('store_id', $storeId);
+                }
+            },
+        ]);
+
+        if ($brandId) {
+            $transactions->whereHas('items.variant.product.brand', function ($query) use ($brandId) {
+                $query->where('id', $brandId);
+            });
+        }
+
+        if ($search) {
+            $transactions->where(function ($query) use ($search) {
+                $query->where('code', 'like', '%' . $search . '%')
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('name', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('items.variant', function ($q) use ($search) {
+                        $q->where('motif', 'like', '%' . $search . '%')
+                            ->orWhereHas('color', function ($q) use ($search) {
+                                $q->where('name', 'like', '%' . $search . '%');
+                            })
+                            ->orWhereHas('size', function ($q) use ($search) {
+                                $q->where('name', 'like', '%' . $search . '%');
+                            })
+                            ->where('material', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('items.variant.product', function ($q) use ($search) {
+                        $q->where('name', 'like', '%' . $search . '%')
+                            ->orWhereHas('brand', function ($q) use ($search) {
+                                $q->where('name', 'like', '%' . $search . '%');
+                            });
+                    });
+            });
+        }
+
+        $transactions->orderBy($orderBy, $orderDirection);
+        return $transactions->paginate($limit);
+    }
+
     public static function getTransactionDetail($transactionCode, $storeId = null)
     {
-        $transaction = Transaction::with(['payment_method', 'shipping_method', 'payments'])
+        $transaction = Transaction::with(['user', 'payment_method', 'shipping_method', 'payments'])
             ->where('code', $transactionCode)
             ->firstOrFail();
         $invoices = Invoice::with(['store'])->where(function ($query) use ($transaction, $storeId) {

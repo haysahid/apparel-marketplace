@@ -174,12 +174,21 @@ const handleScroll = () => {
 onMounted(() => {
     window.addEventListener("scroll", handleScroll);
 });
+
+const breadcrumbs = [
+    { text: "Katalog", url: route("catalog") },
+    {
+        text: props.product.brand.name,
+        url: route("catalog", { brands: props.product.brand.name }),
+    },
+    { text: props.product.name, active: true },
+];
 </script>
 
 <template>
     <LandingLayout title="Detail Produk">
         <div
-            class="p-6 sm:p-12 lg:px-[100px] lg:py-[60px] flex flex-col gap-12 lg:gap-20"
+            class="p-6 lg:px-[100px] lg:pb-[60px] lg:pt-6 flex flex-col gap-12 lg:gap-20"
         >
             <!-- Detail -->
             <section
@@ -187,6 +196,31 @@ onMounted(() => {
                 data-aos-duration="600"
                 class="flex flex-col gap-8 mx-auto max-w-7xl"
             >
+                <!-- Breadcrumbs -->
+                <div
+                    v-if="breadcrumbs && breadcrumbs.length > 0"
+                    class="p-4 rounded-lg bg-gray-50"
+                >
+                    <p class="text-sm text-gray-500">
+                        <template
+                            v-for="(breadcrumb, index) in breadcrumbs"
+                            :key="index"
+                        >
+                            <span v-if="index > 0" class="mx-1">/</span>
+                            <a
+                                v-if="breadcrumb.url"
+                                :href="breadcrumb.url"
+                                class="text-gray-500 hover:underline"
+                            >
+                                {{ breadcrumb.text }}
+                            </a>
+                            <span v-else class="text-gray-500">
+                                {{ breadcrumb.text }}
+                            </span>
+                        </template>
+                    </p>
+                </div>
+
                 <div
                     class="grid justify-center grid-cols-1 mx-auto gap-x-8 gap-y-4 md:grid-cols-2 md:gap-14"
                 >
@@ -196,7 +230,7 @@ onMounted(() => {
                             orderForm?.selectedVariant?.name ||
                             props.product.name
                         "
-                        class="top-0 p-2 lg:sticky h-fit"
+                        class="top-0 lg:sticky h-fit"
                         :class="{
                             'lg:top-[132px]': scrolled,
                         }"

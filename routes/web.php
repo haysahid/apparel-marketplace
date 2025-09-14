@@ -41,6 +41,7 @@ Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 
 Route::get('/checkout-guest', [OrderController::class, 'checkoutGuest'])->name('checkout.guest');
 Route::get('/order-success-guest', [OrderController::class, 'orderSuccessGuest'])->name('order.success.guest');
+Route::get('/my-order-guest/{invoice_code}', [OrderController::class, 'myOrderDetail'])->name('my-order.detail.guest');
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
@@ -132,12 +133,12 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->grou
     Route::delete('/brand/{brand}', [MyStoreBrandController::class, 'destroy'])->name('brand.destroy');
 
     // Product
-    Route::get('/products', [MyStoreProductController::class, 'index'])->name('product');
-    Route::get('/products/create', [MyStoreProductController::class, 'create'])->name('product.create');
-    Route::post('/products', [MyStoreProductController::class, 'store'])->name('product.store');
-    Route::get('/products/{product}', [MyStoreProductController::class, 'edit'])->name('product.edit');
-    Route::post('/products/{product}', [MyStoreProductController::class, 'update'])->name('product.update');
-    Route::delete('/products/{product}', [MyStoreProductController::class, 'destroy'])->name('product.destroy');
+    Route::get('/product', [MyStoreProductController::class, 'index'])->name('product');
+    Route::get('/product/create', [MyStoreProductController::class, 'create'])->name('product.create');
+    Route::post('/product', [MyStoreProductController::class, 'store'])->name('product.store');
+    Route::get('/product/{product}', [MyStoreProductController::class, 'edit'])->name('product.edit');
+    Route::post('/product/{product}', [MyStoreProductController::class, 'update'])->name('product.update');
+    Route::delete('/product/{product}', [MyStoreProductController::class, 'destroy'])->name('product.destroy');
 
     // Transaction
     Route::get('/transaction', [MyStoreTransactionController::class, 'index'])->name('transaction');

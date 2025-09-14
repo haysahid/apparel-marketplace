@@ -277,9 +277,9 @@ onMounted(() => {
                                         transaction: transaction,
                                     })
                                 "
-                                class="font-semibold text-center hover:text-primary"
+                                class="hover:underline"
                             >
-                                #{{ transaction.code }}
+                                {{ transaction.code }}
                             </Link>
                         </td>
                         <td class="text-center">

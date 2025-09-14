@@ -24,7 +24,7 @@ class MyStoreOrderController extends Controller
      */
     public function index(Request $request)
     {
-        $limit = $request->input('limit', 5);
+        $limit = $request->input('limit', 10);
         $search = $request->input('search');
         $orderBy = $request->input('order_by', 'created_at');
         $orderDirection = $request->input('order_direction', 'desc');

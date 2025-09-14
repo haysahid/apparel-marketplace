@@ -5,6 +5,8 @@ import formatDate from "@/plugins/date-formatter";
 import OrderGroup from "./OrderGroup.vue";
 import OrderSummaryCard from "./OrderSummaryCard.vue";
 import DetailRow from "@/Components/DetailRow.vue";
+import InfoHint from "@/Components/InfoHint.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 const props = defineProps({
     transaction: {
@@ -363,6 +365,13 @@ setTimeout(() => {
         100;
 }, 100);
 
+function confirmWhatsApp() {
+    const phone = "6283861999797";
+    const message = `Halo, saya ingin mengkonfirmasi pesanan dengan kode transaksi ${props.transaction?.code}.`;
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
+}
+
 const emit = defineEmits(["continuePayment"]);
 </script>
 
@@ -371,7 +380,7 @@ const emit = defineEmits(["continuePayment"]);
         <!-- Tracking -->
         <div
             v-if="props.showTracking"
-            class="flex flex-col items-center gap-4 mx-auto w-fit sm:gap-6"
+            class="flex flex-col items-center gap-4 py-2 mx-auto w-fit sm:gap-6 sm:py-4"
         >
             <div
                 class="flex items-start justify-center gap-4 md:gap-8 lg:gap-12"
@@ -420,35 +429,62 @@ const emit = defineEmits(["continuePayment"]);
         </div>
 
         <!-- Warning -->
-        <div
+        <InfoHint
             v-if="
                 props.transaction.payment_method.slug === 'transfer' &&
                 props.transaction.status === 'pending'
             "
-            class="flex items-center w-full gap-2 p-4 mx-auto text-sm text-yellow-800 border border-yellow-300 rounded-xl bg-yellow-50 sm:text-base max-w-7xl"
+            type="warning"
         >
-            <span>
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    class="transition-colors duration-200 size-5 fill-yellow-800 sm:size-6"
-                >
-                    <path
-                        d="M12 17C12.2833 17 12.521 16.904 12.713 16.712C12.905 16.52 13.0007 16.2827 13 16V12C13 11.7167 12.904 11.4793 12.712 11.288C12.52 11.0967 12.2827 11.0007 12 11C11.7173 10.9993 11.48 11.0953 11.288 11.288C11.096 11.4807 11 11.718 11 12V16C11 16.2833 11.096 16.521 11.288 16.713C11.48 16.905 11.7173 17.0007 12 17ZM12 9C12.2833 9 12.521 8.904 12.713 8.712C12.905 8.52 13.0007 8.28267 13 8C12.9993 7.71733 12.9033 7.48 12.712 7.288C12.5207 7.096 12.2833 7 12 7C11.7167 7 11.4793 7.096 11.288 7.288C11.0967 7.48 11.0007 7.71733 11 8C10.9993 8.28267 11.0953 8.52033 11.288 8.713C11.4807 8.90567 11.718 9.00133 12 9ZM12 22C10.6167 22 9.31667 21.7373 8.1 21.212C6.88334 20.6867 5.825 19.9743 4.925 19.075C4.025 18.1757 3.31267 17.1173 2.788 15.9C2.26333 14.6827 2.00067 13.3827 2 12C1.99933 10.6173 2.262 9.31733 2.788 8.1C3.314 6.88267 4.02633 5.82433 4.925 4.925C5.82367 4.02567 6.882 3.31333 8.1 2.788C9.318 2.26267 10.618 2 12 2C13.382 2 14.682 2.26267 15.9 2.788C17.118 3.31333 18.1763 4.02567 19.075 4.925C19.9737 5.82433 20.6863 6.88267 21.213 8.1C21.7397 9.31733 22.002 10.6173 22 12C21.998 13.3827 21.7353 14.6827 21.212 15.9C20.6887 17.1173 19.9763 18.1757 19.075 19.075C18.1737 19.9743 17.1153 20.687 15.9 21.213C14.6847 21.739 13.3847 22.0013 12 22ZM12 20C14.2333 20 16.125 19.225 17.675 17.675C19.225 16.125 20 14.2333 20 12C20 9.76667 19.225 7.875 17.675 6.325C16.125 4.775 14.2333 4 12 4C9.76667 4 7.875 4.775 6.325 6.325C4.775 7.875 4 9.76667 4 12C4 14.2333 4.775 16.125 6.325 17.675C7.875 19.225 9.76667 20 12 20Z"
-                    />
-                </svg>
-            </span>
-            <p>
-                Segera<span
-                    class="font-semibold cursor-pointer hover:underline"
-                    @click="emit('continuePayment')"
-                >
-                    lanjutkan pembayaran </span
-                >agar pesanan Anda tidak dibatalkan.
-            </p>
-        </div>
+            <template #content>
+                <p>
+                    Segera<span
+                        class="font-semibold cursor-pointer hover:underline"
+                        @click="emit('continuePayment')"
+                    >
+                        lanjutkan pembayaran </span
+                    >agar pesanan Anda tidak dibatalkan.
+                </p>
+            </template>
+        </InfoHint>
+
+        <!-- Info -->
+        <!-- <InfoHint
+            v-if="
+                props.transaction.payment_method.slug === 'transfer' &&
+                props.transaction.status === 'paid'
+            "
+            type="success"
+        >
+            <template #content>
+                <div class="flex items-center justify-between w-full gap-2">
+                    <p>
+                        Pembayaran Anda telah diterima dan sedang diproses.
+                        Konfirmasi pesanan melalui WhatsApp untuk informasi
+                        lebih lanjut.
+                    </p>
+                    <PrimaryButton
+                        @click="confirmWhatsApp()"
+                        class="!bg-green-600 rounded-lg hover:!bg-green-700 py-2 !text-base !font-bold w-full sm:w-auto"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="25"
+                            viewBox="0 0 24 25"
+                            class="fill-white size-5"
+                        >
+                            <path
+                                d="M19.0498 5.60488C18.1329 4.67898 17.0408 3.94484 15.8373 3.44524C14.6338 2.94564 13.3429 2.69056 12.0398 2.69488C6.5798 2.69488 2.1298 7.14488 2.1298 12.6049C2.1298 14.3549 2.5898 16.0549 3.4498 17.5549L2.0498 22.6949L7.2998 21.3149C8.7498 22.1049 10.3798 22.5249 12.0398 22.5249C17.4998 22.5249 21.9498 18.0749 21.9498 12.6149C21.9498 9.96488 20.9198 7.47488 19.0498 5.60488ZM12.0398 20.8449C10.5598 20.8449 9.1098 20.4449 7.8398 19.6949L7.5398 19.5149L4.4198 20.3349L5.2498 17.2949L5.0498 16.9849C4.22735 15.6719 3.79073 14.1542 3.7898 12.6049C3.7898 8.06488 7.4898 4.36488 12.0298 4.36488C14.2298 4.36488 16.2998 5.22488 17.8498 6.78488C18.6174 7.54874 19.2257 8.45742 19.6394 9.45821C20.0531 10.459 20.264 11.532 20.2598 12.6149C20.2798 17.1549 16.5798 20.8449 12.0398 20.8449ZM16.5598 14.6849C16.3098 14.5649 15.0898 13.9649 14.8698 13.8749C14.6398 13.7949 14.4798 13.7549 14.3098 13.9949C14.1398 14.2449 13.6698 14.8049 13.5298 14.9649C13.3898 15.1349 13.2398 15.1549 12.9898 15.0249C12.7398 14.9049 11.9398 14.6349 10.9998 13.7949C10.2598 13.1349 9.7698 12.3249 9.6198 12.0749C9.4798 11.8249 9.5998 11.6949 9.7298 11.5649C9.8398 11.4549 9.9798 11.2749 10.0998 11.1349C10.2198 10.9949 10.2698 10.8849 10.3498 10.7249C10.4298 10.5549 10.3898 10.4149 10.3298 10.2949C10.2698 10.1749 9.7698 8.95488 9.5698 8.45488C9.3698 7.97488 9.1598 8.03488 9.0098 8.02488H8.5298C8.3598 8.02488 8.0998 8.08488 7.8698 8.33488C7.6498 8.58488 7.0098 9.18488 7.0098 10.4049C7.0098 11.6249 7.89981 12.8049 8.0198 12.9649C8.1398 13.1349 9.7698 15.6349 12.2498 16.7049C12.8398 16.9649 13.2998 17.1149 13.6598 17.2249C14.2498 17.4149 14.7898 17.3849 15.2198 17.3249C15.6998 17.2549 16.6898 16.7249 16.8898 16.1449C17.0998 15.5649 17.0998 15.0749 17.0298 14.9649C16.9598 14.8549 16.8098 14.8049 16.5598 14.6849Z"
+                            />
+                        </svg>
+                        <p class="font-semibold text-white">
+                            Konfirmasi Pesanan
+                        </p>
+                    </PrimaryButton>
+                </div>
+            </template>
+        </InfoHint> -->
 
         <!-- Details -->
         <LandingSection class="!flex-col !justify-start !min-h-[56vh]">
