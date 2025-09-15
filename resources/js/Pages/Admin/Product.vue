@@ -10,6 +10,7 @@ import SuccessDialog from "@/Components/SuccessDialog.vue";
 import TextInput from "@/Components/TextInput.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import DiscountTag from "@/Components/DiscountTag.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     products: {
@@ -33,10 +34,6 @@ const page = usePage();
 const products = ref(
     props.products.data.map((product) => ({
         ...product,
-        images: product.images.map((image) => ({
-            ...image,
-            image: image.image ? "/storage/" + image.image : null,
-        })),
         showDeleteModal: false,
     }))
 );
@@ -128,10 +125,6 @@ function getProducts() {
             getQueryParams();
             products.value = props.products.data.map((product) => ({
                 ...product,
-                images: product.images.map((image) => ({
-                    ...image,
-                    image: image.image ? "/storage/" + image.image : null,
-                })),
                 showDeleteModal: false,
             }));
         },
@@ -457,7 +450,7 @@ onMounted(() => {
                             <td>
                                 <img
                                     v-if="product.images.length > 0"
-                                    :src="product.images[0].image"
+                                    :src="getImageUrl(product.images[0].image)"
                                     :alt="product.name"
                                     class="object-cover h-[80px] sm:h-[120px] aspect-square rounded"
                                 />

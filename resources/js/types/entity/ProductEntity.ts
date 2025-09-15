@@ -13,6 +13,7 @@ interface ProductEntity {
     lowest_final_selling_price: number;
     highest_base_selling_price: number;
     highest_final_selling_price: number;
+    stock_count: number;
 
     // Relationships
     store: StoreEntity | null;

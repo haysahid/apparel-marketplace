@@ -20,6 +20,8 @@ import CategoryForm from "../Category/CategoryForm.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import VariantList from "./VariantList.vue";
 import TabButton from "@/Components/TabButton.vue";
+import axios from "axios";
+import { getImageUrl, isFile } from "@/plugins/helpers";
 
 const props = defineProps({
     product: {
@@ -29,52 +31,18 @@ const props = defineProps({
 });
 
 const form = useForm(
-    props.product
-        ? {
-              ...props.product,
-              categories: props.product?.categories || [],
-              images: [
-                  ...(props.product?.images?.map((image) => ({
-                      ...image,
-                      image: "/storage/" + image.image,
-                  })) || []),
-                  { id: "new-1", image: null },
-              ],
-              links: [
-                  ...(props.product?.links?.map(function (link) {
-                      if (!link.platform) return link;
-                      return {
-                          ...link,
-                          platform: {
-                              ...link.platform,
-                              icon: "/storage/" + link.platform.icon,
-                          },
-                      };
-                  }) || []),
-              ],
-              variants: [
-                  ...(props.product?.variants?.map((variant) => ({
-                      ...variant,
-                      images:
-                          variant.images?.map((image) => ({
-                              ...image,
-                              image: "/storage/" + image.image,
-                          })) || [],
-                  })) || []),
-              ],
-          }
-        : {
-              name: null,
-              sku_prefix: null,
-              brand_id: null,
-              brand: null,
-              discount: 0,
-              description: null,
-              categories: [],
-              images: [{ id: "new-1", image: null }],
-              links: [],
-              variants: [],
-          }
+    props.product || {
+        name: null,
+        sku_prefix: null,
+        brand_id: null,
+        brand: null,
+        discount: 0,
+        description: null,
+        categories: [],
+        images: [{ id: "new-1", image: null }],
+        links: [],
+        variants: [],
+    }
 );
 
 const drag = ref(false);
@@ -113,10 +81,7 @@ function uploadNewImage(image, index) {
             },
         })
         .then((response) => {
-            form.images[index] = {
-                ...response.data.result,
-                image: "/storage/" + response.data.result.image,
-            };
+            form.images[index] = response.data.result;
         })
         .catch((error) => {
             if (error.response?.data?.error) {
@@ -151,10 +116,7 @@ function updateImage(index, image) {
             }
         )
         .then((response) => {
-            form.images[index] = {
-                ...response.data.result,
-                image: "/storage/" + response.data.result.image,
-            };
+            form.images[index] = response.data.result;
         })
         .catch((error) => {
             if (error.response?.data?.error) {
@@ -241,11 +203,7 @@ function getVariants() {
             const product = response.data.result;
             form.variants = product.variants.map((variant) => ({
                 ...variant,
-                images:
-                    variant.images?.map((image) => ({
-                        ...image,
-                        image: "/storage/" + image.image,
-                    })) || [],
+                images: variant.images || [],
             }));
         })
         .catch((error) => {

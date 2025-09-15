@@ -9,6 +9,10 @@ const props = defineProps({
         type: Object as () => CartGroupModel,
         required: true,
     },
+    showStoreInfo: {
+        type: Boolean,
+        default: true,
+    },
 });
 
 const cartStore = useCartStore();
@@ -25,7 +29,10 @@ function formatPrice(price = 0) {
 <template>
     <div class="cart-group">
         <!-- Store Info -->
-        <div class="flex items-center justify-between w-full gap-4">
+        <div
+            v-if="props.showStoreInfo"
+            class="flex items-center justify-between w-full gap-4"
+        >
             <div class="flex items-center gap-4">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

@@ -65,6 +65,18 @@ class ProductVariantRepository
         }
     }
 
+    public static function getVariantById(string $id)
+    {
+        return ProductVariant::with(['color', 'size', 'unit', 'images'])->findOrFail($id);
+    }
+
+    public static function getVariantsByProductId(string $productId)
+    {
+        return ProductVariant::with(['color', 'size', 'unit', 'images'])
+            ->where('product_id', $productId)
+            ->get();
+    }
+
     public static function updateVariant(string $id, array $data)
     {
         try {

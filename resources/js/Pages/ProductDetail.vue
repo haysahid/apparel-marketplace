@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { Link } from "@inertiajs/vue3";
 import LandingLayout from "@/Layouts/LandingLayout.vue";
 import LandingSection from "@/Components/LandingSection.vue";
 import ProductCard from "@/Components/ProductCard.vue";
@@ -12,6 +11,7 @@ import { usePage } from "@inertiajs/vue3";
 import DiscountTag from "@/Components/DiscountTag.vue";
 import TextInput from "@/Components/TextInput.vue";
 import StoreCard from "@/Components/StoreCard.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const page = usePage();
 if (page.props.flash.access_token) {
@@ -373,7 +373,7 @@ const breadcrumbs = [
                             :finalPrice="product.lowest_final_selling_price"
                             :image="
                                 product.images && product.images.length > 0
-                                    ? '/storage/' + product.images[0].image
+                                    ? getImageUrl(product.images[0].image)
                                     : null
                             "
                             :description="product.brand?.name"

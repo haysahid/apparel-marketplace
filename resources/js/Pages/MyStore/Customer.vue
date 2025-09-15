@@ -16,6 +16,7 @@ import DefaultPagination from "@/Components/DefaultPagination.vue";
 import AdminItemCard from "@/Components/AdminItemCard.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
 import MyCustomerCard from "./Customer/MyCustomerCard.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const screenSize = useScreenSize();
 
@@ -26,7 +27,6 @@ const props = defineProps({
 const customers = ref(
     props.customers.data.map((customer) => ({
         ...customer,
-        avatar: customer.avatar ? "/storage/" + customer.avatar : null,
         showDeleteModal: false,
     }))
 );
@@ -52,7 +52,6 @@ function getCustomers() {
             getQueryParams();
             customers.value = props.customers.data.map((brand) => ({
                 ...brand,
-                avatar: brand.avatar ? "/storage/" + brand.avatar : null,
                 showDeleteModal: false,
             }));
         },
@@ -203,7 +202,7 @@ onMounted(() => {
                             <div class="flex items-center gap-3">
                                 <img
                                     v-if="customer.avatar"
-                                    :src="customer.avatar"
+                                    :src="getImageUrl(customer.avatar)"
                                     alt="Foto Pelanggan"
                                     class="object-contain rounded-full size-8"
                                 />

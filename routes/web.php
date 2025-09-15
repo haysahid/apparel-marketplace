@@ -146,6 +146,7 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->grou
 
     // Order
     Route::get('/order', [MyStoreOrderController::class, 'index'])->name('order');
+    Route::get('/order/create', [MyStoreOrderController::class, 'create'])->name('order.create');
     Route::get('/order/{invoice}', [MyStoreOrderController::class, 'edit'])->name('order.edit');
 
     // Voucher

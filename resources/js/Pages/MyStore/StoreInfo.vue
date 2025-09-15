@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { useForm } from "@inertiajs/vue3";
-import AdminLayout from "@/Layouts/AdminLayout.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
@@ -14,7 +13,6 @@ import IconTikTok from "@/Icons/IconTikTok.vue";
 import IconInstagram from "@/Icons/IconInstagram.vue";
 import IconFacebook from "@/Icons/IconFacebook.vue";
 import SocialLinkForm from "@/Pages/MyStore/Store/SocialLinkForm.vue";
-import Dropdown from "@/Components/Dropdown.vue";
 import axios from "axios";
 import useDebounce from "@/plugins/debounce";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
@@ -67,15 +65,7 @@ const form = useForm({
     ...props.store,
     rajaongkir_origin_id: props.store.rajaongkir_origin_id || null,
     rajaongkir_origin: null,
-    social_links: [
-        ...props.store.social_links.map(function (link) {
-            if (!link.icon) return link;
-            return {
-                ...link,
-                icon: "/storage/" + link.icon,
-            };
-        }),
-    ],
+    social_links: props.store.social_links || [],
 });
 
 // Initialize origin

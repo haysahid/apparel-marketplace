@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { getImageUrl } from "@/plugins/helpers";
+
 const props = defineProps({
     brand: {
         required: true,
@@ -22,7 +24,7 @@ const props = defineProps({
     >
         <img
             v-if="props.brand.logo"
-            :src="`/storage/${props.brand.logo}`"
+            :src="getImageUrl(props.brand.logo)"
             class="object-contain w-12 sm:w-16 aspect-square"
         />
         <div

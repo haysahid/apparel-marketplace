@@ -10,6 +10,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { Link } from "@inertiajs/vue3";
 import { usePage } from "@inertiajs/vue3";
 import CategoryCard from "@/Components/CategoryCard.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const page = usePage();
 if (page.props.flash.access_token) {
@@ -48,7 +49,7 @@ const props = defineProps({
             <img
                 v-for="brand in props.brands || []"
                 :key="brand.id"
-                :src="'/storage/' + brand.logo"
+                :src="getImageUrl(brand.logo)"
                 :alt="brand.name"
                 data-aos="zoom-in"
                 data-aos-duration="600"
@@ -124,7 +125,7 @@ const props = defineProps({
                                 :finalPrice="product.lowest_final_selling_price"
                                 :image="
                                     product.images && product.images.length > 0
-                                        ? '/storage/' + product.images[0].image
+                                        ? getImageUrl(product.images[0].image)
                                         : null
                                 "
                                 :description="product.brand?.name"
@@ -176,7 +177,7 @@ const props = defineProps({
                         >
                             <CategoryCard
                                 :name="category.name"
-                                :image="`/storage/${category.image}`"
+                                :image="getImageUrl(category.image)"
                             />
                         </Link>
                     </div>

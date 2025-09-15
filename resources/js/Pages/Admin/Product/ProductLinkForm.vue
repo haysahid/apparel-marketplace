@@ -6,6 +6,7 @@ import TextInput from "@/Components/TextInput.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import { computed, ref } from "vue";
 import { useForm, usePage } from "@inertiajs/vue3";
+import { getImageUrl } from "@/plugins/helpers";
 
 interface Platform {
     id: number;
@@ -31,12 +32,7 @@ const props = defineProps({
 const emit = defineEmits(["submit", "close"]);
 
 const page = usePage();
-const platforms = [
-    ...(page.props.platforms as Platform[]).map((platform) => ({
-        ...platform,
-        icon: "/storage/" + platform.icon,
-    })),
-];
+const platforms = page.props.platforms as Platform[];
 const filteredPlatforms = computed(() => {
     return platforms.filter((platform) =>
         platform.name.toLowerCase().includes(platformSearch.value.toLowerCase())
@@ -135,7 +131,7 @@ function submit() {
                                 #prefix
                             >
                                 <img
-                                    :src="form.platform.icon"
+                                    :src="getImageUrl(form.platform.icon)"
                                     alt="Platform Icon"
                                     class="absolute w-5 h-5 transform -translate-y-1/2 left-3 top-1/2"
                                 />
@@ -204,7 +200,7 @@ function submit() {
                             >
                                 <img
                                     v-if="platform.icon"
-                                    :src="platform.icon"
+                                    :src="getImageUrl(platform.icon)"
                                     alt="Platform Icon"
                                     class="inline-block w-5 h-5 mr-2"
                                 />

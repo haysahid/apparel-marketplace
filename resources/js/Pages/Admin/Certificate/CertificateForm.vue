@@ -7,6 +7,7 @@ import TextAreaInput from "@/Components/TextAreaInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import ImageInput from "@/Components/ImageInput.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     certificate: {
@@ -20,18 +21,11 @@ const props = defineProps({
 });
 
 const form = useForm(
-    props.certificate
-        ? {
-              ...props.certificate,
-              image: props.certificate.image
-                  ? "/storage/" + props.certificate.image
-                  : null,
-          }
-        : {
-              name: null,
-              description: null,
-              image: null,
-          }
+    props.certificate || {
+        name: null,
+        description: null,
+        image: null,
+    }
 );
 
 const submit = () => {

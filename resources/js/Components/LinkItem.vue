@@ -1,5 +1,6 @@
 <script setup>
 import { useSlots } from "vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     name: {
@@ -53,7 +54,7 @@ const getPlatformNameFromUrl = (url) => {
         <slot v-if="slots.icon" name="icon" />
         <img
             v-else-if="props.icon"
-            :src="props.icon"
+            :src="getImageUrl(props.icon)"
             alt="Platform Icon"
             class="text-blue-500 size-8 !fill-blue-500"
         />

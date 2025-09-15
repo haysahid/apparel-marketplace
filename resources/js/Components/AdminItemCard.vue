@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import AdminItemAction from "@/Components/AdminItemAction.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
-import Tooltip from "@/Components/Tooltip.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     name: {
@@ -29,6 +29,10 @@ const props = defineProps({
         type: String,
         default: null,
     },
+    imageClass: {
+        type: String,
+        default: "",
+    },
 });
 
 const emit = defineEmits(["edit", "delete"]);
@@ -43,13 +47,15 @@ const emit = defineEmits(["edit", "delete"]);
         <template v-if="props.showImage">
             <img
                 v-if="props.image"
-                :src="props.image"
+                :src="getImageUrl(props.image)"
                 alt="Brand Logo"
                 class="object-contain w-[80px] sm:w-[100px] rounded aspect-[3/2]"
+                :class="props.imageClass"
             />
             <div
                 v-else
-                class="flex items-center justify-center min-w-[80px] sm:min-w-[100px] bg-gray-100 rounded aspect-[3/2]"
+                class="flex items-center justify-center w-[80px] sm:w-[100px] bg-gray-100 rounded aspect-[3/2] shrink-0"
+                :class="props.imageClass"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

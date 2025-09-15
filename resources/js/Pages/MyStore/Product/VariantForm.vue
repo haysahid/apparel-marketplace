@@ -15,6 +15,7 @@ import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import DialogModal from "@/Components/DialogModal.vue";
 import ColorForm from "../Color/ColorForm.vue";
+import { getImageUrl, isFile } from "@/plugins/helpers";
 
 const props = defineProps({
     product: {
@@ -171,10 +172,7 @@ function uploadNewImage(image, index) {
             },
         })
         .then((response) => {
-            form.images[index] = {
-                ...response.data.result,
-                image: "/storage/" + response.data.result.image,
-            };
+            form.images[index] = response.data.result;
         })
         .catch((error) => {
             if (error.response?.data?.error) {
@@ -205,10 +203,7 @@ function updateImage(index, image) {
             },
         })
         .then((response) => {
-            form.images[index] = {
-                ...response.data.result,
-                image: "/storage/" + response.data.result.image,
-            };
+            form.images[index] = response.data.result;
         })
         .catch((error) => {
             if (error.response?.data?.error) {

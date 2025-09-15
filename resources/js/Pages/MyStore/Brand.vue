@@ -15,6 +15,7 @@ import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import AdminItemCard from "@/Components/AdminItemCard.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
+import { getImageUrl } from "@/plugins/helpers.js";
 
 const screenSize = useScreenSize();
 
@@ -25,7 +26,6 @@ const props = defineProps({
 const brands = ref(
     props.brands.data.map((brand) => ({
         ...brand,
-        logo: brand.logo ? "/storage/" + brand.logo : null,
         showDeleteModal: false,
     }))
 );
@@ -51,7 +51,6 @@ function getBrands() {
             getQueryParams();
             brands.value = props.brands.data.map((brand) => ({
                 ...brand,
-                logo: brand.logo ? "/storage/" + brand.logo : null,
                 showDeleteModal: false,
             }));
         },
@@ -200,7 +199,7 @@ onMounted(() => {
                         <td>
                             <img
                                 v-if="brand.logo"
-                                :src="brand.logo"
+                                :src="getImageUrl(brand.logo)"
                                 alt="Logo Brand"
                                 class="object-contain h-[60px] rounded aspect-[3/2]"
                             />

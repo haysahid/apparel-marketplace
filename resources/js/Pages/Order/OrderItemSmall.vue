@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from "vue";
 import DiscountTag from "@/Components/DiscountTag.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     item: {
@@ -36,7 +36,7 @@ function formatPrice(price = 0) {
                 <!-- Image -->
                 <img
                     v-if="props.item.image"
-                    :src="`/storage/${props.item.image}`"
+                    :src="getImageUrl(props.item.image)"
                     alt="Product Image"
                     class="object-cover size-[60px] sm:size-[80px] rounded-lg outline outline-1 outline-gray-300"
                 />

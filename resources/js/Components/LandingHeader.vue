@@ -10,6 +10,7 @@ import StoreOptionsDialog from "./StoreOptionsDialog.vue";
 import { useMyStoreStore } from "@/stores/my-store-store";
 import UserDropdown from "./UserDropdown.vue";
 import HamburgerButton from "./HamburgerButton.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const cartStore = useCartStore();
 const myStoreStore = useMyStoreStore();
@@ -68,8 +69,12 @@ onMounted(() => {
                             <img
                                 :src="
                                     scrolled
-                                        ? `/storage/${$page.props.setting.logo_white}`
-                                        : `/storage/${$page.props.setting.logo_black}`
+                                        ? getImageUrl(
+                                              $page.props.setting.logo_white
+                                          )
+                                        : getImageUrl(
+                                              $page.props.setting.logo_black
+                                          )
                                 "
                                 alt="Logo"
                                 class="w-auto h-9 sm:h-10"

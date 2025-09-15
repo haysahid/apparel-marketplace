@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import DialogModal from "@/Components/DialogModal.vue";
 import StoreItem from "@/Components/StoreItem.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     title: {
@@ -39,7 +40,7 @@ const emit = defineEmits(["close", "select"]);
                         :key="store.id"
                         :name="store.name"
                         :description="store.rajaongkir_origin_label"
-                        :icon="store.logo ? `/storage/${store.logo}` : null"
+                        :icon="store.logo ? getImageUrl(store.logo) : null"
                         @click="emit('select', store)"
                     />
                 </div>

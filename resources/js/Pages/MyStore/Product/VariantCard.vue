@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import DiscountTag from "@/Components/DiscountTag.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     name: {
@@ -26,6 +27,10 @@ const props = defineProps({
     showDeleteButton: {
         type: Boolean,
         default: true,
+    },
+    selected: {
+        type: Boolean,
+        default: false,
     },
 });
 
@@ -55,6 +60,7 @@ const loadFile = (file) => {
         :class="{
             'hover:outline-gray-300 ': drag,
             'pr-3.5': !showDeleteButton,
+            'outline-2 outline-primary': selected,
         }"
         @click="emit('click')"
     >
@@ -67,7 +73,7 @@ const loadFile = (file) => {
                 :src="
                     isFile(props.variant.images[0].image)
                         ? loadFile(props.variant.images[0].image)
-                        : props.variant.images[0].image
+                        : getImageUrl(props.variant.images[0].image)
                 "
                 alt="Product Image"
                 class="object-cover size-[60px] sm:size-[80px]"

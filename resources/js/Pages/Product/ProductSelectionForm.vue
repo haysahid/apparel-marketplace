@@ -428,18 +428,7 @@ defineExpose({
 
         <ProductLinkDialog
             :show="showProductLinkDialog"
-            :links="
-                props.product.links.map(function (link) {
-                    if (!link.platform) return link;
-                    return {
-                        ...link,
-                        platform: {
-                            ...link.platform,
-                            icon: '/storage/' + link.platform.icon,
-                        },
-                    };
-                })
-            "
+            :links="props.product.links"
             @close="closeProductLinkDialog"
         />
     </div>

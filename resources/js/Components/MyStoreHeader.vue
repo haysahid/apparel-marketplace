@@ -9,6 +9,7 @@ import StoreItem from "./StoreItem.vue";
 import StoreOptionsDialog from "./StoreOptionsDialog.vue";
 import { useMyStoreStore } from "@/stores/my-store-store";
 import HamburgerButton from "./HamburgerButton.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     title: String,
@@ -31,7 +32,12 @@ const showStoreOptionsDialog = ref(false);
         <div
             class="px-4 mx-auto transition-all duration-300 ease-in-out sm:px-6 lg:px-8"
         >
-            <div class="flex items-center justify-between h-16">
+            <div
+                class="flex items-center justify-between h-16"
+                :class="{
+                    'justify-end': !$slots.leading,
+                }"
+            >
                 <slot name="leading" />
 
                 <div class="hidden md:flex sm:items-center sm:ms-6">
@@ -75,7 +81,7 @@ const showStoreOptionsDialog = ref(false);
                         :description="
                             $page.props.selected_store.rajaongkir_origin_label
                         "
-                        :icon="`/storage/${$page.props.selected_store.logo}`"
+                        :icon="getImageUrl($page.props.selected_store.logo)"
                         @click="showStoreOptionsDialog = true"
                     >
                         <template #trailing>

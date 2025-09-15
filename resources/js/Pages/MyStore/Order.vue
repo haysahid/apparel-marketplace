@@ -160,7 +160,7 @@ onMounted(() => {
                 <PrimaryButton
                     type="button"
                     class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
-                    @click="$inertia.visit(route('my-store.product.create'))"
+                    @click="$inertia.visit(route('my-store.order.create'))"
                 >
                     Tambah
                 </PrimaryButton>

@@ -12,6 +12,7 @@ import DefaultPagination from "@/Components/DefaultPagination.vue";
 import DefaultTable from "@/Components/DefaultTable.vue";
 import MyStoreCertificateCard from "./Certificate/MyStoreCertificateCard.vue";
 import { useScreenSize } from "@/plugins/screen-size";
+import { getImageUrl } from "@/plugins/helpers";
 
 const screenSize = useScreenSize();
 
@@ -22,7 +23,6 @@ const props = defineProps({
 const certificates = ref(
     props.certificates.data.map((certificate) => ({
         ...certificate,
-        image: certificate.image ? "/storage/" + certificate.image : null,
         showDeleteModal: false,
     }))
 );
@@ -133,7 +133,7 @@ onMounted(() => {
                         </td>
                         <td>
                             <img
-                                :src="certificate.image"
+                                :src="getImageUrl(certificate.image)"
                                 alt="Sertifikat"
                                 class="object-cover w-[80px] sm:w-[120px] rounded aspect-[3/2] border border-gray-200"
                             />

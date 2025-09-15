@@ -6,6 +6,7 @@ import ColorChip from "./ColorChip.vue";
 import CategoryFilterModal from "@/Pages/Catalog/CategoryFilterModal.vue";
 import BrandFilterModal from "@/Pages/Catalog/BrandFilterModal.vue";
 import ColorFilterModal from "@/Pages/Catalog/ColorFilterModal.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     filters: Object,
@@ -108,7 +109,7 @@ defineExpose({
                         >
                             <img
                                 v-if="brand.logo"
-                                :src="`/storage/${brand.logo}`"
+                                :src="getImageUrl(brand.logo)"
                                 class="object-contain w-8 aspect-square"
                             />
                             <div
@@ -292,7 +293,7 @@ defineExpose({
                         >
                             <img
                                 v-if="brand.logo"
-                                :src="`/storage/${brand.logo}`"
+                                :src="getImageUrl(brand.logo)"
                                 class="object-contain w-8 aspect-square"
                             />
                             <div

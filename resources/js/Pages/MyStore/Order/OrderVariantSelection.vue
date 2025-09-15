@@ -1,29 +1,25 @@
 <script setup>
 import { ref, computed } from "vue";
-import VariantForm from "./VariantForm.vue";
-import VariantCard from "./VariantCard.vue";
-import DialogModal from "@/Components/DialogModal.vue";
-import DeleteConfirmationDialog from "@/Components/DeleteConfirmationDialog.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import Dropdown from "@/Components/Dropdown.vue";
-import InputLabel from "@/Components/InputLabel.vue";
 import Chip from "@/Components/Chip.vue";
 import InputGroup from "@/Components/InputGroup.vue";
 import ColorChip from "@/Components/ColorChip.vue";
+import VariantCard from "@/Pages/MyStore/Product/VariantCard.vue";
+import { useScreenSize } from "@/plugins/screen-size";
+import VariantFilter from "@/Components/VariantFilter.vue";
+
+const screenSize = useScreenSize();
 
 const props = defineProps({
-    product: {
-        type: Object,
-        default: null,
-    },
     variants: {
         type: Array,
         required: true,
     },
-    isEdit: {
-        type: Boolean,
-        default: false,
+    selectedVariants: {
+        type: Array,
+        default: () => [],
     },
     isLoading: {
         type: Boolean,
@@ -31,13 +27,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits([
-    "onAdd",
-    "onAdded",
-    "onEdit",
-    "onEditted",
-    "onDelete",
-]);
+const emit = defineEmits(["selectVariant"]);
 
 const motifs = computed(() => {
     return [...new Set(props.variants.map((variant) => variant.motif))];
@@ -73,32 +63,31 @@ const openAddVariantForm = () => {
 </script>
 
 <template>
-    <div class="relative flex flex-col items-start w-full gap-2">
+    <div class="flex flex-col items-start w-full gap-4">
         <!-- Header -->
-        <div class="sticky flex flex-col items-start w-full gap-2">
+        <div class="flex flex-col items-start w-full gap-2 px-6 bg-white">
             <div class="flex items-start justify-between w-full gap-2">
-                <div>
-                    <h2 class="font-semibold text-left">
-                        Variasi Produk ({{ props.variants.length }})
-                    </h2>
-                    <p class="mt-1 text-sm text-gray-500">
+                <div class="text-left">
+                    <h2 class="font-semibold">Pilih Variasi Produk</h2>
+                    <p
+                        v-if="!props.isLoading"
+                        class="mt-1 text-sm text-gray-500"
+                    >
                         {{
                             (selectedMotif || selectedColor) &&
                             filteredVariants.length == 0
                                 ? "Tidak ada variasi yang ditemukan."
-                                : "Diperlukan minimal 1 variasi produk."
+                                : `Tersedia ${props.variants.length} variasi.`
                         }}
                     </p>
+                    <p v-else class="mt-1 text-sm text-gray-500">
+                        Memuat variasi produk...
+                    </p>
                 </div>
-                <div class="flex items-center gap-2">
-                    <PrimaryButton
-                        type="button"
-                        class="text-nowrap"
-                        :disabled="props.isLoading"
-                        @click="openAddVariantForm"
-                    >
-                        Tambah Variasi
-                    </PrimaryButton>
+                <div
+                    v-if="!screenSize.is('md')"
+                    class="flex items-center gap-2"
+                >
                     <Dropdown
                         v-if="props.variants.length > 0"
                         align="right"
@@ -133,66 +122,13 @@ const openAddVariantForm = () => {
                             </SecondaryButton>
                         </template>
                         <template #content>
-                            <div class="flex flex-col gap-2 p-4">
-                                <div
-                                    class="flex items-center justify-between gap-2"
-                                >
-                                    <h3 class="text-sm font-semibold">
-                                        Filter Variasi Produk
-                                    </h3>
-                                    <button
-                                        v-if="selectedMotif || selectedColor"
-                                        type="button"
-                                        class="text-sm text-red-700 hover:underline w-fit"
-                                        @click="
-                                            selectedMotif = null;
-                                            selectedColor = null;
-                                        "
-                                    >
-                                        Hapus Filter
-                                    </button>
-                                </div>
-                                <InputGroup label="Motif">
-                                    <div class="flex flex-wrap gap-2">
-                                        <Chip
-                                            v-for="(motif, index) in motifs"
-                                            :key="index"
-                                            :label="motif"
-                                            :selected="selectedMotif == motif"
-                                            @click="
-                                                if (selectedMotif == motif) {
-                                                    selectedMotif = null;
-                                                } else {
-                                                    selectedMotif = motif;
-                                                }
-                                            "
-                                        />
-                                    </div>
-                                </InputGroup>
-                                <InputGroup label="Warna">
-                                    <div class="flex flex-wrap gap-2">
-                                        <ColorChip
-                                            v-for="(color, index) in colors"
-                                            :key="index"
-                                            :label="color.name"
-                                            :hexCode="color.hex_code"
-                                            :selected="
-                                                selectedColor?.id == color.id
-                                            "
-                                            @click="
-                                                if (
-                                                    selectedColor?.id ==
-                                                    color.id
-                                                ) {
-                                                    selectedColor = null;
-                                                } else {
-                                                    selectedColor = color;
-                                                }
-                                            "
-                                        />
-                                    </div>
-                                </InputGroup>
-                            </div>
+                            <VariantFilter
+                                :motifs="motifs"
+                                :colors="colors"
+                                v-model:selectedMotif="selectedMotif"
+                                v-model:selectedColor="selectedColor"
+                                class="p-4"
+                            />
                         </template>
                     </Dropdown>
                 </div>
@@ -200,7 +136,7 @@ const openAddVariantForm = () => {
 
             <!-- Active Filter -->
             <div
-                v-if="selectedMotif || selectedColor"
+                v-if="!screenSize.is('md') && (selectedMotif || selectedColor)"
                 class="flex items-center justify-between w-full gap-2 mt-1"
             >
                 <div class="flex items-center gap-2">
@@ -284,112 +220,121 @@ const openAddVariantForm = () => {
         </div>
 
         <!-- List -->
-        <div
-            v-if="props.isLoading"
-            class="flex items-center justify-center w-full h-[40vh]"
-        >
-            <div class="circular-loading"></div>
-        </div>
-        <div
-            v-else-if="filteredVariants.length > 0"
-            class="grid w-full grid-cols-1 gap-2 mt-1.5"
-        >
-            <div
-                v-for="(variant, index) in filteredVariants"
-                :key="index"
-                class="w-full"
-            >
-                <div
-                    v-if="
-                        index == 0 ||
-                        variant.motif != filteredVariants[index - 1].motif ||
-                        variant.color_id != filteredVariants[index - 1].color_id
-                    "
-                    class="mb-2 flex flex-col items-start gap-0.5"
-                    :class="{
-                        'mt-1.5 ': index > 0,
-                    }"
-                >
-                    <p
-                        v-if="
-                            index == 0 ||
-                            variant.motif != filteredVariants[index - 1].motif
-                        "
-                        class="font-medium text-gray-500"
-                    >
-                        {{ variant.motif }}
-                    </p>
-                    <p
-                        v-if="
-                            index == 0 ||
-                            variant.color_id !=
-                                filteredVariants[index - 1].color_id
-                        "
-                        class="flex items-center text-sm font-medium text-gray-500"
-                    >
-                        {{ variant.color?.name }}
-                    </p>
-                </div>
-                <VariantCard
-                    :name="`${variant.motif} - ${variant.color?.name} - ${variant.size?.name}`"
-                    :variant="variant"
-                    :index="index"
-                    @click="variant.showEditForm = true"
-                    @delete="variant.showDeleteConfirmation = true"
+        <div class="flex gap-6 mt-1.5 px-6 w-full">
+            <!-- SideFilter -->
+            <aside v-if="screenSize.is('md')" class="w-full max-w-[300px]">
+                <VariantFilter
+                    :motifs="motifs"
+                    :colors="colors"
+                    v-model:selectedMotif="selectedMotif"
+                    v-model:selectedColor="selectedColor"
                 />
-                <DialogModal
-                    :show="variant.showEditForm"
-                    title="Ubah Variasi Produk"
-                    @close="variant.showEditForm = false"
+            </aside>
+
+            <div
+                class="w-full overflow-y-auto h-[calc(80vh-120px)]"
+                :class="{
+                    'h-[calc(80vh-168px)]':
+                        !screenSize.is('md') &&
+                        (selectedMotif || selectedColor),
+                }"
+            >
+                <!-- Loading -->
+                <div
+                    v-if="props.isLoading"
+                    class="flex flex-col w-full gap-2.5 mt-1.5"
                 >
-                    <template #content>
-                        <VariantForm
-                            :isEdit="props.isEdit"
-                            :product="props.product"
+                    <div class="w-20 h-4 bg-gray-100 rounded-md"></div>
+                    <div class="w-16 h-4 bg-gray-100 rounded-md"></div>
+
+                    <div
+                        v-for="n in 5"
+                        :key="n"
+                        class="flex items-center gap-4 p-2.5 sm:p-4 bg-white border border-gray-200 rounded-xl animate-pulse"
+                    >
+                        <div
+                            class="bg-gray-100 rounded-lg size-[60px] sm:size-[80px]"
+                        ></div>
+                        <div class="flex flex-col flex-1 gap-2.5">
+                            <div class="w-3/4 h-4 bg-gray-100 rounded-md"></div>
+                            <div class="w-1/4 h-4 bg-gray-100 rounded-md"></div>
+                            <div class="w-1/3 h-4 bg-gray-100 rounded-md"></div>
+                        </div>
+                        <div class="w-12 h-4 bg-gray-100 rounded-md"></div>
+                    </div>
+                </div>
+                <!-- Items -->
+                <div
+                    v-else-if="filteredVariants.length > 0"
+                    class="grid w-full grid-cols-1 gap-2"
+                >
+                    <div
+                        v-for="(variant, index) in filteredVariants"
+                        :key="index"
+                        class="w-full"
+                    >
+                        <div
+                            v-if="
+                                index == 0 ||
+                                variant.motif !=
+                                    filteredVariants[index - 1].motif ||
+                                variant.color_id !=
+                                    filteredVariants[index - 1].color_id
+                            "
+                            class="mb-2 flex flex-col items-start gap-0.5"
+                            :class="{
+                                'mt-1.5 ': index > 0,
+                            }"
+                        >
+                            <p
+                                v-if="
+                                    index == 0 ||
+                                    variant.motif !=
+                                        filteredVariants[index - 1].motif
+                                "
+                                class="font-medium text-gray-500"
+                            >
+                                {{ variant.motif }}
+                            </p>
+                            <p
+                                v-if="
+                                    index == 0 ||
+                                    variant.color_id !=
+                                        filteredVariants[index - 1].color_id
+                                "
+                                class="flex items-center text-sm font-medium text-gray-500"
+                            >
+                                {{ variant.color?.name }}
+                            </p>
+                        </div>
+                        <VariantCard
+                            :name="`${variant.motif} - ${variant.color?.name} - ${variant.size?.name}`"
                             :variant="variant"
-                            @submit="emit('onEdit', $event)"
-                            @close="variant.showEditForm = false"
-                            @submitted="
-                                variant.showEditForm = false;
-                                emit('onEditted', $event);
+                            :index="index"
+                            :showDeleteButton="false"
+                            :selected="
+                                props.selectedVariants.some(
+                                    (v) => v.id === variant.id
+                                )
+                            "
+                            @click="
+                                if (
+                                    !props.selectedVariants.some(
+                                        (v) => v.id === variant.id
+                                    )
+                                ) {
+                                    emit('selectVariant', variant);
+                                }
                             "
                         />
-                    </template>
-                </DialogModal>
-                <DeleteConfirmationDialog
-                    :title="`Hapus Varian Produk <b>${variant.motif} - ${variant.color?.name} - ${variant.size?.name}</b>?`"
-                    :show="variant.showDeleteConfirmation"
-                    @close="variant.showDeleteConfirmation = false"
-                    @delete="
-                        variant.showDeleteConfirmation = false;
-                        emit('onDelete', variant);
-                    "
-                />
+                    </div>
+                </div>
+                <div v-else class="flex items-center justify-center h-[40vh]">
+                    <p class="text-sm text-center text-gray-500">
+                        Data tidak ditemukan.
+                    </p>
+                </div>
             </div>
         </div>
-        <div v-else class="flex items-center justify-center h-[40vh]">
-            <p class="text-sm text-center text-gray-500">
-                Data tidak ditemukan.
-            </p>
-        </div>
-
-        <DialogModal
-            :show="showAddVariantForm"
-            @close="showAddVariantForm = false"
-        >
-            <template #content>
-                <VariantForm
-                    :isEdit="props.product != null"
-                    :product="props.product"
-                    :variant="null"
-                    @submit="emit('onAdd', $event)"
-                    @close="showAddVariantForm = false"
-                    @submitted="
-                        showAddVariantForm = false;
-                        emit('onAdded', $event);
-                    "
-                />
-            </template>
-        </DialogModal>
     </div>
 </template>

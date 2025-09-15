@@ -10,7 +10,6 @@ import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import DefaultTable from "@/Components/DefaultTable.vue";
-import MyStoreVoucherCard from "./Voucher/MyStoreVoucherCard.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import AdminItemCard from "@/Components/AdminItemCard.vue";
 
@@ -23,7 +22,6 @@ const props = defineProps({
 const vouchers = ref(
     props.vouchers.data.map((voucher) => ({
         ...voucher,
-        image: voucher.image ? "/storage/" + voucher.image : null,
         showDeleteModal: false,
     }))
 );

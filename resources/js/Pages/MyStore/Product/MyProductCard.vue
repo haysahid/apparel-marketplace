@@ -4,6 +4,7 @@ import { computed } from "vue";
 import { formatCurrency } from "@/plugins/number-formatter";
 import DiscountTag from "@/Components/DiscountTag.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     product: {
@@ -48,7 +49,7 @@ const finalPrice = computed(() => {
         <div class="flex items-start w-full gap-2.5 sm:gap-3">
             <img
                 v-if="props.product.images.length > 0"
-                :src="(props.product.images[0].image as string)"
+                :src="getImageUrl(props.product.images[0].image)"
                 :alt="props.product.name"
                 class="object-cover h-[80px] sm:h-[100px] aspect-square rounded border border-gray-200 self-start"
             />
@@ -81,7 +82,7 @@ const finalPrice = computed(() => {
                     <p class="text-xs text-gray-500 pe-12">
                         {{ props.product.brand.name }}
                     </p>
-                    <div class="flex items-start w-full gap-4 mt-1">
+                    <div class="flex items-end w-full gap-4 mt-1">
                         <div class="flex flex-col items-start w-full">
                             <p class="text-sm font-medium text-gray-600">
                                 {{ finalPrice }}
@@ -105,13 +106,7 @@ const finalPrice = computed(() => {
                             class="flex items-center gap-2 py-1.5 px-2 bg-gray-100 rounded-md"
                         >
                             <p class="text-sm font-medium text-gray-600">
-                                {{
-                                    props.product.variants.reduce(
-                                        (total, variant) =>
-                                            total + variant.current_stock_level,
-                                        0
-                                    )
-                                }}
+                                {{ props.product?.stock_count }}
                             </p>
                         </div>
                     </div>

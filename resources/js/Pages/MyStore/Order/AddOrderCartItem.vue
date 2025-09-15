@@ -53,7 +53,7 @@ const hasActions = computed(() => {
         <div class="flex items-start w-full gap-x-4">
             <div class="flex items-center justify-center flex-shrink-0 gap-4">
                 <!-- Checkbox -->
-                <Checkbox
+                <!-- <Checkbox
                     :checked="props.item.selected"
                     class="transition-colors duration-200 ease-in-out border-2 border-gray-300 rounded-md cursor-pointer size-6 hover:bg-secondary hover:border-primary"
                     :class="{
@@ -61,18 +61,18 @@ const hasActions = computed(() => {
                         '!border-primary': props.item.selected,
                     }"
                     @update:checked="emit('toggleItem')"
-                />
+                /> -->
 
                 <!-- Image -->
                 <img
                     v-if="props.item.image"
                     :src="getImageUrl(props.item.image)"
                     alt="Product Image"
-                    class="object-cover size-[60px] sm:size-[80px] lg:size-[120px] rounded-lg outline outline-1 outline-gray-300"
+                    class="object-cover size-[60px] sm:size-[80px] rounded-lg outline outline-1 outline-gray-300"
                 />
                 <div
                     v-else
-                    class="flex items-center justify-center size-[60px] sm:size-[80px] lg:size-[120px] bg-gray-100 rounded-lg aspect-square"
+                    class="flex items-center justify-center size-[60px] sm:size-[80px] bg-gray-100 rounded-lg aspect-square"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"

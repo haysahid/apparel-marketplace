@@ -89,7 +89,19 @@ class ProductVariantController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $variant = ProductVariantRepository::getVariantById($id);
+
+            return ResponseFormatter::success(
+                $variant,
+                'Variant produk berhasil diambil.'
+            );
+        } catch (Exception $e) {
+            return ResponseFormatter::error(
+                $e->getMessage(),
+                500
+            );
+        }
     }
 
     /**

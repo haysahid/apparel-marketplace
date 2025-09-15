@@ -25,7 +25,12 @@ class ProductRepository
     ) {
         $products = Product::query();
 
-        $products->with(['brand', 'categories', 'images', 'links', 'variants']);
+        $products->with([
+            'brand',
+            'categories',
+            'images',
+            'links',
+        ]);
 
         if ($storeId) {
             $products->where('store_id', $storeId);
@@ -70,6 +75,20 @@ class ProductRepository
         $products->get();
 
         return $products->paginate($limit);
+    }
+
+    public static function getProductDetail(string $id)
+    {
+        return Product::with([
+            'brand',
+            'categories',
+            'images',
+            'links.platform',
+            'variants.color',
+            'variants.size',
+            'variants.unit',
+            'variants.images',
+        ])->findOrFail($id);
     }
 
     public static function createProduct(array $data)

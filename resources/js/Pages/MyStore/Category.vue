@@ -16,6 +16,7 @@ import DefaultPagination from "@/Components/DefaultPagination.vue";
 import MyStoreBrandCard from "./Brand/MyStoreBrandCard.vue";
 import AdminItemCard from "@/Components/AdminItemCard.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const screenSize = useScreenSize();
 
@@ -26,7 +27,6 @@ const props = defineProps({
 const categories = ref(
     props.categories.data.map((category) => ({
         ...category,
-        image: category.image ? "/storage/" + category.image : null,
         showDeleteModal: false,
     }))
 );
@@ -52,7 +52,6 @@ function getCategories() {
             getQueryParams();
             categories.value = props.categories.data.map((category) => ({
                 ...category,
-                image: category.image ? "/storage/" + category.image : null,
                 showDeleteModal: false,
             }));
         },
@@ -205,13 +204,13 @@ onMounted(() => {
                         <td>
                             <img
                                 v-if="category.image"
-                                :src="category.image"
+                                :src="getImageUrl(category.image)"
                                 alt="Logo Brand"
-                                class="object-contain h-[60px] rounded aspect-[3/2]"
+                                class="object-contain h-[40px] rounded aspect-[3/2]"
                             />
                             <div
                                 v-else
-                                class="flex items-center justify-center h-[60px] bg-gray-100 rounded aspect-[3/2]"
+                                class="flex items-center justify-center h-[40px] bg-gray-100 rounded aspect-[3/2]"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -270,6 +269,7 @@ onMounted(() => {
                         :image="category.image"
                         :hideActions="!canEdit(category)"
                         disabledHint="Kategori bawaan sistem"
+                        imageClass="!w-[60px]"
                         @edit="
                             $inertia.visit(
                                 route('my-store.category.edit', {

@@ -13,11 +13,10 @@ import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import MyProductCard from "./Product/MyProductCard.vue";
 import DefaultTable from "@/Components/DefaultTable.vue";
-import Dropdown from "@/Components/Dropdown.vue";
-import DropdownLink from "@/Components/DropdownLink.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import { formatCurrency } from "@/plugins/number-formatter";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const screenSize = useScreenSize();
 
@@ -43,10 +42,6 @@ const page = usePage();
 const products = ref(
     props.products.data.map((product) => ({
         ...product,
-        images: product.images.map((image) => ({
-            ...image,
-            image: image.image ? "/storage/" + image.image : null,
-        })),
         showDeleteModal: false,
     }))
 );
@@ -170,10 +165,6 @@ function getProducts() {
             getQueryParams();
             products.value = props.products.data.map((product) => ({
                 ...product,
-                images: product.images.map((image) => ({
-                    ...image,
-                    image: image.image ? "/storage/" + image.image : null,
-                })),
                 showDeleteModal: false,
             }));
         },
@@ -298,7 +289,7 @@ onMounted(() => {
                         <td>
                             <img
                                 v-if="product.images.length > 0"
-                                :src="product.images[0].image"
+                                :src="getImageUrl(product.images[0].image)"
                                 :alt="product.name"
                                 class="object-cover h-[60px] sm:h-[80px] aspect-square rounded border border-gray-200"
                             />
@@ -345,13 +336,7 @@ onMounted(() => {
                             {{ product.brand.name }}
                         </td>
                         <td class="text-center">
-                            {{
-                                product.variants.reduce(
-                                    (total, variant) =>
-                                        total + variant.current_stock_level,
-                                    0
-                                )
-                            }}
+                            {{ product.stock_count }}
                         </td>
                         <td>
                             <AdminItemAction

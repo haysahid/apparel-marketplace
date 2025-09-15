@@ -27,29 +27,42 @@ class Product extends Model
         'lowest_final_selling_price',
         'highest_base_selling_price',
         'highest_final_selling_price',
+        'stock_count',
     ];
+
+    // Methods
+    public function getVariants()
+    {
+        return once(function () {
+            return $this->variants()->get();
+        });
+    }
 
     // Additional attributes
     public function getLowestBaseSellingPriceAttribute()
     {
-        return $this->variants()->min('base_selling_price');
+        return $this->getVariants()->min('base_selling_price');
     }
 
     public function getLowestFinalSellingPriceAttribute()
     {
-        return $this->variants()->min('final_selling_price');
+        return $this->getVariants()->min('final_selling_price');
     }
 
     public function getHighestBaseSellingPriceAttribute()
     {
-        return $this->variants()->max('base_selling_price');
+        return $this->getVariants()->max('base_selling_price');
     }
 
     public function getHighestFinalSellingPriceAttribute()
     {
-        return $this->variants()->max('final_selling_price');
+        return $this->getVariants()->max('final_selling_price');
     }
 
+    public function getStockCountAttribute()
+    {
+        return $this->getVariants()->sum('current_stock_level');
+    }
 
     // Relationships
     public function store()

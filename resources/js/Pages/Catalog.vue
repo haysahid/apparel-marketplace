@@ -9,6 +9,7 @@ import { usePage, router } from "@inertiajs/vue3";
 import CatalogPagination from "@/Components/CatalogPagination.vue";
 import Chip from "@/Components/Chip.vue";
 import ColorChip from "@/Components/ColorChip.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const page = usePage();
 if (page.props.flash.access_token) {
@@ -20,15 +21,7 @@ const props = defineProps({
     filters: null,
 });
 
-const products = ref(
-    props.products.data.map((product) => ({
-        ...product,
-        images: product.images.map((image) => ({
-            ...image,
-            image: image.image ? "/storage/" + image.image : null,
-        })),
-    }))
-);
+const products = ref(props.products.data);
 
 const catalogFilter = ref(null);
 
@@ -99,14 +92,7 @@ function onChangeBrands(brands) {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
-                products.value = page.props.products.data.map((product) => ({
-                    ...product,
-                    images: product.images.map((image) => ({
-                        ...image,
-                        image: image.image ? "/storage/" + image.image : null,
-                    })),
-                }));
-
+                products.value = page.props.products.data;
                 getQueryParams();
             },
         }
@@ -129,14 +115,7 @@ function onChangeCategories(categories) {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
-                products.value = page.props.products.data.map((product) => ({
-                    ...product,
-                    images: product.images.map((image) => ({
-                        ...image,
-                        image: image.image ? "/storage/" + image.image : null,
-                    })),
-                }));
-
+                products.value = page.props.products.data;
                 getQueryParams();
             },
         }
@@ -159,14 +138,7 @@ function onChangeColors(colors) {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
-                products.value = page.props.products.data.map((product) => ({
-                    ...product,
-                    images: product.images.map((image) => ({
-                        ...image,
-                        image: image.image ? "/storage/" + image.image : null,
-                    })),
-                }));
-
+                products.value = page.props.products.data;
                 getQueryParams();
             },
         }
@@ -191,13 +163,7 @@ function onChangeSearch() {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
-                products.value = page.props.products.data.map((product) => ({
-                    ...product,
-                    images: product.images.map((image) => ({
-                        ...image,
-                        image: image.image ? "/storage/" + image.image : null,
-                    })),
-                }));
+                products.value = page.props.products.data;
                 getQueryParams();
             },
         }

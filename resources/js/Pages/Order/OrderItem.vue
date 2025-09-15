@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import DiscountTag from "@/Components/DiscountTag.vue";
 import { Link } from "@inertiajs/vue3";
+import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     item: {
@@ -41,7 +42,7 @@ const discount = computed(() => {
                 <!-- Image -->
                 <img
                     v-if="props.item.image"
-                    :src="`/storage/${props.item.image}`"
+                    :src="getImageUrl(props.item.image)"
                     alt="Product Image"
                     class="object-cover size-[80px] sm:size-[120px] rounded-lg outline outline-1 outline-gray-300"
                 />

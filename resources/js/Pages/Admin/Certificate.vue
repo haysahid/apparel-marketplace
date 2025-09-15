@@ -8,6 +8,7 @@ import AdminItemAction from "@/Components/AdminItemAction.vue";
 import DeleteConfirmationDialog from "@/Components/DeleteConfirmationDialog.vue";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     certificates: null,
@@ -16,7 +17,6 @@ const props = defineProps({
 const certificates = ref(
     props.certificates.data.map((certificate) => ({
         ...certificate,
-        image: certificate.image ? "/storage/" + certificate.image : null,
         showDeleteModal: false,
     }))
 );
@@ -139,7 +139,7 @@ onMounted(() => {
                             </td>
                             <td>
                                 <img
-                                    :src="certificate.image"
+                                    :src="getImageUrl(certificate.image)"
                                     alt="Sertifikat"
                                     class="object-cover w-[100px] sm:w-[160px] rounded aspect-[3/2]"
                                 />

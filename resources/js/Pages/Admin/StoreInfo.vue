@@ -63,15 +63,7 @@ const form = useForm({
     ...props.store,
     rajaongkir_origin_id: props.store.rajaongkir_origin_id || null,
     rajaongkir_origin: null,
-    social_links: [
-        ...props.store.social_links.map(function (link) {
-            if (!link.icon) return link;
-            return {
-                ...link,
-                icon: "/storage/" + link.icon,
-            };
-        }),
-    ],
+    social_links: props.store.social_links,
 });
 
 // Initialize origin

@@ -5,6 +5,7 @@ import NavLink from "@/Components/NavLink.vue";
 import IconTikTok from "@/Icons/IconTikTok.vue";
 import IconFacebook from "@/Icons/IconFacebook.vue";
 import IconInstagram from "@/Icons/IconInstagram.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const page = usePage();
 const store = page.props.store || {};
@@ -30,7 +31,7 @@ const isHome = route().current("home");
                 >
                     <Link :href="route('home')" class="hidden sm:block">
                         <img
-                            :src="`/storage/${$page.props.setting.logo_white}`"
+                            :src="getImageUrl($page.props.setting.logo_white)"
                             alt="Logo"
                             class="h-20 mb-8"
                         />

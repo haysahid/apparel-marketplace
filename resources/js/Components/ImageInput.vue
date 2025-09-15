@@ -1,6 +1,7 @@
 <script setup>
-import { ref, onUpdated } from "vue";
+import { ref } from "vue";
 import InputError from "@/Components/InputError.vue";
+import { getImageUrl } from "@/plugins/helpers.js";
 
 const props = defineProps([
     "id",
@@ -68,7 +69,7 @@ defineExpose({ clearImage });
                             props.objectFit,
                             props.width,
                         ]"
-                        :src="imagePath || props.modelValue"
+                        :src="imagePath || getImageUrl(props.modelValue)"
                         alt="Current image"
                     />
                     <div

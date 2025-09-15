@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from "@inertiajs/vue3";
 import DiscountTag from "@/Components/DiscountTag.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     name: String,
@@ -44,7 +45,7 @@ function formatPrice(price) {
         >
             <img
                 v-if="props.image"
-                :src="props.image"
+                :src="getImageUrl(props.image)"
                 :alt="props.name"
                 class="object-cover w-full rounded-t-lg aspect-square"
             />

@@ -15,6 +15,7 @@ import DialogModal from "@/Components/DialogModal.vue";
 import LinkItem from "@/Components/LinkItem.vue";
 import VariantCard from "./VariantCard.vue";
 import VariantForm from "./VariantForm.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     product: {
@@ -28,35 +29,9 @@ const form = useForm(
         ? {
               ...props.product,
               categories: props.product?.categories || [],
-              images: [
-                  ...(props.product?.images?.map((image) => ({
-                      ...image,
-                      image: "/storage/" + image.image,
-                  })) || []),
-                  { id: "new-1", image: null },
-              ],
-              links: [
-                  ...(props.product?.links?.map(function (link) {
-                      if (!link.platform) return link;
-                      return {
-                          ...link,
-                          platform: {
-                              ...link.platform,
-                              icon: "/storage/" + link.platform.icon,
-                          },
-                      };
-                  }) || []),
-              ],
-              variants: [
-                  ...(props.product?.variants?.map((variant) => ({
-                      ...variant,
-                      images:
-                          variant.images?.map((image) => ({
-                              ...image,
-                              image: "/storage/" + image.image,
-                          })) || [],
-                  })) || []),
-              ],
+              images: [...props.product?.images, { id: "new-1", image: null }],
+              links: props.product?.links || [],
+              variants: props.product?.variants || [],
           }
         : {
               name: null,
@@ -103,10 +78,7 @@ function uploadNewImage(image, index) {
             },
         })
         .then((response) => {
-            form.images[index] = {
-                ...response.data.result,
-                image: "/storage/" + response.data.result.image,
-            };
+            form.images[index] = response.data.result;
         })
         .catch((error) => {
             if (error.response?.data?.error) {
@@ -141,10 +113,7 @@ function updateImage(index, image) {
             }
         )
         .then((response) => {
-            form.images[index] = {
-                ...response.data.result,
-                image: "/storage/" + response.data.result.image,
-            };
+            form.images[index] = response.data.result;
         })
         .catch((error) => {
             if (error.response?.data?.error) {

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Repositories\BrandRepository;
 use App\Repositories\InvoiceRepository;
+use App\Repositories\ProductRepository;
 use App\Repositories\TransactionRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -54,7 +55,7 @@ class MyStoreOrderController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('MyStore/Order/AddOrder');
     }
 
     /**

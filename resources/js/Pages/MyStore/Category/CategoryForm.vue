@@ -22,17 +22,10 @@ const props = defineProps({
 const emit = defineEmits(["onSubmitted", "close"]);
 
 const form = useForm(
-    props.category
-        ? {
-              ...props.category,
-              image: props.category.image
-                  ? "/storage/" + props.category.image
-                  : null,
-          }
-        : {
-              name: null,
-              image: null,
-          }
+    props.category || {
+        name: null,
+        image: null,
+    }
 );
 
 const submit = () => {

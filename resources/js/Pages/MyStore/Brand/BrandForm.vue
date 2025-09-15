@@ -27,16 +27,11 @@ const props = defineProps({
 const emit = defineEmits(["onSubmitted", "close"]);
 
 const form = useForm(
-    props.brand
-        ? {
-              ...props.brand,
-              logo: props.brand.logo ? "/storage/" + props.brand.logo : null,
-          }
-        : {
-              name: null,
-              description: null,
-              logo: null,
-          }
+    props.brand || {
+        name: null,
+        description: null,
+        logo: null,
+    }
 );
 
 const submit = () => {

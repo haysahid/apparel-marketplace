@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\BrandController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\ProductImageController;
@@ -45,10 +46,14 @@ Route::name('api.admin.')->prefix('admin')->middleware('auth:sanctum')->group(fu
 });
 
 Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->group(function () {
+    Route::apiResource('brand', BrandController::class);
+    Route::get('brand-dropdown', [BrandController::class, 'dropdown'])->name('brand.dropdown');
+
     Route::apiResource('product', ProductController::class);
     Route::apiResource('product-image', ProductImageController::class);
     Route::apiResource('product-variant', ProductVariantController::class);
     Route::apiResource('product-variant-image', ProductVariantImageController::class);
+
     Route::put('change-order-status', [OrderController::class, 'changeStatus'])->name('order.change-status');
     Route::post('report/generate', [ReportController::class, 'generateReport'])->name('report.generate');
 });

@@ -21,6 +21,10 @@ defineProps({
         type: Boolean,
         default: false,
     },
+    dialogClass: {
+        type: String,
+        default: "",
+    },
     containerClass: {
         type: String,
         default: "",
@@ -46,7 +50,7 @@ const hasFooterSlot = !!slots.footer;
         :closeable="closeable"
         @close="close"
     >
-        <div class="relative max-h-[80vh] overflow-y-auto">
+        <div class="relative max-h-[80vh] overflow-y-auto" :class="dialogClass">
             <button
                 v-if="showCloseButton"
                 type="button"

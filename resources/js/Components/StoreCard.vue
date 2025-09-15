@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { getImageUrl } from "@/plugins/helpers";
+
 const props = defineProps({
     store: {
         type: Object as () => StoreEntity,
@@ -13,7 +15,7 @@ const props = defineProps({
     >
         <img
             v-if="props.store.logo"
-            :src="`/storage/${props.store.logo}`"
+            :src="getImageUrl(props.store.logo)"
             :alt="props.store.name"
             class="h-10"
         />

@@ -1,6 +1,7 @@
 <script setup>
 import { Link } from "@inertiajs/vue3";
 import NavLink from "@/Components/NavLink.vue";
+import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     responsive: {
@@ -241,7 +242,7 @@ const menus = [
             >
                 <Link :href="route('home')">
                     <img
-                        :src="`/storage/${$page.props.setting.logo}`"
+                        :src="getImageUrl($page.props.setting.logo)"
                         alt="Logo"
                         class="w-auto h-8 sm:h-12 fill-primary"
                     />
