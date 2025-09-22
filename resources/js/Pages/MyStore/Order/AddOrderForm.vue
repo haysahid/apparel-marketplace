@@ -14,7 +14,6 @@ import useDebounce from "@/plugins/debounce";
 import InputGroup from "@/Components/InputGroup.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import DetailRow from "@/Components/DetailRow.vue";
-import { useMyStoreCartStore } from "@/stores/my-store-cart-store";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 
 const emit = defineEmits(["back"]);
@@ -252,6 +251,7 @@ const submit = () => {
             router.visit(
                 route("my-store.transaction.edit", {
                     transaction: result.transaction,
+                    success: "true",
                 })
             );
         })

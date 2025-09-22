@@ -7,6 +7,7 @@ import axios from "axios";
 import OrderContentRow from "@/Components/OrderContentRow.vue";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
+import SuccessView from "@/Components/SuccessView.vue";
 
 const props = defineProps({
     transaction: {
@@ -60,7 +61,16 @@ window.onpopstate = function () {
         ]"
     >
         <DefaultCard :isMain="true">
+            <SuccessView
+                v-if="route().params.success == 'true'"
+                title="Transaksi Berhasil!"
+            />
             <OrderDetail
+                :data-aos="
+                    route().params.success == 'true' ? 'fade-up' : 'none'
+                "
+                data-aos-delay="1600"
+                data-aos-duration="600"
                 :transaction="props.transaction"
                 :groups="props.groups"
                 :showTracking="false"

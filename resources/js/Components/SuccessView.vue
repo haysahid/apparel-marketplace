@@ -2,12 +2,11 @@
 const props = defineProps({
     title: {
         type: String,
-        default: "Order Confirmed!",
+        default: "Pesanan Berhasil Dibuat!",
     },
     subtitle: {
         type: String,
-        default:
-            "Thank you for your purchase! Your order has been successfully placed and you'll receive a confirmation email shortly.",
+        default: null,
     },
 });
 </script>
@@ -34,16 +33,14 @@ const props = defineProps({
             <h1
                 class="mb-4 text-2xl font-bold text-green-500 sm:text-3xl title bg-clip-text"
             >
-                {{ title || "Order Confirmed!" }}
+                {{ props.title || "Order Confirmed!" }}
             </h1>
 
             <p
+                v-if="props.subtitle"
                 class="text-sm leading-relaxed text-gray-600 sm:text-base subtitle"
             >
-                {{
-                    subtitle ||
-                    "Thank you for your purchase! Your order has been successfully placed and you'll receive a confirmation email shortly."
-                }}
+                {{ props.subtitle }}
             </p>
         </div>
     </div>
