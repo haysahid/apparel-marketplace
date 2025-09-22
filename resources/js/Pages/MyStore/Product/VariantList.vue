@@ -11,6 +11,7 @@ import InputLabel from "@/Components/InputLabel.vue";
 import Chip from "@/Components/Chip.vue";
 import InputGroup from "@/Components/InputGroup.vue";
 import ColorChip from "@/Components/ColorChip.vue";
+import VariantFilter from "@/Components/VariantFilter.vue";
 
 const props = defineProps({
     product: {
@@ -133,66 +134,13 @@ const openAddVariantForm = () => {
                             </SecondaryButton>
                         </template>
                         <template #content>
-                            <div class="flex flex-col gap-2 p-4">
-                                <div
-                                    class="flex items-center justify-between gap-2"
-                                >
-                                    <h3 class="text-sm font-semibold">
-                                        Filter Variasi Produk
-                                    </h3>
-                                    <button
-                                        v-if="selectedMotif || selectedColor"
-                                        type="button"
-                                        class="text-sm text-red-700 hover:underline w-fit"
-                                        @click="
-                                            selectedMotif = null;
-                                            selectedColor = null;
-                                        "
-                                    >
-                                        Hapus Filter
-                                    </button>
-                                </div>
-                                <InputGroup label="Motif">
-                                    <div class="flex flex-wrap gap-2">
-                                        <Chip
-                                            v-for="(motif, index) in motifs"
-                                            :key="index"
-                                            :label="motif"
-                                            :selected="selectedMotif == motif"
-                                            @click="
-                                                if (selectedMotif == motif) {
-                                                    selectedMotif = null;
-                                                } else {
-                                                    selectedMotif = motif;
-                                                }
-                                            "
-                                        />
-                                    </div>
-                                </InputGroup>
-                                <InputGroup label="Warna">
-                                    <div class="flex flex-wrap gap-2">
-                                        <ColorChip
-                                            v-for="(color, index) in colors"
-                                            :key="index"
-                                            :label="color.name"
-                                            :hexCode="color.hex_code"
-                                            :selected="
-                                                selectedColor?.id == color.id
-                                            "
-                                            @click="
-                                                if (
-                                                    selectedColor?.id ==
-                                                    color.id
-                                                ) {
-                                                    selectedColor = null;
-                                                } else {
-                                                    selectedColor = color;
-                                                }
-                                            "
-                                        />
-                                    </div>
-                                </InputGroup>
-                            </div>
+                            <VariantFilter
+                                :motifs="motifs"
+                                :colors="colors"
+                                v-model:selectedMotif="selectedMotif"
+                                v-model:selectedColor="selectedColor"
+                                class="p-4"
+                            />
                         </template>
                     </Dropdown>
                 </div>
@@ -201,7 +149,7 @@ const openAddVariantForm = () => {
             <!-- Active Filter -->
             <div
                 v-if="selectedMotif || selectedColor"
-                class="flex items-center justify-between w-full gap-2 mt-1"
+                class="flex flex-wrap items-center justify-between w-full gap-2 mt-1"
             >
                 <div class="flex items-center gap-2">
                     <Chip
@@ -239,6 +187,7 @@ const openAddVariantForm = () => {
                     <ColorChip
                         v-if="selectedColor"
                         :label="selectedColor.name"
+                        :hexCode="selectedColor.hex_code"
                         :selected="true"
                         class="pr-2 !gap-1 !cursor-default text-sm"
                         radioClasses="!size-4 mr-0.5"
@@ -322,6 +271,8 @@ const openAddVariantForm = () => {
                     <p
                         v-if="
                             index == 0 ||
+                            variant.motif !=
+                                filteredVariants[index - 1].motif ||
                             variant.color_id !=
                                 filteredVariants[index - 1].color_id
                         "

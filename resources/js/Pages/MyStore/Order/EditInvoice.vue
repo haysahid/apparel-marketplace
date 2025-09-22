@@ -70,7 +70,7 @@ window.onpopstate = function () {
 
 <template>
     <MyStoreLayout
-        :title="`${props.invoice.code}`"
+        title="Detail Pesanan"
         :showTitle="true"
         :breadcrumbs="[
             { text: 'Pesanan', url: '/my-store/order', active: false },

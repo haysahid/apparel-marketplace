@@ -9,4 +9,7 @@ interface OrderDetailFormModel {
     guest_name?: string | null;
     guest_email?: string | null;
     guest_phone?: string | null;
+
+    // Customer Info
+    customer: UserEntity | null;
 }

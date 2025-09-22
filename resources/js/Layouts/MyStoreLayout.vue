@@ -33,6 +33,7 @@ defineProps({
             <MyStoreSidebar />
 
             <div
+                id="main-area"
                 class="flex-1 w-full transition-all duration-300 ease-in-out md:ml-64 h-[calc(100vh-72px)] sm:min-h-[calc(100vh-72px)] relative mt-[72px] overflow-x-hidden"
             >
                 <!-- Header -->

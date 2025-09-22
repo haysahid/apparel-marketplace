@@ -19,6 +19,7 @@ use App\Models\User;
 use App\Repositories\MidtransRepository;
 use App\Repositories\VoucherRepository;
 use App\UseCases\CheckoutUseCase;
+use App\UseCases\SyncCartUseCase;
 use App\UseCases\ValidateTransactionPaymentUseCase;
 use Exception;
 use GuzzleHttp\Client;
@@ -127,36 +128,7 @@ class OrderController extends Controller
                 // Skip empty groups
                 if (empty($group['items'])) continue;
 
-                $updatedGroup = $group;
-
-                $store = Store::find($group['store_id']);
-                $updatedGroup['store'] = $store;
-                $updatedGroup['updated_at'] = now()->toDateTimeString();
-
-                $items = $group['items'];
-                $updateItems = [];
-
-                foreach ($items as $item) {
-                    $product = Product::find($item['product_id']);
-                    if (!$product) continue;
-
-                    $variant = ProductVariant::find($item['variant_id']);
-                    if (!$variant) continue;
-
-                    $updatedItem = $item;
-
-                    // Add variant and image to the item
-                    $updatedItem['variant'] = $variant;
-                    $updatedItem['image'] = $variant->images->first()->image ?? $product->images->first()->image;
-
-                    // Add created_at and updated_at timestamps
-                    $updatedItem['updated_at'] = $item['updated_at'] ?? now()->toDateTimeString();
-
-                    $updateItems[] = $updatedItem;
-                }
-
-                $updatedGroup['items'] = $updateItems;
-                $updateCartGroups[$key] = $updatedGroup;
+                $updateCartGroups[$key] = SyncCartUseCase::sync($group);
             }
 
             return ResponseFormatter::success(
@@ -441,6 +413,78 @@ class OrderController extends Controller
         return $this->checkoutUseCase->execute(
             data: $validated,
             isGuestCheckout: true,
+        )->fold(
+            onSuccess: fn($data, $code) => ResponseFormatter::success($data, 'Pesanan berhasil dibuat', $code),
+            onError: fn($error, $code) => ResponseFormatter::error($error, $code)
+        );
+    }
+
+    public function checkoutStore(Request $request)
+    {
+        $validated = $request->validate([
+            'cart_groups' => 'required|array',
+            'cart_groups.*.store_id' => 'required|integer|exists:stores,id',
+            'cart_groups.*.voucher_code' => 'nullable|string|exists:vouchers,code',
+            'cart_groups.*.items' => 'required|array',
+            'cart_groups.*.items.*.product_id' => 'required|integer|exists:products,id',
+            'cart_groups.*.items.*.variant_id' => 'required|integer|exists:product_variants,id',
+            'cart_groups.*.items.*.quantity' => 'required|integer|min:1',
+            'payment_method_id' => 'required|integer|exists:payment_methods,id',
+            'shipping_method_id' => 'required|integer|exists:shipping_methods,id',
+            'destination_id' => 'nullable|integer',
+            'destination_label' => 'nullable|string',
+            'province_name' => 'nullable|string',
+            'city_name' => 'nullable|string',
+            'district_name' => 'nullable|string',
+            'subdistrict_name' => 'nullable|string',
+            'zip_code' => 'nullable|string',
+            'address' => 'nullable|string',
+            'note' => 'nullable|string',
+            'voucher_code' => 'nullable|string|exists:vouchers,code',
+            'customer_id' => 'nullable|integer|exists:users,id',
+            'guest_name' => 'nullable|string|max:255',
+            'guest_email' => 'nullable|email|max:255',
+            'guest_phone' => 'nullable|string|max:20',
+        ], [
+            'cart_groups.required' => 'Keranjang harus diisi',
+            'cart_groups.*.store_id.required' => 'ID toko harus diisi',
+            'cart_groups.*.store_id.exists' => 'Toko tidak ditemukan',
+            'cart_groups.*.voucher_code.string' => 'Kode voucher harus berupa string',
+            'cart_groups.*.voucher_code.exists' => 'Kode voucher tidak ditemukan',
+            'cart_groups.*.items.required' => 'Item keranjang harus diisi',
+            'cart_groups.*.items.*.product_id.required' => 'ID produk harus diisi',
+            'cart_groups.*.items.*.product_id.exists' => 'Produk tidak ditemukan',
+            'cart_groups.*.items.*.variant_id.required' => 'ID varian produk harus diisi',
+            'cart_groups.*.items.*.variant_id.exists' => 'Varian produk tidak ditemukan',
+            'cart_groups.*.items.*.quantity.min' => 'Jumlah produk minimal 1',
+            'payment_method_id.required' => 'Metode pembayaran harus diisi',
+            'payment_method_id.exists' => 'Metode pembayaran tidak ditemukan',
+            'shipping_method_id.required' => 'Metode pengiriman harus diisi',
+            'shipping_method_id.exists' => 'Metode pengiriman tidak ditemukan',
+            'destination_id.integer' => 'ID tujuan harus berupa angka',
+            'destination_label.string' => 'Label tujuan harus berupa string',
+            'province_name.string' => 'Nama provinsi harus berupa string',
+            'city_name.string' => 'Nama kota harus berupa string',
+            'district_name.string' => 'Nama kecamatan harus berupa string',
+            'subdistrict_name.string' => 'Nama kelurahan harus berupa string',
+            'zip_code.string' => 'Kode pos harus berupa string',
+            'address.string' => 'Alamat harus berupa string',
+            'note.string' => 'Catatan harus berupa string',
+            'voucher_code.string' => 'Kode voucher harus berupa string',
+            'voucher_code.exists' => 'Kode voucher tidak ditemukan',
+            'customer_id.integer' => 'ID pelanggan harus berupa angka',
+            'customer_id.exists' => 'Pelanggan tidak ditemukan',
+            'guest_name.string' => 'Nama harus berupa string',
+            'guest_name.max' => 'Nama maksimal 255 karakter',
+            'guest_email.email' => 'Email tidak valid',
+            'guest_email.max' => 'Email maksimal 255 karakter',
+            'guest_phone.string' => 'Nomor telepon harus berupa string',
+            'guest_phone.max' => 'Nomor telepon maksimal 20 karakter',
+        ]);
+
+        return $this->checkoutUseCase->execute(
+            data: $validated,
+            isStoreCheckout: true,
         )->fold(
             onSuccess: fn($data, $code) => ResponseFormatter::success($data, 'Pesanan berhasil dibuat', $code),
             onError: fn($error, $code) => ResponseFormatter::error($error, $code)

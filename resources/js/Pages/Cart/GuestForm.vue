@@ -4,9 +4,12 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { useOrderStore } from "@/stores/order-store";
 import { useForm } from "@inertiajs/vue3";
-import { watch } from "vue";
 
 const props = defineProps({
+    title: {
+        type: String || null,
+        default: "Data Pemesan",
+    },
     isEdit: {
         type: Boolean,
         default: false,
@@ -23,21 +26,22 @@ const form = useForm({
     guest_phone: orderStore.form.guest_phone,
 });
 
-watch(
-    () => form.data(),
-    (newValue) => {
-        orderStore.updateForm({
-            ...orderStore.form,
-            ...newValue,
-        });
-    }
-);
+function submit() {
+    orderStore.updateForm({
+        ...orderStore.form,
+        ...form.data(),
+    });
+
+    emit("submit");
+}
 </script>
 
 <template>
-    <form @submit.prevent="emit('submit')" class="w-full">
+    <form @submit.prevent="submit" class="w-full">
         <div class="flex flex-col w-full gap-4 gap-y-4">
-            <h3 class="text-lg font-semibold text-gray-700">Data Pemesan</h3>
+            <h3 v-if="props.title" class="text-lg font-semibold text-gray-700">
+                {{ title }}
+            </h3>
 
             <div class="flex flex-col gap-y-3">
                 <InputGroup label="Nama Lengkap" id="name">

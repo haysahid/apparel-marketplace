@@ -53,6 +53,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/create-store', [StoreController::class, 'store'])->name('store.store');
 });
 
+// Admin Routes
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [AdminController::class, 'login'])->name('login');
     Route::post('/login', [AdminController::class, 'loginProcess']);
@@ -83,6 +84,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
+// My Store Routes
 Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->group(function () {
     Route::get('/', [MyStoreController::class, 'index'])->name('index');
     Route::get('/select-store/{storeId}', [MyStoreController::class, 'selectStore'])->name('select-store');

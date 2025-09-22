@@ -21,6 +21,10 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    isShowingFromMyStore: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const orderCreated = (date: string | null, status: boolean) => {
@@ -489,7 +493,10 @@ const emit = defineEmits(["continuePayment"]);
         <!-- Details -->
         <LandingSection class="!flex-col !justify-start !min-h-[56vh]">
             <div
-                class="flex flex-col-reverse items-center justify-center w-full gap-5 mx-auto xl:flex-row xl:items-start sm:gap-8 max-w-7xl"
+                class="flex flex-col-reverse items-center justify-center w-full gap-5 mx-auto xl:flex-row xl:items-start max-w-7xl"
+                :class="{
+                    'max-w-none': props.isShowingFromMyStore,
+                }"
             >
                 <!-- Items -->
                 <div class="flex flex-col w-full gap-4">
@@ -501,14 +508,14 @@ const emit = defineEmits(["continuePayment"]);
                     />
                 </div>
 
-                <div class="flex flex-col w-full gap-5 xl:gap-6 xl:max-w-sm">
+                <div class="flex flex-col w-full gap-5 xl:max-w-sm">
                     <!-- Summary -->
                     <div
                         class="flex flex-col w-full p-4 outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl gap-y-3"
                     >
                         <div class="flex items-center justify-between">
                             <h3 class="font-semibold text-gray-800">
-                                Data Pemesan
+                                Data Pengguna
                             </h3>
                         </div>
                         <DetailRow
@@ -531,7 +538,7 @@ const emit = defineEmits(["continuePayment"]);
                         <template #additionalInfo v-if="$slots.additionalInfo">
                             <slot name="additionalInfo" />
                         </template>
-                        <template #actions>
+                        <template #actions v-if="$slots.actions">
                             <slot name="actions" />
                         </template>
                     </OrderSummaryCard>

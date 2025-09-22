@@ -75,7 +75,7 @@ const finalPrice = computed(() => {
                     class="flex flex-col items-start justify-start w-full gap-0.5 sm:gap-1"
                 >
                     <p
-                        class="text-sm font-medium text-gray-900 md:text-base pe-12"
+                        class="text-sm font-medium text-gray-900 md:text-base pe-12 text-start"
                     >
                         {{ props.product.name }}
                     </p>

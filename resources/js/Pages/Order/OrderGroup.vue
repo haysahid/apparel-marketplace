@@ -2,7 +2,7 @@
 import Tooltip from "@/Components/Tooltip.vue";
 import OrderItem from "./OrderItem.vue";
 import { ref } from "vue";
-import { Link } from "@inertiajs/vue3";
+import { Link, usePage } from "@inertiajs/vue3";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 
@@ -26,6 +26,22 @@ function copyToClipboard(text: string) {
         isCopied.value = false;
     }, 2000);
 }
+
+const page = usePage();
+
+const showDetailButton =
+    route().current("order.success") ||
+    route().current("order.success.guest") ||
+    route().current("my-store.transaction.edit");
+
+const detailLink = route().current("my-store.transaction.edit")
+    ? route("my-store.order.edit", {
+          invoice: props.orderGroup.invoice,
+      })
+    : route(
+          page.props.auth.user ? "my-order.detail" : "my-order.detail.guest",
+          props.orderGroup.invoice?.code
+      );
 </script>
 
 <template>
@@ -57,19 +73,13 @@ function copyToClipboard(text: string) {
             </div>
 
             <Link
-                v-if="
-                    route().current('order.success') ||
-                    route().current('order.success.guest')
+                v-if="showDetailButton"
+                :href="detailLink"
+                :target="
+                    route().current('my-store.transaction.edit')
+                        ? undefined
+                        : '_blank'
                 "
-                :href="
-                    route(
-                        $page.props.auth.user
-                            ? 'my-order.detail'
-                            : 'my-order.detail.guest',
-                        props.orderGroup.invoice?.code
-                    )
-                "
-                target="_blank"
             >
                 <PrimaryButton type="button" @click="$event.stopPropagation()">
                     <template #prefix>

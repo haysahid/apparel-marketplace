@@ -52,7 +52,7 @@ window.onpopstate = function () {
 
 <template>
     <MyStoreLayout
-        :title="`${props.transaction.code}`"
+        title="Detail Transaksi"
         :showTitle="true"
         :breadcrumbs="[
             { text: 'Transaksi', url: '/my-store/transaction', active: false },
@@ -63,16 +63,18 @@ window.onpopstate = function () {
             <OrderDetail
                 :transaction="props.transaction"
                 :groups="props.groups"
-                class="!px-0 !pt-8 md:!px-11"
+                :showTracking="false"
+                :isShowingFromMyStore="true"
+                class="!px-0"
             >
-                <template #actions>
+                <!-- <template #actions>
                     <PrimaryButton
                         @click="showChangeStatusDialog = true"
                         class="w-full"
                     >
                         Ubah Status
                     </PrimaryButton>
-                </template>
+                </template> -->
             </OrderDetail>
         </DefaultCard>
 

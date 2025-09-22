@@ -63,9 +63,13 @@ const openAddVariantForm = () => {
 </script>
 
 <template>
-    <div class="flex flex-col items-start w-full gap-4">
+    <div
+        class="flex flex-col items-start w-full gap-2 py-4 transition-all duration-300 ease-in-out sm:gap-4 sm:py-6"
+    >
         <!-- Header -->
-        <div class="flex flex-col items-start w-full gap-2 px-6 bg-white">
+        <div
+            class="flex flex-col items-start w-full gap-2 px-4 bg-white sm:px-6"
+        >
             <div class="flex items-start justify-between w-full gap-2">
                 <div class="text-left">
                     <h2 class="font-semibold">Pilih Variasi Produk</h2>
@@ -91,7 +95,7 @@ const openAddVariantForm = () => {
                     <Dropdown
                         v-if="props.variants.length > 0"
                         align="right"
-                        width="sm"
+                        width="xs"
                         :closeWhenSelect="false"
                     >
                         <template #trigger>
@@ -137,7 +141,7 @@ const openAddVariantForm = () => {
             <!-- Active Filter -->
             <div
                 v-if="!screenSize.is('md') && (selectedMotif || selectedColor)"
-                class="flex items-center justify-between w-full gap-2 mt-1"
+                class="flex flex-wrap items-center justify-between w-full gap-2 mt-1"
             >
                 <div class="flex items-center gap-2">
                     <Chip
@@ -175,6 +179,7 @@ const openAddVariantForm = () => {
                     <ColorChip
                         v-if="selectedColor"
                         :label="selectedColor.name"
+                        :hexCode="selectedColor.hex_code"
                         :selected="true"
                         class="pr-2 !gap-1 !cursor-default text-sm"
                         radioClasses="!size-4 mr-0.5"
@@ -220,9 +225,12 @@ const openAddVariantForm = () => {
         </div>
 
         <!-- List -->
-        <div class="flex gap-6 mt-1.5 px-6 w-full">
+        <div class="flex mt-1.5 w-full">
             <!-- SideFilter -->
-            <aside v-if="screenSize.is('md')" class="w-full max-w-[300px]">
+            <aside
+                v-if="screenSize.is('md')"
+                class="w-full max-w-[300px] pl-4 sm:pl-6"
+            >
                 <VariantFilter
                     :motifs="motifs"
                     :colors="colors"
@@ -232,7 +240,7 @@ const openAddVariantForm = () => {
             </aside>
 
             <div
-                class="w-full overflow-y-auto h-[calc(80vh-120px)]"
+                class="w-full overflow-y-auto h-[calc(80vh-120px)] px-4 sm:px-6"
                 :class="{
                     'h-[calc(80vh-168px)]':
                         !screenSize.is('md') &&
@@ -299,6 +307,8 @@ const openAddVariantForm = () => {
                             <p
                                 v-if="
                                     index == 0 ||
+                                    variant.motif !=
+                                        filteredVariants[index - 1].motif ||
                                     variant.color_id !=
                                         filteredVariants[index - 1].color_id
                                 "

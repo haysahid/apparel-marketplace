@@ -24,6 +24,7 @@ class TransactionRepository
         $transactions = Transaction::query();
 
         $transactions->with([
+            'type',
             'user',
             'payment_method',
             'shipping_method',

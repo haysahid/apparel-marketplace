@@ -60,7 +60,8 @@ const loadFile = (file) => {
         :class="{
             'hover:outline-gray-300 ': drag,
             'pr-3.5': !showDeleteButton,
-            'outline-2 outline-primary': selected,
+            'outline-2 outline-primary hover:!outline-primary cursor-auto':
+                selected,
         }"
         @click="emit('click')"
     >
@@ -153,7 +154,7 @@ const loadFile = (file) => {
                     {{
                         props.variant.current_stock_level +
                         " " +
-                        props.variant.unit?.name
+                        (props.variant.unit?.name || "")
                     }}
                 </p>
             </div>

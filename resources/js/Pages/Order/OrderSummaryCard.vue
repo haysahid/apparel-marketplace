@@ -46,10 +46,10 @@ const isCopied = ref(false);
     <div
         class="flex flex-col w-full gap-4 p-4 xl:max-w-sm outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl gap-y-3"
     >
-        <h3 class="font-semibold text-gray-700">Ringkasan Pemesanan</h3>
+        <h3 class="font-semibold text-gray-700">Ringkasan Transaksi</h3>
         <div>
             <div class="flex flex-col gap-2">
-                <OrderContentRow label="Kode Pemesanan">
+                <OrderContentRow label="Kode Transaksi">
                     <template #value>
                         <div class="flex items-center gap-0.5">
                             <p

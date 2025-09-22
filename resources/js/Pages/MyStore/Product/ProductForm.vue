@@ -465,7 +465,7 @@ const tabIndex = ref(0);
                             Isi informasi produk dan variasi.
                         </p>
                     </div>
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 sm:gap-3">
                         <SecondaryButton
                             type="button"
                             @click="$inertia.visit(route('my-store.product'))"

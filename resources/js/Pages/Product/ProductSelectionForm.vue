@@ -347,7 +347,7 @@ defineExpose({
             <!-- Quantity -->
             <QuantityInput
                 v-model="quantity"
-                :unit="selectedVariant?.unit"
+                :unit="selectedVariant?.unit?.name"
                 :max="availableStock"
             />
         </div>

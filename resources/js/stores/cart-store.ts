@@ -1,8 +1,11 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
+import axios from "axios";
 
 export const useCartStore = defineStore("cart_groups", () => {
     const key = "cart_groups";
+
+    const syncStatus = ref(null);
 
     const groups = ref(
         localStorage.getItem(key)
@@ -217,6 +220,33 @@ export const useCartStore = defineStore("cart_groups", () => {
         localStorage.setItem(key, JSON.stringify(groups.value));
     };
 
+    const syncCart = () => {
+        if (groups.value.length === 0) return;
+
+        for (const group of groups.value) {
+            for (const item of group.items) {
+                if (!group.store_id) {
+                    group.store_id = item.store_id;
+                }
+                if (item.store) delete item.store;
+                if (item.variant) delete item.variant;
+            }
+        }
+
+        syncStatus.value = "loading";
+        axios
+            .post("/api/sync-cart", { cart_groups: groups.value })
+            .then((response) => {
+                const updatedGroups = response.data.result;
+                groups.value = updatedGroups;
+                localStorage.setItem(key, JSON.stringify(groups.value));
+                syncStatus.value = "success";
+            })
+            .catch((error) => {
+                syncStatus.value = "error";
+            });
+    };
+
     return {
         groups,
         items,
@@ -237,5 +267,7 @@ export const useCartStore = defineStore("cart_groups", () => {
         updateGroups,
         updateAllGroups,
         removeSelectedItems,
+        syncStatus,
+        syncCart,
     };
 });

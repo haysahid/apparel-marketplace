@@ -83,7 +83,7 @@ const maxWidthClass = computed(() => {
         ref="dialog"
     >
         <div
-            class="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 overflow-y-auto sm:px-0"
+            class="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 overflow-y-auto"
             scroll-region
         >
             <transition

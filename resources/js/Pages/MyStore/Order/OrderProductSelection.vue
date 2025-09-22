@@ -10,6 +10,13 @@ import MyProductCard from "@/Pages/MyStore/Product/MyProductCard.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import axios from "axios";
 
+const props = defineProps({
+    isModal: {
+        type: Boolean,
+        default: false,
+    },
+});
+
 const emit = defineEmits(["selectProduct", "deselectProduct"]);
 
 const data = ref({
@@ -55,15 +62,17 @@ const filters = useForm({
     search: null,
     brand_id: null,
     brand: null,
+    page: 1,
 });
 
 const getProductsStatus = ref(null);
 
 function getProducts() {
-    let queryParams = {};
-
-    if (filters.search) queryParams.search = filters.search;
-    if (filters.brand_id) queryParams.brand_id = filters.brand_id;
+    const queryParams = {
+        page: filters.page,
+        brand_id: filters.brand_id,
+        search: filters.search,
+    };
 
     getProductsStatus.value = "loading";
     axios
@@ -99,19 +108,36 @@ function getBrands() {
         });
 }
 getBrands();
+
+const changePage = (page) => {
+    filters.page = page;
+    getProducts();
+
+    // Scroll product list component to top
+    const productListElement = document.querySelector(
+        props.isModal ? "product-list" : "#main-area"
+    );
+    if (productListElement) {
+        productListElement.scrollTo({ top: 0, behavior: "smooth" });
+    }
+};
 </script>
 
 <template>
-    <DefaultCard :isMain="true">
-        <div class="flex items-center justify-between gap-4">
-            <!-- <PrimaryButton
-                type="button"
-                class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
-                @click="$inertia.visit(route('my-store.product.create'))"
-            >
-                Tambah
-            </PrimaryButton> -->
-            <h2 class="font-semibold">Pilih Produk</h2>
+    <DefaultCard
+        :isMain="true"
+        :class="{
+            '!px-0 py-4 sm:py-6 flex flex-col gap-4 transition-all duration-300 ease-in-out':
+                props.isModal,
+        }"
+    >
+        <div
+            class="flex items-center justify-between gap-4"
+            :class="{
+                'bg-white px-4 sm:px-6': props.isModal,
+            }"
+        >
+            <h2 class="font-semibold text-nowrap">Pilih Produk</h2>
             <div class="flex items-center gap-2">
                 <DropdownSearchInput
                     id="brand_id"
@@ -138,7 +164,7 @@ getBrands();
                             filters.brand_id = option?.value;
                             filters.brand = option
                                 ? filteredBrands.find(
-                                      (brand) => brand.id === brand.value
+                                      (brand) => brand.id === option.value
                                   )
                                 : null;
                             getProducts();
@@ -156,7 +182,10 @@ getBrands();
                     v-model="filters.search"
                     placeholder="Cari produk..."
                     class="max-w-48"
-                    @keyup.enter="getProducts()"
+                    @keyup.enter="
+                        filters.page = 1;
+                        getProducts();
+                    "
                 >
                     <template #suffix>
                         <svg
@@ -184,8 +213,13 @@ getBrands();
 
         <!-- Mobile View -->
         <div
+            id="product-list"
             class="flex flex-col gap-3 mt-4"
-            :class="{ 'min-h-auto h-[68vh]': products.length == 0 }"
+            :class="{
+                'min-h-auto h-[68vh]': products.length == 0,
+                'overflow-y-auto h-[calc(80vh-190px)] px-4 sm:px-6 mt-0':
+                    props.isModal,
+            }"
         >
             <div
                 v-if="getProductsStatus === 'loading'"
@@ -226,12 +260,22 @@ getBrands();
         </div>
 
         <!-- Pagination -->
-        <div v-if="data.total > 0" class="flex flex-col gap-2 mt-4">
-            <p class="text-xs text-gray-500 sm:text-sm">
+        <div
+            v-if="data.total > 0"
+            class="flex flex-col gap-2 mt-4"
+            :class="{
+                'px-4 sm:px-6 mt-0': props.isModal,
+            }"
+        >
+            <p class="text-xs text-gray-500 sm:text-sm text-start">
                 Menampilkan {{ data.from }} - {{ data.to }} dari
                 {{ data.total }} item
             </p>
-            <DefaultPagination :links="data.links" />
+            <DefaultPagination
+                :isApi="true"
+                :links="data.links"
+                @change="changePage"
+            />
         </div>
 
         <SuccessDialog

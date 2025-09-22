@@ -58,51 +58,49 @@ function formatPrice(price = 0) {
 
         <div v-if="props.item.variant" class="flex flex-col w-full gap-2">
             <!-- Detail -->
-            <div class="w-full">
-                <Link
-                    :href="
-                        route('product.show', props.item.variant.product.slug) +
-                        `?sku=${props.item.variant.sku}`
-                    "
-                    class="w-full"
+            <Link
+                :href="
+                    route('product.show', props.item.variant.product.slug) +
+                    `?sku=${props.item.variant.sku}`
+                "
+                class="w-full"
+            >
+                <h3
+                    class="w-full text-sm font-medium text-gray-800 sm:text-base hover:text-primary-dark"
                 >
-                    <h3
-                        class="w-full text-sm font-medium text-gray-800 sm:text-base hover:text-primary-dark"
-                    >
-                        {{ props.item.variant.name }}
-                    </h3>
-                </Link>
+                    {{ props.item.variant.name }}
+                </h3>
+            </Link>
 
-                <div class="flex items-center gap-x-2">
-                    <p class="text-sm text-gray-800">
-                        {{
-                            formatPrice(props.item.variant.final_selling_price)
-                        }}
-                    </p>
-                    <p
-                        v-if="props.item.variant.discount > 0"
-                        class="text-xs text-gray-500 line-through"
-                    >
-                        {{ formatPrice(props.item.variant.base_selling_price) }}
-                    </p>
-                    <DiscountTag
-                        v-if="props.item.variant.discount > 0"
-                        :discount-type="props.item.variant.discount_type"
-                        :discount="props.item.variant.discount"
-                        class="!text-xs !px-1 !py-0.5"
-                    />
-                </div>
+            <div class="flex items-center gap-x-2">
+                <DiscountTag
+                    v-if="props.item.variant.discount > 0"
+                    :discount-type="props.item.variant.discount_type"
+                    :discount="props.item.variant.discount"
+                    class="!text-xs !px-1 !py-0.5"
+                />
+                <p class="text-sm text-gray-800">
+                    {{ formatPrice(props.item.variant.final_selling_price) }}
+                </p>
+                <p
+                    v-if="props.item.variant.discount > 0"
+                    class="text-xs text-gray-500 line-through"
+                >
+                    {{ formatPrice(props.item.variant.base_selling_price) }}
+                </p>
             </div>
 
             <!-- Quantity and Total Price -->
             <div class="flex items-center justify-between">
                 <p class="text-sm font-semibold text-gray-800 text-start">
-                    x {{ props.item.quantity }} {{ props.item.variant?.unit }}
+                    x {{ props.item.quantity }}
+                    {{ props.item.variant?.unit?.name }}
                 </p>
                 <p class="text-sm font-semibold text-gray-800 text-end">
                     {{
                         formatPrice(
-                            item.variant.final_selling_price * item.quantity
+                            props.item.variant.final_selling_price *
+                                item.quantity
                         )
                     }}
                 </p>

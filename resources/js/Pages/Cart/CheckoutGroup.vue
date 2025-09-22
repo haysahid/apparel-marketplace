@@ -150,14 +150,14 @@ onMounted(() => {
         </div>
 
         <!-- Items -->
-        <template v-if="selectedItems?.length > 0">
+        <div v-if="selectedItems?.length > 0" class="w-full">
             <CheckoutItem
                 v-for="(item, index) in selectedItems"
                 :key="index"
                 :item="item"
                 :showDivider="index !== selectedItems.length - 1"
             />
-        </template>
+        </div>
 
         <!-- Divider -->
         <div
@@ -166,7 +166,9 @@ onMounted(() => {
         ></div>
 
         <!-- Summary -->
-        <div class="flex flex-col w-full gap-4 sm:flex-row sm:justify-between">
+        <div
+            class="flex flex-col w-full mt-1 gap-y-2 gap-x-4 sm:mt-1.5 sm:flex-row sm:justify-between"
+        >
             <!-- Voucher -->
             <div>
                 <InputGroup

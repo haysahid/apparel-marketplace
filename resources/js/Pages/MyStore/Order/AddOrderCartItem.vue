@@ -138,14 +138,14 @@ const hasActions = computed(() => {
                 </div>
 
                 <!-- Actions -->
-                <div v-if="hasActions" class="hidden w-full sm:block xl:w-fit">
+                <div v-if="hasActions" class="hidden w-full xl:block xl:w-fit">
                     <slot name="actions" />
                 </div>
             </div>
         </div>
 
         <!-- Actions -->
-        <div v-if="hasActions" class="block w-full sm:hidden">
+        <div v-if="hasActions" class="block w-full xl:hidden">
             <slot name="actions" />
         </div>
     </div>

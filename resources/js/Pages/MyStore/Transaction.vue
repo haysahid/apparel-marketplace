@@ -154,16 +154,16 @@ onMounted(() => {
 </script>
 
 <template>
-    <MyStoreLayout title="Pesanan" :showTitle="true">
+    <MyStoreLayout title="Transaksi" :showTitle="true">
         <DefaultCard :isMain="true">
-            <div class="flex items-center justify-between gap-4">
-                <PrimaryButton
+            <div class="flex items-center justify-end gap-4">
+                <!-- <PrimaryButton
                     type="button"
                     class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
                     @click="$inertia.visit(route('my-store.product.create'))"
                 >
                     Tambah
-                </PrimaryButton>
+                </PrimaryButton> -->
 
                 <div class="flex items-center gap-2">
                     <DropdownSearchInput
@@ -245,7 +245,8 @@ onMounted(() => {
                         <th class="w-12">No</th>
                         <th>Tanggal</th>
                         <th>Kode</th>
-                        <th>Pemesan</th>
+                        <th>Jenis</th>
+                        <th>Oleh</th>
                         <th>Item</th>
                         <th>Pembayaran</th>
                         <th>Pengiriman</th>
@@ -282,19 +283,22 @@ onMounted(() => {
                                 {{ transaction.code }}
                             </Link>
                         </td>
-                        <td class="text-center">
+                        <td>
+                            {{ transaction.type?.name }}
+                        </td>
+                        <td class="!whitespace-normal">
                             {{ transaction.user.name }}
                         </td>
-                        <td class="text-center">
+                        <td>
                             {{ transaction.items.length }}
                         </td>
-                        <td class="text-center">
+                        <td>
                             {{ transaction.payment_method.name }}
                         </td>
-                        <td class="text-center">
+                        <td>
                             {{ transaction.shipping_method.name }}
                         </td>
-                        <td class="text-center">
+                        <td>
                             {{
                                 $formatCurrency(
                                     transaction.items.reduce(
@@ -305,15 +309,11 @@ onMounted(() => {
                             }}
                         </td>
                         <td>
-                            <div class="flex items-center justify-center">
-                                <OrderStatusChip
-                                    :status="transaction.status"
-                                    :label="
-                                        transaction.status.toLocaleUpperCase()
-                                    "
-                                    class="w-fit"
-                                />
-                            </div>
+                            <OrderStatusChip
+                                :status="transaction.status"
+                                :label="transaction.status.toLocaleUpperCase()"
+                                class="w-fit"
+                            />
                         </td>
                         <td>
                             <AdminItemAction

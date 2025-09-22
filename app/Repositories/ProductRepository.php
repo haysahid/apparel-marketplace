@@ -84,6 +84,7 @@ class ProductRepository
             'categories',
             'images',
             'links.platform',
+            'store',
             'variants.color',
             'variants.size',
             'variants.unit',

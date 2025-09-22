@@ -323,7 +323,7 @@ setTimeout(() => {
         <!-- Tracking -->
         <div
             v-if="props.showTracking"
-            class="flex flex-col items-center gap-4 py-2 sm:py-4 mx-auto w-fit sm:gap-6"
+            class="flex flex-col items-center gap-4 py-2 mx-auto sm:py-4 w-fit sm:gap-6"
         >
             <div
                 class="flex items-start justify-center gap-4 md:gap-8 lg:gap-12"
@@ -403,7 +403,7 @@ setTimeout(() => {
         <!-- Details -->
         <LandingSection class="!flex-col !justify-start !min-h-[56vh]">
             <div
-                class="flex flex-col-reverse items-center justify-center w-full gap-5 mx-auto xl:flex-row xl:items-start sm:gap-8 max-w-7xl"
+                class="flex flex-col-reverse items-center justify-center w-full gap-5 mx-auto xl:flex-row xl:items-start max-w-7xl"
             >
                 <!-- Items -->
                 <OrderGroup
@@ -416,7 +416,7 @@ setTimeout(() => {
                     :showSummary="false"
                 />
 
-                <div class="flex flex-col w-full gap-5 xl:gap-6 xl:max-w-sm">
+                <div class="flex flex-col w-full gap-5 xl:max-w-sm">
                     <!-- Summary -->
                     <div
                         class="flex flex-col w-full p-4 outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl gap-y-3"
