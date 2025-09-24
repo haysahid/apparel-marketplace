@@ -7,7 +7,7 @@ interface PaymentEntity {
     reason: string | null;
     image: string | null;
     midtrans_snap_token: string | null;
-    midtrans_response: string | object | null;
+    midtrans_response: MidtransResponseEntity | null;
     status: string;
     created_at: string | null;
     updated_at: string | null;

@@ -12,46 +12,34 @@ import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import DefaultTable from "@/Components/DefaultTable.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
-import MyTransactionCard from "./Transaction/MyTransactionCard.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import DialogModal from "@/Components/DialogModal.vue";
+import MyPaymentCard from "./Payment/MyPaymentCard.vue";
 
 const screenSize = useScreenSize();
 
 const props = defineProps({
-    transactions: {
-        type: Object as () => {
-            data: TransactionEntity[];
-            current_page: number;
-            per_page: number;
-            total: number;
-            links: Array<{ url: string; label: string; active: boolean }>;
-            to: number;
-            from: number;
-        },
+    payments: {
+        type: Object as () => PaginationModel<PaymentEntity>,
         required: true,
     },
     transactionTypes: {
         type: Array as () => TransactionTypeEntity[],
         required: true,
     },
-    brands: {
-        type: Array as () => BrandEntity[],
-        required: true,
-    },
 });
 
 const page = usePage<PageProps>();
 
-const transactions = ref(
-    props.transactions.data.map((transaction) => ({
-        ...transaction,
+const payments = ref(
+    props.payments.data.map((payment) => ({
+        ...payment,
         showDeleteModal: false,
     }))
 );
 
 const showDeleteTransactionDialog = (id) => {
-    const transaction = transactions.value.find((item) => item.id === id);
+    const transaction = payments.value.find((item) => item.id === id);
     if (transaction) {
         transaction.showDeleteModal = true;
         console.log(`Deleting transaction with ID: ${transaction.id}`);
@@ -63,7 +51,7 @@ const closeDeleteTransactionDialog = (transaction, result) => {
         transaction.showDeleteModal = false;
         if (result) {
             openSuccessDialog("Data Berhasil Dihapus");
-            transactions.value = transactions.value.filter(
+            payments.value = payments.value.filter(
                 (item) => item.id !== transaction.id
             );
         }
@@ -118,23 +106,10 @@ const filteredTransactionTypes = computed(() => {
     );
 });
 
-const brands = (page.props.brands || []) as BrandEntity[];
-const brandSearch = ref("");
-
-const filteredBrands = computed(() => {
-    return brands.filter((brand) =>
-        brand.name
-            .toLowerCase()
-            .includes(brandSearch.value?.toLowerCase() || "")
-    );
-});
-
 const filters = useForm({
     search: null,
     transaction_type_id: null,
     transaction_type: null,
-    brand_id: null,
-    brand: null,
 });
 
 const getQueryParams = () => {
@@ -144,31 +119,26 @@ const getQueryParams = () => {
         props.transactionTypes.find(
             (type) => type.id === filters.transaction_type_id
         ) || null;
-    filters.brand_id = parseInt(route().params.brand_id) || null;
-    filters.brand =
-        props.brands.find((brand) => brand.id === filters.brand_id) || null;
 };
 getQueryParams();
 
-function getTransactions() {
+function getPayments() {
     let queryParams = {
         search: undefined,
         type_id: undefined,
-        brand_id: undefined,
     };
 
     if (filters.search) queryParams.search = filters.search;
     if (filters.transaction_type_id)
         queryParams.type_id = filters.transaction_type_id;
-    if (filters.brand_id) queryParams.brand_id = filters.brand_id;
 
-    router.get(route("my-store.transaction"), queryParams, {
+    router.get(route("my-store.payment"), queryParams, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
             getQueryParams();
-            transactions.value = props.transactions.data.map((transaction) => ({
-                ...transaction,
+            payments.value = props.payments.data.map((payment) => ({
+                ...payment,
                 showDeleteModal: false,
             }));
         },
@@ -181,21 +151,13 @@ onMounted(() => {
     }
 });
 
-const showTransactionTypeOptionDialog = ref(false);
+const showPaymentStatusOptionDialog = ref(false);
 </script>
 
 <template>
-    <MyStoreLayout title="Transaksi" :showTitle="true">
+    <MyStoreLayout title="Pembayaran" :showTitle="true">
         <DefaultCard :isMain="true">
-            <div class="flex items-center justify-between gap-4">
-                <PrimaryButton
-                    type="button"
-                    class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
-                    @click="showTransactionTypeOptionDialog = true"
-                >
-                    Tambah
-                </PrimaryButton>
-
+            <div class="flex items-center justify-end gap-4">
                 <div class="flex items-center gap-2">
                     <DropdownSearchInput
                         id="transaction_type_id"
@@ -224,7 +186,7 @@ const showTransactionTypeOptionDialog = ref(false);
                                           (type) => type.id === option.value
                                       )
                                     : null;
-                                getTransactions();
+                                getPayments();
                             }
                         "
                         @search="transactionTypeSearch = $event"
@@ -232,52 +194,14 @@ const showTransactionTypeOptionDialog = ref(false);
                             filters.transaction_type_id = null;
                             filters.transaction_type = null;
                             transactionTypeSearch = '';
-                            getTransactions();
-                        "
-                    />
-                    <DropdownSearchInput
-                        id="brand_id"
-                        :modelValue="
-                            filters.brand_id
-                                ? {
-                                      label: filters.brand?.name,
-                                      value: filters.brand_id,
-                                  }
-                                : null
-                        "
-                        :options="
-                            filteredBrands.map((brand) => ({
-                                label: brand.name,
-                                value: brand.id,
-                            }))
-                        "
-                        placeholder="Pilih Brand"
-                        class="max-w-48"
-                        :error="filters.errors.brand_id"
-                        @update:modelValue="
-                            (option) => {
-                                filters.brand_id = option?.value;
-                                filters.brand = option
-                                    ? filteredBrands.find(
-                                          (brand) => brand.id === option.value
-                                      )
-                                    : null;
-                                getTransactions();
-                            }
-                        "
-                        @search="brandSearch = $event"
-                        @clear="
-                            filters.brand_id = null;
-                            filters.brand = null;
-                            brandSearch = '';
-                            getTransactions();
+                            getPayments();
                         "
                     />
                     <TextInput
                         v-model="filters.search"
                         placeholder="Cari transaksi..."
                         class="max-w-48"
-                        @keyup.enter="getTransactions()"
+                        @keyup.enter="getPayments()"
                     >
                         <template #suffix>
                             <svg
@@ -306,116 +230,91 @@ const showTransactionTypeOptionDialog = ref(false);
             <!-- Table -->
             <DefaultTable
                 v-if="screenSize.is('xl')"
-                :isEmpty="transactions.length === 0"
+                :isEmpty="payments.length === 0"
                 class="mt-6"
             >
                 <template #thead>
                     <tr>
                         <th class="w-12">No</th>
                         <th>Tanggal</th>
-                        <th>Kode</th>
-                        <th>Jenis</th>
+                        <th>Kode Transaksi</th>
                         <th>Oleh</th>
-                        <th>Item</th>
-                        <th>Pembayaran</th>
-                        <th>Pengiriman</th>
+                        <th>Metode</th>
                         <th>Total</th>
                         <th>Status</th>
-                        <th class="w-24">Aksi</th>
+                        <th>Diterima</th>
+                        <!-- <th class="w-24">Aksi</th> -->
                     </tr>
                 </template>
                 <template #tbody>
-                    <tr
-                        v-for="(transaction, index) in transactions"
-                        :key="transaction.id"
-                    >
+                    <tr v-for="(payment, index) in payments" :key="payment.id">
                         <td>
                             {{
                                 index +
                                 1 +
-                                (props.transactions.current_page - 1) *
-                                    props.transactions.per_page
+                                (props.payments.current_page - 1) *
+                                    props.payments.per_page
                             }}
                         </td>
                         <td>
-                            {{ $formatDate(transaction.created_at) }}
+                            {{ $formatDate(payment.created_at) }}
                         </td>
                         <td>
                             <Link
                                 :href="
                                     route('my-store.transaction.edit', {
-                                        transaction: transaction,
+                                        transaction: payment,
                                     })
                                 "
                                 class="hover:underline"
                             >
-                                {{ transaction.code }}
+                                {{ payment.transaction.code }}
                             </Link>
                         </td>
-                        <td>
-                            {{ transaction.type?.name }}
-                        </td>
                         <td class="!whitespace-normal">
-                            {{ transaction.user.name }}
+                            {{ payment.transaction.user.name }}
                         </td>
                         <td>
-                            {{ transaction.items.length }}
-                        </td>
-                        <td>
-                            {{ transaction.payment_method.name }}
-                        </td>
-                        <td>
-                            {{ transaction.shipping_method.name }}
+                            {{ payment.payment_method.name }}
                         </td>
                         <td>
                             {{
                                 $formatCurrency(
-                                    transaction.items.reduce(
-                                        (total, item) => total + item.subtotal,
-                                        0
-                                    )
+                                    payment.midtrans_response?.gross_amount
                                 )
                             }}
                         </td>
                         <td>
                             <OrderStatusChip
-                                :status="transaction.status"
-                                :label="transaction.status.toLocaleUpperCase()"
+                                :status="payment.status"
+                                :label="payment.status.toLocaleUpperCase()"
                                 class="w-fit"
                             />
                         </td>
                         <td>
-                            <AdminItemAction
-                                @edit="
-                                    $inertia.visit(
-                                        route('my-store.transaction.edit', {
-                                            transaction: transaction,
-                                        })
-                                    )
-                                "
-                            />
+                            {{
+                                payment.status === "completed" &&
+                                payment.transaction.paid_at
+                                    ? `
+                                    ${payment.midtrans_response?.va_numbers[0]?.bank.toUpperCase()}
+                                 - ${$formatDate(payment.transaction.paid_at)}`
+                                    : "-"
+                            }}
                         </td>
+                        <!-- <td>
+                            <AdminItemAction
+                                @edit="showPaymentStatusOptionDialog = true"
+                            />
+                        </td> -->
                     </tr>
                 </template>
             </DefaultTable>
 
             <!-- Mobile View -->
             <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
-                <template v-if="transactions.length > 0">
-                    <div
-                        v-for="(transaction, index) in transactions"
-                        :key="transaction.id"
-                    >
-                        <MyTransactionCard
-                            :transaction="transaction"
-                            @edit="
-                                $inertia.visit(
-                                    route('my-store.transaction.edit', {
-                                        transaction: transaction,
-                                    })
-                                )
-                            "
-                        />
+                <template v-if="payments.length > 0">
+                    <div v-for="(payment, index) in payments" :key="payment.id">
+                        <MyPaymentCard :payment="payment" />
                     </div>
                 </template>
                 <div v-else class="flex items-center justify-center h-[40vh]">
@@ -427,20 +326,19 @@ const showTransactionTypeOptionDialog = ref(false);
 
             <!-- Pagination -->
             <div
-                v-if="props.transactions.total > 0"
+                v-if="props.payments.total > 0"
                 class="flex flex-col gap-2 mt-4"
             >
                 <p class="text-xs text-gray-500 sm:text-sm">
-                    Menampilkan {{ props.transactions.from }} -
-                    {{ props.transactions.to }} dari
-                    {{ props.transactions.total }} item
+                    Menampilkan {{ props.payments.from }} -
+                    {{ props.payments.to }} dari {{ props.payments.total }} item
                 </p>
-                <DefaultPagination :links="props.transactions.links" />
+                <DefaultPagination :links="props.payments.links" />
             </div>
 
             <DialogModal
-                :show="showTransactionTypeOptionDialog"
-                @close="showTransactionTypeOptionDialog = false"
+                :show="showPaymentStatusOptionDialog"
+                @close="showPaymentStatusOptionDialog = false"
             >
                 <template #title> Pilih Jenis Transaksi </template>
                 <template #content>
@@ -448,43 +346,19 @@ const showTransactionTypeOptionDialog = ref(false);
                         class="grid w-full grid-cols-2 gap-2 mt-2 sm:grid-cols-4"
                     >
                         <template
-                            v-for="type in [
-                                {
-                                    name: 'Pembelian',
-                                    slug: 'purchase',
-                                    effect_on_stock: 'inbound',
-                                },
-                                {
-                                    name: 'Penjualan',
-                                    slug: 'sale',
-                                    effect_on_stock: 'outbound',
-                                },
-                                {
-                                    name: 'Barang Hilang',
-                                    slug: 'damaged-out',
-                                    effect_on_stock: 'outbound',
-                                },
-                                {
-                                    name: 'Penggunaan Internal',
-                                    slug: 'internal-use',
-                                    effect_on_stock: 'outbound',
-                                },
+                            v-for="(status, index) in [
+                                'pending',
+                                'completed',
+                                'failed',
                             ]"
-                            :key="type.id"
+                            :key="index"
                         >
                             <button
                                 type="button"
                                 class="w-full px-4 py-2 text-center transition bg-white border rounded-lg shadow-sm hover:bg-gray-50 min-h-16"
-                                @click="
-                                    showTransactionTypeOptionDialog = false;
-                                    $inertia.visit(
-                                        route('my-store.order.create', {
-                                            type: type.slug,
-                                        })
-                                    );
-                                "
+                                @click="showPaymentStatusOptionDialog = false"
                             >
-                                {{ type.name }}
+                                {{ status.toLocaleUpperCase() }}
                             </button>
                         </template>
                     </div>

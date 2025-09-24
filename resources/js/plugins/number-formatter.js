@@ -6,6 +6,9 @@ export const formatCurrency = (value, options = {
     if (value === null || value === undefined) {
         value = 0;
     }
+    if (typeof value === 'string') {
+        value = parseFloat(value);
+    }
     return value.toLocaleString("id-ID", options);
 }
 
@@ -15,6 +18,9 @@ export const formatNumber = (value, options = {
 }) => {
     if (value === null || value === undefined) {
         value = 0;
+    }
+    if (typeof value === 'string') {
+        value = parseFloat(value);
     }
     return value.toLocaleString("id-ID", options);
 }
