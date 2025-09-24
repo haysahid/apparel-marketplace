@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AdminItemAction from "@/Components/AdminItemAction.vue";
 import { computed } from "vue";
-import { formatCurrency } from "@/plugins/number-formatter";
+import { formatCurrency, formatNumber } from "@/plugins/number-formatter";
 import DiscountTag from "@/Components/DiscountTag.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import { getImageUrl } from "@/plugins/helpers";
@@ -106,7 +106,7 @@ const finalPrice = computed(() => {
                             class="flex items-center gap-2 py-1.5 px-2 bg-gray-100 rounded-md"
                         >
                             <p class="text-sm font-medium text-gray-600">
-                                {{ props.product?.stock_count }}
+                                {{ formatNumber(props.product?.stock_count) }}
                             </p>
                         </div>
                     </div>

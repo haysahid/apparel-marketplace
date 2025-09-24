@@ -10,7 +10,7 @@ const props = defineProps({
 
 <template>
     <div
-        class="flex items-center w-full gap-2 p-4 mx-auto text-sm border rounded-xl sm:text-base max-w-7xl"
+        class="flex items-center w-full gap-2 p-4 mx-auto text-sm border rounded-xl sm:text-base"
         :class="{
             'text-blue-800 border-blue-300 bg-blue-50': props.type === 'info',
             'text-yellow-800 border-yellow-300 bg-yellow-50':

@@ -49,6 +49,12 @@ const isCopied = ref(false);
         <h3 class="font-semibold text-gray-700">Ringkasan Transaksi</h3>
         <div>
             <div class="flex flex-col gap-2">
+                <OrderContentRow
+                    v-if="route().current('my-store.transaction.edit')"
+                    label="Jenis Transaksi"
+                    :value="props.transaction.type?.name"
+                />
+
                 <OrderContentRow label="Kode Transaksi">
                     <template #value>
                         <div class="flex items-center gap-0.5">
@@ -96,7 +102,7 @@ const isCopied = ref(false);
                 </OrderContentRow>
 
                 <OrderContentRow
-                    label="Tgl. Pemesanan"
+                    label="Tgl. Transaksi"
                     :value="$formatDate(props.transaction.created_at)"
                 />
                 <OrderContentRow

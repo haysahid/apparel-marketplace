@@ -52,12 +52,6 @@ class OrderController extends Controller
             return redirect()->route('my-order')->with('error', 'Invalid order details.');
         }
 
-        // Decode midtrans response for each payment
-        $transaction->payments = $transaction->payments->map(function ($payment) {
-            $payment->midtrans_response = json_decode($payment->midtrans_response, true);
-            return $payment;
-        });
-
         return Inertia::render('OrderSuccess', [
             'transaction' => $transaction,
             'groups' => $groups,
@@ -93,12 +87,6 @@ class OrderController extends Controller
             Log::error('No invoice or transaction code provided for order success.');
             return redirect()->route('my-order')->with('error', 'Invalid order details.');
         }
-
-        // Decode midtrans response for each payment
-        $transaction->payments = $transaction->payments->map(function ($payment) {
-            $payment->midtrans_response = json_decode($payment->midtrans_response, true);
-            return $payment;
-        });
 
         return Inertia::render('OrderSuccess', [
             'transaction' => $transaction,

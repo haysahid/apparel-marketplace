@@ -8,11 +8,19 @@ use App\Models\Brand;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
+use App\Repositories\TransactionTypeRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class MyStoreTransactionController extends Controller
 {
+    private $storeId;
+
+    public function __construct()
+    {
+        $this->storeId = session('selected_store_id');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -21,6 +29,7 @@ class MyStoreTransactionController extends Controller
         $limit = $request->input('limit', 10);
         $orderBy = $request->input('order_by', 'created_at');
         $orderDirection = $request->input('order_direction', 'desc');
+        $typeId = $request->input('type_id');
         $brandId = $request->input('brand_id');
         $search = $request->input('search');
 
@@ -30,11 +39,16 @@ class MyStoreTransactionController extends Controller
             search: $search,
             orderBy: $orderBy,
             orderDirection: $orderDirection,
+            typeId: $typeId,
             brandId: $brandId,
         );
 
         return Inertia::render('MyStore/Transaction', [
             'transactions' => $transactions,
+            'transactionTypes' => TransactionTypeRepository::getTransactionTypeDropdown(
+                orderBy: 'name',
+                orderDirection: 'asc',
+            ),
             'brands' => Brand::orderBy('name', 'asc')->get(),
         ]);
     }

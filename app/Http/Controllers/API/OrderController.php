@@ -728,4 +728,22 @@ class OrderController extends Controller
             );
         }
     }
+
+    public function midtransPaymentMethods(Request $request)
+    {
+        try {
+            $paymentMethods = $this->midtransRepository->getPaymentMethods();
+
+            return ResponseFormatter::success(
+                $paymentMethods,
+                'Metode pembayaran berhasil diambil',
+                200
+            );
+        } catch (Exception $e) {
+            return ResponseFormatter::error(
+                'Gagal mengambil metode pembayaran: ' . $e->getMessage(),
+                500
+            );
+        }
+    }
 }

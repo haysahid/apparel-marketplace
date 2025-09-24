@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import OrderDetail from "@/Pages/Order/OrderDetail.vue";
 import ChangeTransactionStatusDialog from "./ChangeTransactionStatusDialog.vue";
@@ -8,6 +8,10 @@ import OrderContentRow from "@/Components/OrderContentRow.vue";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import SuccessView from "@/Components/SuccessView.vue";
+import { router } from "@inertiajs/vue3";
+import midtransPayment from "@/plugins/midtrans-payment";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import OrderStatusChip from "@/Pages/Order/OrderStatusChip.vue";
 
 const props = defineProps({
     transaction: {
@@ -19,6 +23,92 @@ const props = defineProps({
         required: true,
     },
 });
+
+function checkPayment() {
+    midtransPayment.checkPayment(
+        {
+            transactionCode: props.transaction.code,
+            isGuest: false,
+        },
+        {
+            onSuccess: (response) => {
+                payment.value = response.data.result;
+                router.reload();
+            },
+        }
+    );
+}
+
+function showSnap() {
+    midtransPayment.showSnap(
+        {
+            snapToken: payment.value.midtrans_snap_token,
+            isGuest: false,
+        },
+        {
+            onSuccess: (result) => {
+                checkPayment();
+            },
+            onPending: (result) => {
+                checkPayment();
+            },
+            onError: (error) => {
+                checkPayment();
+            },
+            onClose: () => {
+                checkPayment();
+            },
+            onChangeStatus: (status) => {
+                resumePaymentStatus.value = status;
+            },
+        }
+    );
+}
+
+function changePaymentType() {
+    midtransPayment.changePaymentType(
+        {
+            transactionCode: props.transaction.code,
+        },
+        {
+            onSuccess: (response) => {
+                payment.value = response.data.result;
+
+                if (payment.value.midtrans_snap_token) {
+                    showSnap();
+                }
+            },
+        }
+    );
+}
+
+// Check payment
+const payment = ref(null);
+const resumePaymentStatus = ref(null);
+
+if (props.transaction.payments) {
+    payment.value = props.transaction.payments[0];
+}
+
+const showPaymentActions = computed(() => {
+    return (
+        props.transaction.status === "pending" &&
+        props.transaction.payment_method.slug === "transfer"
+    );
+});
+
+onMounted(() => {
+    if (route().params?.transaction_status == "settlement") {
+        router.reload();
+    } else if (
+        route().params?.success == "true" &&
+        props.transaction.status == "pending"
+    ) {
+        showSnap();
+    }
+});
+
+// Change Status
 
 const showChangeStatusDialog = ref(false);
 
@@ -49,6 +139,8 @@ function changeStatus(newStatus: string) {
 window.onpopstate = function () {
     location.reload();
 };
+
+const showSuccessView = route().params.success == "true";
 </script>
 
 <template>
@@ -61,22 +153,105 @@ window.onpopstate = function () {
         ]"
     >
         <DefaultCard :isMain="true">
-            <SuccessView
-                v-if="route().params.success == 'true'"
-                title="Transaksi Berhasil!"
-            />
+            <SuccessView v-if="showSuccessView" title="Transaksi Berhasil!" />
             <OrderDetail
-                :data-aos="
-                    route().params.success == 'true' ? 'fade-up' : 'none'
-                "
+                :data-aos="showSuccessView ? 'fade-up' : 'none'"
                 data-aos-delay="1600"
                 data-aos-duration="600"
+                data-aos-once="true"
                 :transaction="props.transaction"
                 :groups="props.groups"
                 :showTracking="false"
                 :isShowingFromMyStore="true"
                 class="!px-0"
+                @continuePayment="showSnap()"
             >
+                <template #additionalInfo>
+                    <!-- Payment -->
+                    <template v-if="true">
+                        <div class="my-2 border-b border-gray-300"></div>
+                        <OrderContentRow
+                            label="Status Pembayaran"
+                            :value="payment?.status"
+                        >
+                            <template #value>
+                                <OrderStatusChip
+                                    :status="payment.status"
+                                    :label="payment.status?.toUpperCase()"
+                                />
+                            </template>
+                        </OrderContentRow>
+                        <OrderContentRow
+                            v-if="payment?.midtrans_response"
+                            label="Tipe Pembayaran"
+                            :value="
+                                payment?.midtrans_response?.payment_type
+                                    ?.split('_')
+                                    .map(
+                                        (word) =>
+                                            word.charAt(0).toUpperCase() +
+                                            word.slice(1)
+                                    )
+                                    .join(' ')
+                            "
+                        />
+                        <OrderContentRow
+                            v-if="payment?.midtrans_response?.va_numbers"
+                            label="Tujuan Pembayaran"
+                            :value="
+                                payment?.midtrans_response?.va_numbers[0]?.bank?.toUpperCase()
+                            "
+                        />
+                        <OrderContentRow
+                            v-if="payment?.midtrans_response"
+                            label="Batas Akhir Pembayaran"
+                            :value="payment?.midtrans_response?.expiry_time"
+                        />
+                    </template>
+
+                    <!-- Shipping Address -->
+                    <template
+                        v-if="
+                            props.transaction.shipping_method.slug === 'courier'
+                        "
+                    >
+                        <div class="my-2 border-b border-gray-300"></div>
+                        <OrderContentRow
+                            label="Provinsi"
+                            :value="props.transaction.province_name"
+                        />
+                        <OrderContentRow
+                            label="Kota"
+                            :value="props.transaction.city_name"
+                        />
+                        <OrderContentRow
+                            label="Alamat"
+                            :value="props.transaction.address"
+                        />
+                    </template>
+                </template>
+
+                <template #actions v-if="showPaymentActions">
+                    <!-- Payment Buttons -->
+                    <div class="flex flex-col gap-2 mt-2">
+                        <PrimaryButton
+                            class="w-full py-3"
+                            :disabled="resumePaymentStatus === 'loading'"
+                            @click="showSnap()"
+                        >
+                            Lanjutkan Pembayaran
+                        </PrimaryButton>
+                        <SecondaryButton
+                            v-if="payment?.midtrans_response"
+                            class="w-full py-3"
+                            :disabled="resumePaymentStatus === 'loading'"
+                            @click="changePaymentType()"
+                        >
+                            Ubah Tipe Pembayaran
+                        </SecondaryButton>
+                    </div>
+                </template>
+
                 <!-- <template #actions>
                     <PrimaryButton
                         @click="showChangeStatusDialog = true"

@@ -61,8 +61,6 @@ class ValidateTransactionPaymentUseCase
                 $this->transactionRepository->setPaidNow($transaction);
             }
 
-            $payment->midtrans_response = json_decode($payment->midtrans_response, true);
-
             return DataState::success($payment);
         } catch (Exception $e) {
             Log::error('Gagal memeriksa status pembayaran: ' . $e->getMessage());

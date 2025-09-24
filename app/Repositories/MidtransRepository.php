@@ -4,14 +4,25 @@ namespace App\Repositories;
 
 class MidtransRepository
 {
-    public function createSnapToken($orderId, $itemDetails, $customer, $grossAmount)
+    public function __construct()
     {
         // Set your Merchant Server Key
         \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
         \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
         \Midtrans\Config::$isSanitized = true;
         \Midtrans\Config::$is3ds = true;
+    }
 
+    public static function getPaymentMethods(): array
+    {
+        $banks = include database_path('seeders/data/banks.php');
+        return [
+            'bank_transfer' => array_values($banks),
+        ];
+    }
+
+    public static function createSnapToken($orderId, $itemDetails, $customer, $grossAmount)
+    {
         $params = [
             'transaction_details' => [
                 'order_id' => $orderId,
@@ -31,10 +42,6 @@ class MidtransRepository
 
     public static function getTransactionStatus($transactionCode): object
     {
-        \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-        \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
-        \Midtrans\Config::$is3ds = true;
-
         return (object) \Midtrans\Transaction::status($transactionCode);
     }
 }

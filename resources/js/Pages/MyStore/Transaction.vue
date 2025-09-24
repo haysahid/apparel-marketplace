@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
-import { usePage, useForm, router, Link } from "@inertiajs/vue3";
+import { useForm, router, Link, usePage } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminPagination from "@/Components/AdminPagination.vue";
 import AdminItemAction from "@/Components/AdminItemAction.vue";
@@ -16,6 +16,8 @@ import { useScreenSize } from "@/plugins/screen-size";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import MyTransactionCard from "./Transaction/MyTransactionCard.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
+import Tooltip from "@/Components/Tooltip.vue";
+import DialogModal from "@/Components/DialogModal.vue";
 
 const screenSize = useScreenSize();
 
@@ -27,7 +29,13 @@ const props = defineProps({
             per_page: number;
             total: number;
             links: Array<{ url: string; label: string; active: boolean }>;
+            to: number;
+            from: number;
         },
+        required: true,
+    },
+    transactionTypes: {
+        type: Array as () => TransactionTypeEntity[],
         required: true,
     },
     brands: {
@@ -36,7 +44,7 @@ const props = defineProps({
     },
 });
 
-const page = usePage();
+const page = usePage<PageProps>();
 
 const transactions = ref(
     props.transactions.data.map((transaction) => ({
@@ -67,7 +75,7 @@ const closeDeleteTransactionDialog = (transaction, result) => {
 
 const deleteTransaction = (transaction) => {
     if (transaction) {
-        const form = useForm();
+        const form = useForm({});
         form.delete(
             route("my-store.transaction.destroy", {
                 transaction: transaction,
@@ -101,9 +109,20 @@ const openErrorDialog = (message) => {
 };
 
 // Filters
-const brands = page.props.brands || [];
+const transactionTypes = (page.props.transactionTypes ||
+    []) as TransactionTypeEntity[];
+const transactionTypeSearch = ref("");
+
+const filteredTransactionTypes = computed(() => {
+    return transactionTypes.filter((type) =>
+        type.name
+            .toLowerCase()
+            .includes(transactionTypeSearch.value?.toLowerCase() || "")
+    );
+});
+
+const brands = (page.props.brands || []) as BrandEntity[];
 const brandSearch = ref("");
-const isBrandDropdownOpen = ref(false);
 
 const filteredBrands = computed(() => {
     return brands.filter((brand) =>
@@ -115,6 +134,8 @@ const filteredBrands = computed(() => {
 
 const filters = useForm({
     search: null,
+    transaction_type_id: null,
+    transaction_type: null,
     brand_id: null,
     brand: null,
 });
@@ -128,9 +149,15 @@ const getQueryParams = () => {
 getQueryParams();
 
 function getTransactions() {
-    let queryParams = {};
+    let queryParams = {
+        search: undefined,
+        type_id: undefined,
+        brand_id: undefined,
+    };
 
     if (filters.search) queryParams.search = filters.search;
+    if (filters.transaction_type_id)
+        queryParams.type_id = filters.transaction_type_id;
     if (filters.brand_id) queryParams.brand_id = filters.brand_id;
 
     router.get(route("my-store.transaction"), queryParams, {
@@ -151,21 +178,61 @@ onMounted(() => {
         openSuccessDialog(page.props.flash.success);
     }
 });
+
+const showTransactionTypeOptionDialog = ref(false);
 </script>
 
 <template>
     <MyStoreLayout title="Transaksi" :showTitle="true">
         <DefaultCard :isMain="true">
-            <div class="flex items-center justify-end gap-4">
-                <!-- <PrimaryButton
+            <div class="flex items-center justify-between gap-4">
+                <PrimaryButton
                     type="button"
                     class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
-                    @click="$inertia.visit(route('my-store.product.create'))"
+                    @click="showTransactionTypeOptionDialog = true"
                 >
                     Tambah
-                </PrimaryButton> -->
+                </PrimaryButton>
 
                 <div class="flex items-center gap-2">
+                    <DropdownSearchInput
+                        id="transaction_type_id"
+                        :modelValue="
+                            filters.transaction_type_id
+                                ? {
+                                      label: filters.transaction_type?.name,
+                                      value: filters.transaction_type_id,
+                                  }
+                                : null
+                        "
+                        :options="
+                            filteredTransactionTypes.map((type) => ({
+                                label: type.name,
+                                value: type.id,
+                            }))
+                        "
+                        placeholder="Pilih Jenis"
+                        class="max-w-48"
+                        :error="filters.errors.transaction_type_id"
+                        @update:modelValue="
+                            (option) => {
+                                filters.transaction_type_id = option?.value;
+                                filters.transaction_type = option
+                                    ? filteredTransactionTypes.find(
+                                          (type) => type.id === option.value
+                                      )
+                                    : null;
+                                getTransactions();
+                            }
+                        "
+                        @search="transactionTypeSearch = $event"
+                        @clear="
+                            filters.transaction_type_id = null;
+                            filters.transaction_type = null;
+                            transactionTypeSearch = '';
+                            getTransactions();
+                        "
+                    />
                     <DropdownSearchInput
                         id="brand_id"
                         :modelValue="
@@ -190,7 +257,7 @@ onMounted(() => {
                                 filters.brand_id = option?.value;
                                 filters.brand = option
                                     ? filteredBrands.find(
-                                          (brand) => brand.id === brand.value
+                                          (brand) => brand.id === option.value
                                       )
                                     : null;
                                 getTransactions();
@@ -331,7 +398,7 @@ onMounted(() => {
             </DefaultTable>
 
             <!-- Mobile View -->
-            <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-6">
+            <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <template v-if="transactions.length > 0">
                     <div
                         v-for="(transaction, index) in transactions"
@@ -368,6 +435,59 @@ onMounted(() => {
                 </p>
                 <DefaultPagination :links="props.transactions.links" />
             </div>
+
+            <DialogModal
+                :show="showTransactionTypeOptionDialog"
+                @close="showTransactionTypeOptionDialog = false"
+            >
+                <template #title> Pilih Jenis Transaksi </template>
+                <template #content>
+                    <div
+                        class="grid w-full grid-cols-2 gap-2 mt-2 sm:grid-cols-4"
+                    >
+                        <template
+                            v-for="type in [
+                                {
+                                    name: 'Pembelian',
+                                    slug: 'purchase',
+                                    effect_on_stock: 'inbound',
+                                },
+                                {
+                                    name: 'Penjualan',
+                                    slug: 'sale',
+                                    effect_on_stock: 'outbound',
+                                },
+                                {
+                                    name: 'Barang Hilang',
+                                    slug: 'damaged-out',
+                                    effect_on_stock: 'outbound',
+                                },
+                                {
+                                    name: 'Penggunaan Internal',
+                                    slug: 'internal-use',
+                                    effect_on_stock: 'outbound',
+                                },
+                            ]"
+                            :key="type.id"
+                        >
+                            <button
+                                type="button"
+                                class="w-full px-4 py-2 text-center transition bg-white border rounded-lg shadow-sm hover:bg-gray-50 min-h-16"
+                                @click="
+                                    showTransactionTypeOptionDialog = false;
+                                    $inertia.visit(
+                                        route('my-store.order.create', {
+                                            type: type.slug,
+                                        })
+                                    );
+                                "
+                            >
+                                {{ type.name }}
+                            </button>
+                        </template>
+                    </div>
+                </template>
+            </DialogModal>
 
             <SuccessDialog
                 :show="showSuccessDialog"

@@ -8,13 +8,10 @@ import SuccessDialog from "@/Components/SuccessDialog.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import axios from "axios";
 import OrderVariantSelection from "./OrderVariantSelection.vue";
-import { useMyStoreCartStore } from "@/stores/my-store-cart-store";
 import DefaultCard from "@/Components/DefaultCard.vue";
-import StepButton from "@/Components/StepButton.vue";
 import Stepper from "@/Components/Stepper.vue";
 import CheckoutGroup from "@/Pages/Cart/CheckoutGroup.vue";
 import DetailRow from "@/Components/DetailRow.vue";
-import OrderForm from "@/Pages/Cart/OrderForm.vue";
 import AddOrderForm from "./AddOrderForm.vue";
 import { useCartStore } from "@/stores/cart-store";
 import { useScreenSize } from "@/plugins/screen-size";
@@ -138,7 +135,7 @@ const scrollToTop = () => {
     }
 };
 
-const page = usePage();
+const page = usePage<PageProps>();
 const orderStore = useOrderStore();
 
 const customer = computed(() => {

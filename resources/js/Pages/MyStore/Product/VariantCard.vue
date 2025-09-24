@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import DiscountTag from "@/Components/DiscountTag.vue";
 import { getImageUrl } from "@/plugins/helpers";
+import { formatNumber } from "@/plugins/number-formatter";
 
 const props = defineProps({
     name: {
@@ -152,7 +153,7 @@ const loadFile = (file) => {
             >
                 <p class="text-sm font-medium text-gray-600">
                     {{
-                        props.variant.current_stock_level +
+                        formatNumber(props.variant.current_stock_level) +
                         " " +
                         (props.variant.unit?.name || "")
                     }}

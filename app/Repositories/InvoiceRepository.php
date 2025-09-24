@@ -89,14 +89,6 @@ class InvoiceRepository
 
         $payments = Payment::where('transaction_id', $invoice->transaction_id)->get();
 
-        if ($invoice->transaction->payment_method->slug === 'transfer' && $payments->isNotEmpty()) {
-            foreach ($payments as $payment) {
-                if (is_string($payment->midtrans_response)) {
-                    $payment->midtrans_response = json_decode($payment->midtrans_response, true);
-                }
-            }
-        }
-
         return [
             'invoice' => $invoice,
             'items' => $items,

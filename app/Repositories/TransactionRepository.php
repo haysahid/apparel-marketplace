@@ -19,6 +19,7 @@ class TransactionRepository
         $search = null,
         $orderBy = 'created_at',
         $orderDirection = 'desc',
+        $typeId = null,
         $brandId = null,
     ) {
         $transactions = Transaction::query();
@@ -35,6 +36,10 @@ class TransactionRepository
                 }
             },
         ]);
+
+        if ($typeId) {
+            $transactions->where('type_id', $typeId);
+        }
 
         if ($brandId) {
             $transactions->whereHas('items.variant.product.brand', function ($query) use ($brandId) {
@@ -73,7 +78,13 @@ class TransactionRepository
 
     public static function getTransactionDetail($transactionCode, $storeId = null)
     {
-        $transaction = Transaction::with(['user', 'payment_method', 'shipping_method', 'payments'])
+        $transaction = Transaction::with([
+            'type',
+            'user',
+            'payment_method',
+            'shipping_method',
+            'payments',
+        ])
             ->where('code', $transactionCode)
             ->firstOrFail();
         $invoices = Invoice::with(['store'])->where(function ($query) use ($transaction, $storeId) {

@@ -26,6 +26,7 @@ createInertiaApp({
 
         const app = createApp({ render: () => h(App, props) })
             .use(plugin)
+            .mixin({ methods: { route } })
             .use(ZiggyVue)
             .use(pinia)
             .use(VueApexCharts);

@@ -55,9 +55,9 @@ class CheckoutUseCase
             DB::beginTransaction();
 
             if ($isStoreCheckout) {
-                if ($data['customer_id']) {
+                if (isset($data['customer_id'])) {
                     $customer = User::find($data['customer_id']);
-                } else if ($data['guest_name'] && $data['guest_email'] && $data['guest_phone']) {
+                } else if (isset($data['guest_name'], $data['guest_email'], $data['guest_phone'])) {
                     $customer = $this->userRepository->createGuestUser([
                         'name' => $data['guest_name'],
                         'email' => $data['guest_email'],

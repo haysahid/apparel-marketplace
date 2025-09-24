@@ -66,6 +66,9 @@ Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->gro
     Route::get('payment-method-dropdown', [PaymentMethodController::class, 'dropdown'])->name('payment-method.dropdown');
     Route::get('shipping-method-dropdown', [ShippingMethodController::class, 'dropdown'])->name('shipping-method.dropdown');
 
+    Route::get('midtrans-payment-methods', [OrderController::class, 'midtransPaymentMethods'])->name('midtrans.payment-methods');
+
     Route::put('change-order-status', [OrderController::class, 'changeStatus'])->name('order.change-status');
+
     Route::post('report/generate', [ReportController::class, 'generateReport'])->name('report.generate');
 });

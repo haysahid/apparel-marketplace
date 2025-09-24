@@ -295,13 +295,11 @@ onMounted(() => {
                             {{ $formatCurrency(invoice.amount) }}
                         </td>
                         <td>
-                            <div class="flex items-center justify-center">
-                                <OrderStatusChip
-                                    :status="invoice.status"
-                                    :label="invoice.status.toLocaleUpperCase()"
-                                    class="w-fit"
-                                />
-                            </div>
+                            <OrderStatusChip
+                                :status="invoice.status"
+                                :label="invoice.status.toLocaleUpperCase()"
+                                class="w-fit"
+                            />
                         </td>
                         <td>
                             <AdminItemAction

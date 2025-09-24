@@ -208,6 +208,7 @@ onMounted(() => {
                 (!showPaymentActions ||
                     props.invoice.transaction.payment_method.slug === 'cod')
             "
+            :isShowingFromMyStore="false"
             class="mt-6"
         >
             <template #additionalInfo>

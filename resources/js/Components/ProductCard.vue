@@ -41,7 +41,7 @@ function formatPrice(price) {
 <template>
     <Link :href="route('product.show', { slug: props.slug })">
         <div
-            class="bg-white rounded-lg outline outline-1 shadow-sm outline-gray-100 hover:outline-primary-light transition-all duration-300 cursor-pointer h-full hover:scale-[1.02] hover:shadow-md"
+            class="bg-white rounded-lg outline outline-1 shadow-sm outline-gray-100 hover:outline-primary-light transition-all duration-300 cursor-pointer h-full hover:scale-[1.01] hover:shadow-md"
         >
             <img
                 v-if="props.image"

@@ -20,6 +20,10 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    isShowingFromMyStore: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const orderCreated = (date: string | null, status: boolean) => {
@@ -378,6 +382,10 @@ setTimeout(() => {
                 props.invoice.status === 'pending'
             "
             type="warning"
+            class="mx-auto mb-2 max-w-7xl"
+            :class="{
+                'max-w-none': props.isShowingFromMyStore,
+            }"
         >
             <template #content>
                 <p
@@ -390,12 +398,13 @@ setTimeout(() => {
                     Pelanggan belum melakukan pembayaran.
                 </p>
                 <p v-else>
-                    Segera<span
+                    Segera
+                    <span
                         class="font-semibold cursor-pointer hover:underline"
                         @click="emit('continuePayment')"
+                        >lanjutkan pembayaran</span
                     >
-                        lanjutkan pembayaran </span
-                    >agar pesanan Anda tidak dibatalkan.
+                    agar pesanan tidak dibatalkan.
                 </p>
             </template>
         </InfoHint>
