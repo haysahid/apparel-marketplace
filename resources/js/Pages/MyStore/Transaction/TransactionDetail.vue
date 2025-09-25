@@ -38,6 +38,7 @@ function checkPayment() {
         }
     );
 }
+checkPayment();
 
 function showSnap() {
     midtransPayment.showSnap(

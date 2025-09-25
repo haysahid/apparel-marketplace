@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed } from "vue";
 import { useForm, usePage } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
-import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import ImageInput from "@/Components/ImageInput.vue";
-import Dropdown from "@/Components/Dropdown.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import { useDraggable } from "vue-draggable-plus";
 import axios from "axios";
@@ -15,7 +13,8 @@ import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import DialogModal from "@/Components/DialogModal.vue";
 import ColorForm from "../Color/ColorForm.vue";
-import { getImageUrl, isFile } from "@/plugins/helpers";
+import UnitForm from "../Unit/UnitForm.vue";
+import SizeForm from "../Size/SizeForm.vue";
 
 const props = defineProps({
     product: {
@@ -619,7 +618,7 @@ const openErrorDialog = (message) => {
                                 <button
                                     type="button"
                                     class="text-sm text-blue-500 hover:underline"
-                                    @click="showAddColorForm = true"
+                                    @click="showAddUnitForm = true"
                                 >
                                     Tambah
                                 </button>
@@ -728,14 +727,14 @@ const openErrorDialog = (message) => {
                     <ColorForm
                         :isDialog="true"
                         @onSubmitted="
-                            (brandName) => {
+                            (colorName) => {
                                 showAddColorForm = false;
                                 colorSearch = '';
 
                                 colors = $page.props.colors as ColorEntity[];
                                 
                                 const newColor = colors.find(
-                                    (color) => color.name === brandName
+                                    (color) => color.name === colorName
                                 );
                                 form.color_id = newColor.id;
                                 form.color = newColor;
@@ -746,6 +745,86 @@ const openErrorDialog = (message) => {
                             }
                         "
                         @close="showAddColorForm = false"
+                        class="w-full"
+                    />
+                </div>
+            </template>
+        </DialogModal>
+
+        <!-- Add Size Modal -->
+        <DialogModal
+            :show="showAddSizeForm"
+            @close="showAddSizeForm = false"
+            maxWidth="sm"
+        >
+            <template #content>
+                <div class="w-full">
+                    <h2
+                        class="w-full mb-3 text-lg font-medium text-center text-gray-900"
+                    >
+                        Tambah Ukuran
+                    </h2>
+                    <SizeForm
+                        :isDialog="true"
+                        @onSubmitted="
+                            (sizeName) => {
+                                showAddSizeForm = false;
+                                sizeSearch = '';
+
+                                sizes = $page.props.sizes as SizeEntity[];
+
+                                const newSize = sizes.find(
+                                    (size) => size.name === sizeName
+                                );
+                                form.size_id = newSize.id;
+                                form.size = newSize;
+
+                                openSuccessDialog(
+                                    'Ukuran berhasil ditambahkan.'
+                                );
+                            }
+                        "
+                        @close="showAddSizeForm = false"
+                        class="w-full"
+                    />
+                </div>
+            </template>
+        </DialogModal>
+
+        <!-- Add Unit Modal -->
+        <DialogModal
+            :show="showAddUnitForm"
+            @close="showAddUnitForm = false"
+            maxWidth="sm"
+        >
+            <template #content>
+                <div class="w-full">
+                    <h2
+                        class="w-full mb-3 text-lg font-medium text-center text-gray-900"
+                    >
+                        Tambah Satuan
+                    </h2>
+                    <UnitForm
+                        :isDialog="true"
+                        @onSubmitted="
+                            (unitName) => {
+                                showAddUnitForm = false;
+                                unitSearch = '';
+
+                                units = $page.props.units as UnitEntity[];
+
+                                const newUnit = units.find(
+                                    (unit) => unit.name === unitName
+                                );
+                                form.unit_id = newUnit.id;
+                                form.unit = newUnit;
+
+                                openSuccessDialog(
+                                    'Satuan berhasil ditambahkan.'
+                                );
+                            }
+                        "
+                        @close="showAddUnitForm = false"
                         class="w-full"
                     />
                 </div>

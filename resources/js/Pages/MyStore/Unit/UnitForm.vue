@@ -8,7 +8,7 @@ import InputGroup from "@/Components/InputGroup.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 
 const props = defineProps({
-    size: {
+    unit: {
         type: Object,
         default: null,
     },
@@ -21,15 +21,16 @@ const props = defineProps({
 const emit = defineEmits(["onSubmitted", "close"]);
 
 const form = useForm(
-    props.size
-        ? props.size
+    props.unit
+        ? props.unit
         : {
               name: null,
+              description: null,
           }
 );
 
 const submit = () => {
-    if (props.size?.id) {
+    if (props.unit?.id) {
         form.transform((data) => {
             const formData = new FormData();
             Object.keys(data).forEach((key) => {
@@ -41,8 +42,8 @@ const submit = () => {
             });
             return formData;
         }).post(
-            route("my-store.size.update", {
-                size: props.size,
+            route("my-store.unit.update", {
+                unit: props.unit,
             }),
             {
                 onError: (errors) => {
@@ -59,7 +60,7 @@ const submit = () => {
                 ...data,
                 is_dialog: props.isDialog ? 1 : 0,
             };
-        }).post(route("my-store.size.store"), {
+        }).post(route("my-store.unit.store"), {
             preserveScroll: props.isDialog,
             preserveState: props.isDialog,
             onError: (errors) => {
@@ -86,12 +87,12 @@ const openErrorDialog = (message) => {
     <form @submit.prevent="submit" class="max-w-3xl">
         <div class="flex flex-col items-start gap-4">
             <!-- Name -->
-            <InputGroup id="name" label="Nama Ukuran">
+            <InputGroup id="name" label="Nama Satuan">
                 <TextInput
                     id="name"
                     v-model="form.name"
                     type="text"
-                    placeholder="Masukkan Nama Ukuran"
+                    placeholder="Masukkan Nama Satuan"
                     class="block w-full"
                     required
                     :autofocus="true"
@@ -100,12 +101,25 @@ const openErrorDialog = (message) => {
                 />
             </InputGroup>
 
+            <!-- Description -->
+            <InputGroup id="description" label="Deskripsi (Opsional)">
+                <TextInput
+                    id="description"
+                    v-model="form.description"
+                    type="text"
+                    placeholder="Masukkan Deskripsi Satuan"
+                    class="block w-full"
+                    :error="form.errors.description"
+                    @update:modelValue="form.errors.description = null"
+                />
+            </InputGroup>
+
             <div class="flex items-center gap-4 mt-4">
                 <PrimaryButton type="submit"> Simpan </PrimaryButton>
                 <SecondaryButton
                     v-if="!props.isDialog"
                     type="button"
-                    @click="$inertia.visit(route('my-store.size'))"
+                    @click="$inertia.visit(route('my-store.unit'))"
                 >
                     Kembali
                 </SecondaryButton>

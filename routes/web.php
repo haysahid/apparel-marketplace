@@ -14,6 +14,7 @@ use App\Http\Controllers\MyStore\MyStoreSizeController;
 use App\Http\Controllers\MyStore\MyStoreTransactionController;
 use App\Http\Controllers\MyStore\MyStoreVoucherController;
 use App\Http\Controllers\MyStore\MyStoreReportController;
+use App\Http\Controllers\MyStore\MyStoreUnitController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PublicController;
@@ -134,6 +135,14 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->grou
     Route::get('/brand/{brand}', [MyStoreBrandController::class, 'edit'])->name('brand.edit');
     Route::post('/brand/{brand}', [MyStoreBrandController::class, 'update'])->name('brand.update');
     Route::delete('/brand/{brand}', [MyStoreBrandController::class, 'destroy'])->name('brand.destroy');
+
+    // Unit
+    Route::get('/unit', [MyStoreUnitController::class, 'index'])->name('unit');
+    Route::get('/unit/create', [MyStoreUnitController::class, 'create'])->name('unit.create');
+    Route::post('/unit', [MyStoreUnitController::class, 'store'])->name('unit.store');
+    Route::get('/unit/{unit}', [MyStoreUnitController::class, 'edit'])->name('unit.edit');
+    Route::post('/unit/{unit}', [MyStoreUnitController::class, 'update'])->name('unit.update');
+    Route::delete('/unit/{unit}', [MyStoreUnitController::class, 'destroy'])->name('unit.destroy');
 
     // Product
     Route::get('/product', [MyStoreProductController::class, 'index'])->name('product');

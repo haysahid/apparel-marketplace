@@ -21,7 +21,6 @@ import DefaultCard from "@/Components/DefaultCard.vue";
 import VariantList from "./VariantList.vue";
 import TabButton from "@/Components/TabButton.vue";
 import axios from "axios";
-import { getImageUrl, isFile } from "@/plugins/helpers";
 
 const props = defineProps({
     product: {

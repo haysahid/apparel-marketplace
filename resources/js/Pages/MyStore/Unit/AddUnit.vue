@@ -1,21 +1,21 @@
 <script setup>
-import SizeForm from "./SizeForm.vue";
+import UnitForm from "./UnitForm.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 </script>
 
 <template>
     <MyStoreLayout
-        title="Tambah Ukuran"
+        title="Tambah Satuan"
         :showTitle="true"
         :breadcrumbs="[
-            { text: 'Ukuran', url: '/my-store/size', active: false },
-            { text: 'Tambah Ukuran', active: true },
+            { text: 'Satuan', url: '/my-store/unit', active: false },
+            { text: 'Tambah Satuan', active: true },
         ]"
     >
         <div class="max-w-7xl">
             <DefaultCard>
-                <SizeForm />
+                <UnitForm />
             </DefaultCard>
         </div>
     </MyStoreLayout>

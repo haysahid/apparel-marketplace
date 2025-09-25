@@ -175,7 +175,7 @@ const showPaymentStatusOptionDialog = ref(false);
                                 value: type.id,
                             }))
                         "
-                        placeholder="Pilih Jenis"
+                        placeholder="Pilih Jenis Transaksi"
                         class="max-w-48"
                         :error="filters.errors.transaction_type_id"
                         @update:modelValue="
@@ -199,7 +199,7 @@ const showPaymentStatusOptionDialog = ref(false);
                     />
                     <TextInput
                         v-model="filters.search"
-                        placeholder="Cari transaksi..."
+                        placeholder="Cari pembayaran..."
                         class="max-w-48"
                         @keyup.enter="getPayments()"
                     >

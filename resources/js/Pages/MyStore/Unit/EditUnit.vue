@@ -1,10 +1,10 @@
 <script setup>
-import SizeForm from "./SizeForm.vue";
+import UnitForm from "./UnitForm.vue";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 
 const props = defineProps({
-    size: {
+    unit: {
         type: Object,
         default: () => ({}),
     },
@@ -13,16 +13,16 @@ const props = defineProps({
 
 <template>
     <MyStoreLayout
-        title="Ubah Ukuran"
+        title="Ubah Satuan"
         :showTitle="true"
         :breadcrumbs="[
-            { text: 'Ukuran', url: '/my-store/size', active: false },
-            { text: 'Ubah Ukuran', active: true },
+            { text: 'Satuan', url: '/my-store/unit', active: false },
+            { text: 'Ubah Satuan', active: true },
         ]"
     >
         <div class="max-w-7xl">
             <DefaultCard>
-                <SizeForm :size="props.size" />
+                <UnitForm :unit="props.unit" />
             </DefaultCard>
         </div>
     </MyStoreLayout>

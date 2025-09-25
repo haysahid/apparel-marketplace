@@ -7,6 +7,7 @@ import { Page, PageProps } from "@inertiajs/core";
 declare module "@vue/runtime-core" {
     export interface ComponentCustomProperties {
         $inertia: typeof router;
+        $page: Page<PageProps>;
         route: typeof route;
         $formatDate: typeof formatDate;
         $formatCurrency: typeof formatCurrency;

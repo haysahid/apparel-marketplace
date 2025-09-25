@@ -273,7 +273,7 @@ onMounted(() => {
                         <th>Harga</th>
                         <th class="w-12">Brand</th>
                         <th>Stok</th>
-                        <th class="w-24 !text-center">Aksi</th>
+                        <th class="w-24">Aksi</th>
                     </tr>
                 </template>
                 <template #tbody>
