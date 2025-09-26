@@ -26,6 +26,8 @@ const props = defineProps({
     },
 });
 
+const emit = defineEmits(["continuePayment"]);
+
 const orderCreated = (date: string | null, status: boolean) => {
     return {
         date: date,

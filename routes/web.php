@@ -174,6 +174,7 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->grou
 
     // Customer
     Route::get('/customer', [MyStoreCustomerController::class, 'index'])->name('customer');
+    Route::get('/customer/{customer}', [MyStoreCustomerController::class, 'show'])->name('customer.show');
 
     // Report
     Route::get('/report', [MyStoreReportController::class, 'index'])->name('report');

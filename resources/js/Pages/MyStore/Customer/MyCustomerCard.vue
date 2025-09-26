@@ -44,8 +44,8 @@ const emit = defineEmits(["edit"]);
                     <div class="flex items-center gap-2 pe-12">
                         <Link
                             :href="
-                                route('my-store.order.edit', {
-                                    invoice: customer,
+                                route('my-store.customer.show', {
+                                    customer: customer,
                                 })
                             "
                             class="text-sm font-medium text-gray-900 md:text-base hover:text-primary"

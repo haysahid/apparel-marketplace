@@ -17,18 +17,13 @@ import MyTransactionCard from "./Transaction/MyTransactionCard.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import MyOrderCard from "./Order/MyOrderCard.vue";
 import StatusChip from "@/Components/StatusChip.vue";
+import CustomPageProps from "@/types/model/CustomPageProps";
 
 const screenSize = useScreenSize();
 
 const props = defineProps({
     invoices: {
-        type: Object as () => {
-            data: InvoiceEntity[];
-            current_page: number;
-            per_page: number;
-            total: number;
-            links: Array<{ url: string; label: string; active: boolean }>;
-        },
+        type: Object as () => PaginationModel<InvoiceEntity>,
         required: true,
     },
     brands: {
@@ -37,7 +32,7 @@ const props = defineProps({
     },
 });
 
-const page = usePage();
+const page = usePage<CustomPageProps>();
 
 const invoices = ref(
     props.invoices.data.map((invoice) => ({
@@ -68,7 +63,7 @@ const closeDeleteOrderDialog = (invoice, result) => {
 
 const deleteOrder = (invoice) => {
     if (invoice) {
-        const form = useForm();
+        const form = useForm({});
         form.delete(
             route("my-store.order.destroy", {
                 invoice: invoice,
@@ -102,7 +97,7 @@ const openErrorDialog = (message) => {
 };
 
 // Filters
-const brands = page.props.brands || [];
+const brands = (page.props.brands || []) as BrandEntity[];
 const brandSearch = ref("");
 
 const filteredBrands = computed(() => {
@@ -128,7 +123,10 @@ const getQueryParams = () => {
 getQueryParams();
 
 function getOrders() {
-    let queryParams = {};
+    let queryParams = {
+        search: undefined,
+        brand_id: undefined,
+    };
 
     if (filters.search) queryParams.search = filters.search;
     if (filters.brand_id) queryParams.brand_id = filters.brand_id;
@@ -190,7 +188,7 @@ onMounted(() => {
                                 filters.brand_id = option?.value;
                                 filters.brand = option
                                     ? filteredBrands.find(
-                                          (brand) => brand.id === brand.value
+                                          (brand) => brand.id === option.value
                                       )
                                     : null;
                                 getOrders();

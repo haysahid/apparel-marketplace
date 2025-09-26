@@ -71,7 +71,7 @@ onMounted(() => {
                                 width="60"
                                 height="61"
                                 viewBox="0 0 60 61"
-                                class="size-10 sm:size-12"
+                                class="size-10"
                             >
                                 <path
                                     opacity="0.21"
@@ -104,7 +104,7 @@ onMounted(() => {
                                 width="60"
                                 height="61"
                                 viewBox="0 0 60 61"
-                                class="size-10 sm:size-12"
+                                class="size-10"
                             >
                                 <path
                                     opacity="0.21"

@@ -109,7 +109,7 @@ class MyStoreUnitController extends Controller
     public function destroy(Unit $unit)
     {
         try {
-            UnitRepository::deleteUnit($unit->id);
+            UnitRepository::deleteUnit($unit);
 
             return redirect()->route('my-store.unit')->with('success', 'Satuan berhasil dihapus.');
         } catch (Exception $e) {

@@ -1,15 +1,17 @@
 import "@vue/runtime-core";
 import formatDate from "@/plugins/date-formatter";
-import { formatCurrency } from "@/plugins/number-formatter";
+import { formatCurrency, formatNumber } from "@/plugins/number-formatter";
 import { router } from "@inertiajs/vue3";
-import { Page, PageProps } from "@inertiajs/core";
+import { Page } from "@inertiajs/core";
+import CustomPageProps from "./model/CustomPageProps";
 
 declare module "@vue/runtime-core" {
     export interface ComponentCustomProperties {
         $inertia: typeof router;
-        $page: Page<PageProps>;
+        $page: Page<CustomPageProps>;
         route: typeof route;
         $formatDate: typeof formatDate;
         $formatCurrency: typeof formatCurrency;
+        $formatNumber: typeof formatNumber;
     }
 }

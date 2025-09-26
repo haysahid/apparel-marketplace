@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\User;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class UserRepository
@@ -50,5 +51,24 @@ class UserRepository
 
         return $query->orderBy($orderBy, $orderDirection)
             ->paginate($limit);
+    }
+
+    public static function getCustomerDetail($customerId)
+    {
+        $customer = User::with(['role'])->where('id', $customerId)->first();
+        $invoiceStats = DB::table('invoices')
+            ->join('transactions', 'invoices.transaction_id', '=', 'transactions.id')
+            ->where('transactions.user_id', $customerId)
+            ->selectRaw('COUNT(invoices.id) as count_orders, SUM(invoices.amount) as total_spent')
+            ->first();
+
+        $countOrders = (int) $invoiceStats->count_orders ?? 0;
+        $totalSpent = (int) $invoiceStats->total_spent ?? 0;
+
+        return [
+            'customer' => $customer,
+            'count_orders' => $countOrders,
+            'total_spent' => $totalSpent,
+        ];
     }
 }

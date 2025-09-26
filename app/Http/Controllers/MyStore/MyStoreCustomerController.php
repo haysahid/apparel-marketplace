@@ -38,4 +38,10 @@ class MyStoreCustomerController extends Controller
             'customers' => $customers,
         ]);
     }
+
+    public function show(User $customer)
+    {
+        $customerDetail = $this->userRepository->getCustomerDetail($customer->id, $this->storeId);
+        return Inertia::render('MyStore/Customer/CustomerDetail', $customerDetail);
+    }
 }

@@ -20,6 +20,7 @@ import { usePage } from "@inertiajs/vue3";
 import { useOrderStore } from "@/stores/order-store";
 import BaseDialog from "@/Components/BaseDialog.vue";
 import OrderCustomerSelection from "./OrderCustomerSelection.vue";
+import CustomPageProps from "@/types/model/CustomPageProps";
 
 const screenSize = useScreenSize();
 
@@ -135,7 +136,7 @@ const scrollToTop = () => {
     }
 };
 
-const page = usePage<PageProps>();
+const page = usePage<CustomPageProps>();
 const orderStore = useOrderStore();
 
 const customer = computed(() => {

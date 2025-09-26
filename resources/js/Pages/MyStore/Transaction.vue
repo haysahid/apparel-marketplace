@@ -15,6 +15,7 @@ import ErrorDialog from "@/Components/ErrorDialog.vue";
 import MyTransactionCard from "./Transaction/MyTransactionCard.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import DialogModal from "@/Components/DialogModal.vue";
+import CustomPageProps from "@/types/model/CustomPageProps";
 
 const screenSize = useScreenSize();
 
@@ -41,7 +42,7 @@ const props = defineProps({
     },
 });
 
-const page = usePage<PageProps>();
+const page = usePage<CustomPageProps>();
 
 const transactions = ref(
     props.transactions.data.map((transaction) => ({
