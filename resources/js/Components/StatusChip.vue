@@ -20,7 +20,8 @@ const props = defineProps({
             'text-orange-500 bg-orange-100': props.status === 'paid',
             'text-indigo-500 bg-indigo-100': props.status === 'processing',
             'text-green-500 bg-green-100': props.status === 'completed',
-            'text-red-500 bg-red-100': props.status === 'cancelled',
+            'text-red-500 bg-red-100':
+                props.status === 'cancelled' || props.status === 'failed',
         }"
     >
         {{ props.label }}

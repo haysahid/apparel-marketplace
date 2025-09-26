@@ -6,7 +6,7 @@ import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import { router } from "@inertiajs/vue3";
 import OrderContentRow from "@/Components/OrderContentRow.vue";
-import OrderStatusChip from "./Order/OrderStatusChip.vue";
+import StatusChip from "@/Components/StatusChip.vue";
 import InvoiceDetail from "./MyStore/Order/InvoiceDetail.vue";
 
 async function initScript() {
@@ -177,7 +177,7 @@ onMounted(() => {
             })
         );
     } else if (
-        route().params?.show_snap == 1 &&
+        route().params?.show_snap == "1" &&
         props.invoice.status == "pending"
     ) {
         showSnap();
@@ -201,6 +201,9 @@ onMounted(() => {
         </div>
 
         <InvoiceDetail
+            data-aos="fade-up"
+            data-aos-duration="600"
+            data-aos-once="true"
             :invoice="props.invoice"
             :items="props.items"
             :showTracking="
@@ -209,7 +212,7 @@ onMounted(() => {
                     props.invoice.transaction.payment_method.slug === 'cod')
             "
             :isShowingFromMyStore="false"
-            class="mt-6"
+            class="p-6 !pt-0 sm:p-12 md:p-[100px] flex flex-col gap-4 mt-6"
         >
             <template #additionalInfo>
                 <!-- Payment -->
@@ -220,7 +223,7 @@ onMounted(() => {
                         :value="payment?.status"
                     >
                         <template #value>
-                            <OrderStatusChip
+                            <StatusChip
                                 :status="payment.status"
                                 :label="payment.status?.toUpperCase()"
                             />

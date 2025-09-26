@@ -5,7 +5,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminItemAction from "@/Components/AdminItemAction.vue";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import TextInput from "@/Components/TextInput.vue";
-import OrderStatusChip from "../Order/OrderStatusChip.vue";
+import StatusChip from "@/Components/StatusChip.vue";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
@@ -378,7 +378,7 @@ const showTransactionTypeOptionDialog = ref(false);
                             }}
                         </td>
                         <td>
-                            <OrderStatusChip
+                            <StatusChip
                                 :status="transaction.status"
                                 :label="transaction.status.toLocaleUpperCase()"
                                 class="w-fit"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AdminItemAction from "@/Components/AdminItemAction.vue";
-import OrderStatusChip from "@/Pages/Order/OrderStatusChip.vue";
+import StatusChip from "@/Components/StatusChip.vue";
 import { Link } from "@inertiajs/vue3";
 import { computed, getCurrentInstance } from "vue";
 
@@ -38,7 +38,7 @@ const hasEditCallback = computed(() => {
                         >
                             {{ payment.transaction.code }}
                         </Link>
-                        <OrderStatusChip
+                        <StatusChip
                             :status="payment.status"
                             :label="payment.status.toLocaleUpperCase()"
                             class="w-fit"
@@ -106,9 +106,11 @@ const hasEditCallback = computed(() => {
                             </svg>
                             <span>
                                 {{
-                                    payment.midtrans_response?.va_numbers[0]?.bank.toUpperCase()
+                                    payment.midtrans_response?.va_numbers[0]
+                                        ?.bank
+                                        ? `${payment.midtrans_response?.va_numbers[0]?.bank.toUpperCase()} - `
+                                        : ""
                                 }}
-                                -
                                 {{ $formatDate(payment.transaction.paid_at) }}
                             </span>
                         </div>

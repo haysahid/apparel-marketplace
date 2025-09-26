@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import AdminItemAction from "@/Components/AdminItemAction.vue";
-import OrderStatusChip from "@/Pages/MyStore/Order/OrderStatusChip.vue";
 import { Link } from "@inertiajs/vue3";
 
 const props = defineProps({

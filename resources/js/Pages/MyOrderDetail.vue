@@ -7,7 +7,7 @@ import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import { router } from "@inertiajs/vue3";
 import OrderContentRow from "@/Components/OrderContentRow.vue";
-import OrderStatusChip from "./Order/OrderStatusChip.vue";
+import StatusChip from "@/Components/StatusChip.vue";
 
 async function initScript() {
     const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
@@ -208,7 +208,7 @@ onMounted(() => {
                         :value="payment?.status"
                     >
                         <template #value>
-                            <OrderStatusChip
+                            <StatusChip
                                 :status="payment.status"
                                 :label="payment.status?.toUpperCase()"
                             />

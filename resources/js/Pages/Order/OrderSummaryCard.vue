@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import OrderContentRow from "@/Components/OrderContentRow.vue";
-import OrderStatusChip from "./OrderStatusChip.vue";
+import StatusChip from "@/Components/StatusChip.vue";
 import Tooltip from "@/Components/Tooltip.vue";
 import { ref } from "vue";
 
@@ -12,6 +12,10 @@ const props = defineProps({
     groups: {
         type: Array as () => OrderGroupModel[],
         required: true,
+    },
+    isLoading: {
+        type: Boolean,
+        default: false,
     },
 });
 
@@ -108,10 +112,11 @@ const isCopied = ref(false);
                 <OrderContentRow
                     label="Status"
                     :value="props.transaction.status"
+                    :isLoading="props.isLoading"
                 >
                     <template #value>
                         <!-- Status -->
-                        <OrderStatusChip
+                        <StatusChip
                             :status="props.transaction.status"
                             :label="props.transaction.status?.toUpperCase()"
                         />

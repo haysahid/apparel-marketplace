@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { Link } from "@inertiajs/vue3";
 import OrderItemSmall from "./OrderItemSmall.vue";
-import OrderStatusChip from "./OrderStatusChip.vue";
+import StatusChip from "@/Components/StatusChip.vue";
 
 const props = defineProps({
     invoice: {
@@ -64,7 +64,7 @@ const total = computed(() => {
                             {{ props.invoice.store?.rajaongkir_origin_label }}
                         </p>
                     </div>
-                    <OrderStatusChip
+                    <StatusChip
                         :status="props.invoice.status"
                         :label="props.invoice.status?.toUpperCase()"
                     />

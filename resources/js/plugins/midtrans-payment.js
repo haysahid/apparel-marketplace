@@ -18,8 +18,14 @@ async function initScript() {
 
 async function checkPayment(
     { transactionCode, isGuest },
-    { onSuccess = (response) => { }, onError = (error) => { } }
+    {
+        onSuccess = (response) => { },
+        onError = (error) => { },
+        onChangeStatus = (status) => { },
+    }
 ) {
+    onChangeStatus("loading");
+
     await axios
         .get(
             isGuest
@@ -33,8 +39,14 @@ async function checkPayment(
                 },
             }
         )
-        .then(onSuccess)
-        .catch(onError);
+        .then((response) => {
+            onChangeStatus("success");
+            onSuccess(response);
+        })
+        .catch((error) => {
+            onChangeStatus("error");
+            onError(error);
+        });
 }
 
 async function showSnap(

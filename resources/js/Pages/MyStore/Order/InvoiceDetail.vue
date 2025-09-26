@@ -319,11 +319,7 @@ setTimeout(() => {
 </script>
 
 <template>
-    <div
-        data-aos="fade-up"
-        data-aos-duration="600"
-        class="p-6 !pt-0 sm:p-12 md:p-[100px] flex flex-col gap-6"
-    >
+    <div class="flex flex-col gap-4">
         <!-- Tracking -->
         <div
             v-if="props.showTracking"

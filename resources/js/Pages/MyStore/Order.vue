@@ -16,7 +16,7 @@ import ErrorDialog from "@/Components/ErrorDialog.vue";
 import MyTransactionCard from "./Transaction/MyTransactionCard.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import MyOrderCard from "./Order/MyOrderCard.vue";
-import OrderStatusChip from "./Order/OrderStatusChip.vue";
+import StatusChip from "@/Components/StatusChip.vue";
 
 const screenSize = useScreenSize();
 
@@ -295,7 +295,7 @@ onMounted(() => {
                             {{ $formatCurrency(invoice.amount) }}
                         </td>
                         <td>
-                            <OrderStatusChip
+                            <StatusChip
                                 :status="invoice.status"
                                 :label="invoice.status.toLocaleUpperCase()"
                                 class="w-fit"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AdminItemAction from "@/Components/AdminItemAction.vue";
-import OrderStatusChip from "@/Pages/Order/OrderStatusChip.vue";
+import StatusChip from "@/Components/StatusChip.vue";
 import { Link } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -33,7 +33,7 @@ const emit = defineEmits(["edit"]);
                         >
                             {{ transaction.code }}
                         </p>
-                        <OrderStatusChip
+                        <StatusChip
                             :status="transaction.status"
                             :label="transaction.status.toLocaleUpperCase()"
                             class="w-fit"

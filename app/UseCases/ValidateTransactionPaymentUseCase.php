@@ -30,7 +30,7 @@ class ValidateTransactionPaymentUseCase
     {
         try {
             $transaction = Transaction::with(['payments'])->where('code', $transactionCode)->first();
-            $payment = Payment::where('transaction_id', $transaction->id)->first();
+            $payment = Payment::where('transaction_id', $transaction->id)->latest()->first();
 
             if (!$payment) {
                 return DataState::error('Pembayaran tidak ditemukan untuk transaksi ini.', 404);
@@ -42,23 +42,34 @@ class ValidateTransactionPaymentUseCase
                 $transactionCode = $transaction->code . '-' . ($transaction->payments->count() - 1);
             }
 
-            $response = $this->midtransRepository->getTransactionStatus($transactionCode);
+            if ($payment->payment_method->slug == 'transfer') {
+                $paymentStatusBefore = $payment->status;
 
-            $paymentStatusBefore = $payment->status;
+                try {
+                    $response = $this->midtransRepository->getTransactionStatus($transactionCode);
+                    if ($response->transaction_status == 'settlement') {
+                        $paymentStatusAfter = 'completed';
+                    } else if ($response->transaction_status == 'failed' || $response->transaction_status == 'expire') {
+                        $paymentStatusAfter = 'failed';
+                    } else {
+                        $paymentStatusAfter = 'pending';
+                    }
+                } catch (Exception $e) {
+                    if ($e->getCode() == 404) {
+                        $paymentStatusAfter = 'failed';
+                    }
+                }
 
-            // Update payment
-            $payment->midtrans_response = json_encode($response);
-            $paymentStatusAfter = $response->transaction_status == 'settlement'
-                ? 'completed'
-                : ($response->transaction_status == 'failed' ? 'failed' : 'pending');
-
-            // Update invoice paid_at if payment is completed
-            if ($paymentStatusAfter === 'completed' && ($paymentStatusBefore !== 'completed' || $transaction->status === 'pending')) {
-                // Update payment status
-                $payment = $this->paymentRepository->setComplete($payment);
-
-                // Update transaction status
-                $this->transactionRepository->setPaidNow($transaction);
+                // Update payment, invoice, and transaction status if needed
+                if ($paymentStatusBefore !== 'completed' || $transaction->status === 'pending') {
+                    if ($paymentStatusAfter === 'completed') {
+                        $payment = $this->paymentRepository->setComplete($payment);
+                        $this->transactionRepository->setPaidNow($transaction);
+                    } else if ($paymentStatusAfter === 'failed') {
+                        $payment = $this->paymentRepository->setFailed($payment);
+                        $this->transactionRepository->setCancelled($transaction);
+                    }
+                }
             }
 
             return DataState::success($payment);

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class PaymentRepository
 {
-    public function createPayment(array $data): Payment
+    public static function createPayment(array $data): Payment
     {
         try {
             $payment = Payment::create($data);
@@ -19,7 +19,7 @@ class PaymentRepository
         }
     }
 
-    public function setComplete(Payment $payment): Payment
+    public static function setComplete(Payment $payment): Payment
     {
         try {
             $payment->status = 'completed';
@@ -29,6 +29,19 @@ class PaymentRepository
         } catch (Exception $e) {
             Log::error('Gagal mengubah status pembayaran menjadi dibayar: ' . $e);
             throw new Exception('Gagal mengubah status pembayaran menjadi dibayar: ' . $e);
+        }
+    }
+
+    public static function setFailed(Payment $payment): Payment
+    {
+        try {
+            $payment->status = 'failed';
+            $payment->save();
+
+            return $payment;
+        } catch (Exception $e) {
+            Log::error('Gagal mengubah status pembayaran menjadi gagal: ' . $e);
+            throw new Exception('Gagal mengubah status pembayaran menjadi gagal: ' . $e);
         }
     }
 

@@ -171,4 +171,31 @@ class TransactionRepository
             throw new Exception('Gagal mengubah status transaksi menjadi dibayar: ' . $e);
         }
     }
+
+    public static function setCancelled(Transaction $transaction): void
+    {
+        try {
+            DB::beginTransaction();
+
+            // Update invoice status
+            Invoice::where('transaction_id', $transaction->id)
+                ->update([
+                    'status' => 'cancelled',
+                ]);
+
+            // Update transaction status
+            $transaction->status = 'cancelled';
+            $transaction->save();
+
+            // Update transaction items status
+            TransactionItem::where('transaction_id', $transaction->id)
+                ->update(['fullfillment_status' => 'cancelled']);
+
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal mengubah status transaksi menjadi dibatalkan: ' . $e);
+            throw new Exception('Gagal mengubah status transaksi menjadi dibatalkan: ' . $e);
+        }
+    }
 }

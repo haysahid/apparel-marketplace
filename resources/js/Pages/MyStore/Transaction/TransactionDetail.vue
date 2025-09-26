@@ -11,7 +11,7 @@ import SuccessView from "@/Components/SuccessView.vue";
 import { router } from "@inertiajs/vue3";
 import midtransPayment from "@/plugins/midtrans-payment";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
-import OrderStatusChip from "@/Pages/Order/OrderStatusChip.vue";
+import StatusChip from "@/Components/StatusChip.vue";
 
 const props = defineProps({
     transaction: {
@@ -24,6 +24,7 @@ const props = defineProps({
     },
 });
 
+const checkPaymentStatus = ref(null);
 function checkPayment() {
     midtransPayment.checkPayment(
         {
@@ -35,10 +36,12 @@ function checkPayment() {
                 payment.value = response.data.result;
                 router.reload();
             },
+            onChangeStatus: (status) => {
+                checkPaymentStatus.value = status;
+            },
         }
     );
 }
-checkPayment();
 
 function showSnap() {
     midtransPayment.showSnap(
@@ -99,6 +102,8 @@ const showPaymentActions = computed(() => {
 });
 
 onMounted(() => {
+    checkPayment();
+
     if (route().params?.transaction_status == "settlement") {
         router.reload();
     } else if (
@@ -164,6 +169,7 @@ const showSuccessView = route().params.success == "true";
                 :groups="props.groups"
                 :showTracking="false"
                 :isShowingFromMyStore="true"
+                :isLoading="checkPaymentStatus === 'loading'"
                 class="!px-0"
                 @continuePayment="showSnap()"
             >
@@ -174,9 +180,10 @@ const showSuccessView = route().params.success == "true";
                         <OrderContentRow
                             label="Status Pembayaran"
                             :value="payment?.status"
+                            :isLoading="checkPaymentStatus === 'loading'"
                         >
                             <template #value>
-                                <OrderStatusChip
+                                <StatusChip
                                     :status="payment.status"
                                     :label="payment.status?.toUpperCase()"
                                 />

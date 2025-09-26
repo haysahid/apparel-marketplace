@@ -5,7 +5,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminItemAction from "@/Components/AdminItemAction.vue";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import TextInput from "@/Components/TextInput.vue";
-import OrderStatusChip from "../Order/OrderStatusChip.vue";
+import StatusChip from "@/Components/StatusChip.vue";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
@@ -263,7 +263,7 @@ const showPaymentStatusOptionDialog = ref(false);
                             <Link
                                 :href="
                                     route('my-store.transaction.edit', {
-                                        transaction: payment,
+                                        transaction: payment.transaction,
                                     })
                                 "
                                 class="hover:underline"
@@ -285,7 +285,7 @@ const showPaymentStatusOptionDialog = ref(false);
                             }}
                         </td>
                         <td>
-                            <OrderStatusChip
+                            <StatusChip
                                 :status="payment.status"
                                 :label="payment.status.toLocaleUpperCase()"
                                 class="w-fit"
@@ -294,11 +294,18 @@ const showPaymentStatusOptionDialog = ref(false);
                         <td>
                             {{
                                 payment.status === "completed" &&
-                                payment.transaction.paid_at
+                                payment.transaction.paid_at &&
+                                payment.midtrans_response?.va_numbers[0]?.bank
                                     ? `
-                                    ${payment.midtrans_response?.va_numbers[0]?.bank.toUpperCase()}
-                                 - ${$formatDate(payment.transaction.paid_at)}`
-                                    : "-"
+                                    ${
+                                        payment.midtrans_response?.va_numbers[0]?.bank.toUpperCase() ??
+                                        ""
+                                    } - 
+                                 `
+                                    : ""
+                            }}
+                            {{
+                                $formatDate(payment.transaction.paid_at) ?? "-"
                             }}
                         </td>
                         <!-- <td>

@@ -4,10 +4,9 @@ import OrderDetail from "./Order/OrderDetail.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { ref, computed, onMounted } from "vue";
-import axios from "axios";
 import { router } from "@inertiajs/vue3";
 import OrderContentRow from "@/Components/OrderContentRow.vue";
-import OrderStatusChip from "./Order/OrderStatusChip.vue";
+import StatusChip from "@/Components/StatusChip.vue";
 import SuccessView from "@/Components/SuccessView.vue";
 import midtransPayment from "@/plugins/midtrans-payment";
 
@@ -170,7 +169,7 @@ onMounted(() => {
                         :value="payment?.status"
                     >
                         <template #value>
-                            <OrderStatusChip
+                            <StatusChip
                                 :status="payment.status"
                                 :label="payment.status?.toUpperCase()"
                             />

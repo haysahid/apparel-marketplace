@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import OrderContentRow from "@/Components/OrderContentRow.vue";
-import OrderStatusChip from "./OrderStatusChip.vue";
+import StatusChip from "@/Components/StatusChip.vue";
 import Tooltip from "@/Components/Tooltip.vue";
 import { ref } from "vue";
 
@@ -92,7 +92,7 @@ const isCopied = ref(false);
                 <OrderContentRow label="Status" :value="props.invoice.status">
                     <template #value>
                         <!-- Status -->
-                        <OrderStatusChip
+                        <StatusChip
                             :status="props.invoice.status"
                             :label="props.invoice.status?.toUpperCase()"
                         />

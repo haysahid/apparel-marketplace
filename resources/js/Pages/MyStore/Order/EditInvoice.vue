@@ -7,7 +7,7 @@ import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import InvoiceDetail from "./InvoiceDetail.vue";
 import OrderContentRow from "@/Components/OrderContentRow.vue";
-import OrderStatusChip from "./OrderStatusChip.vue";
+import StatusChip from "@/Components/StatusChip.vue";
 
 const props = defineProps({
     invoice: {
@@ -93,7 +93,7 @@ window.onpopstate = function () {
                             :value="payment?.status"
                         >
                             <template #value>
-                                <OrderStatusChip
+                                <StatusChip
                                     :status="payment.status"
                                     :label="payment.status?.toUpperCase()"
                                 />
@@ -150,7 +150,7 @@ window.onpopstate = function () {
                     </template>
                 </template>
 
-                <template #actions>
+                <template #actions v-if="props.invoice.status !== 'cancelled'">
                     <PrimaryButton
                         @click="showChangeStatusDialog = true"
                         class="w-full py-3"

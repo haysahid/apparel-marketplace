@@ -7,6 +7,7 @@ import OrderSummaryCard from "./OrderSummaryCard.vue";
 import DetailRow from "@/Components/DetailRow.vue";
 import InfoHint from "@/Components/InfoHint.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import OrderLoading from "@/Components/OrderLoading.vue";
 
 const props = defineProps({
     transaction: {
@@ -22,6 +23,10 @@ const props = defineProps({
         default: true,
     },
     isShowingFromMyStore: {
+        type: Boolean,
+        default: false,
+    },
+    isLoading: {
         type: Boolean,
         default: false,
     },
@@ -512,7 +517,6 @@ const emit = defineEmits(["continuePayment"]);
                         :showDivider="index !== props.groups.length - 1"
                     />
                 </div>
-
                 <div class="flex flex-col w-full gap-5 xl:max-w-sm">
                     <!-- Summary -->
                     <div
@@ -539,6 +543,7 @@ const emit = defineEmits(["continuePayment"]);
                     <OrderSummaryCard
                         :transaction="props.transaction"
                         :groups="props.groups"
+                        :isLoading="props.isLoading"
                     >
                         <template #additionalInfo v-if="$slots.additionalInfo">
                             <slot name="additionalInfo" />
