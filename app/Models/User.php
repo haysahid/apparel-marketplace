@@ -85,11 +85,26 @@ class User extends Authenticatable
 
     public function stores()
     {
-        return $this->belongsToMany(Store::class, 'store_roles')->withTimestamps()->withPivot(['store_id', 'role_id']);
+        return $this->belongsToMany(Store::class, 'user_store_role')->withTimestamps()->withPivot(['store_id', 'role_id']);
+    }
+
+    public function store_roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_store_role', 'user_id', 'role_id')->withTimestamps()->withPivot('store_id');
     }
 
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    public function vouchers()
+    {
+        return $this->belongsToMany(Voucher::class, 'user_vouchers')->withTimestamps()->withPivot('usage_count');
+    }
+
+    public function partners()
+    {
+        return $this->hasMany(Partner::class);
     }
 }

@@ -13,6 +13,7 @@ import AOS from 'aos';
 // My plugins
 import formatDate from './plugins/date-formatter';
 import { formatCurrency, formatNumber } from './plugins/number-formatter';
+import { getImageUrl } from './plugins/helpers';
 
 AOS.init();
 
@@ -34,6 +35,7 @@ createInertiaApp({
         app.config.globalProperties.$formatDate = formatDate;
         app.config.globalProperties.$formatCurrency = formatCurrency;
         app.config.globalProperties.$formatNumber = formatNumber;
+        app.config.globalProperties.$getImageUrl = getImageUrl;
         app.mount(el);
     },
     progress: {

@@ -12,6 +12,7 @@ class VoucherRepository
         $search = null,
         $orderBy = 'created_at',
         $orderDirection = 'desc',
+        $userId = null,
         $activeOnly = true,
     ) {
         $vouchers = Voucher::query();
@@ -24,10 +25,16 @@ class VoucherRepository
             $vouchers->whereNull('store_id');
         }
 
+        if ($userId) {
+            $vouchers->whereHas('users', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            });
+        }
+
         if ($activeOnly) {
             $vouchers->whereNull('disabled_at')
-                ->where('start_date', '<=', now())
-                ->where('end_date', '>=', now());
+                ->where('redeem_start_date', '<=', now())
+                ->where('redeem_end_date', '>=', now());
         }
 
         if ($search) {
@@ -53,8 +60,8 @@ class VoucherRepository
         }
 
         $vouchers->whereNull('disabled_at')
-            ->where('start_date', '<=', now())
-            ->where('end_date', '>=', now())
+            ->where('redeem_start_date', '<=', now())
+            ->where('redeem_end_date', '>=', now())
             ->get();
 
         return $vouchers;
@@ -71,8 +78,8 @@ class VoucherRepository
         }
 
         $voucher->whereNull('disabled_at')
-            ->where('start_date', '<=', now())
-            ->where('end_date', '>=', now());
+            ->where('redeem_start_date', '<=', now())
+            ->where('redeem_end_date', '>=', now());
 
         return $voucher->first();
     }
@@ -175,5 +182,24 @@ class VoucherRepository
     public static function deleteVoucher(Voucher $voucher): bool
     {
         return $voucher->delete();
+    }
+
+    public static function getUserVouchers($userId, $storeId = null)
+    {
+        $query = Voucher::with(['users' => function ($q) use ($userId) {
+            $q->where('user_id', $userId);
+        }])
+            ->whereHas('users', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            });
+
+        if ($storeId) {
+            $query->where(function ($q) use ($storeId) {
+                $q->where('store_id', $storeId)
+                    ->orWhereNull('store_id');
+            });
+        }
+
+        return $query->get();
     }
 }

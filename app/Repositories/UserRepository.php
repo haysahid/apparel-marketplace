@@ -40,7 +40,24 @@ class UserRepository
         $orderBy = 'created_at',
         $orderDirection = 'desc'
     ) {
-        $query = User::with(['role'])->where('role_id', 8);
+        // Exclude superadmin and admin roles
+        $query = User::with([
+            'role',
+            'store_roles' => function ($q) use ($storeId) {
+                $q->where('store_id', $storeId);
+            },
+        ])->whereNotIn('role_id', [1, 2]);
+
+        // Filter users who have transactions or roles in the specified store
+        $query->where(function ($q) use ($storeId) {
+            $q->whereHas('transactions', function ($q1) use ($storeId) {
+                $q1->whereHas('invoices', function ($q2) use ($storeId) {
+                    $q2->where('store_id', $storeId);
+                });
+            })->orWhereHas('store_roles', function ($q3) use ($storeId) {
+                $q3->where('store_id', $storeId);
+            });
+        });
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -55,7 +72,7 @@ class UserRepository
 
     public static function getCustomerDetail($customerId)
     {
-        $customer = User::with(['role'])->where('id', $customerId)->first();
+        $customer = User::with(['role', 'stores'])->find($customerId);
         $invoiceStats = DB::table('invoices')
             ->join('transactions', 'invoices.transaction_id', '=', 'transactions.id')
             ->where('transactions.user_id', $customerId)

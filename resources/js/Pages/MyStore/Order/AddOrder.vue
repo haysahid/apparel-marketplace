@@ -181,7 +181,7 @@ const showGuestForm = ref(false);
         ]"
     >
         <div class="flex flex-col sm:gap-4">
-            <!-- Tab Navigation -->
+            <!-- Step Navigation -->
             <DefaultCard
                 :isMain="true"
                 class="!py-0 !px-4 sticky top-0 z-10 sm:static"

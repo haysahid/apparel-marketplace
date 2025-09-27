@@ -3,7 +3,7 @@ export const formatCurrency = (value, options = {
     currency: "IDR",
     minimumFractionDigits: 0,
 }) => {
-    if (value === null || value === undefined) {
+    if (!value) {
         value = 0;
     }
     if (typeof value === 'string') {
@@ -16,7 +16,7 @@ export const formatNumber = (value, options = {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
 }) => {
-    if (value === null || value === undefined) {
+    if (!value) {
         value = 0;
     }
     if (typeof value === 'string') {

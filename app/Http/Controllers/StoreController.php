@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\Store;
-use App\Models\StoreRole;
+use App\Models\UserStoreRole;
 use App\Models\StoreSocialLink;
 use App\Repositories\StoreRepository;
 use Exception;

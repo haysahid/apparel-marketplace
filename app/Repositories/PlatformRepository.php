@@ -31,7 +31,6 @@ class PlatformRepository
         }
 
         $platforms->orderBy($orderBy, $orderDirection);
-        $platforms->get();
 
         return $platforms->paginate($limit);
     }

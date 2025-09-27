@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { usePage, useForm, Link } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -15,18 +15,22 @@ import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import AdminItemCard from "@/Components/AdminItemCard.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
-import MyCustomerCard from "./Customer/MyCustomerCard.vue";
-import { getImageUrl } from "@/plugins/helpers";
+import { getImageUrl } from "@/plugins/helpers.js";
+import CustomPageProps from "@/types/model/CustomPageProps";
+import MyStorePartnerCard from "./Partner/MyStorePartnerCard.vue";
 
 const screenSize = useScreenSize();
 
 const props = defineProps({
-    customers: null,
+    partners: {
+        type: Object as () => PaginationModel<PartnerEntity>,
+        default: null,
+    },
 });
 
-const customers = ref(
-    props.customers.data.map((customer) => ({
-        ...customer,
+const partners = ref<PartnerEntity[]>(
+    props.partners.data.map((partner) => ({
+        ...partner,
         showDeleteModal: false,
     }))
 );
@@ -40,59 +44,62 @@ const getQueryParams = () => {
 };
 getQueryParams();
 
-function getCustomers() {
-    let queryParams = {};
+function getPartners() {
+    let queryParams = {
+        search: undefined,
+    };
 
     if (filters.search) queryParams.search = filters.search;
 
-    router.get(route("my-store.customer"), queryParams, {
+    router.get(route("my-store.partner"), queryParams, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
             getQueryParams();
-            customers.value = props.customers.data.map((brand) => ({
-                ...brand,
+            partners.value = props.partners.data.map((partner) => ({
+                ...partner,
                 showDeleteModal: false,
             }));
         },
     });
 }
 
-const selectedCustomer = ref(null);
-const showDeleteCustomerDialog = ref(false);
+const selectedPartner = ref(null);
+const showDeletePartnerDialog = ref(false);
 
-const openDeleteCustomerDialog = (customer) => {
-    if (customer) {
-        selectedCustomer.value = customer;
-        showDeleteCustomerDialog.value = true;
+const openDeletePartnerDialog = (partner) => {
+    console.log("openDeletePartnerDialog", partner);
+    if (partner) {
+        selectedPartner.value = partner;
+        showDeletePartnerDialog.value = true;
     }
 };
 
-const closeDeleteCustomerDialog = (result) => {
-    showDeleteCustomerDialog.value = false;
+const closeDeletePartnerDialog = (result = false) => {
+    showDeletePartnerDialog.value = false;
     if (result) {
-        selectedCustomer.value = null;
+        selectedPartner.value = null;
         openSuccessDialog("Data Berhasil Dihapus");
-        customers.value = customers.value.filter(
-            (b) => b.id !== selectedCustomer.value?.id
+        partners.value = partners.value.filter(
+            (b) => b.id !== selectedPartner.value?.id
         );
     }
 };
 
-const deleteCustomer = () => {
-    if (selectedCustomer.value) {
-        const form = useForm();
+const deletePartner = () => {
+    if (selectedPartner.value) {
+        const form = useForm({});
         form.delete(
-            route("my-store.brand.destroy", {
-                brand: selectedCustomer.value,
+            route("my-store.partner.destroy", {
+                partner: selectedPartner.value,
             }),
             {
                 onError: (errors) => {
                     openErrorDialog(errors.error);
                 },
                 onSuccess: () => {
-                    closeDeleteCustomerDialog(true);
-                    getCustomers();
+                    closeDeletePartnerDialog(true);
+                    getPartners();
                 },
             }
         );
@@ -115,11 +122,15 @@ const openErrorDialog = (message) => {
     showErrorDialog.value = true;
 };
 
-const page = usePage();
+const page = usePage<CustomPageProps>();
 
-function canEdit(customer) {
-    return false;
-    // return page.props.auth.is_admin;
+function canEdit(partner) {
+    return (
+        page.props.auth.is_admin ||
+        page.props.auth.user.stores.some(
+            (store) => store.id === partner.store_id
+        )
+    );
 }
 
 onMounted(() => {
@@ -130,21 +141,21 @@ onMounted(() => {
 </script>
 
 <template>
-    <MyStoreLayout title="Pelanggan" :showTitle="true">
+    <MyStoreLayout title="Mitra" :showTitle="true">
         <DefaultCard :isMain="true">
-            <div class="flex items-center justify-end gap-4">
-                <!-- <PrimaryButton
+            <div class="flex items-center justify-between gap-4">
+                <PrimaryButton
                     type="button"
                     class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
-                    @click="$inertia.visit(route('my-store.brand.create'))"
+                    @click="$inertia.visit(route('my-store.partner.create'))"
                 >
                     Tambah
-                </PrimaryButton> -->
+                </PrimaryButton>
                 <TextInput
                     v-model="filters.search"
-                    placeholder="Cari pelanggan..."
+                    placeholder="Cari mitra..."
                     class="max-w-48"
-                    @keyup.enter="getCustomers()"
+                    @keyup.enter="getPartners()"
                 >
                     <template #suffix>
                         <svg
@@ -172,93 +183,103 @@ onMounted(() => {
             <!-- Table -->
             <DefaultTable
                 v-if="screenSize.is('xl')"
-                :isEmpty="customers.length === 0"
+                :isEmpty="partners.length === 0"
                 class="mt-6"
             >
                 <template #thead>
                     <tr>
                         <th class="w-12">No</th>
-                        <th>Pelanggan</th>
-                        <th>Email</th>
-                        <th>No. HP</th>
-                        <th>Jenis</th>
+                        <th class="w-24">Logo</th>
+                        <th>Nama</th>
+                        <th>Deskripsi</th>
+                        <th>Alamat</th>
+                        <th>Nama Kontak</th>
+                        <th>Email Kontak</th>
+                        <th>No. HP Kontak</th>
                         <th class="w-24">Aksi</th>
                     </tr>
                 </template>
                 <template #tbody>
-                    <tr
-                        v-for="(customer, index) in customers"
-                        :key="customer.id"
-                    >
+                    <tr v-for="(partner, index) in partners" :key="partner.id">
                         <td>
                             {{
                                 index +
                                 1 +
-                                (props.customers.current_page - 1) *
-                                    props.customers.per_page
+                                (props.partners.current_page - 1) *
+                                    props.partners.per_page
                             }}
+                        </td>
+                        <td>
+                            <img
+                                v-if="partner.logo"
+                                :src="getImageUrl(partner.logo)"
+                                alt="Logo Partner"
+                                class="object-contain h-[60px] rounded aspect-[3/2]"
+                            />
+                            <div
+                                v-else
+                                class="flex items-center justify-center h-[60px] bg-gray-100 rounded aspect-[3/2]"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    class="size-6 fill-gray-400"
+                                >
+                                    <path
+                                        d="M5 21C4.45 21 3.97933 20.8043 3.588 20.413C3.19667 20.0217 3.00067 19.5507 3 19V5C3 4.45 3.196 3.97933 3.588 3.588C3.98 3.19667 4.45067 3.00067 5 3H19C19.55 3 20.021 3.196 20.413 3.588C20.805 3.98 21.0007 4.45067 21 5V19C21 19.55 20.8043 20.021 20.413 20.413C20.0217 20.805 19.5507 21.0007 19 21H5ZM6 17H18L14.25 12L11.25 16L9 13L6 17Z"
+                                    />
+                                </svg>
+                            </div>
                         </td>
                         <td>
                             <Link
                                 :href="
-                                    route('my-store.customer.show', {
-                                        customer: customer,
+                                    route('my-store.partner.show', {
+                                        partner: partner.id,
                                     })
                                 "
-                                class="flex items-center gap-3 group"
+                                class="hover:underline"
                             >
-                                <div class="flex items-center gap-3">
-                                    <img
-                                        v-if="customer.avatar"
-                                        :src="getImageUrl(customer.avatar)"
-                                        alt="Foto Pelanggan"
-                                        class="object-contain rounded-full size-8"
-                                    />
-                                    <svg
-                                        v-else
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="44"
-                                        height="44"
-                                        viewBox="0 0 44 44"
-                                        class="size-8 fill-gray-400"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            clip-rule="evenodd"
-                                            d="M40.3333 22.0003C40.3333 32.1258 32.1255 40.3337 22 40.3337C11.8745 40.3337 3.66663 32.1258 3.66663 22.0003C3.66663 11.8748 11.8745 3.66699 22 3.66699C32.1255 3.66699 40.3333 11.8748 40.3333 22.0003ZM27.5 16.5003C27.5 17.959 26.9205 19.358 25.889 20.3894C24.8576 21.4209 23.4586 22.0003 22 22.0003C20.5413 22.0003 19.1423 21.4209 18.1109 20.3894C17.0794 19.358 16.5 17.959 16.5 16.5003C16.5 15.0416 17.0794 13.6427 18.1109 12.6112C19.1423 11.5798 20.5413 11.0003 22 11.0003C23.4586 11.0003 24.8576 11.5798 25.889 12.6112C26.9205 13.6427 27.5 15.0416 27.5 16.5003ZM22 37.5837C25.1465 37.5887 28.2201 36.6366 30.8128 34.8538C31.9201 34.093 32.3931 32.6447 31.7478 31.4658C30.415 29.022 27.665 27.5003 22 27.5003C16.335 27.5003 13.585 29.022 12.2503 31.4658C11.6068 32.6447 12.0798 34.093 13.1871 34.8538C15.7798 36.6366 18.8535 37.5887 22 37.5837Z"
-                                        />
-                                    </svg>
-                                    <p class="group-hover:underline">
-                                        {{ customer.name }}
-                                    </p>
-                                </div>
+                                {{ partner.name }}
                             </Link>
                         </td>
                         <td class="!whitespace-normal">
-                            {{ customer.email }}
+                            <p class="line-clamp-2">
+                                {{ partner.description ?? "-" }}
+                            </p>
                         </td>
                         <td class="!whitespace-normal">
-                            {{ customer.phone }}
+                            <p class="line-clamp-2">
+                                {{ partner.address ?? "-" }}
+                            </p>
                         </td>
-                        <td class="!whitespace-normal">
-                            {{ customer.store_roles[0]?.name || "-" }}
+                        <td>
+                            {{ partner.contact_name ?? "-" }}
+                        </td>
+                        <td>
+                            {{ partner.contact_email ?? "-" }}
+                        </td>
+                        <td>
+                            {{ partner.contact_phone ?? "-" }}
                         </td>
                         <td>
                             <AdminItemAction
-                                v-if="canEdit(customer)"
+                                v-if="canEdit(partner)"
                                 @edit="
                                     $inertia.visit(
-                                        route('my-store.brand.edit', {
-                                            brand: customer,
+                                        route('my-store.partner.edit', {
+                                            partner: partner,
                                         })
                                     )
                                 "
-                                @delete="openDeleteCustomerDialog(customer)"
+                                @delete="openDeletePartnerDialog(partner)"
                             />
                             <InfoTooltip
-                                v-if="!canEdit(customer)"
-                                :id="`table-tooltip-hint-${customer.id}`"
-                                text="Pelanggan tidak dapat diedit atau dihapus"
+                                v-if="!canEdit(partner)"
+                                :id="`table-tooltip-hint-${partner.id}`"
+                                text="Partner bawaan sistem"
                             />
                         </td>
                     </tr>
@@ -269,24 +290,21 @@ onMounted(() => {
             <div
                 v-if="!screenSize.is('xl')"
                 class="flex flex-col gap-3 mt-4"
-                :class="{ 'min-h-auto h-[68vh]': customers.length == 0 }"
+                :class="{ 'min-h-auto h-[68vh]': partners.length == 0 }"
             >
-                <div
-                    v-if="customers.length > 0"
-                    class="grid grid-cols-1 gap-3 sm:grid-cols-2"
-                >
-                    <MyCustomerCard
-                        v-for="(customer, index) in customers"
-                        :key="customer.id"
-                        :customer="customer"
+                <div v-if="partners.length > 0" class="grid grid-cols-1 gap-3">
+                    <MyStorePartnerCard
+                        v-for="(partner, index) in partners"
+                        :key="partner.id"
+                        :partner="partner"
                         @edit="
                             $inertia.visit(
-                                route('my-store.brand.edit', {
-                                    brand: customer,
+                                route('my-store.partner.edit', {
+                                    partner: partner,
                                 })
                             )
                         "
-                        @delete="openDeleteCustomerDialog(customer)"
+                        @delete="openDeletePartnerDialog(partner)"
                     />
                 </div>
                 <div v-else class="flex items-center justify-center h-[90%]">
@@ -298,23 +316,22 @@ onMounted(() => {
 
             <!-- Pagination -->
             <div
-                v-if="props.customers.total > 0"
+                v-if="props.partners.total > 0"
                 class="flex flex-col gap-2 mt-4"
             >
                 <p class="text-xs text-gray-500 sm:text-sm">
-                    Menampilkan {{ props.customers.from }} -
-                    {{ props.customers.to }} dari
-                    {{ props.customers.total }} item
+                    Menampilkan {{ props.partners.from }} -
+                    {{ props.partners.to }} dari {{ props.partners.total }} item
                 </p>
-                <DefaultPagination :links="props.customers.links" />
+                <DefaultPagination :links="props.partners.links" />
             </div>
         </DefaultCard>
 
         <DeleteConfirmationDialog
-            :show="showDeleteCustomerDialog"
-            :title="`Hapus Pelanggan <b>${selectedCustomer?.name}</b>?`"
-            @close="closeDeleteCustomerDialog()"
-            @delete="deleteCustomer()"
+            :show="showDeletePartnerDialog"
+            :title="`Hapus Mitra <b>${selectedPartner?.name}</b>?`"
+            @close="closeDeletePartnerDialog()"
+            @delete="deletePartner()"
         />
 
         <SuccessDialog

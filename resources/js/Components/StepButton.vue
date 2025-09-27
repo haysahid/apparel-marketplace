@@ -30,6 +30,7 @@ const props = defineProps({
         :class="{
             'text-gray-700 dark:text-gray-300 ': !isActive,
             'text-primary dark:primary-dark ': isActive,
+            '!text-gray-400': !isActive && disabled,
         }"
         :disabled="disabled"
     >
@@ -40,12 +41,16 @@ const props = defineProps({
                 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300':
                     !isActive,
                 'bg-primary text-white dark:bg-primary-dark': isActive,
+                '!bg-gray-100 !text-gray-400 dark:bg-gray-800 dark:text-gray-500':
+                    !isActive && disabled,
             }"
         >
             {{ number }}
         </div>
         <div class="flex flex-col items-start justify-center">
-            <p class="font-semibold">{{ title }}</p>
+            <p class="font-semibold">
+                {{ title }}
+            </p>
             <p
                 v-if="subtitle"
                 class="text-xs text-gray-400 dark:text-gray-300"

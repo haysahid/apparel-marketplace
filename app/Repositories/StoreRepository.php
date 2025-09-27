@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Role;
 use App\Models\Store;
-use App\Models\StoreRole;
+use App\Models\UserStoreRole;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,7 +36,7 @@ class StoreRepository
             $store = Store::create($data);
 
             // Create user store relationship
-            StoreRole::create([
+            UserStoreRole::create([
                 'store_id' => $store->id,
                 'user_id' => Auth::id(),
                 'role_id' => Role::where('slug', 'store-owner')->first()->id,

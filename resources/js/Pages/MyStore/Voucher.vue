@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { usePage, useForm } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -12,11 +12,15 @@ import DefaultPagination from "@/Components/DefaultPagination.vue";
 import DefaultTable from "@/Components/DefaultTable.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import AdminItemCard from "@/Components/AdminItemCard.vue";
+import CustomPageProps from "@/types/model/CustomPageProps";
 
 const screenSize = useScreenSize();
 
 const props = defineProps({
-    vouchers: null,
+    vouchers: {
+        type: Object as () => PaginationModel<VoucherEntity>,
+        required: true,
+    },
 });
 
 const vouchers = ref(
@@ -49,7 +53,7 @@ const closeDeleteVoucherDialog = (result = false) => {
 
 const deleteVoucher = () => {
     if (selectedVoucher.value) {
-        const form = useForm();
+        const form = useForm({});
         form.delete(
             route("my-store.voucher.destroy", {
                 voucher: selectedVoucher.value,
@@ -82,7 +86,7 @@ const openErrorDialog = (message) => {
     showErrorDialog.value = true;
 };
 
-const page = usePage();
+const page = usePage<CustomPageProps>();
 
 onMounted(() => {
     if (page.props.flash.success) {
@@ -112,6 +116,7 @@ onMounted(() => {
                     <tr>
                         <th class="w-12">No</th>
                         <th>Nama Voucher</th>
+                        <th>Kode Voucher</th>
                         <th class="w-[150px]">Jumlah Diskon</th>
                         <th>Limit</th>
                         <th>Tgl. Mulai</th>
@@ -133,6 +138,9 @@ onMounted(() => {
                             {{ voucher.name }}
                         </td>
                         <td>
+                            {{ voucher.code }}
+                        </td>
+                        <td>
                             {{
                                 voucher.type === "percentage"
                                     ? `${voucher.amount}%`
@@ -144,16 +152,16 @@ onMounted(() => {
                         </td>
                         <td>
                             {{
-                                $formatDate(voucher.start_date, {
+                                $formatDate(voucher.redeem_start_date, {
                                     dateStyle: "medium",
-                                })
+                                }) ?? "-"
                             }}
                         </td>
                         <td>
                             {{
-                                $formatDate(voucher.end_date, {
+                                $formatDate(voucher.redeem_end_date, {
                                     dateStyle: "medium",
-                                })
+                                }) ?? "-"
                             }}
                         </td>
                         <td>
@@ -176,13 +184,17 @@ onMounted(() => {
             <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <div
                     v-if="vouchers.length > 0"
-                    class="grid grid-cols-2 gap-3 sm:grid-cols-3"
+                    class="grid grid-cols-1 gap-3 sm:grid-cols-2"
                 >
                     <AdminItemCard
                         v-for="(voucher, index) in vouchers"
                         :key="voucher.id"
                         :name="voucher.name"
-                        :description="voucher.code"
+                        :description="`${voucher.code} - ${
+                            voucher.type === 'percentage'
+                                ? voucher.amount + '%'
+                                : $formatCurrency(voucher.amount)
+                        }`"
                         :showImage="false"
                         @edit="
                             $inertia.visit(

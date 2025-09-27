@@ -50,13 +50,11 @@ class Store extends Model
 
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'store_roles');
+        return $this->belongsToMany(Role::class, 'user_store_role');
     }
 
-    public function my_role()
+    public function partners()
     {
-        return $this->belongsToMany(Role::class, 'store_roles')
-            ->where('user_id', Auth::id())
-            ->withPivot('role');
+        return $this->hasMany(Partner::class);
     }
 }

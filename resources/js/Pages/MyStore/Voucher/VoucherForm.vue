@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
@@ -8,6 +8,11 @@ import ErrorDialog from "@/Components/ErrorDialog.vue";
 import InputGroup from "@/Components/InputGroup.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
+import InfoTooltip from "@/Components/InfoTooltip.vue";
+import DateInput from "@/Components/DateInput.vue";
+import DefaultCard from "@/Components/DefaultCard.vue";
+import Stepper from "@/Components/Stepper.vue";
+import VoucherPreview from "./VoucherPreview.vue";
 
 const props = defineProps({
     voucher: {
@@ -17,18 +22,52 @@ const props = defineProps({
 });
 
 const form = useForm(
-    props.voucher ?? {
-        name: null,
-        code: null,
-        description: null,
-        type: "percentage",
-        amount: null,
-        min_amount: null,
-        max_amount: null,
-        start_date: null,
-        end_date: null,
-        usage_limit: null,
-    }
+    props.voucher
+        ? {
+              ...props.voucher,
+              redeem_start_date: props.voucher.redeem_start_date
+                  ? props.voucher.redeem_start_date.split(" ")[0]
+                  : null,
+              redeem_end_date: props.voucher.redeem_end_date
+                  ? props.voucher.redeem_end_date.split(" ")[0]
+                  : null,
+              usage_start_date: props.voucher.usage_start_date
+                  ? props.voucher.usage_start_date.split(" ")[0]
+                  : null,
+              usage_end_date: props.voucher.usage_end_date
+                  ? props.voucher.usage_end_date.split(" ")[0]
+                  : null,
+
+              // Utility
+              usage_period_type: props.voucher.usage_duration_days
+                  ? "days"
+                  : props.voucher.usage_start_date ||
+                    props.voucher.usage_end_date
+                  ? "range"
+                  : "days", // days, range
+          }
+        : {
+              name: null,
+              code: null,
+              description: null,
+              type: "percentage",
+              amount: null,
+              min_amount: null,
+              max_amount: null,
+              redeem_start_date: null,
+              redeem_end_date: null,
+              usage_duration_days: null,
+              usage_start_date: null,
+              usage_end_date: null,
+              usage_limit: null,
+              required_points: null,
+              usage_url: null,
+              is_internal: true,
+              partner_id: null,
+
+              // Utility
+              usage_period_type: "range", // days, range
+          }
 );
 
 const typeSearch = ref(null);
@@ -42,9 +81,6 @@ const filteredTypes = computed(() => {
         type.label.toLowerCase().includes(typeSearch.value.toLowerCase())
     );
 });
-
-const startDateInput = ref(null);
-const endDateInput = ref(null);
 
 const submit = () => {
     if (props.voucher?.id) {
@@ -84,216 +120,469 @@ const openErrorDialog = (message) => {
     errorMessage.value = message;
     showErrorDialog.value = true;
 };
+
+const stepIndex = ref(0);
+
+const steps = computed(() => [
+    {
+        title: "Informasi Voucher",
+        subtitle: null,
+        disabled: false,
+    },
+    {
+        title: "Pengaturan Lanjutan",
+        subtitle: null,
+        disabled: !form.name || !form.code || !form.type || !form.amount,
+    },
+]);
+
+const scrollToTop = () => {
+    const productListElement = document.querySelector("#main-area");
+    if (productListElement) {
+        productListElement.scrollTo({ top: 0, behavior: "smooth" });
+    }
+};
 </script>
 
 <template>
     <form @submit.prevent="submit" class="">
-        <div class="flex flex-col items-start gap-4">
-            <div class="flex flex-col w-full gap-y-4 gap-x-6 sm:flex-row">
-                <div class="flex flex-col w-full max-w-3xl gap-4">
-                    <!-- Name -->
-                    <InputGroup id="name" label="Nama Voucher">
-                        <TextInput
-                            id="name"
-                            v-model="form.name"
-                            type="text"
-                            placeholder="Masukkan Nama Voucher"
-                            required
-                            :autofocus="true"
-                            :error="form.errors.name"
-                            @update:modelValue="form.errors.name = null"
-                        />
-                    </InputGroup>
+        <div class="flex flex-col sm:gap-4">
+            <!-- Step Navigation -->
+            <DefaultCard
+                :isMain="true"
+                class="!py-0 !px-4 sticky top-0 z-10 sm:static"
+            >
+                <Stepper :steps="steps" v-model:stepIndex="stepIndex" />
+            </DefaultCard>
 
-                    <!-- Code -->
-                    <InputGroup id="code" label="Kode Voucher">
-                        <TextInput
-                            id="code"
-                            v-model="form.code"
-                            type="text"
-                            placeholder="Masukkan Kode Voucher"
-                            required
-                            :error="form.errors.code"
-                            @update:modelValue="form.errors.code = null"
-                        />
-                    </InputGroup>
-
-                    <!-- Description -->
-                    <InputGroup id="description" label="Deskripsi Voucher">
-                        <TextAreaInput
-                            id="description"
-                            v-model="form.description"
-                            type="text"
-                            placeholder="Masukkan Deskripsi"
-                            autocomplete="description"
-                            :error="form.errors.description"
-                            @update:modelValue="form.errors.description = null"
-                        />
-                    </InputGroup>
-
-                    <!-- Type -->
-                    <InputGroup id="type" label="Tipe Voucher">
-                        <DropdownSearchInput
-                            id="type"
-                            :modelValue="
-                                form.type
-                                    ? {
-                                          label:
-                                              form.type === 'percentage'
-                                                  ? 'Persentase'
-                                                  : 'Nominal',
-                                          value: form.type,
-                                      }
-                                    : null
-                            "
-                            :options="filteredTypes"
-                            placeholder="Pilih Tipe Voucher"
-                            required
-                            @update:modelValue="
-                                (option) => {
-                                    form.type = option?.value;
-                                }
-                            "
-                            @clear="form.type = null"
-                        />
-                    </InputGroup>
-
-                    <!-- Amount -->
-                    <InputGroup
-                        id="amount"
-                        :label="`Jumlah Voucher (${
-                            form.type === 'percentage' ? '%' : 'Rp'
-                        })`"
-                    >
-                        <TextInput
-                            id="amount"
-                            v-model="form.amount"
-                            type="number"
-                            placeholder="Masukkan Jumlah Voucher"
-                            required
-                            :error="form.errors.amount"
-                            @update:modelValue="form.errors.amount = null"
-                        />
-                    </InputGroup>
-                </div>
-
-                <div class="flex flex-col w-full max-w-3xl gap-4">
-                    <!-- Start Date -->
-                    <InputGroup id="start_date" label="Tanggal Mulai">
-                        <TextInput
-                            ref="startDateInput"
-                            v-model="form.start_date"
-                            type="date"
-                            placeholder="Tanggal Mulai"
-                            :error="form.errors.start_date"
-                            @change="form.errors.start_date = null"
+            <div class="flex sm:gap-4">
+                <!-- Form -->
+                <DefaultCard :isMain="true" class="w-full">
+                    <div class="flex flex-col items-start gap-4">
+                        <div
+                            class="flex flex-col w-full gap-y-4 gap-x-6 sm:flex-row"
                         >
-                            <template #suffix>
-                                <div class="absolute right-1.5">
-                                    <button
-                                        type="button"
-                                        class="p-2"
-                                        @click="
-                                            startDateInput.input.showPicker()
+                            <!-- Step 1 -->
+                            <div
+                                v-if="stepIndex === 0"
+                                class="flex flex-col w-full max-w-3xl gap-4"
+                            >
+                                <!-- Name -->
+                                <InputGroup id="name" label="Nama Voucher">
+                                    <TextInput
+                                        id="name"
+                                        v-model="form.name"
+                                        type="text"
+                                        placeholder="Masukkan Nama Voucher"
+                                        required
+                                        :autofocus="true"
+                                        :error="form.errors.name"
+                                        @update:modelValue="
+                                            form.errors.name = null
                                         "
+                                    />
+                                </InputGroup>
+
+                                <!-- Code -->
+                                <InputGroup id="code" label="Kode Voucher">
+                                    <TextInput
+                                        id="code"
+                                        v-model="form.code"
+                                        type="text"
+                                        placeholder="Masukkan Kode Voucher"
+                                        required
+                                        :error="form.errors.code"
+                                        @update:modelValue="
+                                            form.errors.code = null
+                                        "
+                                    />
+                                </InputGroup>
+
+                                <!-- Description -->
+                                <InputGroup
+                                    id="description"
+                                    label="Deskripsi Voucher"
+                                >
+                                    <TextAreaInput
+                                        id="description"
+                                        v-model="form.description"
+                                        type="text"
+                                        placeholder="Masukkan Deskripsi"
+                                        autocomplete="description"
+                                        :error="form.errors.description"
+                                        @update:modelValue="
+                                            form.errors.description = null
+                                        "
+                                    />
+                                </InputGroup>
+
+                                <div class="flex items-center w-full gap-4">
+                                    <!-- Type -->
+                                    <InputGroup id="type" label="Tipe Voucher">
+                                        <DropdownSearchInput
+                                            id="type"
+                                            :modelValue="
+                                                form.type
+                                                    ? {
+                                                          label:
+                                                              form.type ===
+                                                              'percentage'
+                                                                  ? 'Persentase'
+                                                                  : 'Nominal',
+                                                          value: form.type,
+                                                      }
+                                                    : null
+                                            "
+                                            :options="filteredTypes"
+                                            placeholder="Pilih Tipe Voucher"
+                                            required
+                                            @update:modelValue="
+                                                (option) => {
+                                                    form.type = option?.value;
+                                                }
+                                            "
+                                            @clear="form.type = null"
+                                        />
+                                    </InputGroup>
+
+                                    <!-- Amount -->
+                                    <InputGroup
+                                        id="amount"
+                                        :label="`Nilai Voucher (${
+                                            form.type === 'percentage'
+                                                ? '%'
+                                                : 'Rp'
+                                        })`"
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            class="size-4 fill-gray-400"
-                                        >
-                                            <path
-                                                d="M8 14C7.71667 14 7.47933 13.904 7.288 13.712C7.09667 13.52 7.00067 13.2827 7 13C6.99933 12.7173 7.09533 12.48 7.288 12.288C7.48067 12.096 7.718 12 8 12C8.282 12 8.51967 12.096 8.713 12.288C8.90633 12.48 9.002 12.7173 9 13C8.998 13.2827 8.902 13.5203 8.712 13.713C8.522 13.9057 8.28467 14.0013 8 14ZM12 14C11.7167 14 11.4793 13.904 11.288 13.712C11.0967 13.52 11.0007 13.2827 11 13C10.9993 12.7173 11.0953 12.48 11.288 12.288C11.4807 12.096 11.718 12 12 12C12.282 12 12.5197 12.096 12.713 12.288C12.9063 12.48 13.002 12.7173 13 13C12.998 13.2827 12.902 13.5203 12.712 13.713C12.522 13.9057 12.2847 14.0013 12 14ZM16 14C15.7167 14 15.4793 13.904 15.288 13.712C15.0967 13.52 15.0007 13.2827 15 13C14.9993 12.7173 15.0953 12.48 15.288 12.288C15.4807 12.096 15.718 12 16 12C16.282 12 16.5197 12.096 16.713 12.288C16.9063 12.48 17.002 12.7173 17 13C16.998 13.2827 16.902 13.5203 16.712 13.713C16.522 13.9057 16.2847 14.0013 16 14ZM5 22C4.45 22 3.97933 21.8043 3.588 21.413C3.19667 21.0217 3.00067 20.5507 3 20V6C3 5.45 3.196 4.97934 3.588 4.588C3.98 4.19667 4.45067 4.00067 5 4H6V3C6 2.71667 6.096 2.47934 6.288 2.288C6.48 2.09667 6.71733 2.00067 7 2C7.28267 1.99934 7.52033 2.09534 7.713 2.288C7.90567 2.48067 8.00133 2.718 8 3V4H16V3C16 2.71667 16.096 2.47934 16.288 2.288C16.48 2.09667 16.7173 2.00067 17 2C17.2827 1.99934 17.5203 2.09534 17.713 2.288C17.9057 2.48067 18.0013 2.718 18 3V4H19C19.55 4 20.021 4.196 20.413 4.588C20.805 4.98 21.0007 5.45067 21 6V20C21 20.55 20.8043 21.021 20.413 21.413C20.0217 21.805 19.5507 22.0007 19 22H5ZM5 20H19V10H5V20Z"
-                                            />
-                                        </svg>
-                                    </button>
+                                        <TextInput
+                                            id="amount"
+                                            v-model="form.amount"
+                                            type="number"
+                                            placeholder="Masukkan Nilai Voucher"
+                                            required
+                                            :error="form.errors.amount"
+                                            @update:modelValue="
+                                                form.errors.amount = null
+                                            "
+                                        />
+                                    </InputGroup>
                                 </div>
-                            </template>
-                        </TextInput>
-                    </InputGroup>
 
-                    <!-- End Date -->
-                    <InputGroup id="end_date" label="Tanggal Berakhir">
-                        <TextInput
-                            ref="endDateInput"
-                            v-model="form.end_date"
-                            type="date"
-                            placeholder="Tanggal Berakhir"
-                            :error="form.errors.end_date"
-                            @change="form.errors.end_date = null"
-                        >
-                            <template #suffix>
-                                <div class="absolute right-1.5">
-                                    <button
-                                        type="button"
-                                        class="p-2"
-                                        @click="endDateInput.input.showPicker()"
+                                <div class="flex items-center w-full gap-4">
+                                    <!-- Start Date -->
+                                    <InputGroup
+                                        id="redeem_start_date"
+                                        label="Tgl. Mulai"
                                     >
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="24"
-                                            height="24"
-                                            viewBox="0 0 24 24"
-                                            class="size-4 fill-gray-400"
-                                        >
-                                            <path
-                                                d="M8 14C7.71667 14 7.47933 13.904 7.288 13.712C7.09667 13.52 7.00067 13.2827 7 13C6.99933 12.7173 7.09533 12.48 7.288 12.288C7.48067 12.096 7.718 12 8 12C8.282 12 8.51967 12.096 8.713 12.288C8.90633 12.48 9.002 12.7173 9 13C8.998 13.2827 8.902 13.5203 8.712 13.713C8.522 13.9057 8.28467 14.0013 8 14ZM12 14C11.7167 14 11.4793 13.904 11.288 13.712C11.0967 13.52 11.0007 13.2827 11 13C10.9993 12.7173 11.0953 12.48 11.288 12.288C11.4807 12.096 11.718 12 12 12C12.282 12 12.5197 12.096 12.713 12.288C12.9063 12.48 13.002 12.7173 13 13C12.998 13.2827 12.902 13.5203 12.712 13.713C12.522 13.9057 12.2847 14.0013 12 14ZM16 14C15.7167 14 15.4793 13.904 15.288 13.712C15.0967 13.52 15.0007 13.2827 15 13C14.9993 12.7173 15.0953 12.48 15.288 12.288C15.4807 12.096 15.718 12 16 12C16.282 12 16.5197 12.096 16.713 12.288C16.9063 12.48 17.002 12.7173 17 13C16.998 13.2827 16.902 13.5203 16.712 13.713C16.522 13.9057 16.2847 14.0013 16 14ZM5 22C4.45 22 3.97933 21.8043 3.588 21.413C3.19667 21.0217 3.00067 20.5507 3 20V6C3 5.45 3.196 4.97934 3.588 4.588C3.98 4.19667 4.45067 4.00067 5 4H6V3C6 2.71667 6.096 2.47934 6.288 2.288C6.48 2.09667 6.71733 2.00067 7 2C7.28267 1.99934 7.52033 2.09534 7.713 2.288C7.90567 2.48067 8.00133 2.718 8 3V4H16V3C16 2.71667 16.096 2.47934 16.288 2.288C16.48 2.09667 16.7173 2.00067 17 2C17.2827 1.99934 17.5203 2.09534 17.713 2.288C17.9057 2.48067 18.0013 2.718 18 3V4H19C19.55 4 20.021 4.196 20.413 4.588C20.805 4.98 21.0007 5.45067 21 6V20C21 20.55 20.8043 21.021 20.413 21.413C20.0217 21.805 19.5507 22.0007 19 22H5ZM5 20H19V10H5V20Z"
+                                        <DateInput
+                                            v-model="form.redeem_start_date"
+                                            placeholder="Tanggal Mulai"
+                                            :error="
+                                                form.errors.redeem_start_date
+                                            "
+                                            @update:modelValue="
+                                                form.errors.redeem_start_date =
+                                                    null
+                                            "
+                                        />
+                                        <template #suffix>
+                                            <InfoTooltip
+                                                id="redeem-start-date-tooltip"
+                                                text="Tanggal mulai voucher dapat diperoleh. Biarkan kosong untuk langsung dapat diperoleh."
                                             />
-                                        </svg>
-                                    </button>
+                                        </template>
+                                    </InputGroup>
+
+                                    <!-- End Date -->
+                                    <InputGroup
+                                        id="redeem_end_date"
+                                        label="Tgl. Berakhir"
+                                    >
+                                        <DateInput
+                                            v-model="form.redeem_end_date"
+                                            placeholder="Tanggal Berakhir"
+                                            :error="form.errors.redeem_end_date"
+                                            @update:modelValue="
+                                                form.errors.redeem_end_date =
+                                                    null
+                                            "
+                                        />
+                                        <template #suffix>
+                                            <InfoTooltip
+                                                id="redeem-end-date-tooltip"
+                                                text="Tanggal berakhir voucher dapat diperoleh. Biarkan kosong untuk tidak ada batasan tanggal berakhir penukaran."
+                                            />
+                                        </template>
+                                    </InputGroup>
                                 </div>
-                            </template>
-                        </TextInput>
-                    </InputGroup>
 
-                    <!-- Usage Limit -->
-                    <InputGroup id="usage_limit" label="Batas Penggunaan">
-                        <TextInput
-                            id="usage_limit"
-                            v-model="form.usage_limit"
-                            type="number"
-                            placeholder="Masukkan Batas Penggunaan Voucher"
-                            :error="form.errors.usage_limit"
-                            @update:modelValue="form.errors.usage_limit = null"
-                        />
-                    </InputGroup>
+                                <!-- Required Points -->
+                                <InputGroup
+                                    id="required_points"
+                                    label="Poin Penukaran"
+                                >
+                                    <TextInput
+                                        id="required_points"
+                                        v-model="form.required_points"
+                                        type="number"
+                                        placeholder="Masukkan Poin Penukaran"
+                                        :error="form.errors.required_points"
+                                        @update:modelValue="
+                                            form.errors.required_points = null
+                                        "
+                                    />
+                                    <template #suffix>
+                                        <InfoTooltip
+                                            id="required-points-tooltip"
+                                            text="Jumlah poin yang harus dimiliki pelanggan untuk dapat ditukar dengan voucher ini."
+                                        />
+                                    </template>
+                                </InputGroup>
+                            </div>
 
-                    <!-- Min. Amount -->
-                    <InputGroup id="min_amount" label="Minimal Pembelian (Rp)">
-                        <TextInput
-                            id="min_amount"
-                            v-model="form.min_amount"
-                            type="number"
-                            placeholder="Masukkan Minimal Pembelian"
-                            :error="form.errors.min_amount"
-                            @update:modelValue="form.errors.min_amount = null"
-                        />
-                    </InputGroup>
+                            <!-- Step 2 -->
+                            <div
+                                v-if="stepIndex === 1"
+                                class="flex flex-col w-full max-w-3xl gap-4"
+                            >
+                                <!-- Usage Limit -->
+                                <InputGroup
+                                    id="usage_limit"
+                                    label="Batas Penggunaan"
+                                >
+                                    <TextInput
+                                        id="usage_limit"
+                                        v-model="form.usage_limit"
+                                        type="number"
+                                        placeholder="Masukkan Batas Penggunaan"
+                                        :error="form.errors.usage_limit"
+                                        @update:modelValue="
+                                            form.errors.usage_limit = null
+                                        "
+                                    />
+                                    <template #suffix>
+                                        <InfoTooltip
+                                            id="usage-limit-tooltip"
+                                            text="Jumlah maksimal penggunaan voucher per pelanggan. Biarkan kosong untuk tanpa batas."
+                                        />
+                                    </template>
+                                </InputGroup>
 
-                    <!-- Max. Amount -->
-                    <InputGroup id="max_amount" label="Maksimal Voucher (Rp)">
-                        <TextInput
-                            id="max_amount"
-                            v-model="form.max_amount"
-                            type="number"
-                            placeholder="Masukkan Maksimal Voucher"
-                            :error="form.errors.max_amount"
-                            @update:modelValue="form.errors.max_amount = null"
-                        />
-                    </InputGroup>
-                </div>
-            </div>
+                                <div class="flex items-center w-full gap-4">
+                                    <!-- Min. Amount -->
+                                    <InputGroup
+                                        id="min_amount"
+                                        label="Min. Diskon (Rp)"
+                                    >
+                                        <TextInput
+                                            id="min_amount"
+                                            v-model="form.min_amount"
+                                            type="number"
+                                            placeholder="Masukkan Min. Diskon"
+                                            :error="form.errors.min_amount"
+                                            @update:modelValue="
+                                                form.errors.min_amount = null
+                                            "
+                                        />
+                                        <template #suffix>
+                                            <InfoTooltip
+                                                id="min-amount-tooltip"
+                                                text="Minimal potongan yang dapat diberikan oleh voucher."
+                                            />
+                                        </template>
+                                    </InputGroup>
 
-            <div class="flex items-center gap-4 mt-4">
-                <PrimaryButton type="submit"> Simpan </PrimaryButton>
-                <SecondaryButton
-                    type="button"
-                    @click="$inertia.visit(route('my-store.voucher'))"
-                >
-                    Kembali
-                </SecondaryButton>
+                                    <!-- Max. Amount -->
+                                    <InputGroup
+                                        id="max_amount"
+                                        label="Maks. Diskon (Rp)"
+                                    >
+                                        <TextInput
+                                            id="max_amount"
+                                            v-model="form.max_amount"
+                                            type="number"
+                                            placeholder="Masukkan Maks. Diskon"
+                                            :error="form.errors.max_amount"
+                                            @update:modelValue="
+                                                form.errors.max_amount = null
+                                            "
+                                        />
+                                        <template #suffix>
+                                            <InfoTooltip
+                                                id="max-amount-tooltip"
+                                                text="Maksimal potongan yang dapat diberikan oleh voucher."
+                                            />
+                                        </template>
+                                    </InputGroup>
+                                </div>
+
+                                <!-- Usage Period Type -->
+                                <InputGroup
+                                    id="usage_period_type"
+                                    label="Jenis Periode Penggunaan"
+                                >
+                                    <DropdownSearchInput
+                                        id="usage_period_type"
+                                        label="Jenis Periode Penggunaan"
+                                        :modelValue="
+                                            form.usage_period_type
+                                                ? {
+                                                      label:
+                                                          form.usage_period_type ===
+                                                          'days'
+                                                              ? 'Hitungan Hari'
+                                                              : 'Rentang Tanggal',
+                                                      value: form.usage_period_type,
+                                                  }
+                                                : null
+                                        "
+                                        :options="[
+                                            {
+                                                label: 'Hitungan Hari',
+                                                value: 'days',
+                                            },
+                                            {
+                                                label: 'Rentang Tanggal',
+                                                value: 'range',
+                                            },
+                                        ]"
+                                        placeholder="Pilih Jenis Periode Penggunaan"
+                                        required
+                                        @update:modelValue="
+                                            (option) => {
+                                                form.usage_period_type =
+                                                    option?.value;
+                                                // Reset usage date fields
+                                                form.usage_duration_days = null;
+                                                form.usage_start_date = null;
+                                                form.usage_end_date = null;
+                                            }
+                                        "
+                                        @clear="form.usage_period_type = null"
+                                    />
+                                </InputGroup>
+
+                                <!-- Usage Duration Days -->
+                                <InputGroup
+                                    v-if="form.usage_period_type === 'days'"
+                                    id="usage_duration_days"
+                                    label="Durasi Penggunaan (Hari)"
+                                >
+                                    <TextInput
+                                        id="usage_duration_days"
+                                        v-model="form.usage_duration_days"
+                                        type="number"
+                                        placeholder="Masukkan Durasi Penggunaan"
+                                        :error="form.errors.usage_duration_days"
+                                        @update:modelValue="
+                                            form.errors.usage_duration_days =
+                                                null
+                                        "
+                                    />
+                                    <template #suffix>
+                                        <InfoTooltip
+                                            id="usage-duration-days-tooltip"
+                                            text="Jumlah hari voucher dapat digunakan setelah diperoleh. Biarkan kosong untuk tanpa batas."
+                                        />
+                                    </template>
+                                </InputGroup>
+
+                                <div
+                                    v-else-if="
+                                        form.usage_period_type === 'range'
+                                    "
+                                    class="flex items-center w-full gap-4"
+                                >
+                                    <!-- Usage Start Date -->
+                                    <InputGroup
+                                        id="usage_start_date"
+                                        label="Tgl. Mulai Penggunaan"
+                                    >
+                                        <DateInput
+                                            id="usage_start_date"
+                                            v-model="form.usage_start_date"
+                                            placeholder="Tanggal Mulai Penggunaan"
+                                            :error="
+                                                form.errors.usage_start_date
+                                            "
+                                            @update:modelValue="
+                                                form.errors.usage_start_date =
+                                                    null
+                                            "
+                                        />
+                                        <template #suffix>
+                                            <InfoTooltip
+                                                id="usage-start-date-tooltip"
+                                                text="Tanggal mulai voucher dapat digunakan. Biarkan kosong untuk langsung dapat digunakan setelah diperoleh."
+                                            />
+                                        </template>
+                                    </InputGroup>
+
+                                    <!-- Usage End Date -->
+                                    <InputGroup
+                                        id="usage_end_date"
+                                        label="Tgl. Akhir Penggunaan"
+                                    >
+                                        <DateInput
+                                            id="usage_end_date"
+                                            v-model="form.usage_end_date"
+                                            placeholder="Tanggal Akhir Penggunaan"
+                                            :error="form.errors.usage_end_date"
+                                            @update:modelValue="
+                                                form.errors.usage_end_date =
+                                                    null
+                                            "
+                                        />
+                                        <template #suffix>
+                                            <InfoTooltip
+                                                id="usage-end-date-tooltip"
+                                                text="Tanggal berakhir voucher dapat digunakan. Biarkan kosong untuk tidak ada batasan tanggal berakhir penggunaan."
+                                            />
+                                        </template>
+                                    </InputGroup>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 mt-4">
+                            <SecondaryButton
+                                v-if="stepIndex > 0"
+                                type="button"
+                                @click="
+                                    if (stepIndex > 0) {
+                                        stepIndex--;
+                                        scrollToTop();
+                                    } else {
+                                        $inertia.visit(
+                                            route('my-store.voucher')
+                                        );
+                                    }
+                                "
+                            >
+                                Kembali
+                            </SecondaryButton>
+                            <PrimaryButton
+                                v-if="stepIndex < steps.length - 1"
+                                @click="
+                                    stepIndex++;
+                                    scrollToTop();
+                                "
+                                type="button"
+                                :disabled="steps[stepIndex + 1].disabled"
+                            >
+                                Selanjutnya
+                            </PrimaryButton>
+                            <PrimaryButton v-else type="submit">
+                                Simpan
+                            </PrimaryButton>
+                        </div>
+                    </div>
+                </DefaultCard>
+
+                <!-- Preview -->
+                <DefaultCard :isMain="true" class="w-full max-w-sm h-fit">
+                    <VoucherPreview :voucher="(form.data() as VoucherEntity)" />
+                </DefaultCard>
             </div>
         </div>
 

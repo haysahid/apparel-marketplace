@@ -37,7 +37,6 @@ class ColorRepository
         }
 
         $colors->orderBy($orderBy, $orderDirection);
-        $colors->get();
 
         return $colors->paginate($limit);
     }

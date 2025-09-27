@@ -130,7 +130,7 @@ defineExpose({ focus: () => input.value.focus() });
         </label>
         <InputError
             :message="props.error"
-            class="px-4 mt-1"
+            class="px-2 mt-1"
             :class="[props.errorClass]"
         />
     </div>

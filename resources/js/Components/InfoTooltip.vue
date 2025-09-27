@@ -14,12 +14,12 @@ const props = defineProps({
 </script>
 
 <template>
-    <Tooltip :id="props.id" placement="bottom">
+    <Tooltip :id="props.id" placement="bottom" class="group size-5">
         <template #content>
-            <p>{{ props.text }}</p>
+            <p class="text-center text-wrap max-w-[320px]">{{ props.text }}</p>
         </template>
 
-        <button type="button" class="group">
+        <button type="button">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"

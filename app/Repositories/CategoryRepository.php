@@ -31,7 +31,6 @@ class CategoryRepository
         }
 
         $categories->orderBy($orderBy, $orderDirection);
-        $categories->get();
 
         return $categories->paginate($limit);
     }

@@ -18,9 +18,16 @@ class Voucher extends Model
         'amount',
         'min_amount',
         'max_amount',
-        'start_date',
-        'end_date',
+        'redeem_start_date',
+        'redeem_end_date',
+        'usage_duration_days',
+        'usage_start_date',
+        'usage_end_date',
         'usage_limit',
+        'required_points',
+        'usage_url',
+        'is_internal',
+        'partner_id',
         'disabled_at',
     ];
 
@@ -28,5 +35,15 @@ class Voucher extends Model
     public function store()
     {
         return $this->belongsTo(Store::class);
+    }
+
+    public function partner()
+    {
+        return $this->belongsTo(Partner::class);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_vouchers')->withTimestamps()->withPivot('usage_count');
     }
 }

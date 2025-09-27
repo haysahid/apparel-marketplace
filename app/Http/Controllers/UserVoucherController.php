@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\UserStoreRole;
+use App\Models\UserVoucher;
 use Illuminate\Http\Request;
 
-class UserStoreRoleController extends Controller
+class UserVoucherController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class UserStoreRoleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(UserStoreRole $userStoreRole)
+    public function show(UserVoucher $userVoucher)
     {
         //
     }
@@ -42,7 +42,7 @@ class UserStoreRoleController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(UserStoreRole $userStoreRole)
+    public function edit(UserVoucher $userVoucher)
     {
         //
     }
@@ -50,7 +50,7 @@ class UserStoreRoleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, UserStoreRole $userStoreRole)
+    public function update(Request $request, UserVoucher $userVoucher)
     {
         //
     }
@@ -58,7 +58,7 @@ class UserStoreRoleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(UserStoreRole $userStoreRole)
+    public function destroy(UserVoucher $userVoucher)
     {
         //
     }

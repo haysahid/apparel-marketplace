@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class StoreRole extends Model
+class UserStoreRole extends Model
 {
+    protected $table = 'user_store_role';
+
     protected $fillable = [
         'user_id',
         'store_id',

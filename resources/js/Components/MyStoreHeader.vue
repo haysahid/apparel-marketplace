@@ -1,10 +1,7 @@
 <script setup>
-import { defineProps, ref, onMounted } from "vue";
-import { Head, Link, router } from "@inertiajs/vue3";
-import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
+import { ref } from "vue";
 import UserDropdown from "./UserDropdown.vue";
 import MyStoreSidebar from "./MyStoreSidebar.vue";
-import NavLink from "./NavLink.vue";
 import StoreItem from "./StoreItem.vue";
 import StoreOptionsDialog from "./StoreOptionsDialog.vue";
 import { useMyStoreStore } from "@/stores/my-store-store";

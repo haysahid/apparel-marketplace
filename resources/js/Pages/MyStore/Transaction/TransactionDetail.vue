@@ -102,15 +102,14 @@ const showPaymentActions = computed(() => {
 });
 
 onMounted(() => {
-    checkPayment();
-
     if (route().params?.transaction_status == "settlement") {
         router.reload();
-    } else if (
-        route().params?.success == "true" &&
-        props.transaction.status == "pending"
-    ) {
-        showSnap();
+    } else if (props.transaction.status == "pending") {
+        if (route().params?.success == "true") {
+            showSnap();
+        } else {
+            checkPayment();
+        }
     }
 });
 

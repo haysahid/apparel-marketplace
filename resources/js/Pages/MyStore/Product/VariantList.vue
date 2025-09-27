@@ -318,7 +318,7 @@ const openAddVariantForm = () => {
                 />
             </div>
         </div>
-        <div v-else class="flex items-center justify-center h-[40vh]">
+        <div v-else class="flex items-center justify-center h-[40vh] w-full">
             <p class="text-sm text-center text-gray-500">
                 Data tidak ditemukan.
             </p>

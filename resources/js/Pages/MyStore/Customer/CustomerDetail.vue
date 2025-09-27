@@ -47,6 +47,27 @@ function getInvoices() {
         });
 }
 getInvoices();
+
+const vouchers = ref<PaginationModel<VoucherEntity>>(null);
+const getVouchersStatus = ref(null);
+function getUserVouchers() {
+    getVouchersStatus.value = "loading";
+    axios
+        .get("/api/my-store/voucher", {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+        })
+        .then((response) => {
+            vouchers.value = response.data.result;
+            getVouchersStatus.value = "success";
+        })
+        .catch((error) => {
+            console.error("Error fetching vouchers:", error);
+            getVouchersStatus.value = "error";
+        });
+}
+getUserVouchers();
 </script>
 
 <template>
@@ -66,7 +87,7 @@ getInvoices();
                 >
                     <img
                         v-if="props.customer.avatar"
-                        :src="props.customer.avatar"
+                        :src="$getImageUrl(props.customer.avatar)"
                         alt="Foto Pelanggan"
                         class="object-contain rounded-full size-[100px] h-fit shrink-0"
                     />
@@ -88,15 +109,16 @@ getInvoices();
                     <div
                         class="flex flex-col items-center justify-center w-full gap-2 sm:items-start"
                     >
-                        <p
-                            class="font-bold text-gray-900 md:text-lg hover:text-primary"
-                        >
+                        <p class="font-bold text-gray-900 md:text-lg">
                             {{ props.customer.name }}
                         </p>
                         <div
-                            class="flex flex-wrap items-center justify-center sm:justify-start text-sm text-gray-600 gap-x-6 gap-y-0.5"
+                            class="flex flex-wrap items-start justify-center w-full text-sm text-gray-600 max-sm:flex-col sm:justify-start gap-x-6 gap-y-1"
                         >
-                            <div class="flex items-center gap-0.5">
+                            <div
+                                v-if="props.customer.email"
+                                class="flex items-center gap-0.5"
+                            >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     width="24"
@@ -112,7 +134,10 @@ getInvoices();
                                     {{ props.customer.email }}
                                 </span>
                             </div>
-                            <div class="flex items-center gap-0.5">
+                            <div
+                                v-if="props.customer.phone"
+                                class="flex items-center gap-0.5"
+                            >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     width="24"
@@ -148,6 +173,7 @@ getInvoices();
                     </div>
 
                     <Link
+                        v-if="props.customer.phone"
                         :href="
                             getWhatsAppLink(
                                 props.customer.phone,
@@ -158,9 +184,8 @@ getInvoices();
                         class="mt-2"
                     >
                         <PrimaryButton
-                            v-if="props.customer.phone !== null"
                             @click="$event.stopPropagation()"
-                            class="px-3 py-1 text-sm text-white bg-green-600 rounded-md hover:bg-green-700 focus:ring-green-600 focus:ring-offset-2 focus:ring-2 focus:bg-green-700"
+                            class="px-3 py-1 text-sm text-white !bg-green-600 rounded-md hover:!bg-green-700 focus:!ring-green-600 focus:!ring-offset-2 focus:!ring-2 focus:!bg-green-700"
                         >
                             <template #prefix>
                                 <svg
@@ -182,7 +207,7 @@ getInvoices();
             </DefaultCard>
 
             <!-- Summary -->
-            <div class="flex w-full gap-1 sm:gap-2">
+            <div class="grid w-full grid-cols-2 gap-1 sm:gap-2">
                 <SummaryCard
                     title="Total Pesanan"
                     :value="$formatNumber(props.count_orders)"
@@ -194,51 +219,88 @@ getInvoices();
             </div>
 
             <!-- Order History -->
-            <DefaultCard class="w-full">
-                <h3 class="font-semibold text-gray-900">Riwayat Pesanan</h3>
-                <div class="w-full mt-2.5">
-                    <div
-                        v-if="invoices && invoices.data.length"
-                        class="flex flex-col w-full gap-2"
-                    >
-                        <MyOrderCard
-                            v-for="invoice in invoices.data"
-                            :key="invoice.id"
-                            :invoice="invoice"
-                        />
+            <div class="flex flex-col w-full gap-1 lg:flex-row sm:gap-2">
+                <DefaultCard class="w-full sm:w-3/4">
+                    <h3 class="font-semibold text-gray-900">Riwayat Pesanan</h3>
+                    <div class="w-full mt-2.5">
+                        <div
+                            v-if="invoices && invoices.data.length"
+                            class="flex flex-col w-full gap-2"
+                        >
+                            <MyOrderCard
+                                v-for="invoice in invoices.data"
+                                :key="invoice.id"
+                                :invoice="invoice"
+                            />
+                        </div>
+                        <div
+                            v-else
+                            class="flex items-center justify-center h-[10vh] mb-6"
+                        >
+                            <ThreeDotsLoading
+                                v-if="getInvoicesStatus === 'loading'"
+                            />
+                            <p v-else class="text-sm text-center text-gray-500">
+                                Data tidak ditemukan.
+                            </p>
+                        </div>
                     </div>
                     <div
-                        v-else
-                        class="flex items-center justify-center h-[10vh] mb-6"
+                        v-if="invoices?.total > 0"
+                        class="flex flex-col gap-2 mt-4"
                     >
-                        <ThreeDotsLoading
-                            v-if="getInvoicesStatus === 'loading'"
-                        />
-                        <p v-else class="text-sm text-center text-gray-500">
-                            Data tidak ditemukan.
+                        <p class="text-xs text-gray-500 sm:text-sm">
+                            Menampilkan {{ invoices.from }} -
+                            {{ invoices.to }} dari {{ invoices.total }} item
                         </p>
+                        <DefaultPagination
+                            :links="invoices.links"
+                            :isApi="true"
+                            @change="
+                                (page) => {
+                                    invoiceFilter.page = page;
+                                    getInvoices();
+                                }
+                            "
+                        />
                     </div>
-                </div>
-                <div
-                    v-if="invoices?.total > 0"
-                    class="flex flex-col gap-2 mt-4"
-                >
-                    <p class="text-xs text-gray-500 sm:text-sm">
-                        Menampilkan {{ invoices.from }} - {{ invoices.to }} dari
-                        {{ invoices.total }} item
-                    </p>
-                    <DefaultPagination
-                        :links="invoices.links"
-                        :isApi="true"
-                        @change="
-                            (page) => {
-                                invoiceFilter.page = page;
-                                getInvoices();
-                            }
-                        "
-                    />
-                </div>
-            </DefaultCard>
+                </DefaultCard>
+                <DefaultCard class="w-full sm:w-1/4 h-fit">
+                    <h3 class="font-semibold text-gray-900">Voucher</h3>
+                    <div class="w-full mt-2.5">
+                        <div
+                            v-if="vouchers && vouchers.data.length"
+                            class="flex flex-col w-full gap-2"
+                        >
+                            <div
+                                v-for="voucher in vouchers.data"
+                                :key="voucher.id"
+                                class="flex flex-col gap-1 p-3 border border-gray-200 rounded-lg"
+                            >
+                                <p
+                                    class="font-semibold text-gray-900 hover:text-primary"
+                                >
+                                    {{ voucher.code }}
+                                </p>
+                                <p class="text-sm text-gray-600">
+                                    {{ voucher.description }}
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            v-else
+                            class="flex items-center justify-center h-[10vh] mb-6"
+                        >
+                            <ThreeDotsLoading
+                                v-if="getVouchersStatus === 'loading'"
+                            />
+                            <p v-else class="text-sm text-center text-gray-500">
+                                Data tidak ditemukan.
+                            </p>
+                        </div>
+                    </div>
+                </DefaultCard>
+            </div>
         </div>
     </MyStoreLayout>
 </template>

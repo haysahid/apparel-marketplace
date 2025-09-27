@@ -24,7 +24,6 @@ class TransactionTypeRepository
         }
 
         $transactionTypes->orderBy($orderBy, $orderDirection);
-        $transactionTypes->get();
 
         return $transactionTypes->paginate($limit);
     }

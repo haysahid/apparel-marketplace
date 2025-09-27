@@ -5,8 +5,9 @@ namespace Database\Seeders;
 use App\Models\Store;
 use App\Models\StoreAdvantage;
 use App\Models\StoreCertificate;
-use App\Models\StoreRole;
+use App\Models\UserStoreRole;
 use App\Models\StoreSocialLink;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -32,6 +33,12 @@ class StoreSeeder extends Seeder
             'district_name' => 'PASAR KEMIS',
             'subdistrict_name' => 'KUTABUMI',
             'zip_code' => '15560',
+        ]);
+
+        $storeAdmin = User::where('username', 'adminmustika')->first();
+        $storeAdmin->stores()->attach(1, [
+            'role_id' => 2,
+            'created_at' => now(),
         ]);
 
         StoreAdvantage::insert([
@@ -94,7 +101,7 @@ class StoreSeeder extends Seeder
             ],
         ]);
 
-        StoreRole::insert([
+        UserStoreRole::insert([
             [
                 'store_id' => 1,
                 'user_id' => 1, // Super Admin

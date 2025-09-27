@@ -9,6 +9,7 @@ use App\Http\Controllers\MyStore\MyStoreCategoryController;
 use App\Http\Controllers\MyStore\MyStoreColorController;
 use App\Http\Controllers\MyStore\MyStoreCustomerController;
 use App\Http\Controllers\MyStore\MyStoreOrderController;
+use App\Http\Controllers\MyStore\MyStorePartnerController;
 use App\Http\Controllers\MyStore\MyStorePaymentController;
 use App\Http\Controllers\MyStore\MyStoreSizeController;
 use App\Http\Controllers\MyStore\MyStoreTransactionController;
@@ -168,13 +169,22 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->grou
     Route::get('/voucher', [MyStoreVoucherController::class, 'index'])->name('voucher');
     Route::get('/voucher/create', [MyStoreVoucherController::class, 'create'])->name('voucher.create');
     Route::post('/voucher', [MyStoreVoucherController::class, 'store'])->name('voucher.store');
-    Route::get('/voucher/{voucher}', [MyStoreVoucherController::class, 'edit'])->name('voucher.edit');
+    Route::get('/voucher/{voucher}/edit', [MyStoreVoucherController::class, 'edit'])->name('voucher.edit');
     Route::post('/voucher/{voucher}', [MyStoreVoucherController::class, 'update'])->name('voucher.update');
     Route::delete('/voucher/{voucher}', [MyStoreVoucherController::class, 'destroy'])->name('voucher.destroy');
 
     // Customer
     Route::get('/customer', [MyStoreCustomerController::class, 'index'])->name('customer');
     Route::get('/customer/{customer}', [MyStoreCustomerController::class, 'show'])->name('customer.show');
+
+    // Partner
+    Route::get('/partner', [MyStorePartnerController::class, 'index'])->name('partner');
+    Route::get('/partner/{partner}', [MyStorePartnerController::class, 'show'])->name('partner.show');
+    Route::get('/partner/create', [MyStorePartnerController::class, 'create'])->name('partner.create');
+    Route::post('/partner', [MyStorePartnerController::class, 'store'])->name('partner.store');
+    Route::get('/partner/{partner}/edit', [MyStorePartnerController::class, 'edit'])->name('partner.edit');
+    Route::post('/partner/{partner}', [MyStorePartnerController::class, 'update'])->name('partner.update');
+    Route::delete('/partner/{partner}', [MyStorePartnerController::class, 'destroy'])->name('partner.destroy');
 
     // Report
     Route::get('/report', [MyStoreReportController::class, 'index'])->name('report');

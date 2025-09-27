@@ -56,7 +56,7 @@ class ValidateTransactionPaymentUseCase
                     }
                 } catch (Exception $e) {
                     if ($e->getCode() == 404) {
-                        $paymentStatusAfter = 'failed';
+                        $paymentStatusAfter = 'pending';
                     }
                 }
 

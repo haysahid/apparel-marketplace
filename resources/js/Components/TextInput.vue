@@ -125,6 +125,8 @@ defineExpose({
                         'no-arrows':
                             props.hideArrows && props.type === 'number',
                         'no-date-icon': props.type === 'date',
+                        'text-gray-400':
+                            props.type === 'date' && !props.modelValue,
                     },
                     props.bgClass,
                     props.textClass,
@@ -138,7 +140,7 @@ defineExpose({
         </label>
         <InputError
             :message="props.error"
-            class="px-4 mt-1"
+            class="px-2 mt-1"
             :class="[props.errorClass]"
         />
     </div>

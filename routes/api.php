@@ -10,6 +10,7 @@ use App\Http\Controllers\API\ProductVariantController;
 use App\Http\Controllers\API\ProductVariantImageController;
 use App\Http\Controllers\API\ReportController;
 use App\Http\Controllers\API\ShippingMethodController;
+use App\Http\Controllers\API\VoucherController;
 use App\Http\Controllers\InvoiceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -72,6 +73,9 @@ Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->gro
     Route::put('change-order-status', [OrderController::class, 'changeStatus'])->name('order.change-status');
 
     Route::apiResource('invoice', InvoiceController::class);
+
+    Route::apiResource('voucher', VoucherController::class);
+    Route::get('voucher-dropdown', [VoucherController::class, 'dropdown'])->name('voucher.dropdown');
 
     Route::post('report/generate', [ReportController::class, 'generateReport'])->name('report.generate');
 });

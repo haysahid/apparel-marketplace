@@ -31,7 +31,6 @@ class SizeRepository
         }
 
         $sizes->orderBy($orderBy, $orderDirection);
-        $sizes->get();
 
         return $sizes->paginate($limit);
     }

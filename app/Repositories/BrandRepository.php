@@ -34,7 +34,6 @@ class BrandRepository
         }
 
         $brands->orderBy($orderBy, $orderDirection);
-        $brands->get();
 
         return $brands->paginate($limit);
     }

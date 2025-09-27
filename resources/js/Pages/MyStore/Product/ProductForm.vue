@@ -21,6 +21,7 @@ import DefaultCard from "@/Components/DefaultCard.vue";
 import VariantList from "./VariantList.vue";
 import TabButton from "@/Components/TabButton.vue";
 import axios from "axios";
+import InfoTooltip from "@/Components/InfoTooltip.vue";
 
 const props = defineProps({
     product: {
@@ -608,6 +609,12 @@ const tabIndex = ref(0);
                                             form.errors.sku_prefix = null
                                         "
                                     />
+                                    <template #suffix>
+                                        <InfoTooltip
+                                            id="sku-prefix-info"
+                                            text="SKU Prefix digunakan untuk mengidentifikasi variasi produk turunan."
+                                        />
+                                    </template>
                                 </InputGroup>
                             </div>
 

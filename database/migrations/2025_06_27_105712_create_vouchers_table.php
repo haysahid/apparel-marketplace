@@ -21,9 +21,16 @@ return new class extends Migration
             $table->integer('amount')->default(0);
             $table->integer('min_amount')->nullable();
             $table->integer('max_amount')->nullable();
-            $table->timestamp('start_date')->nullable();
-            $table->timestamp('end_date')->nullable();
+            $table->timestamp('redeem_start_date')->nullable();
+            $table->timestamp('redeem_end_date')->nullable();
+            $table->integer('usage_duration_days')->nullable();
+            $table->timestamp('usage_start_date')->nullable();
+            $table->timestamp('usage_end_date')->nullable();
             $table->integer('usage_limit')->nullable();
+            $table->integer('required_points')->nullable();
+            $table->string('usage_url')->nullable();
+            $table->boolean('is_internal')->default(true);
+            $table->foreignId('partner_id')->nullable()->constrained('partners')->onDelete('set null');
             $table->timestamp('disabled_at')->nullable();
             $table->timestamps();
             $table->softDeletes();

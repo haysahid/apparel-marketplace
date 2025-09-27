@@ -57,7 +57,10 @@ const emit = defineEmits(["edit"]);
                 <div
                     class="flex flex-wrap text-xs text-gray-600 gap-x-6 gap-y-0.5"
                 >
-                    <div class="flex items-center gap-0.5">
+                    <div
+                        v-if="props.customer.email"
+                        class="flex items-center gap-0.5"
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
@@ -73,7 +76,10 @@ const emit = defineEmits(["edit"]);
                             {{ props.customer.email }}
                         </span>
                     </div>
-                    <div class="flex items-center gap-0.5">
+                    <div
+                        v-if="props.customer.phone"
+                        class="flex items-center gap-0.5"
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
@@ -89,7 +95,10 @@ const emit = defineEmits(["edit"]);
                             {{ props.customer.phone }}
                         </span>
                     </div>
-                    <div class="flex items-center gap-0.5">
+                    <div
+                        v-if="props.customer.role"
+                        class="flex items-center gap-0.5"
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"

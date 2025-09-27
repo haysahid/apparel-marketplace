@@ -14,5 +14,6 @@ interface UserEntity {
 
     // Relationships
     role: RoleEntity | null;
+    store_roles: RoleEntity[] | null;
     transactions: TransactionEntity[] | null;
 }
