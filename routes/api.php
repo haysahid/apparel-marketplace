@@ -34,7 +34,7 @@ Route::name('api.')->group(function () {
     Route::get('/check-payment-guest', [OrderController::class, 'checkPayment'])->name('check-payment-guest');
 
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/vouchers', [OrderController::class, 'getVouchers'])->name('vouchers');
+        Route::get('/voucher', [OrderController::class, 'getVouchers'])->name('voucher');
         Route::post('/check-voucher', [OrderController::class, 'checkVoucher'])->name('check-voucher');
 
         Route::post('/checkout', [OrderController::class, 'checkout'])->name('checkout');
@@ -57,6 +57,7 @@ Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->gro
     Route::get('brand-dropdown', [BrandController::class, 'dropdown'])->name('brand.dropdown');
 
     Route::apiResource('customer', CustomerController::class);
+    Route::get('customer/{userId}/voucher', [CustomerController::class, 'getUserVouchers'])->name('customer.voucher');
 
     Route::apiResource('product', ProductController::class);
     Route::apiResource('product-image', ProductImageController::class);

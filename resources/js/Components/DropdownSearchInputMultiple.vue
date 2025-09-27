@@ -8,6 +8,7 @@ interface DropdownOption {
     label: string;
     value: string | number;
     icon?: string | null;
+    disabled?: boolean | null;
 }
 
 const props = defineProps({
@@ -52,6 +53,10 @@ const props = defineProps({
         default: null,
     },
     autoResize: {
+        type: Boolean,
+        default: false,
+    },
+    disabled: {
         type: Boolean,
         default: false,
     },
@@ -115,6 +120,7 @@ function onFocusout() {
                     :bgClass="props.bgClass"
                     :placeholder="props.placeholder"
                     :error="props.error"
+                    :disabled="props.disabled"
                     @focus="dropdown.open = true"
                     @focusout="onFocusout"
                 >
@@ -150,14 +156,21 @@ function onFocusout() {
                             v-for="option in filteredOptions"
                             :key="option.value"
                             @click="
-                                emit('update:modelValue', [
-                                    ...props.modelValue,
-                                    option,
-                                ]);
-                                isDropdownOpen = false;
-                                search = '';
+                                if (!option.disabled) {
+                                    emit('update:modelValue', [
+                                        ...props.modelValue,
+                                        option,
+                                    ]);
+                                    isDropdownOpen = false;
+                                    search = '';
+                                }
                             "
                             class="flex items-center gap-2 px-4 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                            :class="
+                                option.disabled
+                                    ? 'opacity-50 !cursor-default hover:bg-transparent'
+                                    : ''
+                            "
                         >
                             <span v-if="option.icon" class="flex-shrink-0">
                                 <img

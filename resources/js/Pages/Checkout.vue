@@ -50,7 +50,7 @@ function syncCart() {
         const syncCart = JSON.parse(JSON.stringify(cartGroups));
 
         axios
-            .post(`${page.props.ziggy.url}/api/sync-cart`, {
+            .post("/api/sync-cart", {
                 cart_groups: syncCart,
             })
             .then((response) => {

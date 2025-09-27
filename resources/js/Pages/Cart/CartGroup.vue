@@ -104,7 +104,7 @@ function formatPrice(price = 0) {
                             >
                                 <QuantityInput
                                     :modelValue="item.quantity"
-                                    :unit="item.variant.unit"
+                                    :unit="item.variant.unit?.name"
                                     :max="item.variant.current_stock_level"
                                     :showAvailability="false"
                                     :label="null"

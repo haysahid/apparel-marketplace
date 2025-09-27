@@ -22,6 +22,10 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits(["onOpen", "onClose"]);
@@ -80,7 +84,13 @@ defineExpose({
 
 <template>
     <div class="relative">
-        <div @click="open = !open">
+        <div
+            @click="
+                if (!props.disabled) {
+                    open = !open;
+                }
+            "
+        >
             <slot name="trigger" />
         </div>
 

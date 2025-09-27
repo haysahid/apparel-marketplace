@@ -51,8 +51,12 @@ class OrderController extends Controller
     public function getVouchers(Request $request)
     {
         $storeId = $request->input('store_id');
+        $userId = $request->input('user_id');
 
-        $vouchers = VoucherRepository::getAllVouchers($storeId);
+        $vouchers = VoucherRepository::getAllVouchers(
+            storeId: $storeId,
+            userId: $userId ?? Auth::id(),
+        );
         return ResponseFormatter::success($vouchers);
     }
 

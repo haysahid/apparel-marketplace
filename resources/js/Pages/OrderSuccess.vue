@@ -26,22 +26,20 @@ const props = defineProps({
     },
 });
 
-function checkPayment(autoReload = false) {
+function checkPayment() {
     midtransPayment.checkPayment(
         {
-            transaction_code: props.transaction.code,
+            transactionCode: props.transaction.code,
             isGuest: props.isGuest,
         },
         {
             onSuccess: (response) => {
                 payment.value = response.data.result;
 
-                if (autoReload) {
-                    if (props.isGuest) {
-                        router.reload();
-                    } else {
-                        router.visit(route("my-order"));
-                    }
+                if (props.isGuest) {
+                    router.reload();
+                } else {
+                    router.visit(route("my-order"));
                 }
             },
             onError: (error) => {
@@ -113,10 +111,6 @@ const showPaymentActions = computed(() => {
     );
 });
 
-if (showPaymentActions.value) {
-    checkPayment();
-}
-
 onMounted(() => {
     if (route().params?.transaction_status == "settlement") {
         if (props.isGuest) {
@@ -128,11 +122,12 @@ onMounted(() => {
                 })
             );
         }
-    } else if (
-        route().params?.show_snap == "1" &&
-        props.transaction.status == "pending"
-    ) {
-        showSnap();
+    } else if (props.transaction.status == "pending") {
+        if (route().params?.show_snap == "1") {
+            showSnap();
+        } else {
+            checkPayment();
+        }
     }
 });
 </script>

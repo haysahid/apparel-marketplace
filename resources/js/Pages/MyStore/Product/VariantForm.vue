@@ -572,7 +572,7 @@ const openErrorDialog = (message) => {
                 </InputGroup>
 
                 <!-- Unit -->
-                <InputGroup id="unit" label="Satuan">
+                <InputGroup id="unit_id" label="Satuan">
                     <DropdownSearchInput
                         id="unit_id"
                         :modelValue="

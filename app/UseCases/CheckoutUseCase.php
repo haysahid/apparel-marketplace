@@ -260,11 +260,21 @@ class CheckoutUseCase
                 }
 
                 if ($storeVoucher) {
-                    // Apply voucher discount
-                    $discountAmount = $this->voucherRepository->calculateVoucherAmount(
+                    // Redeem voucher
+                    $redeemed = $this->voucherRepository->redeemVoucher(
                         voucher: $storeVoucher,
-                        amount: $invoice->base_amount,
+                        user: $customer,
+                        use: true,
                     );
+
+                    $discountAmount = 0;
+                    if ($redeemed) {
+                        // Apply voucher discount
+                        $discountAmount = $this->voucherRepository->calculateVoucherAmount(
+                            voucher: $storeVoucher,
+                            amount: $invoice->base_amount,
+                        );
+                    }
 
                     // Update invoice with discount
                     $invoice->voucher_id = $storeVoucher->id;
@@ -308,11 +318,21 @@ class CheckoutUseCase
             // [END] Processing each cart group
 
             if ($transactionVoucher) {
-                // Apply transaction voucher discount
-                $discountAmount = VoucherRepository::calculateVoucherAmount(
+                // Redeem voucher
+                $redeemed = $this->voucherRepository->redeemVoucher(
                     voucher: $transactionVoucher,
-                    amount: $totalPayment - $transaction->shipping_cost,
+                    user: $customer,
+                    use: true,
                 );
+
+                $discountAmount = 0;
+                if ($redeemed) {
+                    // Apply transaction voucher discount
+                    $discountAmount = VoucherRepository::calculateVoucherAmount(
+                        voucher: $transactionVoucher,
+                        amount: $totalPayment - $transaction->shipping_cost,
+                    );
+                }
 
                 $totalPayment = $totalPayment - $discountAmount;
 

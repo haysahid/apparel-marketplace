@@ -8,7 +8,7 @@ const props = defineProps({
     },
     text: {
         type: String,
-        required: true,
+        default: null,
     },
 });
 </script>
@@ -16,7 +16,10 @@ const props = defineProps({
 <template>
     <Tooltip :id="props.id" placement="bottom" class="group size-5">
         <template #content>
-            <p class="text-center text-wrap max-w-[320px]">{{ props.text }}</p>
+            <slot v-if="$slots.content" name="content" />
+            <p v-else class="text-center text-wrap max-w-[320px]">
+                {{ props.text }}
+            </p>
         </template>
 
         <button type="button">

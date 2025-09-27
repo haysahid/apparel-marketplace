@@ -148,7 +148,7 @@ onMounted(() => {
                             }}
                         </td>
                         <td>
-                            {{ voucher.usage_limit }}
+                            {{ voucher.usage_limit ?? "-" }}
                         </td>
                         <td>
                             {{

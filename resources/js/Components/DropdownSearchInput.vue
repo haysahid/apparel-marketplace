@@ -9,6 +9,7 @@ interface DropdownOption {
     value: string | number;
     icon?: string | null;
     hexCode?: string | null;
+    disabled?: boolean | null;
 }
 
 const props = defineProps({
@@ -60,6 +61,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits(["update:modelValue", "clear", "search"]);
@@ -98,6 +103,7 @@ function onFocusout() {
         <template #trigger>
             <TextInput
                 v-if="props.type === 'text'"
+                :id="`text-input-${props.id}`"
                 :modelValue="
                     props.modelValue && !isDropdownOpen
                         ? props.modelValue.label
@@ -113,6 +119,7 @@ function onFocusout() {
                 :textClass="props.modelValue?.hexCode ? 'pl-10' : ''"
                 :placeholder="props.placeholder"
                 :error="props.error"
+                :disabled="props.disabled"
                 @focus="dropdown.open = true"
                 @focusout="onFocusout"
             >
@@ -153,7 +160,12 @@ function onFocusout() {
                             />
                         </svg>
                     </button>
-                    <button v-else type="button" class="absolute p-2 right-1">
+                    <button
+                        v-else
+                        type="button"
+                        class="absolute p-2 right-1"
+                        :disabled="props.disabled"
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
@@ -170,6 +182,7 @@ function onFocusout() {
             </TextInput>
             <TextAreaInput
                 v-else-if="props.type === 'textarea'"
+                :id="`textarea-input-${props.id}`"
                 :modelValue="
                     props.modelValue && !isDropdownOpen
                         ? props.modelValue.label
@@ -185,6 +198,7 @@ function onFocusout() {
                 :rows="props.rows"
                 :preventNewLine="props.preventNewLine"
                 :error="props.error"
+                :disabled="props.disabled"
                 @focus="dropdown.open = true"
                 @focusout="onFocusout"
             >
@@ -243,12 +257,19 @@ function onFocusout() {
                     <li
                         v-for="option in props.options"
                         :key="option.value"
-                        @click="
-                            emit('update:modelValue', option);
-                            isDropdownOpen = false;
-                            search = '';
-                        "
                         class="flex items-center gap-2 px-4 py-2 text-sm cursor-pointer hover:bg-gray-100"
+                        :class="
+                            option.disabled
+                                ? 'opacity-50 !cursor-default hover:bg-transparent'
+                                : ''
+                        "
+                        @click="
+                            if (!option.disabled) {
+                                emit('update:modelValue', option);
+                                isDropdownOpen = false;
+                                search = '';
+                            }
+                        "
                     >
                         <span v-if="option.icon" class="flex-shrink-0">
                             <img

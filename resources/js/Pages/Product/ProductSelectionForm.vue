@@ -55,7 +55,7 @@ const filter = useForm(
 // Set initial filter based on URL parameters
 if (route().params) {
     const sku = route().params.sku;
-    const variant_id = route().params.variant_id;
+    const variant_id = Number(route().params.variant_id);
 
     const variant = variants.find((v) => v.sku === sku || v.id === variant_id);
     if (variant) {

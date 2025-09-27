@@ -42,6 +42,11 @@ class Voucher extends Model
         return $this->belongsTo(Partner::class);
     }
 
+    public function user_vouchers()
+    {
+        return $this->hasMany(UserVoucher::class);
+    }
+
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_vouchers')->withTimestamps()->withPivot('usage_count');

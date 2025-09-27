@@ -127,7 +127,7 @@ const menus = [
             </svg>`,
     },
     {
-        name: "Unit",
+        name: "Satuan",
         href: route("my-store.unit"),
         active: route().current("my-store.unit"),
         icon: `

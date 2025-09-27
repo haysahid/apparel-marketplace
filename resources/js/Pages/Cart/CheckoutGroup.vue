@@ -5,6 +5,7 @@ import { computed, onMounted, ref } from "vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import axios from "axios";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
+import InfoTooltip from "@/Components/InfoTooltip.vue";
 
 const props = defineProps({
     cartGroup: {
@@ -35,7 +36,7 @@ const voucherErrorMessage = ref(null);
 
 function getStoreVouchers(storeId = null) {
     axios
-        .get("/api/vouchers", {
+        .get("/api/voucher", {
             params: {
                 store_id: storeId,
             },
@@ -197,9 +198,11 @@ onMounted(() => {
                                         : voucher.amount
                                 }`,
                                 value: voucher.code,
+                                disabled: voucher.is_redeemed ? true : false,
                             }))
                         "
                         placeholder="Pilih Voucher"
+                        :disabled="$page.props.auth.user ? false : true"
                         @update:modelValue="
                             (option) => {
                                 selectedVoucher = option
@@ -223,9 +226,30 @@ onMounted(() => {
                             emit('removeVoucher');
                         "
                     />
+                    <template #suffix>
+                        <InfoTooltip
+                            :id="`${props.cartGroup.store?.id}-voucher-hint`"
+                        >
+                            <template #content>
+                                <p
+                                    v-if="$page.props.auth.user"
+                                    class="text-center text-wrap max-w-[320px]"
+                                >
+                                    Pilih voucher untuk mendapatkan potongan
+                                    harga.
+                                </p>
+                                <p
+                                    v-else
+                                    class="text-center text-wrap max-w-[320px]"
+                                >
+                                    Silakan masuk untuk menggunakan voucher.
+                                </p>
+                            </template>
+                        </InfoTooltip>
+                    </template>
                 </InputGroup>
 
-                <p v-if="selectedVoucher" class="mt-1 text-sm text-green-600">
+                <p v-if="selectedVoucher" class="mt-1 text-xs text-green-600">
                     Voucher berhasil diterapkan.
                 </p>
             </div>

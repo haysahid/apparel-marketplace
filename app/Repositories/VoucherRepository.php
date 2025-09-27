@@ -2,7 +2,10 @@
 
 namespace App\Repositories;
 
+use App\Models\User;
 use App\Models\Voucher;
+use DateTime;
+use Illuminate\Support\Facades\DB;
 
 class VoucherRepository
 {
@@ -45,6 +48,11 @@ class VoucherRepository
             });
         }
 
+        $vouchers->select([
+            'vouchers.*',
+            DB::raw('EXISTS(SELECT 1 FROM user_vouchers WHERE user_vouchers.voucher_id = vouchers.id AND user_vouchers.user_id = ' . intval($userId) . ') as is_redeemed'),
+        ]);
+
         return $vouchers->orderBy($orderBy, $orderDirection)->paginate($limit);
     }
 
@@ -79,7 +87,9 @@ class VoucherRepository
 
         $voucher->whereNull('disabled_at')
             ->where('redeem_start_date', '<=', now())
-            ->where('redeem_end_date', '>=', now());
+            ->where('redeem_end_date', '>=', now())
+            ->whereNull('required_points')
+            ->where('is_internal', true);
 
         return $voucher->first();
     }
@@ -155,7 +165,7 @@ class VoucherRepository
         return $query->first();
     }
 
-    public static function getAllVouchers($storeId = null)
+    public static function getAllVouchers($storeId = null, $userId = null)
     {
         $vouchers = Voucher::query();
 
@@ -164,6 +174,11 @@ class VoucherRepository
         } else {
             $vouchers->whereNull('store_id');
         }
+
+        $vouchers->select([
+            'vouchers.*',
+            DB::raw('EXISTS(SELECT 1 FROM user_vouchers WHERE user_vouchers.voucher_id = vouchers.id AND user_vouchers.user_id = ' . intval($userId) . ') as is_redeemed'),
+        ]);
 
         return $vouchers->get();
     }
@@ -201,5 +216,69 @@ class VoucherRepository
         }
 
         return $query->get();
+    }
+
+    private function getVoucherExpiryDate(Voucher $voucher): ?DateTime
+    {
+        if ($voucher->usage_duration_days) {
+            return now()->addDays($voucher->usage_duration_days);
+        } else if ($voucher->usage_end_date) {
+            return new DateTime($voucher->usage_end_date);
+        }
+
+        return null;
+    }
+
+    public static function redeemVoucher(Voucher $voucher, User $user, bool $use = false)
+    {
+        if (!$voucher || !$user) {
+            return false;
+        }
+
+        // Check if user already redeemed the voucher
+        $existingUserVoucher = $voucher->user_vouchers()
+            ->where('user_id', $user->id)
+            ->first();
+        if ($existingUserVoucher) {
+            if ($voucher->usage_limit && $existingUserVoucher->usage_count >= $voucher->usage_limit) {
+                // User has reached the usage limit
+                return false;
+            }
+
+            // Increment usage count
+            $existingUserVoucher->increment('usage_count');
+
+            if ($use) {
+                $existingUserVoucher->used_at = now();
+            }
+
+            $existingUserVoucher->updated_at = now();
+            $existingUserVoucher->save();
+        } else {
+            // Redeem the voucher
+            $voucher->user_vouchers()->create([
+                'user_id' => $user->id,
+                'unique_code' => strtoupper($voucher->code . '-' . $user->id),
+                'redeemed_at' => now(),
+                'used_at' => $use ? now() : null,
+                'usage_count' => 1,
+                'expired_at' => self::getVoucherExpiryDate($voucher),
+            ]);
+        }
+
+        return true;
+    }
+
+    public static function isVoucherRedeemedByUser(Voucher $voucher, User $user): bool
+    {
+        if (!$voucher || !$user) {
+            return false;
+        }
+
+        $existingUserVoucher = $voucher->user_vouchers()
+            ->where('user_id', $user->id)
+            ->first();
+
+        return $existingUserVoucher !== null;
     }
 }

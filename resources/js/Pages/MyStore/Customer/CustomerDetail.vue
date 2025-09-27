@@ -53,7 +53,7 @@ const getVouchersStatus = ref(null);
 function getUserVouchers() {
     getVouchersStatus.value = "loading";
     axios
-        .get("/api/my-store/voucher", {
+        .get(`/api/my-store/customer/${props.customer.id}/voucher`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("access_token")}`,
             },
