@@ -1,5 +1,5 @@
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { nextTick, onMounted, ref } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -84,15 +84,24 @@ const openErrorDialog = (message) => {
     errorMessage.value = message;
     showErrorDialog.value = true;
 };
+
+onMounted(() => {
+    nextTick(() => {
+        const input = document.getElementById(
+            "category-name"
+        ) as HTMLInputElement;
+        input?.focus();
+    });
+});
 </script>
 
 <template>
     <form @submit.prevent="submit" class="max-w-3xl">
         <div class="flex flex-col items-start gap-4">
             <!-- Name -->
-            <InputGroup id="name" label="Nama Kategori">
+            <InputGroup id="category-name" label="Nama Kategori">
                 <TextInput
-                    id="name"
+                    id="category-name"
                     v-model="form.name"
                     type="text"
                     placeholder="Masukkan Nama Kategori"

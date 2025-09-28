@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, nextTick } from "vue";
 import { usePage, useForm, router } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminItemAction from "@/Components/AdminItemAction.vue";
@@ -17,18 +17,13 @@ import { useScreenSize } from "@/plugins/screen-size";
 import { formatCurrency } from "@/plugins/number-formatter";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import { getImageUrl } from "@/plugins/helpers";
+import CustomPageProps from "@/types/model/CustomPageProps";
 
 const screenSize = useScreenSize();
 
 const props = defineProps({
     products: {
-        type: Object as () => {
-            data: ProductEntity[];
-            current_page: number;
-            per_page: number;
-            total: number;
-            links: Array<{ url: string; label: string; active: boolean }>;
-        },
+        type: Object as () => PaginationModel<ProductEntity>,
         required: true,
     },
     brands: {
@@ -37,7 +32,7 @@ const props = defineProps({
     },
 });
 
-const page = usePage();
+const page = usePage<CustomPageProps>();
 
 const products = ref(
     props.products.data.map((product) => ({
@@ -92,7 +87,7 @@ const closeDeleteProductDialog = (result = false) => {
 
 const deleteProduct = () => {
     if (selectedProduct.value) {
-        const form = useForm();
+        const form = useForm({});
         form.delete(
             route("my-store.product.destroy", {
                 product: selectedProduct.value,
@@ -126,7 +121,7 @@ const openErrorDialog = (message) => {
 };
 
 // Filters
-const brands = page.props.brands || [];
+const brands = (page.props.brands || []) as BrandEntity[];
 const brandSearch = ref("");
 const isBrandDropdownOpen = ref(false);
 
@@ -153,7 +148,10 @@ const getQueryParams = () => {
 getQueryParams();
 
 function getProducts() {
-    let queryParams = {};
+    let queryParams = {
+        brand_id: undefined,
+        search: undefined,
+    };
 
     if (filters.search) queryParams.search = filters.search;
     if (filters.brand_id) queryParams.brand_id = filters.brand_id;
@@ -175,6 +173,13 @@ onMounted(() => {
     if (page.props.flash.success) {
         openSuccessDialog(page.props.flash.success);
     }
+
+    nextTick(() => {
+        const input = document.getElementById(
+            "search-product"
+        ) as HTMLInputElement;
+        input?.focus();
+    });
 });
 </script>
 
@@ -215,7 +220,7 @@ onMounted(() => {
                                 filters.brand_id = option?.value;
                                 filters.brand = option
                                     ? filteredBrands.find(
-                                          (brand) => brand.id === brand.value
+                                          (brand) => brand.id === option.value
                                       )
                                     : null;
                                 getProducts();
@@ -230,6 +235,7 @@ onMounted(() => {
                         "
                     />
                     <TextInput
+                        id="search-product"
                         v-model="filters.search"
                         placeholder="Cari produk..."
                         class="max-w-48"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import TextInput from "@/Components/TextInput.vue";
@@ -123,6 +123,13 @@ onMounted(() => {
         tabIndex.value = 1;
     } else {
         tabIndex.value = 0;
+
+        nextTick(() => {
+            const input = document.getElementById(
+                "search-customer"
+            ) as HTMLInputElement;
+            input?.focus();
+        });
     }
 });
 </script>
@@ -207,6 +214,7 @@ onMounted(() => {
 
         <div v-if="tabIndex === 0" class="w-full px-4 sm:px-6">
             <TextInput
+                id="search-customer"
                 v-model="filters.search"
                 placeholder="Cari pelanggan..."
                 @keyup.enter="

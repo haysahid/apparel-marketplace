@@ -1,5 +1,5 @@
-<script setup>
-import { ref, onMounted } from "vue";
+<script setup lang="ts">
+import { ref, onMounted, nextTick } from "vue";
 import { usePage, useForm } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminItemAction from "@/Components/AdminItemAction.vue";
@@ -17,6 +17,7 @@ import MyStoreBrandCard from "./Brand/MyStoreBrandCard.vue";
 import AdminItemCard from "@/Components/AdminItemCard.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
 import { getImageUrl } from "@/plugins/helpers";
+import CustomPageProps from "@/types/model/CustomPageProps";
 
 const screenSize = useScreenSize();
 
@@ -41,7 +42,9 @@ const getQueryParams = () => {
 getQueryParams();
 
 function getCategories() {
-    let queryParams = {};
+    let queryParams = {
+        search: undefined,
+    };
 
     if (filters.search) queryParams.search = filters.search;
 
@@ -68,7 +71,7 @@ const openDeleteCategoryDialog = (category) => {
     }
 };
 
-const closeDeleteCategoryDialog = (result) => {
+const closeDeleteCategoryDialog = (result = false) => {
     showDeleteCategoryDialog.value = false;
     if (result) {
         selectedCategory.value = null;
@@ -81,7 +84,7 @@ const closeDeleteCategoryDialog = (result) => {
 
 const deleteCategory = () => {
     if (selectedCategory.value) {
-        const form = useForm();
+        const form = useForm({});
         form.delete(
             route("my-store.category.destroy", {
                 category: selectedCategory.value,
@@ -115,7 +118,7 @@ const openErrorDialog = (message) => {
     showErrorDialog.value = true;
 };
 
-const page = usePage();
+const page = usePage<CustomPageProps>();
 
 function canEdit(category) {
     return (
@@ -130,6 +133,13 @@ onMounted(() => {
     if (page.props.flash.success) {
         openSuccessDialog(page.props.flash.success);
     }
+
+    nextTick(() => {
+        const input = document.getElementById(
+            "search-category"
+        ) as HTMLInputElement;
+        input?.focus();
+    });
 });
 </script>
 
@@ -145,6 +155,7 @@ onMounted(() => {
                     Tambah
                 </PrimaryButton>
                 <TextInput
+                    id="search-category"
                     v-model="filters.search"
                     placeholder="Cari kategori..."
                     class="max-w-48"

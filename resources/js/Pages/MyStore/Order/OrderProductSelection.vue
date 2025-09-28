@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import TextInput from "@/Components/TextInput.vue";
@@ -121,6 +121,15 @@ const changePage = (page) => {
         productListElement.scrollTo({ top: 0, behavior: "smooth" });
     }
 };
+
+onMounted(() => {
+    nextTick(() => {
+        const input = document.getElementById(
+            props.isModal ? "search-product-modal" : "search-product"
+        ) as HTMLInputElement;
+        input?.focus();
+    });
+});
 </script>
 
 <template>
@@ -179,6 +188,11 @@ const changePage = (page) => {
                     "
                 />
                 <TextInput
+                    :id="
+                        props.isModal
+                            ? 'search-product-modal'
+                            : 'search-product'
+                    "
                     v-model="filters.search"
                     placeholder="Cari produk..."
                     class="max-w-48"

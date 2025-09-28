@@ -1,19 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, nextTick } from "vue";
 import { usePage, useForm, router, Link } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import AdminPagination from "@/Components/AdminPagination.vue";
 import AdminItemAction from "@/Components/AdminItemAction.vue";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import TextInput from "@/Components/TextInput.vue";
-import Dropdown from "@/Components/Dropdown.vue";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import DefaultTable from "@/Components/DefaultTable.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
-import MyTransactionCard from "./Transaction/MyTransactionCard.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import MyOrderCard from "./Order/MyOrderCard.vue";
 import StatusChip from "@/Components/StatusChip.vue";
@@ -148,6 +145,13 @@ onMounted(() => {
     if (page.props.flash.success) {
         openSuccessDialog(page.props.flash.success);
     }
+
+    nextTick(() => {
+        const input = document.getElementById(
+            "search-order"
+        ) as HTMLInputElement;
+        input?.focus();
+    });
 });
 </script>
 
@@ -203,8 +207,9 @@ onMounted(() => {
                         "
                     />
                     <TextInput
+                        id="search-order"
                         v-model="filters.search"
-                        placeholder="Cari transaksi..."
+                        placeholder="Cari pesanan..."
                         class="max-w-48"
                         @keyup.enter="getOrders()"
                     >

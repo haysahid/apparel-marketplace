@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, nextTick } from "vue";
 import { useForm, router, Link, usePage } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminItemAction from "@/Components/AdminItemAction.vue";
@@ -180,6 +180,13 @@ onMounted(() => {
     if (page.props.flash.success) {
         openSuccessDialog(page.props.flash.success);
     }
+
+    nextTick(() => {
+        const input = document.getElementById(
+            "search-transaction"
+        ) as HTMLInputElement;
+        input?.focus();
+    });
 });
 
 const showTransactionTypeOptionDialog = ref(false);
@@ -275,6 +282,7 @@ const showTransactionTypeOptionDialog = ref(false);
                         "
                     />
                     <TextInput
+                        id="search-transaction"
                         v-model="filters.search"
                         placeholder="Cari transaksi..."
                         class="max-w-48"

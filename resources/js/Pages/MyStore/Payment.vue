@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, nextTick } from "vue";
 import { useForm, router, Link, usePage } from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import AdminItemAction from "@/Components/AdminItemAction.vue";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import TextInput from "@/Components/TextInput.vue";
 import StatusChip from "@/Components/StatusChip.vue";
@@ -150,6 +148,13 @@ onMounted(() => {
     if (page.props.flash.success) {
         openSuccessDialog(page.props.flash.success);
     }
+
+    nextTick(() => {
+        const input = document.getElementById(
+            "search-payment"
+        ) as HTMLInputElement;
+        input?.focus();
+    });
 });
 
 const showPaymentStatusOptionDialog = ref(false);
@@ -199,6 +204,7 @@ const showPaymentStatusOptionDialog = ref(false);
                         "
                     />
                     <TextInput
+                        id="search-payment"
                         v-model="filters.search"
                         placeholder="Cari pembayaran..."
                         class="max-w-48"

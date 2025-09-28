@@ -4,6 +4,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { useForm, usePage } from "@inertiajs/vue3";
+import { nextTick, onMounted } from "vue";
 
 interface SocialLink {
     id?: number | string;
@@ -58,6 +59,14 @@ function submit() {
     emit("submit", form.data());
     emit("close");
 }
+
+onMounted(() => {
+    nextTick(() => {
+        const input = document.getElementById("url") as HTMLInputElement;
+        input?.focus();
+        input?.select();
+    });
+});
 </script>
 
 <template>

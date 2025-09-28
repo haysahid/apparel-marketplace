@@ -4,6 +4,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import { useOrderStore } from "@/stores/order-store";
 import { useForm } from "@inertiajs/vue3";
+import { nextTick, onMounted } from "vue";
 
 const props = defineProps({
     title: {
@@ -34,6 +35,13 @@ function submit() {
 
     emit("submit");
 }
+
+onMounted(() => {
+    nextTick(() => {
+        const input = document.getElementById("guest-name") as HTMLInputElement;
+        input?.focus();
+    });
+});
 </script>
 
 <template>
@@ -44,9 +52,9 @@ function submit() {
             </h3>
 
             <div class="flex flex-col gap-y-3">
-                <InputGroup label="Nama Lengkap" id="name">
+                <InputGroup label="Nama Lengkap" id="guest-name">
                     <TextInput
-                        id="name"
+                        id="guest-name"
                         v-model="form.guest_name"
                         type="text"
                         placeholder="Masukkan nama"

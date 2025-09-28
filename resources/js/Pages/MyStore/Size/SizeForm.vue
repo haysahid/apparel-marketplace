@@ -1,5 +1,5 @@
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { nextTick, onMounted, ref } from "vue";
 import { useForm } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -80,15 +80,22 @@ const openErrorDialog = (message) => {
     errorMessage.value = message;
     showErrorDialog.value = true;
 };
+
+onMounted(() => {
+    nextTick(() => {
+        const input = document.getElementById("size-name") as HTMLInputElement;
+        input?.focus();
+    });
+});
 </script>
 
 <template>
     <form @submit.prevent="submit" class="max-w-3xl">
         <div class="flex flex-col items-start gap-4">
             <!-- Name -->
-            <InputGroup id="name" label="Nama Ukuran">
+            <InputGroup id="size-name" label="Nama Ukuran">
                 <TextInput
-                    id="name"
+                    id="size-name"
                     v-model="form.name"
                     type="text"
                     placeholder="Masukkan Nama Ukuran"

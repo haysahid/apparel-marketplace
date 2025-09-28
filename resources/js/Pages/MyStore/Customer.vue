@@ -1,7 +1,6 @@
-<script setup>
-import { ref, onMounted } from "vue";
+<script setup lang="ts">
+import { ref, onMounted, nextTick } from "vue";
 import { usePage, useForm, Link } from "@inertiajs/vue3";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminItemAction from "@/Components/AdminItemAction.vue";
 import DeleteConfirmationDialog from "@/Components/DeleteConfirmationDialog.vue";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
@@ -13,10 +12,10 @@ import DefaultTable from "@/Components/DefaultTable.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
-import AdminItemCard from "@/Components/AdminItemCard.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
 import MyCustomerCard from "./Customer/MyCustomerCard.vue";
 import { getImageUrl } from "@/plugins/helpers";
+import CustomPageProps from "@/types/model/CustomPageProps";
 
 const screenSize = useScreenSize();
 
@@ -41,7 +40,9 @@ const getQueryParams = () => {
 getQueryParams();
 
 function getCustomers() {
-    let queryParams = {};
+    let queryParams = {
+        search: undefined,
+    };
 
     if (filters.search) queryParams.search = filters.search;
 
@@ -68,7 +69,7 @@ const openDeleteCustomerDialog = (customer) => {
     }
 };
 
-const closeDeleteCustomerDialog = (result) => {
+const closeDeleteCustomerDialog = (result = false) => {
     showDeleteCustomerDialog.value = false;
     if (result) {
         selectedCustomer.value = null;
@@ -81,7 +82,7 @@ const closeDeleteCustomerDialog = (result) => {
 
 const deleteCustomer = () => {
     if (selectedCustomer.value) {
-        const form = useForm();
+        const form = useForm({});
         form.delete(
             route("my-store.brand.destroy", {
                 brand: selectedCustomer.value,
@@ -115,7 +116,7 @@ const openErrorDialog = (message) => {
     showErrorDialog.value = true;
 };
 
-const page = usePage();
+const page = usePage<CustomPageProps>();
 
 function canEdit(customer) {
     return false;
@@ -126,6 +127,13 @@ onMounted(() => {
     if (page.props.flash.success) {
         openSuccessDialog(page.props.flash.success);
     }
+
+    nextTick(() => {
+        const input = document.getElementById(
+            "search-customer"
+        ) as HTMLInputElement;
+        input?.focus();
+    });
 });
 </script>
 
@@ -141,6 +149,7 @@ onMounted(() => {
                     Tambah
                 </PrimaryButton> -->
                 <TextInput
+                    id="search-customer"
                     v-model="filters.search"
                     placeholder="Cari pelanggan..."
                     class="max-w-48"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import { useForm, usePage } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -401,6 +401,13 @@ const openErrorDialog = (message) => {
     errorMessage.value = message;
     showErrorDialog.value = true;
 };
+
+onMounted(() => {
+    nextTick(() => {
+        const input = document.getElementById("motif") as HTMLInputElement;
+        input?.focus();
+    });
+});
 </script>
 
 <template>

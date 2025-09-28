@@ -1,5 +1,5 @@
-<script setup>
-import { ref, onMounted } from "vue";
+<script setup lang="ts">
+import { ref, onMounted, nextTick } from "vue";
 import { usePage, useForm } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminItemAction from "@/Components/AdminItemAction.vue";
@@ -15,6 +15,7 @@ import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import AdminItemCard from "@/Components/AdminItemCard.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
+import CustomPageProps from "@/types/model/CustomPageProps";
 
 const screenSize = useScreenSize();
 
@@ -39,7 +40,9 @@ const getQueryParams = () => {
 getQueryParams();
 
 function getUnits() {
-    let queryParams = {};
+    let queryParams = {
+        search: undefined,
+    };
 
     if (filters.search) queryParams.search = filters.search;
 
@@ -66,7 +69,7 @@ const openDeleteUnitDialog = (unit) => {
     }
 };
 
-const closeDeleteUnitDialog = (result) => {
+const closeDeleteUnitDialog = (result = false) => {
     showDeleteUnitDialog.value = false;
     if (result) {
         selectedUnit.value = null;
@@ -79,7 +82,7 @@ const closeDeleteUnitDialog = (result) => {
 
 const deleteUnit = () => {
     if (selectedUnit.value) {
-        const form = useForm();
+        const form = useForm({});
         form.delete(
             route("my-store.unit.destroy", {
                 unit: selectedUnit.value,
@@ -113,7 +116,7 @@ const openErrorDialog = (message) => {
     showErrorDialog.value = true;
 };
 
-const page = usePage();
+const page = usePage<CustomPageProps>();
 
 function canEdit(unit) {
     return (
@@ -126,6 +129,13 @@ onMounted(() => {
     if (page.props.flash.success) {
         openSuccessDialog(page.props.flash.success);
     }
+
+    nextTick(() => {
+        const input = document.getElementById(
+            "search-unit"
+        ) as HTMLInputElement;
+        input?.focus();
+    });
 });
 </script>
 
@@ -141,6 +151,7 @@ onMounted(() => {
                     Tambah
                 </PrimaryButton>
                 <TextInput
+                    id="search-unit"
                     v-model="filters.search"
                     placeholder="Cari satuan..."
                     class="max-w-48"

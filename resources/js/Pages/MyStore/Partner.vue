@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import { usePage, useForm, Link } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminItemAction from "@/Components/AdminItemAction.vue";
@@ -137,6 +137,13 @@ onMounted(() => {
     if (page.props.flash.success) {
         openSuccessDialog(page.props.flash.success);
     }
+
+    nextTick(() => {
+        const input = document.getElementById(
+            "search-partner"
+        ) as HTMLInputElement;
+        input?.focus();
+    });
 });
 </script>
 
@@ -152,6 +159,7 @@ onMounted(() => {
                     Tambah
                 </PrimaryButton>
                 <TextInput
+                    id="search-partner"
                     v-model="filters.search"
                     placeholder="Cari mitra..."
                     class="max-w-48"
