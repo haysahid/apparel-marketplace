@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted, nextTick, computed } from "vue";
 import { usePage, useForm, Link } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminItemAction from "@/Components/AdminItemAction.vue";
@@ -18,6 +18,8 @@ import InfoTooltip from "@/Components/InfoTooltip.vue";
 import { getImageUrl } from "@/plugins/helpers.js";
 import CustomPageProps from "@/types/model/CustomPageProps";
 import MyStorePartnerCard from "./Partner/MyStorePartnerCard.vue";
+import { scrollToTop } from "@/plugins/helpers";
+import SearchInput from "@/Components/SearchInput.vue";
 
 const screenSize = useScreenSize();
 
@@ -28,38 +30,47 @@ const props = defineProps({
     },
 });
 
-const partners = ref<PartnerEntity[]>(
-    props.partners.data.map((partner) => ({
+const partners = ref<PaginationModel<PartnerEntity>>({
+    ...props.partners,
+    data: props.partners.data.map((partner) => ({
         ...partner,
         showDeleteModal: false,
-    }))
-);
+    })),
+});
 
 const filters = useForm({
+    page: null,
     search: null,
 });
 
 const getQueryParams = () => {
-    filters.search = route().params.search;
+    filters.page = route().params.page || null;
+    filters.search = route().params.search || null;
 };
 getQueryParams();
 
-function getPartners() {
-    let queryParams = {
-        search: undefined,
+const queryParams = computed(() => {
+    return {
+        page: filters.page || undefined,
+        search: filters.search || undefined,
     };
+});
 
-    if (filters.search) queryParams.search = filters.search;
-
-    router.get(route("my-store.partner"), queryParams, {
+function getPartners() {
+    router.get(route("my-store.partner"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
             getQueryParams();
-            partners.value = props.partners.data.map((partner) => ({
-                ...partner,
-                showDeleteModal: false,
-            }));
+            partners.value = {
+                ...props.partners,
+                data: props.partners.data.map((partner) => ({
+                    ...partner,
+                    showDeleteModal: false,
+                })),
+            };
+            scrollToTop({ id: "main-area" });
+            setSearchFocus();
         },
     });
 }
@@ -80,9 +91,6 @@ const closeDeletePartnerDialog = (result = false) => {
     if (result) {
         selectedPartner.value = null;
         openSuccessDialog("Data Berhasil Dihapus");
-        partners.value = partners.value.filter(
-            (b) => b.id !== selectedPartner.value?.id
-        );
     }
 };
 
@@ -133,17 +141,20 @@ function canEdit(partner) {
     );
 }
 
-onMounted(() => {
-    if (page.props.flash.success) {
-        openSuccessDialog(page.props.flash.success);
-    }
-
+function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
             "search-partner"
         ) as HTMLInputElement;
-        input?.focus();
+        input?.focus({ preventScroll: true });
     });
+}
+
+onMounted(() => {
+    if (page.props.flash.success) {
+        openSuccessDialog(page.props.flash.success);
+    }
+    setSearchFocus();
 });
 </script>
 
@@ -158,40 +169,22 @@ onMounted(() => {
                 >
                     Tambah
                 </PrimaryButton>
-                <TextInput
+                <SearchInput
                     id="search-partner"
                     v-model="filters.search"
                     placeholder="Cari mitra..."
                     class="max-w-48"
-                    @keyup.enter="getPartners()"
-                >
-                    <template #suffix>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            class="absolute -translate-y-1/2 fill-gray-400 right-3 top-1/2 size-5"
-                        >
-                            <path
-                                fill-rule="evenodd"
-                                clip-rule="evenodd"
-                                d="M11 17C11.7879 17 12.5681 16.8448 13.2961 16.5433C14.0241 16.2417 14.6855 15.7998 15.2426 15.2426C15.7998 14.6855 16.2417 14.0241 16.5433 13.2961C16.8448 12.5681 17 11.7879 17 11C17 10.2121 16.8448 9.43185 16.5433 8.7039C16.2417 7.97595 15.7998 7.31451 15.2426 6.75736C14.6855 6.20021 14.0241 5.75825 13.2961 5.45672C12.5681 5.15519 11.7879 5 11 5C9.4087 5 7.88258 5.63214 6.75736 6.75736C5.63214 7.88258 5 9.4087 5 11C5 12.5913 5.63214 14.1174 6.75736 15.2426C7.88258 16.3679 9.4087 17 11 17ZM11 19C13.1217 19 15.1566 18.1571 16.6569 16.6569C18.1571 15.1566 19 13.1217 19 11C19 8.87827 18.1571 6.84344 16.6569 5.34315C15.1566 3.84285 13.1217 3 11 3C8.87827 3 6.84344 3.84285 5.34315 5.34315C3.84285 6.84344 3 8.87827 3 11C3 13.1217 3.84285 15.1566 5.34315 16.6569C6.84344 18.1571 8.87827 19 11 19Z"
-                            />
-                            <path
-                                fill-rule="evenodd"
-                                clip-rule="evenodd"
-                                d="M15.3201 15.2903C15.5082 15.1035 15.7629 14.9991 16.0281 15C16.2933 15.0009 16.5472 15.1072 16.7341 15.2953L20.7091 19.2953C20.8908 19.4844 20.9909 19.7373 20.9879 19.9995C20.9849 20.2618 20.879 20.5123 20.6931 20.6972C20.5071 20.8822 20.256 20.9866 19.9937 20.9881C19.7315 20.9896 19.4791 20.8881 19.2911 20.7053L15.3161 16.7053C15.1291 16.5172 15.0245 16.2626 15.0253 15.9975C15.026 15.7323 15.1321 15.4783 15.3201 15.2913V15.2903Z"
-                            />
-                        </svg>
-                    </template>
-                </TextInput>
+                    @search="
+                        filters.page = 1;
+                        getPartners();
+                    "
+                />
             </div>
 
             <!-- Table -->
             <DefaultTable
                 v-if="screenSize.is('xl')"
-                :isEmpty="partners.length === 0"
+                :isEmpty="partners.data.length === 0"
                 class="mt-6"
             >
                 <template #thead>
@@ -208,7 +201,10 @@ onMounted(() => {
                     </tr>
                 </template>
                 <template #tbody>
-                    <tr v-for="(partner, index) in partners" :key="partner.id">
+                    <tr
+                        v-for="(partner, index) in partners.data"
+                        :key="partner.id"
+                    >
                         <td>
                             {{
                                 index +
@@ -298,11 +294,14 @@ onMounted(() => {
             <div
                 v-if="!screenSize.is('xl')"
                 class="flex flex-col gap-3 mt-4"
-                :class="{ 'min-h-auto h-[68vh]': partners.length == 0 }"
+                :class="{ 'min-h-auto h-[68vh]': partners.data.length == 0 }"
             >
-                <div v-if="partners.length > 0" class="grid grid-cols-1 gap-3">
+                <div
+                    v-if="partners.data.length > 0"
+                    class="grid grid-cols-1 gap-3"
+                >
                     <MyStorePartnerCard
-                        v-for="(partner, index) in partners"
+                        v-for="(partner, index) in partners.data"
                         :key="partner.id"
                         :partner="partner"
                         @edit="
@@ -323,15 +322,21 @@ onMounted(() => {
             </div>
 
             <!-- Pagination -->
-            <div
-                v-if="props.partners.total > 0"
-                class="flex flex-col gap-2 mt-4"
-            >
+            <div v-if="partners.total > 0" class="flex flex-col gap-2 mt-4">
                 <p class="text-xs text-gray-500 sm:text-sm">
-                    Menampilkan {{ props.partners.from }} -
-                    {{ props.partners.to }} dari {{ props.partners.total }} item
+                    Menampilkan {{ partners.from }} - {{ partners.to }} dari
+                    {{ partners.total }} item
                 </p>
-                <DefaultPagination :links="props.partners.links" />
+                <DefaultPagination
+                    :isApi="true"
+                    :links="partners.links"
+                    @change="
+                        (page) => {
+                            filters.page = page;
+                            getPartners();
+                        }
+                    "
+                />
             </div>
         </DefaultCard>
 

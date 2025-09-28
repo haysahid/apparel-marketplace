@@ -5,7 +5,6 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminItemAction from "@/Components/AdminItemAction.vue";
 import DeleteConfirmationDialog from "@/Components/DeleteConfirmationDialog.vue";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
-import TextInput from "@/Components/TextInput.vue";
 import DiscountTag from "@/Components/DiscountTag.vue";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
@@ -18,6 +17,8 @@ import { formatCurrency } from "@/plugins/number-formatter";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import { getImageUrl } from "@/plugins/helpers";
 import CustomPageProps from "@/types/model/CustomPageProps";
+import SearchInput from "@/Components/SearchInput.vue";
+import { scrollToTop } from "@/plugins/helpers";
 
 const screenSize = useScreenSize();
 
@@ -34,12 +35,13 @@ const props = defineProps({
 
 const page = usePage<CustomPageProps>();
 
-const products = ref(
-    props.products.data.map((product) => ({
+const products = ref<PaginationModel<ProductEntity>>({
+    ...props.products,
+    data: props.products.data.map((product) => ({
         ...product,
         showDeleteModal: false,
-    }))
-);
+    })),
+});
 
 const basePrice = (product) => {
     if (
@@ -79,9 +81,6 @@ const closeDeleteProductDialog = (result = false) => {
     if (result) {
         selectedProduct.value = null;
         openSuccessDialog("Data Berhasil Dihapus");
-        products.value = products.value.filter(
-            (item) => item.id !== selectedProduct.value.id
-        );
     }
 };
 
@@ -98,6 +97,7 @@ const deleteProduct = () => {
                 },
                 onSuccess: () => {
                     closeDeleteProductDialog(true);
+                    getProducts();
                 },
             }
         );
@@ -134,38 +134,54 @@ const filteredBrands = computed(() => {
 });
 
 const filters = useForm({
+    page: null,
     search: null,
     brand_id: null,
     brand: null,
 });
 
 const getQueryParams = () => {
-    filters.search = route().params.search;
+    filters.page = parseInt(route().params.page) || null;
+    filters.search = route().params.search || null;
     filters.brand_id = parseInt(route().params.brand_id) || null;
     filters.brand =
         props.brands.find((brand) => brand.id === filters.brand_id) || null;
 };
 getQueryParams();
 
-function getProducts() {
-    let queryParams = {
-        brand_id: undefined,
-        search: undefined,
+const queryParams = computed(() => {
+    return {
+        page: filters.page || undefined,
+        search: filters.search || undefined,
+        brand_id: filters.brand_id || undefined,
     };
+});
 
-    if (filters.search) queryParams.search = filters.search;
-    if (filters.brand_id) queryParams.brand_id = filters.brand_id;
-
-    router.get(route("my-store.product"), queryParams, {
+function getProducts() {
+    router.get(route("my-store.product"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
             getQueryParams();
-            products.value = props.products.data.map((product) => ({
-                ...product,
-                showDeleteModal: false,
-            }));
+            products.value = {
+                ...page.props.products,
+                data: page.props.products.data.map((product) => ({
+                    ...product,
+                    showDeleteModal: false,
+                })),
+            };
+            scrollToTop({ id: "main-area" });
+            setSearchFocus();
         },
+    });
+}
+
+function setSearchFocus() {
+    nextTick(() => {
+        const input = document.getElementById(
+            "search-product"
+        ) as HTMLInputElement;
+        input?.focus({ preventScroll: true });
     });
 }
 
@@ -173,13 +189,7 @@ onMounted(() => {
     if (page.props.flash.success) {
         openSuccessDialog(page.props.flash.success);
     }
-
-    nextTick(() => {
-        const input = document.getElementById(
-            "search-product"
-        ) as HTMLInputElement;
-        input?.focus();
-    });
+    setSearchFocus();
 });
 </script>
 
@@ -223,6 +233,7 @@ onMounted(() => {
                                           (brand) => brand.id === option.value
                                       )
                                     : null;
+                                filters.page = 1;
                                 getProducts();
                             }
                         "
@@ -231,44 +242,27 @@ onMounted(() => {
                             filters.brand_id = null;
                             filters.brand = null;
                             brandSearch = '';
+                            filters.page = 1;
                             getProducts();
                         "
                     />
-                    <TextInput
+                    <SearchInput
                         id="search-product"
                         v-model="filters.search"
                         placeholder="Cari produk..."
                         class="max-w-48"
-                        @keyup.enter="getProducts()"
-                    >
-                        <template #suffix>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                class="absolute -translate-y-1/2 fill-gray-400 right-3 top-1/2 size-5"
-                            >
-                                <path
-                                    fill-rule="evenodd"
-                                    clip-rule="evenodd"
-                                    d="M11 17C11.7879 17 12.5681 16.8448 13.2961 16.5433C14.0241 16.2417 14.6855 15.7998 15.2426 15.2426C15.7998 14.6855 16.2417 14.0241 16.5433 13.2961C16.8448 12.5681 17 11.7879 17 11C17 10.2121 16.8448 9.43185 16.5433 8.7039C16.2417 7.97595 15.7998 7.31451 15.2426 6.75736C14.6855 6.20021 14.0241 5.75825 13.2961 5.45672C12.5681 5.15519 11.7879 5 11 5C9.4087 5 7.88258 5.63214 6.75736 6.75736C5.63214 7.88258 5 9.4087 5 11C5 12.5913 5.63214 14.1174 6.75736 15.2426C7.88258 16.3679 9.4087 17 11 17ZM11 19C13.1217 19 15.1566 18.1571 16.6569 16.6569C18.1571 15.1566 19 13.1217 19 11C19 8.87827 18.1571 6.84344 16.6569 5.34315C15.1566 3.84285 13.1217 3 11 3C8.87827 3 6.84344 3.84285 5.34315 5.34315C3.84285 6.84344 3 8.87827 3 11C3 13.1217 3.84285 15.1566 5.34315 16.6569C6.84344 18.1571 8.87827 19 11 19Z"
-                                />
-                                <path
-                                    fill-rule="evenodd"
-                                    clip-rule="evenodd"
-                                    d="M15.3201 15.2903C15.5082 15.1035 15.7629 14.9991 16.0281 15C16.2933 15.0009 16.5472 15.1072 16.7341 15.2953L20.7091 19.2953C20.8908 19.4844 20.9909 19.7373 20.9879 19.9995C20.9849 20.2618 20.879 20.5123 20.6931 20.6972C20.5071 20.8822 20.256 20.9866 19.9937 20.9881C19.7315 20.9896 19.4791 20.8881 19.2911 20.7053L15.3161 16.7053C15.1291 16.5172 15.0245 16.2626 15.0253 15.9975C15.026 15.7323 15.1321 15.4783 15.3201 15.2913V15.2903Z"
-                                />
-                            </svg>
-                        </template>
-                    </TextInput>
+                        @search="
+                            filters.page = 1;
+                            getProducts();
+                        "
+                    />
                 </div>
             </div>
 
             <!-- Table -->
             <DefaultTable
                 v-if="screenSize.is('xl')"
-                :isEmpty="products.length === 0"
+                :isEmpty="products.data.length === 0"
                 class="mt-6"
             >
                 <template #thead>
@@ -283,7 +277,10 @@ onMounted(() => {
                     </tr>
                 </template>
                 <template #tbody>
-                    <tr v-for="(product, index) in products" :key="product.id">
+                    <tr
+                        v-for="(product, index) in products.data"
+                        :key="product.id"
+                    >
                         <td>
                             {{
                                 index +
@@ -364,10 +361,13 @@ onMounted(() => {
             <div
                 v-if="!screenSize.is('xl')"
                 class="flex flex-col gap-3 mt-4"
-                :class="{ 'min-h-auto h-[68vh]': products.length == 0 }"
+                :class="{ 'min-h-auto h-[68vh]': products.data.length == 0 }"
             >
-                <template v-if="products.length > 0">
-                    <div v-for="(product, index) in products" :key="product.id">
+                <template v-if="products.data.length > 0">
+                    <div
+                        v-for="(product, index) in products.data"
+                        :key="product.id"
+                    >
                         <MyProductCard
                             :product="product"
                             @edit="
@@ -389,15 +389,21 @@ onMounted(() => {
             </div>
 
             <!-- Pagination -->
-            <div
-                v-if="props.products.total > 0"
-                class="flex flex-col gap-2 mt-4"
-            >
+            <div v-if="products.total > 0" class="flex flex-col gap-2 mt-4">
                 <p class="text-xs text-gray-500 sm:text-sm">
-                    Menampilkan {{ props.products.from }} -
-                    {{ props.products.to }} dari {{ props.products.total }} item
+                    Menampilkan {{ products.from }} - {{ products.to }} dari
+                    {{ products.total }} item
                 </p>
-                <DefaultPagination :links="props.products.links" />
+                <DefaultPagination
+                    :isApi="true"
+                    :links="products.links"
+                    @change="
+                        (page) => {
+                            filters.page = page;
+                            getProducts();
+                        }
+                    "
+                />
             </div>
 
             <DeleteConfirmationDialog

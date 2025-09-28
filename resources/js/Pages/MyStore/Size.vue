@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from "vue";
+import { ref, onMounted, nextTick, computed } from "vue";
 import { usePage, useForm } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminItemAction from "@/Components/AdminItemAction.vue";
 import DeleteConfirmationDialog from "@/Components/DeleteConfirmationDialog.vue";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
-import TextInput from "@/Components/TextInput.vue";
 import { router } from "@inertiajs/vue3";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultTable from "@/Components/DefaultTable.vue";
@@ -16,45 +15,56 @@ import DefaultPagination from "@/Components/DefaultPagination.vue";
 import AdminItemCard from "@/Components/AdminItemCard.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
 import CustomPageProps from "@/types/model/CustomPageProps";
+import SearchInput from "@/Components/SearchInput.vue";
+import { scrollToTop } from "@/plugins/helpers";
 
 const screenSize = useScreenSize();
 
 const props = defineProps({
-    sizes: null,
+    sizes: Object as () => PaginationModel<SizeEntity>,
 });
 
-const sizes = ref(
-    props.sizes.data.map((size) => ({
+const sizes = ref<PaginationModel<SizeEntity>>({
+    ...props.sizes,
+    data: props.sizes.data.map((size) => ({
         ...size,
         showDeleteModal: false,
-    }))
-);
+    })),
+});
 
 const filters = useForm({
+    page: null,
     search: null,
 });
 
 const getQueryParams = () => {
-    filters.search = route().params.search;
+    filters.page = route().params.page || null;
+    filters.search = route().params.search || null;
 };
 getQueryParams();
 
-function getSizes() {
-    let queryParams = {
-        search: undefined,
+const queryParams = computed(() => {
+    return {
+        page: filters.page || undefined,
+        search: filters.search || undefined,
     };
+});
 
-    if (filters.search) queryParams.search = filters.search;
-
-    router.get(route("my-store.size"), queryParams, {
+function getSizes() {
+    router.get(route("my-store.size"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
             getQueryParams();
-            sizes.value = props.sizes.data.map((size) => ({
-                ...size,
-                showDeleteModal: false,
-            }));
+            sizes.value = {
+                ...props.sizes,
+                data: props.sizes.data.map((size) => ({
+                    ...size,
+                    showDeleteModal: false,
+                })),
+            };
+            scrollToTop({ id: "main-area" });
+            setSearchFocus();
         },
     });
 }
@@ -74,9 +84,6 @@ const closeDeleteSizeDialog = (result = false) => {
     if (result) {
         selectedSize.value = null;
         openSuccessDialog("Data Berhasil Dihapus");
-        sizes.value = sizes.value.filter(
-            (b) => b.id !== selectedSize.value?.id
-        );
     }
 };
 
@@ -125,17 +132,20 @@ function canEdit(size) {
     );
 }
 
-onMounted(() => {
-    if (page.props.flash.success) {
-        openSuccessDialog(page.props.flash.success);
-    }
-
+function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
             "search-size"
         ) as HTMLInputElement;
-        input?.focus();
+        input?.focus({ preventScroll: true });
     });
+}
+
+onMounted(() => {
+    if (page.props.flash.success) {
+        openSuccessDialog(page.props.flash.success);
+    }
+    setSearchFocus();
 });
 </script>
 
@@ -150,12 +160,15 @@ onMounted(() => {
                 >
                     Tambah
                 </PrimaryButton>
-                <TextInput
+                <SearchInput
                     id="search-size"
                     v-model="filters.search"
                     placeholder="Cari ukuran..."
                     class="max-w-48"
-                    @keyup.enter="getSizes()"
+                    @search="
+                        filters.page = 1;
+                        getSizes();
+                    "
                 >
                     <template #suffix>
                         <svg
@@ -177,13 +190,13 @@ onMounted(() => {
                             />
                         </svg>
                     </template>
-                </TextInput>
+                </SearchInput>
             </div>
 
             <!-- Table -->
             <DefaultTable
                 v-if="screenSize.is('xl')"
-                :isEmpty="sizes.length === 0"
+                :isEmpty="sizes.data.length === 0"
                 class="mt-6"
             >
                 <template #thead>
@@ -194,7 +207,7 @@ onMounted(() => {
                     </tr>
                 </template>
                 <template #tbody>
-                    <tr v-for="(size, index) in sizes" :key="size.id">
+                    <tr v-for="(size, index) in sizes.data" :key="size.id">
                         <td>
                             {{
                                 index +
@@ -233,11 +246,11 @@ onMounted(() => {
             <!-- Mobile View -->
             <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <div
-                    v-if="sizes.length > 0"
+                    v-if="sizes.data.length > 0"
                     class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
                 >
                     <AdminItemCard
-                        v-for="(size, index) in sizes"
+                        v-for="(size, index) in sizes.data"
                         :key="size.id"
                         :name="size.name"
                         :showImage="false"
@@ -275,12 +288,21 @@ onMounted(() => {
             </div>
 
             <!-- Pagination -->
-            <div v-if="props.sizes.total > 0" class="flex flex-col gap-2 mt-4">
+            <div v-if="sizes.total > 0" class="flex flex-col gap-2 mt-4">
                 <p class="text-xs text-gray-500 sm:text-sm">
-                    Menampilkan {{ props.sizes.from }} -
-                    {{ props.sizes.to }} dari {{ props.sizes.total }} item
+                    Menampilkan {{ sizes.from }} - {{ sizes.to }} dari
+                    {{ sizes.total }} item
                 </p>
-                <DefaultPagination :links="props.sizes.links" />
+                <DefaultPagination
+                    :isApi="true"
+                    :links="sizes.links"
+                    @change="
+                        (page) => {
+                            filters.page = page;
+                            getSizes();
+                        }
+                    "
+                />
             </div>
         </DefaultCard>
 
