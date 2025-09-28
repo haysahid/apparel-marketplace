@@ -26,8 +26,9 @@ const onClick = () => {
 </script>
 
 <template>
-    <div
-        class="flex items-center justify-center gap-2 cursor-pointer px-3.5 py-2 rounded-lg hover:bg-gray-50 outline outline-1 -outline-offset-1 outline-gray-400 min-w-[50px] text-center text-sm h-fit"
+    <button
+        type="button"
+        class="flex items-center justify-center gap-2 cursor-pointer px-3.5 py-2 rounded-lg hover:bg-gray-50 outline outline-1 -outline-offset-1 outline-gray-400 min-w-[50px] text-center text-sm h-fit focus:ring-2 focus:ring-offset-2 focus:ring-primary-light"
         :class="{
             '!outline-2 !-outline-offset-2 !outline-primary bg-primary/10 hover:bg-primary/10':
                 props.selected,
@@ -38,5 +39,5 @@ const onClick = () => {
         <slot name="prefix" />
         {{ props.label }}
         <slot name="suffix" />
-    </div>
+    </button>
 </template>

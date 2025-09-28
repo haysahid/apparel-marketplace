@@ -18,7 +18,7 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-    closeWhenSelect: {
+    autoClose: {
         type: Boolean,
         default: true,
     },
@@ -129,7 +129,7 @@ defineExpose({
                 :class="[widthClass, alignmentClasses]"
                 style="display: none"
                 @click="
-                    if (props.closeWhenSelect) {
+                    if (props.autoClose) {
                         open = false;
                     }
                 "

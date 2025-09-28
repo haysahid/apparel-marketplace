@@ -55,8 +55,9 @@ const onClick = () => {
 </script>
 
 <template>
-    <div
-        class="flex items-center justify-center gap-2 cursor-pointer px-3.5 py-2 text-sm rounded-lg hover:bg-gray-50 outline outline-1 -outline-offset-1 outline-gray-400 min-w-[60px] h-fit"
+    <button
+        type="button"
+        class="flex items-center justify-center gap-2 cursor-pointer px-3.5 py-2 text-sm rounded-lg hover:bg-gray-50 outline outline-1 -outline-offset-1 outline-gray-400 min-w-[60px] h-fit focus:ring-2 focus:ring-offset-2 focus:ring-primary-light"
         :class="{
             '!outline-2 !-outline-offset-2 outline-primary bg-primary/10 hover:bg-primary/10':
                 props.selected,
@@ -71,5 +72,5 @@ const onClick = () => {
         ></div>
         <span>{{ props.label }}</span>
         <slot name="suffix" />
-    </div>
+    </button>
 </template>

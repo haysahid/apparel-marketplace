@@ -96,7 +96,7 @@ const openAddVariantForm = () => {
                         v-if="props.variants.length > 0"
                         align="right"
                         width="xs"
-                        :closeWhenSelect="false"
+                        :autoClose="false"
                     >
                         <template #trigger>
                             <SecondaryButton
