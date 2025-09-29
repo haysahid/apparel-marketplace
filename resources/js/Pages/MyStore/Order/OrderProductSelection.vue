@@ -10,6 +10,7 @@ import MyProductCard from "@/Pages/MyStore/Product/MyProductCard.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import axios from "axios";
 import SearchInput from "@/Components/SearchInput.vue";
+import cookieManager from "@/plugins/cookie-manager";
 
 const props = defineProps({
     isModal: {
@@ -70,9 +71,9 @@ const getProductsStatus = ref(null);
 
 function getProducts() {
     const queryParams = {
-        page: filters.page,
-        brand_id: filters.brand_id,
-        search: filters.search,
+        page: filters.page || undefined,
+        brand_id: filters.brand_id || undefined,
+        search: filters.search || undefined,
     };
 
     getProductsStatus.value = "loading";
@@ -80,7 +81,9 @@ function getProducts() {
         .get("/api/my-store/product", {
             params: queryParams,
             headers: {
-                Authorization: "Bearer " + localStorage.getItem("access_token"),
+                Authorization: `Bearer ${cookieManager.getItem(
+                    "access_token"
+                )}`,
             },
         })
         .then((response) => {
@@ -98,7 +101,9 @@ function getBrands() {
     axios
         .get("/api/my-store/brand-dropdown", {
             headers: {
-                Authorization: "Bearer " + localStorage.getItem("access_token"),
+                Authorization: `Bearer ${cookieManager.getItem(
+                    "access_token"
+                )}`,
             },
         })
         .then((response) => {

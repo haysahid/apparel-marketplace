@@ -6,6 +6,7 @@ import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import axios from "axios";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
+import cookieManager from "@/plugins/cookie-manager";
 
 const props = defineProps({
     cartGroup: {
@@ -41,7 +42,9 @@ function getStoreVouchers(storeId = null) {
                 store_id: storeId,
             },
             headers: {
-                authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                authorization: `Bearer ${cookieManager.getItem(
+                    "access_token"
+                )}`,
             },
         })
         .then((response) => {
@@ -63,7 +66,7 @@ function checkVoucherCode(voucherCode: string, storeId = null) {
             },
             {
                 headers: {
-                    authorization: `Bearer ${localStorage.getItem(
+                    authorization: `Bearer ${cookieManager.getItem(
                         "access_token"
                     )}`,
                 },

@@ -32,7 +32,7 @@ const logout = () => {
             >
                 <button
                     type="button"
-                    class="flex items-center justify-start w-full gap-2 px-4 py-2 text-sm font-medium leading-4 transition duration-150 ease-in-out bg-transparent border border-transparent rounded-none sm:rounded-md sm:px-3 text-start sm:w-auto text-gray-500/90 hover:text-gray-500 focus:outline-none hover:bg-gray-500/10 focus:bg-gray-500/10 active:bg-gray-500/20 group"
+                    class="flex items-center justify-start w-full gap-2 px-4 py-2 text-sm font-medium leading-4 transition duration-150 ease-in-out bg-transparent border border-transparent rounded-none md:rounded-md md:px-3 text-start md:w-auto text-gray-500/90 hover:text-gray-500 focus:outline-none hover:bg-gray-500/10 focus:bg-gray-500/10 active:bg-gray-500/20 group"
                     :class="{
                         '!text-white/80 hover:bg-white/10 focus:bg-white/10':
                             props.invert,
@@ -63,12 +63,12 @@ const logout = () => {
                         />
                     </svg>
 
-                    <span class="w-full sm:w-auto sm:hidden md:inline">
+                    <span class="w-full md:w-auto md:hidden lg:inline">
                         {{ $page.props.auth.user.name }}
                     </span>
 
                     <svg
-                        class="size-4 sm:hidden md:inline"
+                        class="size-4 md:hidden lg:inline"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"

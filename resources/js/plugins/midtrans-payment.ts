@@ -19,9 +19,9 @@ async function initScript() {
 async function checkPayment(
     { transactionCode, isGuest },
     {
-        onSuccess = (response) => { },
-        onError = (error) => { },
-        onChangeStatus = (status) => { },
+        onSuccess = (response) => {},
+        onError = (error) => {},
+        onChangeStatus = (status) => {},
     }
 ) {
     onChangeStatus("loading");
@@ -52,11 +52,11 @@ async function checkPayment(
 async function showSnap(
     { snapToken, delay = 1000 },
     {
-        onSuccess = (result) => { },
-        onPending = (result) => { },
-        onError = (result) => { },
-        onClose = () => { },
-        onChangeStatus = (status) => { },
+        onSuccess = (result) => {},
+        onPending = (result) => {},
+        onError = (result) => {},
+        onClose = () => {},
+        onChangeStatus = (status) => {},
     }
 ) {
     console.log("showSnap called");
@@ -100,7 +100,7 @@ async function showSnap(
 
 async function changePaymentType(
     { transactionCode },
-    { onSuccess = (response) => { }, onError = (error) => { } }
+    { onSuccess = (response) => {}, onError = (error) => {} }
 ) {
     await axios
         .put(

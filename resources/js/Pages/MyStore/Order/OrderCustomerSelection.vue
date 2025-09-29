@@ -10,6 +10,7 @@ import axios from "axios";
 import MyCustomerCard from "../Customer/MyCustomerCard.vue";
 import Chip from "@/Components/Chip.vue";
 import GuestForm from "@/Pages/Cart/GuestForm.vue";
+import cookieManager from "@/plugins/cookie-manager";
 
 const props = defineProps({
     selectedCustomer: {
@@ -88,7 +89,8 @@ function getCustomers() {
         .get("/api/my-store/customer", {
             params: queryParams,
             headers: {
-                Authorization: "Bearer " + localStorage.getItem("access_token"),
+                Authorization:
+                    "Bearer " + cookieManager.getItem("access_token"),
             },
         })
         .then((response) => {

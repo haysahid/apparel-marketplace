@@ -1,21 +1,13 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import LandingLayout from "@/Layouts/LandingLayout.vue";
-import AdvantageCard from "@/Components/AdvantageCard.vue";
 import ProductCard from "@/Components/ProductCard.vue";
 import LandingSection from "@/Components/LandingSection.vue";
 import JoinUs from "@/Components/JoinUs.vue";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { Link } from "@inertiajs/vue3";
-import { usePage } from "@inertiajs/vue3";
 import CategoryCard from "@/Components/CategoryCard.vue";
 import { getImageUrl } from "@/plugins/helpers";
-
-const page = usePage();
-if (page.props.flash.access_token) {
-    localStorage.setItem("access_token", page.props.flash.access_token);
-}
 
 const props = defineProps({
     store: Object,

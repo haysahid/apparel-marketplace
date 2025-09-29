@@ -14,6 +14,7 @@ import useDebounce from "@/plugins/debounce";
 import InputGroup from "@/Components/InputGroup.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import DetailRow from "@/Components/DetailRow.vue";
+import cookieManager from "@/plugins/cookie-manager";
 
 const page = usePage();
 const cartStore = useCartStore();
@@ -199,7 +200,9 @@ const submit = () => {
     axios
         .post(isGuest ? "/api/checkout-guest" : "/api/checkout", data, {
             headers: {
-                authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                authorization: `Bearer ${cookieManager.getItem(
+                    "access_token"
+                )}`,
             },
         })
         .then((response) => {

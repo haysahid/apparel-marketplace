@@ -21,6 +21,7 @@ import { useOrderStore } from "@/stores/order-store";
 import BaseDialog from "@/Components/BaseDialog.vue";
 import OrderCustomerSelection from "./OrderCustomerSelection.vue";
 import CustomPageProps from "@/types/model/CustomPageProps";
+import cookieManager from "@/plugins/cookie-manager";
 
 const screenSize = useScreenSize();
 
@@ -37,7 +38,9 @@ function getProductDetail(productId) {
     axios
         .get(`/api/my-store/product/${productId}`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                Authorization: `Bearer ${cookieManager.getItem(
+                    "access_token"
+                )}`,
             },
         })
         .then((response) => {

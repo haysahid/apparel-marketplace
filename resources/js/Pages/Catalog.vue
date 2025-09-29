@@ -9,12 +9,8 @@ import { usePage, router } from "@inertiajs/vue3";
 import CatalogPagination from "@/Components/CatalogPagination.vue";
 import Chip from "@/Components/Chip.vue";
 import ColorChip from "@/Components/ColorChip.vue";
-import { getImageUrl } from "@/plugins/helpers";
 
 const page = usePage();
-if (page.props.flash.access_token) {
-    localStorage.setItem("access_token", page.props.flash.access_token);
-}
 
 const props = defineProps({
     products: null,

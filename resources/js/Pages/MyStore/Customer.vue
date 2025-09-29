@@ -5,7 +5,6 @@ import AdminItemAction from "@/Components/AdminItemAction.vue";
 import DeleteConfirmationDialog from "@/Components/DeleteConfirmationDialog.vue";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
-import TextInput from "@/Components/TextInput.vue";
 import { router } from "@inertiajs/vue3";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultTable from "@/Components/DefaultTable.vue";
@@ -243,7 +242,11 @@ onMounted(() => {
                             {{ customer.phone }}
                         </td>
                         <td class="!whitespace-normal">
-                            {{ customer.store_roles[0]?.name || "-" }}
+                            {{
+                                customer.store_roles
+                                    ?.map((role) => role.name)
+                                    ?.join(", ") || "-"
+                            }}
                         </td>
                         <td>
                             <AdminItemAction

@@ -77,7 +77,11 @@ return [
 
     'middleware' => [
         'authenticate_session' => Laravel\Sanctum\Http\Middleware\AuthenticateSession::class,
-        'encrypt_cookies' => Illuminate\Cookie\Middleware\EncryptCookies::class,
+        // 'encrypt_cookies' => Illuminate\Cookie\Middleware\EncryptCookies::class,
+
+        // Custom middleware to exclude 'access_token' from encryption
+        'encrypt_cookies' => App\Http\Middleware\CustomEncryptCookiesMiddleware::class,
+
         'validate_csrf_token' => Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
     ],
 

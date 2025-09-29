@@ -11,6 +11,7 @@ import ThreeDotsLoading from "@/Components/ThreeDotsLoading.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { getWhatsAppLink } from "@/plugins/helpers";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import cookieManager from "@/plugins/cookie-manager";
 
 const props = defineProps({
     partner: Object as () => PartnerEntity,
@@ -26,7 +27,9 @@ function getUserVouchers() {
     axios
         .get("/api/my-store/voucher", {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                Authorization: `Bearer ${cookieManager.getItem(
+                    "access_token"
+                )}`,
             },
         })
         .then((response) => {

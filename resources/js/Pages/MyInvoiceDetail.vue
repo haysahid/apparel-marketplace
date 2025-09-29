@@ -8,6 +8,7 @@ import { router } from "@inertiajs/vue3";
 import OrderContentRow from "@/Components/OrderContentRow.vue";
 import StatusChip from "@/Components/StatusChip.vue";
 import InvoiceDetail from "./MyStore/Order/InvoiceDetail.vue";
+import cookieManager from "@/plugins/cookie-manager";
 
 async function initScript() {
     const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
@@ -49,7 +50,7 @@ async function checkPayment() {
             `/api/check-payment?transaction_code=${props.invoice.transaction.code}`,
             {
                 headers: {
-                    authorization: `Bearer ${localStorage.getItem(
+                    authorization: `Bearer ${cookieManager.getItem(
                         "access_token"
                     )}`,
                 },
@@ -108,7 +109,7 @@ async function showSnap() {
                         },
                         {
                             headers: {
-                                authorization: `Bearer ${localStorage.getItem(
+                                authorization: `Bearer ${cookieManager.getItem(
                                     "access_token"
                                 )}`,
                             },
@@ -153,7 +154,7 @@ async function changePaymentType() {
             },
             {
                 headers: {
-                    authorization: `Bearer ${localStorage.getItem(
+                    authorization: `Bearer ${cookieManager.getItem(
                         "access_token"
                     )}`,
                 },

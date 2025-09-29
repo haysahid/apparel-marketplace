@@ -15,11 +15,9 @@ import { useOrderStore } from "@/stores/order-store";
 import { computed, ref } from "vue";
 import DialogModal from "@/Components/DialogModal.vue";
 import DetailRow from "@/Components/DetailRow.vue";
+import CustomPageProps from "@/types/model/CustomPageProps";
 
-const page = usePage();
-if (page.props.flash.access_token) {
-    localStorage.setItem("access_token", page.props.flash.access_token);
-}
+const page = usePage<CustomPageProps>();
 
 if (route().params.order_id) {
     router.visit(route("order.success", { order_id: route().params.order_id }));

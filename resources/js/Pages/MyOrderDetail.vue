@@ -8,6 +8,7 @@ import axios from "axios";
 import { router } from "@inertiajs/vue3";
 import OrderContentRow from "@/Components/OrderContentRow.vue";
 import StatusChip from "@/Components/StatusChip.vue";
+import cookieManager from "@/plugins/cookie-manager";
 
 async function initScript() {
     const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
@@ -43,7 +44,9 @@ async function checkPayment() {
     await axios
         .get(`/api/check-payment?transaction_code=${props.transaction.code}`, {
             headers: {
-                authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                authorization: `Bearer ${cookieManager.getItem(
+                    "access_token"
+                )}`,
             },
         })
         .then((response) => {
@@ -99,7 +102,7 @@ async function showSnap() {
                         },
                         {
                             headers: {
-                                authorization: `Bearer ${localStorage.getItem(
+                                authorization: `Bearer ${cookieManager.getItem(
                                     "access_token"
                                 )}`,
                             },
@@ -143,7 +146,7 @@ async function changePaymentType() {
             },
             {
                 headers: {
-                    authorization: `Bearer ${localStorage.getItem(
+                    authorization: `Bearer ${cookieManager.getItem(
                         "access_token"
                     )}`,
                 },
@@ -167,7 +170,7 @@ onMounted(() => {
             })
         );
     } else if (
-        route().params?.show_snap == 1 &&
+        route().params?.show_snap == "1" &&
         props.transaction.status == "pending"
     ) {
         showSnap();

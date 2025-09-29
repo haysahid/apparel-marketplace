@@ -15,6 +15,7 @@ import InputGroup from "@/Components/InputGroup.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import DetailRow from "@/Components/DetailRow.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import cookieManager from "@/plugins/cookie-manager";
 
 const emit = defineEmits(["back"]);
 
@@ -42,7 +43,9 @@ function getPaymentMethods() {
     axios
         .get("/api/my-store/payment-method-dropdown", {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                Authorization: `Bearer ${cookieManager.getItem(
+                    "access_token"
+                )}`,
             },
         })
         .then((response) => {
@@ -60,7 +63,9 @@ function getShippingMethods() {
     axios
         .get("/api/my-store/shipping-method-dropdown", {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                Authorization: `Bearer ${cookieManager.getItem(
+                    "access_token"
+                )}`,
             },
         })
         .then((response) => {
@@ -239,7 +244,9 @@ const submit = () => {
     axios
         .post("/api/my-store/checkout", data, {
             headers: {
-                authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                authorization: `Bearer ${cookieManager.getItem(
+                    "access_token"
+                )}`,
             },
         })
         .then((response) => {

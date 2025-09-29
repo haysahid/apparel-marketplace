@@ -14,6 +14,7 @@ import LoadingDialog from "@/Components/LoadingDialog.vue";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
+import cookieManager from "@/plugins/cookie-manager";
 
 const props = defineProps({
     brands: null,
@@ -89,7 +90,7 @@ function isMobileDevice() {
 function printReport() {
     printStatus.value = "loading";
 
-    const token = `Bearer ${localStorage.getItem("access_token")}`;
+    const token = `Bearer ${cookieManager.getItem("access_token")}`;
 
     const reportType = selectedReportType.value.value;
     const brand = selectedBrand.value ? selectedBrand.value.name : undefined;

@@ -10,6 +10,7 @@ import DefaultPagination from "@/Components/DefaultPagination.vue";
 import ThreeDotsLoading from "@/Components/ThreeDotsLoading.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { getWhatsAppLink } from "@/plugins/helpers";
+import cookieManager from "@/plugins/cookie-manager";
 
 const props = defineProps({
     customer: Object as () => UserEntity,
@@ -34,7 +35,9 @@ function getInvoices() {
                 limit: invoiceFilter.value.limit,
             },
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                Authorization: `Bearer ${cookieManager.getItem(
+                    "access_token"
+                )}`,
             },
         })
         .then((response) => {
@@ -55,7 +58,9 @@ function getUserVouchers() {
     axios
         .get(`/api/my-store/customer/${props.customer.id}/voucher`, {
             headers: {
-                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                Authorization: `Bearer ${cookieManager.getItem(
+                    "access_token"
+                )}`,
             },
         })
         .then((response) => {

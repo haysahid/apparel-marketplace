@@ -6,6 +6,7 @@ import ChangeTransactionStatusDialog from "./ChangeTransactionStatusDialog.vue";
 import axios from "axios";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
+import cookieManager from "@/plugins/cookie-manager";
 
 const props = defineProps({
     transaction: {
@@ -21,7 +22,7 @@ const props = defineProps({
 const showChangeStatusDialog = ref(false);
 
 function changeStatus(newStatus: string) {
-    const token = `Bearer ${localStorage.getItem("access_token")}`;
+    const token = `Bearer ${cookieManager.getItem("access_token")}`;
 
     axios
         .put(

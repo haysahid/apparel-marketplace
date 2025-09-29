@@ -1,17 +1,17 @@
-function set(cname, cvalue, exdays) {
+function setItem(cname: string, cvalue: string, exdays: number) {
     const d = new Date();
-    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000);
     let expires = "expires=" + d.toUTCString();
     document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
 
-function get(cname) {
+function getItem(cname: string) {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
-    let ca = decodedCookie.split(';');
+    let ca = decodedCookie.split(";");
     for (let i = 0; i < ca.length; i++) {
         let c = ca[i];
-        while (c.charAt(0) == ' ') {
+        while (c.charAt(0) == " ") {
             c = c.substring(1);
         }
         if (c.indexOf(name) == 0) {
@@ -21,8 +21,8 @@ function get(cname) {
     return "";
 }
 
-function check(cName) {
-    let cValue = get(cName);
+function checkItem(cName: string) {
+    let cValue = getItem(cName);
     if (cValue != "") {
         return true;
     } else {
@@ -30,4 +30,4 @@ function check(cName) {
     }
 }
 
-export default { set, get, check };
+export default { setItem, getItem, checkItem };

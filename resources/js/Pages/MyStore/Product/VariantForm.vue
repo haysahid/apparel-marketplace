@@ -15,6 +15,7 @@ import DialogModal from "@/Components/DialogModal.vue";
 import ColorForm from "../Color/ColorForm.vue";
 import UnitForm from "../Unit/UnitForm.vue";
 import SizeForm from "../Size/SizeForm.vue";
+import cookieManager from "@/plugins/cookie-manager";
 
 const props = defineProps({
     product: {
@@ -155,7 +156,7 @@ function validate() {
 }
 
 function uploadNewImage(image, index) {
-    const token = `Bearer ${localStorage.getItem("access_token")}`;
+    const token = `Bearer ${cookieManager.getItem("access_token")}`;
 
     const formData = new FormData();
     formData.append("product_variant_id", props.variant?.id?.toString());
@@ -185,7 +186,7 @@ function updateImage(index, image) {
         return;
     }
 
-    const token = `Bearer ${localStorage.getItem("access_token")}`;
+    const token = `Bearer ${cookieManager.getItem("access_token")}`;
 
     const formData = new FormData();
     formData.append("_method", "PUT");
@@ -224,7 +225,7 @@ function updateImages() {
 }
 
 function deleteImages() {
-    const token = `Bearer ${localStorage.getItem("access_token")}`;
+    const token = `Bearer ${cookieManager.getItem("access_token")}`;
     const images = imagesToDelete.value || [];
 
     images.forEach((imageId) => {
@@ -261,7 +262,7 @@ function updateVariant() {
         }
     });
 
-    const token = `Bearer ${localStorage.getItem("access_token")}`;
+    const token = `Bearer ${cookieManager.getItem("access_token")}`;
 
     axios
         .post(`/api/my-store/product-variant/${props.variant.id}`, formData, {
@@ -291,7 +292,7 @@ function createVariant() {
     const data = form.data();
     const formData = new FormData();
 
-    formData.append("store_id", localStorage.getItem("selected_store_id"));
+    formData.append("store_id", cookieManager.getItem("selected_store_id"));
 
     Object.keys(data).forEach((key) => {
         if (key === "images") {
@@ -305,7 +306,7 @@ function createVariant() {
         }
     });
 
-    const token = `Bearer ${localStorage.getItem("access_token")}`;
+    const token = `Bearer ${cookieManager.getItem("access_token")}`;
 
     axios
         .post("/api/my-store/product-variant", formData, {

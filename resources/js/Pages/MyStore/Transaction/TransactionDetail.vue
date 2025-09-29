@@ -12,6 +12,7 @@ import { router } from "@inertiajs/vue3";
 import midtransPayment from "@/plugins/midtrans-payment";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import StatusChip from "@/Components/StatusChip.vue";
+import cookieManager from "@/plugins/cookie-manager";
 
 const props = defineProps({
     transaction: {
@@ -118,7 +119,7 @@ onMounted(() => {
 const showChangeStatusDialog = ref(false);
 
 function changeStatus(newStatus: string) {
-    const token = `Bearer ${localStorage.getItem("access_token")}`;
+    const token = `Bearer ${cookieManager.getItem("access_token")}`;
 
     axios
         .put(

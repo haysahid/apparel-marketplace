@@ -22,6 +22,7 @@ import VariantList from "./VariantList.vue";
 import TabButton from "@/Components/TabButton.vue";
 import axios from "axios";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
+import cookieManager from "@/plugins/cookie-manager";
 
 const props = defineProps({
     product: {
@@ -66,7 +67,7 @@ const filteredCategories = computed(() => {
 });
 
 function uploadNewImage(image, index) {
-    const token = `Bearer ${localStorage.getItem("access_token")}`;
+    const token = `Bearer ${cookieManager.getItem("access_token")}`;
 
     const formData = new FormData();
     formData.append("product_id", props.product.id);
@@ -95,7 +96,7 @@ function updateImage(index, image) {
         return;
     }
 
-    const token = `Bearer ${localStorage.getItem("access_token")}`;
+    const token = `Bearer ${cookieManager.getItem("access_token")}`;
 
     const formData = new FormData();
     formData.append("_method", "PUT");
@@ -138,7 +139,7 @@ function updateImages() {
 }
 
 function deleteImages() {
-    const token = `Bearer ${localStorage.getItem("access_token")}`;
+    const token = `Bearer ${cookieManager.getItem("access_token")}`;
     const images = imagesToDelete.value || [];
 
     images.forEach((imageId) => {
@@ -165,7 +166,7 @@ function deleteImages() {
 }
 
 function deleteVariant(variant) {
-    const token = `Bearer ${localStorage.getItem("access_token")}`;
+    const token = `Bearer ${cookieManager.getItem("access_token")}`;
 
     axios
         .delete(
@@ -188,7 +189,7 @@ function deleteVariant(variant) {
 }
 
 function getVariants() {
-    const token = `Bearer ${localStorage.getItem("access_token")}`;
+    const token = `Bearer ${cookieManager.getItem("access_token")}`;
 
     axios
         .get(

@@ -8,6 +8,7 @@ import DefaultCard from "@/Components/DefaultCard.vue";
 import InvoiceDetail from "./InvoiceDetail.vue";
 import OrderContentRow from "@/Components/OrderContentRow.vue";
 import StatusChip from "@/Components/StatusChip.vue";
+import cookieManager from "@/plugins/cookie-manager";
 
 const props = defineProps({
     invoice: {
@@ -27,7 +28,7 @@ const props = defineProps({
 const showChangeStatusDialog = ref(false);
 
 function changeStatus(newStatus: string) {
-    const token = `Bearer ${localStorage.getItem("access_token")}`;
+    const token = `Bearer ${cookieManager.getItem("access_token")}`;
 
     axios
         .put(

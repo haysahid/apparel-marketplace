@@ -96,7 +96,7 @@ const emit = defineEmits(["edit"]);
                         </span>
                     </div>
                     <div
-                        v-if="props.customer.role"
+                        v-if="props.customer.store_roles?.length"
                         class="flex items-center gap-0.5"
                     >
                         <svg
@@ -111,7 +111,11 @@ const emit = defineEmits(["edit"]);
                             />
                         </svg>
                         <span>
-                            {{ props.customer.role?.name }}
+                            {{
+                                props.customer.store_roles
+                                    ?.map((role) => role.name)
+                                    ?.join(", ") || "-"
+                            }}
                         </span>
                     </div>
                 </div>

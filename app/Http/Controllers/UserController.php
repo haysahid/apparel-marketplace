@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class UserController extends Controller
@@ -37,10 +38,16 @@ class UserController extends Controller
 
             $redirectUrl = $request->input('redirect');
 
+            Cookie::queue(Cookie::forever(
+                name: 'access_token',
+                value: $accessToken,
+                secure: false,
+                httpOnly: false,
+            ));
+
             if ($redirectUrl) {
                 return redirect()->to($redirectUrl)->with([
                     'success' => 'Berhasil masuk.',
-                    'access_token' => $accessToken,
                 ]);
             }
 
@@ -53,7 +60,6 @@ class UserController extends Controller
 
             return redirect()->route('home')->with([
                 'success' => 'Berhasil masuk.',
-                'access_token' => $accessToken,
             ]);
         }
 

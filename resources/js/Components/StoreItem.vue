@@ -41,7 +41,7 @@ const props = defineProps({
             </svg>
         </div>
         <div class="w-full pb-0.5">
-            <p class="font-medium text-gray-700 text-start">
+            <p class="text-sm font-medium text-gray-700 text-start">
                 {{ props.name }}
             </p>
             <p

@@ -5,16 +5,10 @@ import LandingLayout from "@/Layouts/LandingLayout.vue";
 import { Link } from "@inertiajs/vue3";
 import { useCartStore } from "@/stores/cart-store";
 import axios from "axios";
-import { usePage } from "@inertiajs/vue3";
 import JoinUs from "@/Components/JoinUs.vue";
 import { router } from "@inertiajs/vue3";
 import CartGroup from "./Cart/CartGroup.vue";
 import CartForm from "./Cart/CartForm.vue";
-
-const page = usePage();
-if (page.props.flash.access_token) {
-    localStorage.setItem("access_token", page.props.flash.access_token);
-}
 
 if (route().params.order_id) {
     router.visit(route("order.success", { order_id: route().params.order_id }));
