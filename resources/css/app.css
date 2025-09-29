@@ -145,6 +145,25 @@ textarea::placeholder {
     .cart-group {
         @apply flex flex-col items-start justify-between gap-2 p-4 !pb-2 transition-all duration-200 ease-in-out border-b rounded-2xl sm:p-6 sm:!pb-4 outline outline-1 -outline-offset-1 outline-gray-300 hover:outline-primary;
     }
+
+    /* Transition styles for max-height */
+    .accordion-enter-active,
+    .accordion-leave-active {
+        transition: all 0.3s ease-in-out;
+        overflow: hidden;
+    }
+
+    .accordion-enter-from,
+    .accordion-leave-to {
+        max-height: 0;
+        opacity: 0;
+    }
+
+    .accordion-enter-to,
+    .accordion-leave-from {
+        max-height: 900px;
+        opacity: 1;
+    }
 }
 
 @layer utilities {

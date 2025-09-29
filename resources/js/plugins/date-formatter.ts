@@ -1,6 +1,6 @@
 const formatDate = (
-    datetime,
-    options = {
+    datetime: string,
+    options: Intl.DateTimeFormatOptions = {
         dateStyle: "medium",
         timeStyle: "short",
     }

@@ -13,7 +13,6 @@ import DefaultTable from "@/Components/DefaultTable.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import AdminItemCard from "@/Components/AdminItemCard.vue";
 import CustomPageProps from "@/types/model/CustomPageProps";
-import TextInput from "@/Components/TextInput.vue";
 import { scrollToTop } from "@/plugins/helpers";
 import SearchInput from "@/Components/SearchInput.vue";
 

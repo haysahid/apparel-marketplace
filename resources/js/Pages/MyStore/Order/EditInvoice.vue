@@ -82,8 +82,9 @@ window.onpopstate = function () {
             <InvoiceDetail
                 :invoice="props.invoice"
                 :items="props.items"
-                class="!px-0 !pt-8 md:!px-0"
+                class="!px-0 !pt-0 md:!px-0"
                 :showTracking="props.invoice.status !== 'cancelled'"
+                :isShowingFromMyStore="true"
             >
                 <template #additionalInfo>
                     <!-- Payment -->

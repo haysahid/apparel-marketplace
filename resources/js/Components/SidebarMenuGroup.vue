@@ -39,6 +39,7 @@ onMounted(() => {
             class="flex items-center justify-between px-6 py-4 text-base font-medium text-gray-500 border-l-4 border-transparent cursor-pointer select-none"
             :class="{
                 'bg-gray-50 border-primary text-primary': active,
+                '!px-4 !py-2.5': props.responsive,
             }"
         >
             <div class="flex items-center">
@@ -77,41 +78,16 @@ onMounted(() => {
                 </svg>
             </span>
         </summary>
-        <Transition
-            name="accordion"
-            enter-active-class="accordion-enter-active"
-            leave-active-class="accordion-leave-active"
-        >
+        <Transition name="accordion">
             <div v-if="expanded">
                 <SidebarMenu
                     v-for="child in menu.children"
                     :key="child.name"
                     :menu="child"
                     :responsive="props.responsive"
-                    class="pl-10"
+                    class="!pl-8 sm:!pl-10"
                 />
             </div>
         </Transition>
     </details>
 </template>
-
-<style scoped>
-/* Transition styles for max-height */
-.accordion-enter-active,
-.accordion-leave-active {
-    transition: all 0.3s ease-in-out;
-    overflow: hidden;
-}
-
-.accordion-enter-from,
-.accordion-leave-to {
-    max-height: 0;
-    opacity: 0;
-}
-
-.accordion-enter-to,
-.accordion-leave-from {
-    max-height: 500px;
-    opacity: 1;
-}
-</style>
