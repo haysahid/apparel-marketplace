@@ -48,7 +48,7 @@ function getInvoices() {
 }
 getInvoices();
 
-const vouchers = ref<PaginationModel<VoucherEntity>>(null);
+const userVouchers = ref<PaginationModel<UserVoucherEntity>>(null);
 const getVouchersStatus = ref(null);
 function getUserVouchers() {
     getVouchersStatus.value = "loading";
@@ -59,7 +59,7 @@ function getUserVouchers() {
             },
         })
         .then((response) => {
-            vouchers.value = response.data.result;
+            userVouchers.value = response.data.result;
             getVouchersStatus.value = "success";
         })
         .catch((error) => {
@@ -269,21 +269,21 @@ getUserVouchers();
                     <h3 class="font-semibold text-gray-900">Voucher</h3>
                     <div class="w-full mt-2.5">
                         <div
-                            v-if="vouchers && vouchers.data.length"
+                            v-if="userVouchers && userVouchers.data.length"
                             class="flex flex-col w-full gap-2"
                         >
                             <div
-                                v-for="voucher in vouchers.data"
-                                :key="voucher.id"
+                                v-for="userVoucher in userVouchers.data"
+                                :key="userVoucher.id"
                                 class="flex flex-col gap-1 p-3 border border-gray-200 rounded-lg"
                             >
                                 <p
                                     class="font-semibold text-gray-900 hover:text-primary"
                                 >
-                                    {{ voucher.code }}
+                                    {{ userVoucher.voucher.code }}
                                 </p>
                                 <p class="text-sm text-gray-600">
-                                    {{ voucher.description }}
+                                    {{ userVoucher.voucher.description }}
                                 </p>
                             </div>
                         </div>

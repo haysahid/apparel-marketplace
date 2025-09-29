@@ -197,7 +197,7 @@ const showGuestForm = ref(false);
                 >
                     <OrderProductSelection
                         v-show="screenSize.is('lg')"
-                        class="w-full"
+                        class="w-full h-fit"
                         @selectProduct="openVariantModal($event)"
                     />
                     <AddOrderCart

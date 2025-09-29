@@ -33,6 +33,7 @@ const searchDebounce = useDebounce();
             searchDebounce(() => emit('search'), 600);
         "
     >
+        <template #prefix v-if="$slots.prefix"><slot name="prefix" /></template>
         <template #suffix>
             <svg
                 xmlns="http://www.w3.org/2000/svg"

@@ -246,7 +246,7 @@ onMounted(() => {
                         />
                     </div>
                 </template>
-                <div v-else class="flex items-center justify-center h-[40vh]">
+                <div v-else class="flex items-center justify-center py-10">
                     <p class="text-sm text-center text-gray-500">
                         Data tidak ditemukan.
                     </p>

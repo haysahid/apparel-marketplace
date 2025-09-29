@@ -19,7 +19,7 @@ const props = defineProps({
         </table>
 
         <!-- Empty State -->
-        <div v-if="isEmpty" class="flex items-center justify-center h-[40vh]">
+        <div v-if="isEmpty" class="flex items-center justify-center py-10">
             <div class="flex flex-col items-center justify-center gap-2">
                 <p class="text-sm text-center text-gray-500">
                     Data tidak ditemukan.

@@ -245,7 +245,7 @@ const searchInput = ref(null);
                         :error="props.error"
                         :disabled="props.disabled"
                     >
-                        <template v-if="props.modelValue?.hexCode" #prefix>
+                        <template #prefix v-if="props.modelValue?.hexCode">
                             <span
                                 class="absolute w-5 h-5 border rounded-full left-3"
                                 :style="`background-color: ${props.modelValue.hexCode}`"

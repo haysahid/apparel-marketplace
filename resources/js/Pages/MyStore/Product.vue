@@ -358,11 +358,7 @@ onMounted(() => {
             </DefaultTable>
 
             <!-- Mobile View -->
-            <div
-                v-if="!screenSize.is('xl')"
-                class="flex flex-col gap-3 mt-4"
-                :class="{ 'min-h-auto h-[68vh]': products.data.length == 0 }"
-            >
+            <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <template v-if="products.data.length > 0">
                     <div
                         v-for="(product, index) in products.data"
@@ -381,7 +377,7 @@ onMounted(() => {
                         />
                     </div>
                 </template>
-                <div v-else class="flex items-center justify-center h-[40vh]">
+                <div v-else class="flex items-center justify-center py-10">
                     <p class="text-sm text-center text-gray-500">
                         Data tidak ditemukan.
                     </p>

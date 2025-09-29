@@ -254,11 +254,7 @@ onMounted(() => {
             </DefaultTable>
 
             <!-- Mobile View -->
-            <div
-                v-if="!screenSize.is('xl')"
-                class="flex flex-col gap-3 mt-4"
-                :class="{ 'min-h-auto h-[68vh]': brands.data.length == 0 }"
-            >
+            <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <div
                     v-if="brands.data.length > 0"
                     class="grid grid-cols-1 gap-3 sm:grid-cols-2"
@@ -282,7 +278,7 @@ onMounted(() => {
                         @delete="openDeleteBrandDialog(brand)"
                     />
                 </div>
-                <div v-else class="flex items-center justify-center h-[90%]">
+                <div v-else class="flex items-center justify-center py-10">
                     <p class="text-sm text-center text-gray-500">
                         Data tidak ditemukan.
                     </p>
