@@ -48,7 +48,6 @@ function showSnap() {
     midtransPayment.showSnap(
         {
             snapToken: payment.value.midtrans_snap_token,
-            isGuest: false,
         },
         {
             onSuccess: (result) => {

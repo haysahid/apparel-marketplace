@@ -15,8 +15,9 @@ import InputGroup from "@/Components/InputGroup.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import DetailRow from "@/Components/DetailRow.vue";
 import cookieManager from "@/plugins/cookie-manager";
+import CustomPageProps from "@/types/model/CustomPageProps";
 
-const page = usePage();
+const page = usePage<CustomPageProps>();
 const cartStore = useCartStore();
 const orderStore = useOrderStore();
 
@@ -44,7 +45,7 @@ const destinations = ref([]);
 
 function getDestinations(search) {
     axios
-        .get(`${page.props.ziggy.url}/api/destinations`, {
+        .get("/api/destinations", {
             params: {
                 search: search,
             },
@@ -55,13 +56,15 @@ function getDestinations(search) {
         .catch((error) => {});
 }
 
-const debouncedGetDestinations = useDebounce(getDestinations, 400);
+const debouncedGetDestinations = useDebounce();
 
 watch(
     () => destinationSearch.value,
     (newValue) => {
         if (newValue) {
-            debouncedGetDestinations(newValue);
+            debouncedGetDestinations(() => {
+                getDestinations(newValue);
+            }, 600);
         } else {
             destinations.value = [];
         }
@@ -93,7 +96,7 @@ function getShippingCost() {
     }
 
     axios
-        .get(`${page.props.ziggy.url}/api/shipping-cost`, {
+        .get("/api/shipping-cost", {
             params: {
                 destination: form.destination_id,
                 store_ids: cartStore.groupHasSelectedItems
@@ -159,9 +162,36 @@ const total = computed(() => {
 
 const showAuthWarning = ref(false);
 
+function validateForm() {
+    let valid = true;
+    if (!form.payment_method) {
+        form.errors.payment_method = "Metode pembayaran harus dipilih";
+        valid = false;
+    }
+    if (!form.shipping_method) {
+        form.errors.shipping_method = "Metode pengiriman harus dipilih";
+        valid = false;
+    }
+    if (form.shipping_method?.slug == "courier") {
+        if (!form.destination_id) {
+            form.errors.destination_id = "Alamat pengiriman harus dipilih";
+            valid = false;
+        }
+        if (!form.address) {
+            form.errors.address = "Alamat lengkap harus diisi";
+            valid = false;
+        }
+    }
+    return valid;
+}
+
 const submit = () => {
     if (route().current("checkout") && !page.props.auth.user) {
         showAuthWarning.value = true;
+        return;
+    }
+
+    if (!validateForm()) {
         return;
     }
 
@@ -320,11 +350,7 @@ const submit = () => {
                         class="w-full"
                         placeholder="Masukkan alamat lengkap"
                         @update:modelValue="form.errors.address = null"
-                        :error="
-                            form.errors?.address
-                                ? form.errors?.address[0] || null
-                                : null
-                        "
+                        :error="form.errors?.address"
                     />
                     <p
                         v-if="form.estimated_delivery"

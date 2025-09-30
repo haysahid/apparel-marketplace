@@ -13,6 +13,7 @@ interface UserVoucherEntity {
     voucher: VoucherEntity | null;
     user: UserEntity | null;
 
-    // Additional properties
+    // Additional attributes
     is_redeemed: boolean | null;
+    status: "active" | "used" | "expired" | null;
 }

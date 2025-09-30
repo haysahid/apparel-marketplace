@@ -116,6 +116,7 @@ const emit = defineEmits(["edit"]);
                                 }}
                             </span>
                         </div>
+                        <slot name="extra-info" />
                     </div>
                     <p class="text-sm font-medium text-gray-700">
                         {{ $formatCurrency(props.invoice.amount) }}

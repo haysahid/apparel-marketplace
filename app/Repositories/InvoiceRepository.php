@@ -27,6 +27,7 @@ class InvoiceRepository
             'transaction.payment_method',
             'transaction.shipping_method',
             'transaction.items',
+            'voucher',
         ]);
 
         if ($storeId) {

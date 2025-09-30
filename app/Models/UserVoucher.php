@@ -19,6 +19,24 @@ class UserVoucher extends Model
         'expired_at',
     ];
 
+    // Additional attributes
+    protected $appends = [
+        'status',
+    ];
+
+    public function getStatusAttribute()
+    {
+        if ($this->used_at) {
+            return 'used';
+        }
+
+        if ($this->expired_at && $this->expired_at < now()) {
+            return 'expired';
+        }
+
+        return 'active';
+    }
+
     // Relationships
     public function user()
     {

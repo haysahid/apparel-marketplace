@@ -218,7 +218,7 @@ class VoucherRepository
         return $query->get();
     }
 
-    private function getVoucherExpiryDate(Voucher $voucher): ?DateTime
+    public static function getVoucherExpiryDate(Voucher $voucher): ?DateTime
     {
         if ($voucher->usage_duration_days) {
             return now()->addDays($voucher->usage_duration_days);

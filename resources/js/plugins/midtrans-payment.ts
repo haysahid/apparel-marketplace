@@ -1,4 +1,5 @@
 import axios from "axios";
+import cookieManager from "./cookie-manager";
 
 async function initScript() {
     const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
@@ -33,7 +34,7 @@ async function checkPayment(
                 : `/api/check-payment?transaction_code=${transactionCode}`,
             {
                 headers: {
-                    authorization: `Bearer ${localStorage.getItem(
+                    authorization: `Bearer ${cookieManager.getItem(
                         "access_token"
                     )}`,
                 },
@@ -110,7 +111,7 @@ async function changePaymentType(
             },
             {
                 headers: {
-                    authorization: `Bearer ${localStorage.getItem(
+                    authorization: `Bearer ${cookieManager.getItem(
                         "access_token"
                     )}`,
                 },

@@ -4,27 +4,10 @@ import OrderDetail from "./Order/OrderDetail.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { ref, computed, onMounted } from "vue";
-import axios from "axios";
 import { router } from "@inertiajs/vue3";
 import OrderContentRow from "@/Components/OrderContentRow.vue";
 import StatusChip from "@/Components/StatusChip.vue";
-import cookieManager from "@/plugins/cookie-manager";
-
-async function initScript() {
-    const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
-    const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
-
-    const script = document.createElement("script");
-    script.src = snapScript;
-    script.setAttribute("data-client-key", clientKey);
-    script.async = true;
-
-    document.body.appendChild(script);
-
-    return () => {
-        document.body.removeChild(script);
-    };
-}
+import midtransPayment from "@/plugins/midtrans-payment";
 
 const props = defineProps({
     transaction: {
@@ -37,22 +20,70 @@ const props = defineProps({
     },
 });
 
+const checkPaymentStatus = ref(null);
+function checkPayment() {
+    midtransPayment.checkPayment(
+        {
+            transactionCode: props.transaction.code,
+            isGuest: false,
+        },
+        {
+            onSuccess: (response) => {
+                payment.value = response.data.result;
+                router.reload();
+            },
+            onChangeStatus: (status) => {
+                checkPaymentStatus.value = status;
+            },
+        }
+    );
+}
+
+function showSnap() {
+    midtransPayment.showSnap(
+        {
+            snapToken: payment.value.midtrans_snap_token,
+        },
+        {
+            onSuccess: (result) => {
+                checkPayment();
+            },
+            onPending: (result) => {
+                checkPayment();
+            },
+            onError: (error) => {
+                checkPayment();
+            },
+            onClose: () => {
+                checkPayment();
+            },
+            onChangeStatus: (status) => {
+                resumePaymentStatus.value = status;
+            },
+        }
+    );
+}
+
+function changePaymentType() {
+    midtransPayment.changePaymentType(
+        {
+            transactionCode: props.transaction.code,
+        },
+        {
+            onSuccess: (response) => {
+                payment.value = response.data.result;
+
+                if (payment.value.midtrans_snap_token) {
+                    showSnap();
+                }
+            },
+        }
+    );
+}
+
 // Check payment
 const payment = ref(null);
-
-async function checkPayment() {
-    await axios
-        .get(`/api/check-payment?transaction_code=${props.transaction.code}`, {
-            headers: {
-                authorization: `Bearer ${cookieManager.getItem(
-                    "access_token"
-                )}`,
-            },
-        })
-        .then((response) => {
-            payment.value = response.data.result;
-        });
-}
+const resumePaymentStatus = ref(null);
 
 if (props.transaction.payments) {
     payment.value = props.transaction.payments[0];
@@ -67,98 +98,6 @@ const showPaymentActions = computed(() => {
 
 if (showPaymentActions.value) {
     checkPayment();
-}
-
-// Resume Payment
-const resumePaymentStatus = ref(null);
-
-async function showSnap() {
-    resumePaymentStatus.value = "loading";
-
-    if (!window.snap) {
-        await initScript();
-    }
-
-    setTimeout(async () => {
-        const snapToken = payment.value.midtrans_snap_token;
-
-        if (!snapToken) {
-            console.error("Snap token is not available");
-            return;
-        }
-
-        await window.snap.pay(snapToken, {
-            onSuccess: async function (result) {
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
-
-                await axios
-                    .post(
-                        "/api/confirm-payment",
-                        {
-                            payment_id: payment.value.id,
-                        },
-                        {
-                            headers: {
-                                authorization: `Bearer ${cookieManager.getItem(
-                                    "access_token"
-                                )}`,
-                            },
-                        }
-                    )
-                    .then((response) => {
-                        resumePaymentStatus.value = "success";
-                        router.visit(
-                            route("my-order.detail", {
-                                transaction_code: props.transaction.code,
-                            })
-                        );
-                    })
-                    .catch((error) => {
-                        resumePaymentStatus.value = "error";
-                    });
-            },
-            onPending: async function (result) {
-                resumePaymentStatus.value = "pending";
-                await checkPayment();
-            },
-            onError: async function (result) {
-                resumePaymentStatus.value = "error";
-                await checkPayment();
-            },
-            onClose: async function () {
-                resumePaymentStatus.value = "error";
-                await checkPayment();
-            },
-        });
-    }, 1000);
-}
-
-// Change Payment Type
-async function changePaymentType() {
-    await axios
-        .put(
-            "/api/change-payment-type",
-            {
-                transaction_code: props.transaction.code,
-            },
-            {
-                headers: {
-                    authorization: `Bearer ${cookieManager.getItem(
-                        "access_token"
-                    )}`,
-                },
-            }
-        )
-        .then(async (response) => {
-            payment.value = response.data.result;
-
-            if (payment.value.midtrans_snap_token) {
-                await showSnap();
-            }
-        });
 }
 
 onMounted(() => {

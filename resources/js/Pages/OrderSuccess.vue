@@ -38,7 +38,7 @@ function checkPayment() {
 
                 if (props.isGuest) {
                     router.reload();
-                } else {
+                } else if (payment.value.status !== "pending") {
                     router.visit(route("my-order"));
                 }
             },
@@ -53,7 +53,6 @@ function showSnap() {
     midtransPayment.showSnap(
         {
             snapToken: payment.value.midtrans_snap_token,
-            isGuest: props.isGuest,
         },
         {
             onSuccess: (result) => {
@@ -78,8 +77,7 @@ function showSnap() {
 function changePaymentType() {
     midtransPayment.changePaymentType(
         {
-            transaction_code: props.transaction.code,
-            isGuest: props.isGuest,
+            transactionCode: props.transaction.code,
         },
         {
             onSuccess: async (response) => {
