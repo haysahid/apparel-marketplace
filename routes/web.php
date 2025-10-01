@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\MyStore\MyStoreCertificateController;
 use App\Http\Controllers\MyStoreController;
 use App\Http\Controllers\MyStore\MyStoreProductController;
@@ -65,26 +66,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::middleware([AdminMiddleware::class])->group(function () {
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-
-        // Store
-        Route::get('/store-info', [StoreController::class, 'edit'])->name('store.edit');
-        Route::post('/store-info', [StoreController::class, 'update'])->name('store.update');
-
-        // Certificate
-        Route::get('/certificate', [StoreCertificateController::class, 'index'])->name('certificate');
-        Route::get('/certificate/create', [StoreCertificateController::class, 'create'])->name('certificate.create');
-        Route::post('/certificate', [StoreCertificateController::class, 'store'])->name('certificate.store');
-        Route::get('/certificate/{storeCertificate}', [StoreCertificateController::class, 'edit'])->name('certificate.edit');
-        Route::post('/certificate/{storeCertificate}', [StoreCertificateController::class, 'update'])->name('certificate.update');
-        Route::delete('/certificate/{storeCertificate}', [StoreCertificateController::class, 'destroy'])->name('certificate.destroy');
-
-        // Product
-        Route::get('/product', [ProductController::class, 'index'])->name('product');
-        Route::get('/product/create', [ProductController::class, 'create'])->name('product.create');
-        Route::post('/product', [ProductController::class, 'store'])->name('product.store');
-        Route::get('/product/{product}', [ProductController::class, 'edit'])->name('product.edit');
-        Route::post('/product/{product}', [ProductController::class, 'update'])->name('product.update');
-        Route::delete('/product/{product}', [ProductController::class, 'destroy'])->name('product.destroy');
+        Route::get('/user', [AdminUserController::class, 'index'])->name('user');
+        Route::get('/user/{user}', [AdminUserController::class, 'show'])->name('user.show');
     });
 });
 

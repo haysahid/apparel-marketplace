@@ -95,7 +95,7 @@ onMounted(() => {
                         </template>
                     </SummaryCard>
                     <SummaryCard
-                        title="Total Pengunjung"
+                        title="Total Pengguna"
                         :value="props.userCount"
                     >
                         <template #icon>

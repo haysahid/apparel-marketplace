@@ -2,6 +2,7 @@
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import { router } from "@inertiajs/vue3";
+import { computed, getCurrentInstance } from "vue";
 
 const props = defineProps({
     invert: {
@@ -14,11 +15,17 @@ const props = defineProps({
     },
 });
 
+defineEmits(["showStoreOptionsDialog"]);
+
 const logout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("selected_store_id");
     router.post(route("logout"));
 };
+
+const hasShowStoreOptionsDialogCallback = computed(() => {
+    return !!getCurrentInstance()?.vnode?.props?.["onShowStoreOptionsDialog"];
+});
 </script>
 
 <template>
@@ -87,17 +94,19 @@ const logout = () => {
 
         <template #content>
             <div class="divide-y divide-gray-200">
-                <DropdownLink
-                    v-if="$page.props.auth.has_store"
-                    as="button"
-                    @click="$emit('showStoreOptionsDialog')"
-                >
-                    Toko Saya
-                </DropdownLink>
+                <template v-if="hasShowStoreOptionsDialogCallback">
+                    <DropdownLink
+                        v-if="$page.props.auth.has_store"
+                        as="button"
+                        @click="$emit('showStoreOptionsDialog')"
+                    >
+                        Toko Saya
+                    </DropdownLink>
 
-                <DropdownLink v-else :href="route('store.create')">
-                    Buat Toko
-                </DropdownLink>
+                    <DropdownLink v-else :href="route('store.create')">
+                        Buat Toko
+                    </DropdownLink>
+                </template>
 
                 <DropdownLink :href="route('profile')"> Profile </DropdownLink>
 

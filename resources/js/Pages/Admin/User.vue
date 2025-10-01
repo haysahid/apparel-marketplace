@@ -12,22 +12,23 @@ import DefaultCard from "@/Components/DefaultCard.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
-import MyCustomerCard from "./Customer/MyCustomerCard.vue";
+import UserCard from "./User/UserCard.vue";
 import { getImageUrl } from "@/plugins/helpers";
 import CustomPageProps from "@/types/model/CustomPageProps";
 import { scrollToTop } from "@/plugins/helpers";
 import SearchInput from "@/Components/SearchInput.vue";
+import AdminLayout from "@/Layouts/AdminLayout.vue";
 
 const screenSize = useScreenSize();
 
 const props = defineProps({
-    customers: Object as () => PaginationModel<UserEntity>,
+    users: Object as () => PaginationModel<UserEntity>,
 });
 
-const customers = ref<PaginationModel<UserEntity>>({
-    ...props.customers,
-    data: props.customers.data.map((customer) => ({
-        ...customer,
+const users = ref<PaginationModel<UserEntity>>({
+    ...props.users,
+    data: props.users.data.map((user) => ({
+        ...user,
         showDeleteModal: false,
     })),
 });
@@ -50,16 +51,16 @@ const queryParams = computed(() => {
     };
 });
 
-function getCustomers() {
-    router.get(route("my-store.customer"), queryParams.value, {
+function getUsers() {
+    router.get(route("admin.user"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
             getQueryParams();
-            customers.value = {
-                ...props.customers,
-                data: props.customers.data.map((customer) => ({
-                    ...customer,
+            users.value = {
+                ...props.users,
+                data: props.users.data.map((user) => ({
+                    ...user,
                     showDeleteModal: false,
                 })),
             };
@@ -69,38 +70,38 @@ function getCustomers() {
     });
 }
 
-const selectedCustomer = ref(null);
-const showDeleteCustomerDialog = ref(false);
+const selectedUser = ref(null);
+const showDeleteUserDialog = ref(false);
 
-const openDeleteCustomerDialog = (customer) => {
-    if (customer) {
-        selectedCustomer.value = customer;
-        showDeleteCustomerDialog.value = true;
+const openDeleteUserDialog = (user) => {
+    if (user) {
+        selectedUser.value = user;
+        showDeleteUserDialog.value = true;
     }
 };
 
-const closeDeleteCustomerDialog = (result = false) => {
-    showDeleteCustomerDialog.value = false;
+const closeDeleteUserDialog = (result = false) => {
+    showDeleteUserDialog.value = false;
     if (result) {
-        selectedCustomer.value = null;
+        selectedUser.value = null;
         openSuccessDialog("Data Berhasil Dihapus");
     }
 };
 
-const deleteCustomer = () => {
-    if (selectedCustomer.value) {
+const deleteUser = () => {
+    if (selectedUser.value) {
         const form = useForm({});
         form.delete(
-            route("my-store.customer.destroy", {
-                customer: selectedCustomer.value,
+            route("admin.user.destroy", {
+                user: selectedUser.value,
             }),
             {
                 onError: (errors) => {
                     openErrorDialog(errors.error);
                 },
                 onSuccess: () => {
-                    closeDeleteCustomerDialog(true);
-                    getCustomers();
+                    closeDeleteUserDialog(true);
+                    getUsers();
                 },
             }
         );
@@ -125,7 +126,7 @@ const openErrorDialog = (message) => {
 
 const page = usePage<CustomPageProps>();
 
-function canEdit(customer) {
+function canEdit(user) {
     return false;
     // return page.props.auth.is_admin;
 }
@@ -133,7 +134,7 @@ function canEdit(customer) {
 function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
-            "search-customer"
+            "search-user"
         ) as HTMLInputElement;
         input?.focus({ preventScroll: true });
     });
@@ -148,24 +149,24 @@ onMounted(() => {
 </script>
 
 <template>
-    <MyStoreLayout title="Pelanggan" :showTitle="true">
+    <AdminLayout title="Pengguna" :showTitle="true">
         <DefaultCard :isMain="true">
             <div class="flex items-center justify-end gap-4">
                 <!-- <PrimaryButton
                     type="button"
                     class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
-                    @click="$inertia.visit(route('my-store.customer.create'))"
+                    @click="$inertia.visit(route('admin.user.create'))"
                 >
                     Tambah
                 </PrimaryButton> -->
                 <SearchInput
-                    id="search-customer"
+                    id="search-user"
                     v-model="filters.search"
-                    placeholder="Cari pelanggan..."
+                    placeholder="Cari pengguna..."
                     class="max-w-48"
                     @search="
                         filters.page = 1;
-                        getCustomers();
+                        getUsers();
                     "
                 />
             </div>
@@ -173,13 +174,13 @@ onMounted(() => {
             <!-- Table -->
             <DefaultTable
                 v-if="screenSize.is('xl')"
-                :isEmpty="customers.data.length === 0"
+                :isEmpty="users.data.length === 0"
                 class="mt-6"
             >
                 <template #thead>
                     <tr>
                         <th class="w-12">No</th>
-                        <th>Pelanggan</th>
+                        <th>Pengguna</th>
                         <th>Email</th>
                         <th>No. HP</th>
                         <th>Jenis</th>
@@ -187,32 +188,29 @@ onMounted(() => {
                     </tr>
                 </template>
                 <template #tbody>
-                    <tr
-                        v-for="(customer, index) in customers.data"
-                        :key="customer.id"
-                    >
+                    <tr v-for="(user, index) in users.data" :key="user.id">
                         <td>
                             {{
                                 index +
                                 1 +
-                                (props.customers.current_page - 1) *
-                                    props.customers.per_page
+                                (props.users.current_page - 1) *
+                                    props.users.per_page
                             }}
                         </td>
                         <td>
                             <Link
                                 :href="
-                                    route('my-store.customer.show', {
-                                        customer: customer,
+                                    route('admin.user.show', {
+                                        user: user,
                                     })
                                 "
                                 class="flex items-center gap-3 group"
                             >
                                 <div class="flex items-center gap-3">
                                     <img
-                                        v-if="customer.avatar"
-                                        :src="getImageUrl(customer.avatar)"
-                                        alt="Foto Pelanggan"
+                                        v-if="user.avatar"
+                                        :src="getImageUrl(user.avatar)"
+                                        alt="Foto Pengguna"
                                         class="object-contain rounded-full size-8"
                                     />
                                     <svg
@@ -230,40 +228,36 @@ onMounted(() => {
                                         />
                                     </svg>
                                     <p class="group-hover:underline">
-                                        {{ customer.name }}
+                                        {{ user.name }}
                                     </p>
                                 </div>
                             </Link>
                         </td>
                         <td class="!whitespace-normal">
-                            {{ customer.email }}
+                            {{ user.email }}
                         </td>
                         <td class="!whitespace-normal">
-                            {{ customer.phone }}
+                            {{ user.phone }}
                         </td>
                         <td class="!whitespace-normal">
-                            {{
-                                customer.store_roles
-                                    ?.map((role) => role.name)
-                                    ?.join(", ") || "-"
-                            }}
+                            {{ user.role?.name ?? "-" }}
                         </td>
                         <td>
                             <AdminItemAction
-                                v-if="canEdit(customer)"
+                                v-if="canEdit(user)"
                                 @edit="
                                     $inertia.visit(
-                                        route('my-store.customer.edit', {
-                                            customer: customer,
+                                        route('admin.user.edit', {
+                                            user: user,
                                         })
                                     )
                                 "
-                                @delete="openDeleteCustomerDialog(customer)"
+                                @delete="openDeleteUserDialog(user)"
                             />
                             <InfoTooltip
-                                v-if="!canEdit(customer)"
-                                :id="`table-tooltip-hint-${customer.id}`"
-                                text="Pelanggan tidak dapat diedit atau dihapus"
+                                v-if="!canEdit(user)"
+                                :id="`table-tooltip-hint-${user.id}`"
+                                text="Pengguna tidak dapat diedit atau dihapus"
                             />
                         </td>
                     </tr>
@@ -273,21 +267,21 @@ onMounted(() => {
             <!-- Mobile View -->
             <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <div
-                    v-if="customers.data.length > 0"
+                    v-if="users.data.length > 0"
                     class="grid grid-cols-1 gap-3 lg:grid-cols-2"
                 >
-                    <MyCustomerCard
-                        v-for="(customer, index) in customers.data"
-                        :key="customer.id"
-                        :customer="customer"
+                    <UserCard
+                        v-for="(user, index) in users.data"
+                        :key="user.id"
+                        :user="user"
                         @edit="
                             $inertia.visit(
-                                route('my-store.customer.edit', {
-                                    customer: customer,
+                                route('admin.user.edit', {
+                                    user: user,
                                 })
                             )
                         "
-                        @delete="openDeleteCustomerDialog(customer)"
+                        @delete="openDeleteUserDialog(user)"
                     />
                 </div>
                 <div v-else class="flex items-center justify-center py-10">
@@ -298,18 +292,18 @@ onMounted(() => {
             </div>
 
             <!-- Pagination -->
-            <div v-if="customers.total > 0" class="flex flex-col gap-2 mt-4">
+            <div v-if="users.total > 0" class="flex flex-col gap-2 mt-4">
                 <p class="text-xs text-gray-500 sm:text-sm">
-                    Menampilkan {{ customers.from }} - {{ customers.to }} dari
-                    {{ customers.total }} item
+                    Menampilkan {{ users.from }} - {{ users.to }} dari
+                    {{ users.total }} item
                 </p>
                 <DefaultPagination
                     :isApi="true"
-                    :links="customers.links"
+                    :links="users.links"
                     @change="
                         (page) => {
                             filters.page = page;
-                            getCustomers();
+                            getUsers();
                         }
                     "
                 />
@@ -317,10 +311,10 @@ onMounted(() => {
         </DefaultCard>
 
         <DeleteConfirmationDialog
-            :show="showDeleteCustomerDialog"
-            :title="`Hapus Pelanggan <b>${selectedCustomer?.name}</b>?`"
-            @close="closeDeleteCustomerDialog()"
-            @delete="deleteCustomer()"
+            :show="showDeleteUserDialog"
+            :title="`Hapus Pengguna <b>${selectedUser?.name}</b>?`"
+            @close="closeDeleteUserDialog()"
+            @delete="deleteUser()"
         />
 
         <SuccessDialog
@@ -343,5 +337,5 @@ onMounted(() => {
                 </div>
             </template>
         </ErrorDialog>
-    </MyStoreLayout>
+    </AdminLayout>
 </template>

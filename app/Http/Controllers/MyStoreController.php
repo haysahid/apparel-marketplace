@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Store;
+use App\Models\User;
 use App\Repositories\StoreRepository;
 use Exception;
 use Illuminate\Http\Request;
@@ -44,8 +45,10 @@ class MyStoreController extends Controller
     public function dashboard()
     {
         $productCount = Product::where('store_id', $this->storeId)->count();
+        $userCount = User::count();
         return Inertia::render('MyStore/Dashboard', [
             'productCount' => $productCount,
+            'userCount' => $userCount,
         ]);
     }
 

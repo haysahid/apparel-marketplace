@@ -86,6 +86,41 @@ class UserRepository
         }
     }
 
+    public static function getUsers(
+        $storeId,
+        $limit = 10,
+        $search = null,
+        $orderBy = 'created_at',
+        $orderDirection = 'desc'
+    ) {
+        $query = User::with(['role']);
+
+        if ($storeId) {
+            $query->whereHas('store_roles', function ($q) use ($storeId) {
+                $q->where('store_id', $storeId);
+            });
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('email', 'like', "%$search%");
+            });
+        }
+
+        return $query->orderBy($orderBy, $orderDirection)
+            ->paginate($limit);
+    }
+
+    public static function getUserDetail($userId)
+    {
+        $user =  User::with(['role', 'stores', 'user_points'])->find($userId);
+
+        return [
+            'user' => $user,
+        ];
+    }
+
     public static function getCustomers(
         $storeId,
         $limit = 10,
