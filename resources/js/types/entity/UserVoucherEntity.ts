@@ -4,7 +4,7 @@ interface UserVoucherEntity {
     voucher_id: string | null;
     usage_count: number | null;
     redeemed_at: string | null;
-    used_at: string | null;
+    last_used_at: string | null;
     expired_at: string | null;
     created_at: string | null;
     updated_at: string | null;

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('unique_code')->unique();
             $table->integer('usage_count')->default(0);
             $table->timestamp('redeemed_at')->nullable();
-            $table->timestamp('used_at')->nullable();
+            $table->timestamp('last_used_at')->nullable();
             $table->timestamp('expired_at')->nullable();
             $table->timestamps();
             $table->softDeletes();

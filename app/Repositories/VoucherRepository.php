@@ -249,7 +249,7 @@ class VoucherRepository
             $existingUserVoucher->increment('usage_count');
 
             if ($use) {
-                $existingUserVoucher->used_at = now();
+                $existingUserVoucher->last_used_at = now();
             }
 
             $existingUserVoucher->updated_at = now();
@@ -258,9 +258,9 @@ class VoucherRepository
             // Redeem the voucher
             $voucher->user_vouchers()->create([
                 'user_id' => $user->id,
-                'unique_code' => strtoupper($voucher->code . '-' . $user->id),
+                'unique_code' => strtoupper($voucher->code . '-' . $user->id . '-' . date('YmdHis')),
                 'redeemed_at' => now(),
-                'used_at' => $use ? now() : null,
+                'last_used_at' => $use ? now() : null,
                 'usage_count' => 1,
                 'expired_at' => self::getVoucherExpiryDate($voucher),
             ]);

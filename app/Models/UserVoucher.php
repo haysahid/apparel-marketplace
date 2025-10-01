@@ -15,7 +15,7 @@ class UserVoucher extends Model
         'unique_code',
         'usage_count',
         'redeemed_at',
-        'used_at',
+        'last_used_at',
         'expired_at',
     ];
 
@@ -26,7 +26,7 @@ class UserVoucher extends Model
 
     public function getStatusAttribute()
     {
-        if ($this->used_at) {
+        if ($this->last_used_at) {
             return 'used';
         }
 
