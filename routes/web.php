@@ -11,6 +11,7 @@ use App\Http\Controllers\MyStore\MyStoreCustomerController;
 use App\Http\Controllers\MyStore\MyStoreOrderController;
 use App\Http\Controllers\MyStore\MyStorePartnerController;
 use App\Http\Controllers\MyStore\MyStorePaymentController;
+use App\Http\Controllers\MyStore\MyStorePointRuleController;
 use App\Http\Controllers\MyStore\MyStoreSizeController;
 use App\Http\Controllers\MyStore\MyStoreTransactionController;
 use App\Http\Controllers\MyStore\MyStoreVoucherController;
@@ -176,6 +177,14 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth:sanctum'])->grou
     // Customer
     Route::get('/customer', [MyStoreCustomerController::class, 'index'])->name('customer');
     Route::get('/customer/{customer}', [MyStoreCustomerController::class, 'show'])->name('customer.show');
+
+    // Point Rule
+    Route::get('/point-rule', [MyStorePointRuleController::class, 'index'])->name('point-rule');
+    Route::get('/point-rule/create', [MyStorePointRuleController::class, 'create'])->name('point-rule.create');
+    Route::post('/point-rule', [MyStorePointRuleController::class, 'store'])->name('point-rule.store');
+    Route::get('/point-rule/{pointRule}', [MyStorePointRuleController::class, 'edit'])->name('point-rule.edit');
+    Route::post('/point-rule/{pointRule}', [MyStorePointRuleController::class, 'update'])->name('point-rule.update');
+    Route::delete('/point-rule/{pointRule}', [MyStorePointRuleController::class, 'destroy'])->name('point-rule.destroy');
 
     // Partner
     Route::get('/partner', [MyStorePartnerController::class, 'index'])->name('partner');

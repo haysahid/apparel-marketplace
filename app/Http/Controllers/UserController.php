@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Store;
 use App\Models\User;
+use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
@@ -96,34 +97,33 @@ class UserController extends Controller
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
-        $data['password'] = Hash::make($data['password']);
-        $data['role_id'] = 3; // Default role for regular users
-
-        $user = User::create($data);
-
-        Auth::login($user);
+        $user = UserRepository::register($data);
 
         $accessToken = $user->createToken('authToken')->plainTextToken;
+
+        Cookie::queue(Cookie::forever(
+            name: 'access_token',
+            value: $accessToken,
+            secure: false,
+            httpOnly: false,
+        ));
 
         $redirectUrl = $request->input('redirect');
 
         if ($redirectUrl) {
             return redirect()->to($redirectUrl)->with([
                 'success' => 'Berhasil masuk.',
-                'access_token' => $accessToken,
             ]);
         }
 
         if ($user->isAdmin()) {
             return redirect()->route('admin.dashboard')->with([
                 'success' => 'Berhasil masuk sebagai admin.',
-                'access_token' => $accessToken,
             ]);
         }
 
         return redirect()->route('home')->with([
             'success' => 'Akun berhasil dibuat. Selamat datang!',
-            'access_token' => $accessToken,
         ]);
     }
 
@@ -177,6 +177,7 @@ class UserController extends Controller
     {
         session()->forget('selected_store_id');
         Auth::logout();
+        Cookie::queue(Cookie::forget('access_token'));
         return redirect()->route('home')->with([
             'success' => 'Berhasil keluar.',
         ]);

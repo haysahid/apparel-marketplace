@@ -6,6 +6,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import InputGroup from "@/Components/InputGroup.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import TextAreaInput from "@/Components/TextAreaInput.vue";
 
 const props = defineProps({
     unit: {
@@ -110,10 +111,9 @@ onMounted(() => {
 
             <!-- Description -->
             <InputGroup id="description" label="Deskripsi (Opsional)">
-                <TextInput
+                <TextAreaInput
                     id="description"
                     v-model="form.description"
-                    type="text"
                     placeholder="Masukkan Deskripsi Satuan"
                     class="block w-full"
                     :error="form.errors.description"

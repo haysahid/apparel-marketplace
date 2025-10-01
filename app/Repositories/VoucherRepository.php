@@ -165,14 +165,26 @@ class VoucherRepository
         return $query->first();
     }
 
-    public static function getAllVouchers($storeId = null, $userId = null)
-    {
-        $vouchers = Voucher::query();
+    public static function getAllVouchers(
+        $storeId = null,
+        $userId = null,
+        $isPublic = null,
+    ) {
+        $vouchers = Voucher::query()->where('is_internal', true);
 
         if ($storeId) {
             $vouchers->where('store_id', $storeId);
         } else {
             $vouchers->whereNull('store_id');
+        }
+
+        if ($isPublic === true) {
+            $vouchers->where(function ($q) use ($userId) {
+                $q->where('is_public', true)
+                    ->orWhereHas('users', function ($q2) use ($userId) {
+                        $q2->where('user_id', $userId);
+                    });
+            });
         }
 
         $vouchers->select([

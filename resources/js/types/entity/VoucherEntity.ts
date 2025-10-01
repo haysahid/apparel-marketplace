@@ -16,6 +16,7 @@ interface VoucherEntity {
     usage_limit: number | null;
     required_points: number | null;
     usage_url: string | null;
+    is_public: boolean;
     is_internal: boolean;
     partner_id: number | null;
     disabled_at: string | null;

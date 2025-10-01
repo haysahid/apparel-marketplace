@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             StoreSeeder::class,
             ProductSeeder::class,
             TransactionSeeder::class,
+            PointRuleSeeder::class,
         ]);
     }
 }

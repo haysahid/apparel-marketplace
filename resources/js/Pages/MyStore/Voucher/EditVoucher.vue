@@ -1,5 +1,4 @@
 <script setup>
-import DefaultCard from "@/Components/DefaultCard.vue";
 import VoucherForm from "./VoucherForm.vue";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 
@@ -14,9 +13,7 @@ const props = defineProps({
 <template>
     <MyStoreLayout title="Ubah Voucher" :showTitle="true">
         <div class="max-w-7xl">
-            <DefaultCard>
-                <VoucherForm :voucher="props.voucher" />
-            </DefaultCard>
+            <VoucherForm :voucher="props.voucher" />
         </div>
     </MyStoreLayout>
 </template>

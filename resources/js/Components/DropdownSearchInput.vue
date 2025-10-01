@@ -2,7 +2,7 @@
 import Dropdown from "@/Components/Dropdown.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
 import TextInput from "@/Components/TextInput.vue";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 interface DropdownOption {
     label: string;
@@ -65,6 +65,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    searchable: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits(["update:modelValue", "clear", "search"]);
@@ -90,6 +94,18 @@ function onFocusout() {
 }
 
 const searchInput = ref(null);
+
+const filteredOptions = computed(() => {
+    if (props.searchable && search.value.length > 0) {
+        return props.options.filter((option) =>
+            option.label
+                .toLowerCase()
+                .includes(search.value.toLowerCase().trim())
+        );
+    } else {
+        return props.options;
+    }
+});
 </script>
 
 <template>
@@ -298,7 +314,7 @@ const searchInput = ref(null);
                 </div>
                 <ul class="overflow-y-auto max-h-60">
                     <li
-                        v-for="option in props.options"
+                        v-for="option in filteredOptions"
                         :key="option.value"
                         class="flex items-center gap-2 px-4 py-2 text-sm cursor-pointer hover:bg-gray-100"
                         :class="

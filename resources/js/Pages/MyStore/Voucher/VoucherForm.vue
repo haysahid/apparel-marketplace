@@ -13,6 +13,8 @@ import DateInput from "@/Components/DateInput.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import Stepper from "@/Components/Stepper.vue";
 import VoucherPreview from "./VoucherPreview.vue";
+import Checkbox from "@/Components/Checkbox.vue";
+import Switch from "@/Components/Switch.vue";
 
 const props = defineProps({
     voucher: {
@@ -62,6 +64,7 @@ const form = useForm(
               usage_limit: null,
               required_points: null,
               usage_url: null,
+              is_public: false,
               is_internal: true,
               partner_id: null,
 
@@ -338,6 +341,20 @@ const scrollToTop = () => {
                                         />
                                     </template>
                                 </InputGroup>
+
+                                <!-- Is Public -->
+                                <InputGroup id="is_public" label="Akses Publik">
+                                    <Switch
+                                        id="is_public"
+                                        v-model="form.is_public"
+                                    />
+                                    <template #suffix>
+                                        <InfoTooltip
+                                            id="is-public-tooltip"
+                                            text="Tandai jika voucher ini dapat diakses oleh publik."
+                                        />
+                                    </template>
+                                </InputGroup>
                             </div>
 
                             <!-- Step 2 -->
@@ -580,7 +597,10 @@ const scrollToTop = () => {
                 </DefaultCard>
 
                 <!-- Preview -->
-                <DefaultCard :isMain="true" class="w-full max-w-sm h-fit">
+                <DefaultCard
+                    :isMain="true"
+                    class="hidden w-full max-w-sm h-fit lg:block"
+                >
                     <VoucherPreview :voucher="(form.data() as VoucherEntity)" />
                 </DefaultCard>
             </div>

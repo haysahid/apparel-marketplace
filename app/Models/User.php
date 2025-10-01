@@ -107,4 +107,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Partner::class);
     }
+
+    public function user_points()
+    {
+        return $this->hasMany(UserPoint::class);
+    }
 }

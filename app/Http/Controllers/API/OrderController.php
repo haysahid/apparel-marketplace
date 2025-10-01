@@ -56,6 +56,7 @@ class OrderController extends Controller
         $vouchers = VoucherRepository::getAllVouchers(
             storeId: $storeId,
             userId: $userId ?? Auth::id(),
+            isPublic: true,
         );
         return ResponseFormatter::success($vouchers);
     }

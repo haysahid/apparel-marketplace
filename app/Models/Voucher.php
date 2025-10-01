@@ -26,9 +26,16 @@ class Voucher extends Model
         'usage_limit',
         'required_points',
         'usage_url',
+        'is_public',
         'is_internal',
         'partner_id',
         'disabled_at',
+    ];
+
+    // Casts
+    protected $casts = [
+        'is_public' => 'boolean',
+        'is_internal' => 'boolean',
     ];
 
     // Relationships

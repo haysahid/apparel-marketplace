@@ -29,6 +29,7 @@ return new class extends Migration
             $table->integer('usage_limit')->nullable();
             $table->integer('required_points')->nullable();
             $table->string('usage_url')->nullable();
+            $table->boolean('is_public')->default(false);
             $table->boolean('is_internal')->default(true);
             $table->foreignId('partner_id')->nullable()->constrained('partners')->onDelete('set null');
             $table->timestamp('disabled_at')->nullable();

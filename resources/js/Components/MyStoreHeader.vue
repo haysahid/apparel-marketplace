@@ -30,7 +30,7 @@ const showStoreOptionsDialog = ref(false);
     >
         <!-- Primary Navigation Menu -->
         <div
-            class="px-4 mx-auto transition-all duration-300 ease-in-out sm:px-6 lg:px-8"
+            class="px-4 mx-auto transition-all duration-300 ease-in-out sm:px-6 lg:px-7"
         >
             <div
                 class="flex items-center justify-between h-16"
@@ -45,7 +45,7 @@ const showStoreOptionsDialog = ref(false);
                     <button
                         v-if="$page.props.selected_store"
                         type="button"
-                        class="flex items-center justify-start w-full gap-2 px-3 py-2 transition-all duration-200 ease-in-out bg-white border border-transparent border-gray-200 rounded-md cursor-pointer hover:bg-gray-100"
+                        class="flex items-center justify-start gap-2 px-3 py-2 transition-all duration-200 ease-in-out bg-white border border-transparent border-gray-200 rounded-md cursor-pointer hover:bg-gray-100"
                         @click="showStoreOptionsDialog = true"
                     >
                         <img

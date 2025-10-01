@@ -33,7 +33,6 @@ class UnitRepository
         }
 
         $units->orderBy($orderBy, $orderDirection);
-        $units->get();
 
         return $units->paginate($limit);
     }

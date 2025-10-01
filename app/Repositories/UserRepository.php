@@ -2,13 +2,66 @@
 
 namespace App\Repositories;
 
+use App\Models\PointRule;
+use App\Models\PointTransaction;
 use App\Models\User;
+use App\Models\UserPoint;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class UserRepository
 {
+    public static function register(array $data)
+    {
+        try {
+            $data['password'] = Hash::make($data['password']);
+            $data['role_id'] = 3; // Default role for regular users
+
+            // Create the user
+            $user = User::create($data);
+
+            // Add user points if rule exists
+            $startingPoint = 0;
+            $onRegisterPointRule = PointRule::where('type', 'on_register')->first();
+
+            if ($onRegisterPointRule) {
+                // Get the points from the point rule
+                $startingPoint = $onRegisterPointRule->points_earned;
+
+                // Create initial point transaction
+                PointTransaction::create([
+                    'user_id' => $user->id,
+                    'points' => $startingPoint,
+                    'type' => 'earn',
+                    'description' => 'Poin awal pendaftaran',
+                    'points_amount' => $startingPoint,
+                    'balance_before' => 0,
+                    'balance_after' => $startingPoint,
+                    'reference_type' => 'point_rule',
+                    'point_rule_id' => $onRegisterPointRule->id,
+                ]);
+            }
+
+            // Create user points record
+            UserPoint::create([
+                'user_id' => $user->id,
+                'current_balance' => $startingPoint,
+                'lifetime_points' => $startingPoint,
+            ]);
+
+            // Automatically log in the user after registration
+            Auth::login($user);
+
+            return $user;
+        } catch (Exception $e) {
+            Log::error('Gagal membuat user: ' . $e);
+            throw $e;
+        }
+    }
+
     public static function createGuestUser(array $data)
     {
         try {
@@ -72,7 +125,11 @@ class UserRepository
 
     public static function getCustomerDetail($customerId)
     {
-        $customer = User::with(['role', 'stores'])->find($customerId);
+        $customer = User::with([
+            'role',
+            'stores',
+            'user_points'
+        ])->find($customerId);
         $invoiceStats = DB::table('invoices')
             ->join('transactions', 'invoices.transaction_id', '=', 'transactions.id')
             ->where('transactions.user_id', $customerId)

@@ -21,13 +21,13 @@ import SearchInput from "@/Components/SearchInput.vue";
 const screenSize = useScreenSize();
 
 const props = defineProps({
-    units: Object as () => PaginationModel<UnitEntity>,
+    pointRules: Object as () => PaginationModel<PointRuleEntity>,
 });
 
-const units = ref<PaginationModel<UnitEntity>>({
-    ...props.units,
-    data: props.units.data.map((unit) => ({
-        ...unit,
+const pointRules = ref<PaginationModel<PointRuleEntity>>({
+    ...props.pointRules,
+    data: props.pointRules.data.map((pointRule) => ({
+        ...pointRule,
         showDeleteModal: false,
     })),
 });
@@ -50,16 +50,16 @@ const queryParams = computed(() => {
     };
 });
 
-function getUnits() {
-    router.get(route("my-store.unit"), queryParams.value, {
+function getPointRules() {
+    router.get(route("my-store.point-rule"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
             getQueryParams();
-            units.value = {
-                ...props.units,
-                data: props.units.data.map((unit) => ({
-                    ...unit,
+            pointRules.value = {
+                ...props.pointRules,
+                data: props.pointRules.data.map((pointRule) => ({
+                    ...pointRule,
                     showDeleteModal: false,
                 })),
             };
@@ -69,38 +69,38 @@ function getUnits() {
     });
 }
 
-const selectedUnit = ref(null);
-const showDeleteUnitDialog = ref(false);
+const selectedPointRule = ref(null);
+const showDeletePointRuleDialog = ref(false);
 
-const openDeleteUnitDialog = (unit) => {
-    if (unit) {
-        selectedUnit.value = unit;
-        showDeleteUnitDialog.value = true;
+const openDeletePointRuleDialog = (pointRule) => {
+    if (pointRule) {
+        selectedPointRule.value = pointRule;
+        showDeletePointRuleDialog.value = true;
     }
 };
 
-const closeDeleteUnitDialog = (result = false) => {
-    showDeleteUnitDialog.value = false;
+const closeDeletePointRuleDialog = (result = false) => {
+    showDeletePointRuleDialog.value = false;
     if (result) {
-        selectedUnit.value = null;
+        selectedPointRule.value = null;
         openSuccessDialog("Data Berhasil Dihapus");
     }
 };
 
-const deleteUnit = () => {
-    if (selectedUnit.value) {
+const deletePointRule = () => {
+    if (selectedPointRule.value) {
         const form = useForm({});
         form.delete(
-            route("my-store.unit.destroy", {
-                unit: selectedUnit.value,
+            route("my-store.point-rule.destroy", {
+                pointRule: selectedPointRule.value,
             }),
             {
                 onError: (errors) => {
                     openErrorDialog(errors.error);
                 },
                 onSuccess: () => {
-                    closeDeleteUnitDialog(true);
-                    getUnits();
+                    closeDeletePointRuleDialog(true);
+                    getPointRules();
                 },
             }
         );
@@ -125,17 +125,19 @@ const openErrorDialog = (message) => {
 
 const page = usePage<CustomPageProps>();
 
-function canEdit(unit) {
+function canEdit(pointRule) {
     return (
         page.props.auth.is_admin ||
-        page.props.auth.user.stores.some((store) => store.id === unit.store_id)
+        page.props.auth.user.stores.some(
+            (store) => store.id === pointRule.store_id
+        )
     );
 }
 
 function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
-            "search-unit"
+            "search-point-rule"
         ) as HTMLInputElement;
         input?.focus({ preventScroll: true });
     });
@@ -150,24 +152,24 @@ onMounted(() => {
 </script>
 
 <template>
-    <MyStoreLayout title="Satuan" :showTitle="true">
+    <MyStoreLayout title="Aturan Poin" :showTitle="true">
         <DefaultCard :isMain="true">
             <div class="flex items-center justify-between gap-4">
                 <PrimaryButton
                     type="button"
                     class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
-                    @click="$inertia.visit(route('my-store.unit.create'))"
+                    @click="$inertia.visit(route('my-store.point-rule.create'))"
                 >
                     Tambah
                 </PrimaryButton>
                 <SearchInput
-                    id="search-unit"
+                    id="search-point-rule"
                     v-model="filters.search"
-                    placeholder="Cari satuan..."
+                    placeholder="Cari aturan poin..."
                     class="max-w-48"
                     @search="
                         filters.page = 1;
-                        getUnits();
+                        getPointRules();
                     "
                 />
             </div>
@@ -175,50 +177,83 @@ onMounted(() => {
             <!-- Table -->
             <DefaultTable
                 v-if="screenSize.is('xl')"
-                :isEmpty="units.data.length === 0"
+                :isEmpty="pointRules.data.length === 0"
                 class="mt-6"
             >
                 <template #thead>
                     <tr>
                         <th class="w-12">No</th>
-                        <th>Nama Satuan</th>
+                        <th>Nama Aturan</th>
+                        <th>Jenis</th>
+                        <th>Poin</th>
                         <th>Deskripsi</th>
+                        <th>Tgl. Berlaku</th>
+                        <th>Tgl. Kadaluarsa</th>
                         <th class="w-24">Aksi</th>
                     </tr>
                 </template>
                 <template #tbody>
-                    <tr v-for="(unit, index) in units.data" :key="unit.id">
+                    <tr
+                        v-for="(pointRule, index) in pointRules.data"
+                        :key="pointRule.id"
+                    >
                         <td>
                             {{
                                 index +
                                 1 +
-                                (props.units.current_page - 1) *
-                                    props.units.per_page
+                                (props.pointRules.current_page - 1) *
+                                    props.pointRules.per_page
                             }}
                         </td>
                         <td>
-                            {{ unit.name }}
+                            {{ pointRule.name }}
                         </td>
+                        <td>
+                            <div
+                                class="px-2 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded-md w-fit"
+                            >
+                                {{ pointRule.type.replaceAll("_", " ") }}
+                            </div>
+                        </td>
+                        <td>+{{ pointRule.points_earned }}</td>
                         <td class="!whitespace-normal">
-                            {{ unit.description }}
+                            <p class="line-clamp-2">
+                                {{ pointRule.description }}
+                            </p>
+                        </td>
+                        <td>
+                            {{
+                                $formatDate(pointRule.valid_from, {
+                                    dateStyle: "medium",
+                                }) ?? "-"
+                            }}
+                        </td>
+                        <td>
+                            {{
+                                $formatDate(pointRule.valid_until, {
+                                    dateStyle: "medium",
+                                }) ?? "-"
+                            }}
                         </td>
                         <td>
                             <div class="flex items-center justify-start gap-2">
                                 <AdminItemAction
-                                    v-if="canEdit(unit)"
+                                    v-if="canEdit(pointRule)"
                                     @edit="
                                         $inertia.visit(
-                                            route('my-store.unit.edit', {
-                                                unit: unit,
+                                            route('my-store.point-rule.edit', {
+                                                pointRule: pointRule,
                                             })
                                         )
                                     "
-                                    @delete="openDeleteUnitDialog(unit)"
+                                    @delete="
+                                        openDeletePointRuleDialog(pointRule)
+                                    "
                                 />
                                 <InfoTooltip
-                                    v-if="!canEdit(unit)"
-                                    :id="`table-tooltip-hint-${unit.id}`"
-                                    text="Satuan bawaan sistem"
+                                    v-if="!canEdit(pointRule)"
+                                    :id="`table-tooltip-hint-${pointRule.id}`"
+                                    text="Aturan bawaan sistem"
                                 />
                             </div>
                         </td>
@@ -229,38 +264,32 @@ onMounted(() => {
             <!-- Mobile View -->
             <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <div
-                    v-if="units.data.length > 0"
+                    v-if="pointRules.data.length > 0"
                     class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                 >
                     <AdminItemCard
-                        v-for="(unit, index) in units.data"
-                        :key="unit.id"
-                        :name="unit.name"
-                        :description="unit.description"
+                        v-for="(pointRule, index) in pointRules.data"
+                        :key="pointRule.id"
+                        :name="pointRule.name"
+                        :description="pointRule.type.replaceAll('_', ' ')"
                         :showImage="false"
-                        :hideActions="!canEdit(unit)"
-                        disabledHint="Satuan bawaan sistem"
+                        :hideActions="!canEdit(pointRule)"
+                        disabledHint="Aturan bawaan sistem"
                         @edit="
                             $inertia.visit(
-                                route('my-store.unit.edit', {
-                                    unit: unit,
+                                route('my-store.point-rule.edit', {
+                                    pointRule: pointRule,
                                 })
                             )
                         "
-                        @delete="openDeleteUnitDialog(unit)"
+                        @delete="openDeletePointRuleDialog(pointRule)"
                     >
                         <template #leading>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="26"
-                                height="27"
-                                viewBox="0 0 26 27"
-                                class="fill-gray-500 size-8 shrink-0"
+                            <p
+                                class="w-16 text-lg font-bold text-center text-yellow-600"
                             >
-                                <path
-                                    d="M5.41667 22.75C4.82083 22.75 4.31094 22.538 3.887 22.1141C3.46306 21.6901 3.25072 21.1799 3.25 20.5833V7.06876C3.25 6.81598 3.29081 6.57223 3.37242 6.33751C3.45403 6.10278 3.57572 5.88612 3.7375 5.68751L5.09167 4.03542C5.29028 3.78264 5.53836 3.58837 5.83592 3.45259C6.13347 3.31681 6.44511 3.24928 6.77083 3.25001H19.2292C19.5542 3.25001 19.8658 3.31789 20.1641 3.45367C20.4624 3.58945 20.7104 3.78337 20.9083 4.03542L22.2625 5.68751C22.425 5.88612 22.5471 6.10278 22.6287 6.33751C22.7103 6.57223 22.7507 6.81598 22.75 7.06876V20.5833C22.75 21.1792 22.538 21.6894 22.1141 22.1141C21.6901 22.5388 21.1799 22.7507 20.5833 22.75H5.41667ZM5.85 6.50001H20.15L19.2292 5.41667H6.77083L5.85 6.50001ZM17.3333 8.66667H8.66667V17.3333L13 15.1667L17.3333 17.3333V8.66667Z"
-                                />
-                            </svg>
+                                +{{ pointRule.points_earned }}
+                            </p>
                         </template>
                     </AdminItemCard>
                 </div>
@@ -272,18 +301,18 @@ onMounted(() => {
             </div>
 
             <!-- Pagination -->
-            <div v-if="units.total > 0" class="flex flex-col gap-2 mt-4">
+            <div v-if="pointRules.total > 0" class="flex flex-col gap-2 mt-4">
                 <p class="text-xs text-gray-500 sm:text-sm">
-                    Menampilkan {{ units.from }} - {{ units.to }} dari
-                    {{ units.total }} item
+                    Menampilkan {{ pointRules.from }} - {{ pointRules.to }} dari
+                    {{ pointRules.total }} item
                 </p>
                 <DefaultPagination
                     :isApi="true"
-                    :links="units.links"
+                    :links="pointRules.links"
                     @change="
                         (page) => {
                             filters.page = page;
-                            getUnits();
+                            getPointRules();
                         }
                     "
                 />
@@ -291,10 +320,10 @@ onMounted(() => {
         </DefaultCard>
 
         <DeleteConfirmationDialog
-            :show="showDeleteUnitDialog"
-            :title="`Hapus Kategori <b>${selectedUnit?.name}</b>?`"
-            @close="closeDeleteUnitDialog()"
-            @delete="deleteUnit()"
+            :show="showDeletePointRuleDialog"
+            :title="`Hapus Kategori <b>${selectedPointRule?.name}</b>?`"
+            @close="closeDeletePointRuleDialog()"
+            @delete="deletePointRule()"
         />
 
         <SuccessDialog

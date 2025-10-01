@@ -70,6 +70,7 @@ class MyStoreVoucherController extends Controller
             'usage_limit' => 'nullable|integer|min:0',
             'required_points' => 'nullable|integer|min:0',
             'usage_url' => 'nullable|url',
+            'is_public' => 'nullable|boolean',
             'is_internal' => 'nullable|boolean',
             'partner_id' => 'nullable|exists:partners,id',
         ], [
@@ -105,6 +106,7 @@ class MyStoreVoucherController extends Controller
             'required_points.integer' => 'Poin yang dibutuhkan harus berupa angka bulat.',
             'required_points.min' => 'Poin yang dibutuhkan minimal 0.',
             'usage_url.url' => 'URL penggunaan tidak valid.',
+            'is_public.boolean' => 'Nilai publik tidak valid.',
             'is_internal.boolean' => 'Nilai internal tidak valid.',
             'partner_id.exists' => 'Mitra tidak ditemukan.',
         ]);
@@ -155,6 +157,7 @@ class MyStoreVoucherController extends Controller
             'usage_limit' => 'nullable|integer|min:0',
             'required_points' => 'nullable|integer|min:0',
             'usage_url' => 'nullable|url',
+            'is_public' => 'nullable|boolean',
             'is_internal' => 'nullable|boolean',
             'partner_id' => 'nullable|exists:partners,id',
         ], [
@@ -191,6 +194,7 @@ class MyStoreVoucherController extends Controller
             'required_points.integer' => 'Poin yang dibutuhkan harus berupa angka bulat.',
             'required_points.min' => 'Poin yang dibutuhkan minimal 0.',
             'usage_url.url' => 'URL penggunaan tidak valid.',
+            'is_public.boolean' => 'Nilai publik tidak valid.',
             'is_internal.boolean' => 'Nilai internal tidak valid.',
             'partner_id.exists' => 'Mitra tidak ditemukan.',
         ]);
