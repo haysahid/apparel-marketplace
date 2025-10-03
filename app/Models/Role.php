@@ -14,6 +14,11 @@ class Role extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class, 'user_store_role')->withTimestamps()->withPivot('store_id');
+    }
+
+    public function stores()
+    {
+        return $this->belongsToMany(Store::class, 'user_store_role')->withTimestamps()->withPivot('user_id');
     }
 }

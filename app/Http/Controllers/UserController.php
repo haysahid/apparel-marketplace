@@ -6,6 +6,7 @@ use App\Models\Store;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
@@ -16,17 +17,7 @@ class UserController extends Controller
 {
     public function login()
     {
-        $store = Store::with([
-            'advantages',
-            'certificates' => function ($query) {
-                $query->limit(5);
-            },
-            'social_links',
-        ])->first();
-
-        return Inertia::render('Auth/Login', [
-            'store' => $store,
-        ]);
+        return Inertia::render('Auth/Login');
     }
 
     public function loginProcess(Request $request)
@@ -37,14 +28,14 @@ class UserController extends Controller
             $user = User::find(Auth::id());
             $accessToken = $user->createToken('authToken')->plainTextToken;
 
-            $redirectUrl = $request->input('redirect');
-
             Cookie::queue(Cookie::forever(
                 name: 'access_token',
                 value: $accessToken,
                 secure: false,
                 httpOnly: false,
             ));
+
+            $redirectUrl = $request->input('redirect');
 
             if ($redirectUrl) {
                 return redirect()->to($redirectUrl)->with([
@@ -176,8 +167,8 @@ class UserController extends Controller
     public function logout()
     {
         session()->forget('selected_store_id');
-        Auth::logout();
         Cookie::queue(Cookie::forget('access_token'));
+        Auth::logout();
         return redirect()->route('home')->with([
             'success' => 'Berhasil keluar.',
         ]);

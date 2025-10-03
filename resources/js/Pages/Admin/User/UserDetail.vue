@@ -4,10 +4,72 @@ import { Link } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { getWhatsAppLink } from "@/plugins/helpers";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
+import SummaryCard from "@/Components/SummaryCard.vue";
+import { ref } from "vue";
+import axios from "axios";
+import cookieManager from "@/plugins/cookie-manager";
+import ThreeDotsLoading from "@/Components/ThreeDotsLoading.vue";
+import DefaultPagination from "@/Components/DefaultPagination.vue";
+import WhatsAppButton from "@/Components/WhatsAppButton.vue";
 
 const props = defineProps({
     user: Object as () => UserEntity,
 });
+
+const pointTransactions = ref<PaginationModel<PointTransactionEntity>>(null);
+const getPointTransactionsStatus = ref(null);
+const pointTransactionFilter = ref({
+    page: 1,
+    limit: 5,
+});
+
+function getPointTransactions() {
+    getPointTransactionsStatus.value = "loading";
+    axios
+        .get(`/api/admin/user/${props.user?.id}/point-transaction`, {
+            params: {
+                page: pointTransactionFilter.value.page,
+                limit: pointTransactionFilter.value.limit,
+            },
+            headers: {
+                Authorization: `Bearer ${cookieManager.getItem(
+                    "access_token"
+                )}`,
+            },
+        })
+        .then((response) => {
+            pointTransactions.value = response.data.result;
+            getPointTransactionsStatus.value = "success";
+        })
+        .catch((error) => {
+            console.error("Error fetching point transactions:", error);
+            getPointTransactionsStatus.value = "error";
+        });
+}
+getPointTransactions();
+
+const userVouchers = ref<PaginationModel<UserVoucherEntity>>(null);
+const getVouchersStatus = ref(null);
+function getUserVouchers() {
+    getVouchersStatus.value = "loading";
+    axios
+        .get(`/api/admin/user/${props.user.id}/voucher`, {
+            headers: {
+                Authorization: `Bearer ${cookieManager.getItem(
+                    "access_token"
+                )}`,
+            },
+        })
+        .then((response) => {
+            userVouchers.value = response.data.result;
+            getVouchersStatus.value = "success";
+        })
+        .catch((error) => {
+            console.error("Error fetching vouchers:", error);
+            getVouchersStatus.value = "error";
+        });
+}
+getUserVouchers();
 </script>
 
 <template>
@@ -112,6 +174,54 @@ const props = defineProps({
                                     {{ props.user.role?.name }}
                                 </span>
                             </div>
+                            <div
+                                v-if="props.user.address"
+                                class="flex items-center gap-0.5"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    class="inline-block mr-1 size-5 fill-gray-400 shrink-0"
+                                >
+                                    <path
+                                        d="M12 2C16.6945 2 20.5 5.8055 20.5 10.5C20.5033 12.5106 19.7908 14.4568 18.49 15.99L18.489 15.9905L18.481 16H18.5L13.4555 21.3545C13.2685 21.5529 13.043 21.711 12.7927 21.819C12.5424 21.9271 12.2726 21.9828 12 21.9828C11.7274 21.9828 11.4576 21.9271 11.2074 21.819C10.9571 21.711 10.7315 21.5529 10.5445 21.3545L5.50002 16H5.51902L5.51002 15.99L5.50002 15.9775C5.17673 15.5946 4.88793 15.1838 4.63702 14.75C3.8894 13.4586 3.49711 11.9922 3.50002 10.5C3.50002 5.8055 7.30552 2 12 2ZM12 7.5C11.2044 7.5 10.4413 7.81607 9.8787 8.37868C9.31609 8.94129 9.00002 9.70435 9.00002 10.5C9.00002 11.2956 9.31609 12.0587 9.8787 12.6213C10.4413 13.1839 11.2044 13.5 12 13.5C12.7957 13.5 13.5587 13.1839 14.1213 12.6213C14.6839 12.0587 15 11.2956 15 10.5C15 9.70435 14.6839 8.94129 14.1213 8.37868C13.5587 7.81607 12.7957 7.5 12 7.5Z"
+                                    />
+                                </svg>
+                                <span>
+                                    {{ props.user.address }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Store Role Pairs -->
+                        <div
+                            v-if="props.user.store_role_pairs?.length"
+                            class="flex flex-wrap items-start justify-center w-full text-sm text-gray-600 max-sm:flex-col sm:justify-start gap-x-6 gap-y-1"
+                        >
+                            <div
+                                v-for="pair in props.user.store_role_pairs"
+                                :key="pair.store?.id + '-' + pair.role?.id"
+                                class="flex items-center gap-0.5 text-sm text-gray-600"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    class="inline-block mr-1 size-5 fill-gray-400"
+                                >
+                                    <path
+                                        d="M4.33333 6.49992V4.33325H21.6667V6.49992H4.33333ZM4.33333 21.6666V15.1666H3.25V12.9999L4.33333 7.58325H21.6667L22.75 12.9999V15.1666H21.6667V21.6666H19.5V15.1666H15.1667V21.6666H4.33333ZM6.5 19.4999H13V15.1666H6.5V19.4999Z"
+                                    />
+                                </svg>
+                                <span>
+                                    {{ pair.store?.name || "Tidak ada toko" }}
+                                    -
+                                    {{ pair.role?.name || "Tidak ada peran" }}
+                                </span>
+                            </div>
                         </div>
                     </div>
 
@@ -126,28 +236,217 @@ const props = defineProps({
                         target="_blank"
                         class="mt-2"
                     >
-                        <PrimaryButton
+                        <WhatsAppButton
+                            type="button"
                             @click="$event.stopPropagation()"
-                            class="px-3 py-1 text-sm text-white !bg-green-600 rounded-md hover:!bg-green-700 focus:!ring-green-600 focus:!ring-offset-2 focus:!ring-2 focus:!bg-green-700"
                         >
-                            <template #prefix>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="25"
-                                    viewBox="0 0 24 25"
-                                    class="fill-white size-5"
-                                >
-                                    <path
-                                        d="M19.0498 5.60488C18.1329 4.67898 17.0408 3.94484 15.8373 3.44524C14.6338 2.94564 13.3429 2.69056 12.0398 2.69488C6.5798 2.69488 2.1298 7.14488 2.1298 12.6049C2.1298 14.3549 2.5898 16.0549 3.4498 17.5549L2.0498 22.6949L7.2998 21.3149C8.7498 22.1049 10.3798 22.5249 12.0398 22.5249C17.4998 22.5249 21.9498 18.0749 21.9498 12.6149C21.9498 9.96488 20.9198 7.47488 19.0498 5.60488ZM12.0398 20.8449C10.5598 20.8449 9.1098 20.4449 7.8398 19.6949L7.5398 19.5149L4.4198 20.3349L5.2498 17.2949L5.0498 16.9849C4.22735 15.6719 3.79073 14.1542 3.7898 12.6049C3.7898 8.06488 7.4898 4.36488 12.0298 4.36488C14.2298 4.36488 16.2998 5.22488 17.8498 6.78488C18.6174 7.54874 19.2257 8.45742 19.6394 9.45821C20.0531 10.459 20.264 11.532 20.2598 12.6149C20.2798 17.1549 16.5798 20.8449 12.0398 20.8449ZM16.5598 14.6849C16.3098 14.5649 15.0898 13.9649 14.8698 13.8749C14.6398 13.7949 14.4798 13.7549 14.3098 13.9949C14.1398 14.2449 13.6698 14.8049 13.5298 14.9649C13.3898 15.1349 13.2398 15.1549 12.9898 15.0249C12.7398 14.9049 11.9398 14.6349 10.9998 13.7949C10.2598 13.1349 9.7698 12.3249 9.6198 12.0749C9.4798 11.8249 9.5998 11.6949 9.7298 11.5649C9.8398 11.4549 9.9798 11.2749 10.0998 11.1349C10.2198 10.9949 10.2698 10.8849 10.3498 10.7249C10.4298 10.5549 10.3898 10.4149 10.3298 10.2949C10.2698 10.1749 9.7698 8.95488 9.5698 8.45488C9.3698 7.97488 9.1598 8.03488 9.0098 8.02488H8.5298C8.3598 8.02488 8.0998 8.08488 7.8698 8.33488C7.6498 8.58488 7.0098 9.18488 7.0098 10.4049C7.0098 11.6249 7.89981 12.8049 8.0198 12.9649C8.1398 13.1349 9.7698 15.6349 12.2498 16.7049C12.8398 16.9649 13.2998 17.1149 13.6598 17.2249C14.2498 17.4149 14.7898 17.3849 15.2198 17.3249C15.6998 17.2549 16.6898 16.7249 16.8898 16.1449C17.0998 15.5649 17.0998 15.0749 17.0298 14.9649C16.9598 14.8549 16.8098 14.8049 16.5598 14.6849Z"
-                                    />
-                                </svg>
-                            </template>
                             Hubungi
-                        </PrimaryButton>
+                        </WhatsAppButton>
                     </Link>
                 </div>
             </DefaultCard>
+
+            <!-- Summary -->
+            <div class="grid w-full grid-cols-2 gap-1 lg:grid-cols-4 sm:gap-2">
+                <SummaryCard
+                    title="Poin Saat Ini"
+                    :value="
+                        $formatNumber(
+                            props.user.user_points[0]?.current_balance || 0
+                        )
+                    "
+                />
+                <SummaryCard
+                    title="Total Poin Diperoleh"
+                    :value="
+                        $formatNumber(
+                            props.user.user_points[0]?.lifetime_points || 0
+                        )
+                    "
+                />
+            </div>
+
+            <div class="flex flex-col w-full gap-1 lg:flex-row sm:gap-2">
+                <!-- Point Transactions -->
+                <DefaultCard class="w-full">
+                    <h3 class="font-semibold text-gray-900">Riwayat Poin</h3>
+                    <div class="w-full mt-2.5">
+                        <div
+                            v-if="pointTransactions?.data?.length"
+                            class="flex flex-col w-full gap-2"
+                        >
+                            <div
+                                v-for="pointTransaction in pointTransactions.data"
+                                :key="pointTransaction.id"
+                                class="flex items-center justify-between gap-2.5 p-2.5 sm:gap-3 sm:p-4 transition-all duration-300 ease-in-out border border-gray-200 rounded-lg hover:border-primary-light hover:ring-1 hover:ring-primary-light"
+                            >
+                                <div class="flex flex-col">
+                                    <p class="font-medium text-gray-900">
+                                        {{ pointTransaction.description }}
+                                    </p>
+                                    <p class="text-sm text-gray-500">
+                                        {{
+                                            $formatDate(
+                                                pointTransaction.created_at
+                                            )
+                                        }}
+                                    </p>
+                                </div>
+                                <p
+                                    class="text-lg font-bold text-center"
+                                    :class="{
+                                        'text-green-600':
+                                            pointTransaction.points_amount > 0,
+                                        'text-red-600':
+                                            pointTransaction.points_amount < 0,
+                                    }"
+                                >
+                                    {{
+                                        pointTransaction.points_amount > 0
+                                            ? "+" +
+                                              $formatNumber(
+                                                  pointTransaction.points_amount
+                                              )
+                                            : $formatNumber(
+                                                  pointTransaction.points_amount
+                                              )
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+                        <div
+                            v-else
+                            class="flex items-center justify-center h-[10vh] mb-6"
+                        >
+                            <ThreeDotsLoading
+                                v-if="getPointTransactionsStatus === 'loading'"
+                            />
+                            <p v-else class="text-sm text-center text-gray-500">
+                                Data tidak ditemukan.
+                            </p>
+                        </div>
+                    </div>
+                    <div
+                        v-if="pointTransactions?.total > 0"
+                        class="flex flex-col gap-2 mt-4"
+                    >
+                        <p class="text-xs text-gray-500 sm:text-sm">
+                            Menampilkan {{ pointTransactions.from }} -
+                            {{ pointTransactions.to }} dari
+                            {{ pointTransactions.total }} item
+                        </p>
+                        <DefaultPagination
+                            :links="pointTransactions.links"
+                            :isApi="true"
+                            @change="
+                                (page) => {
+                                    pointTransactionFilter.page = page;
+                                    getPointTransactions();
+                                }
+                            "
+                        />
+                    </div>
+                </DefaultCard>
+
+                <!-- Voucher -->
+                <DefaultCard class="w-full h-fit">
+                    <h3 class="font-semibold text-gray-900">Voucher</h3>
+                    <div class="w-full mt-2.5">
+                        <div
+                            v-if="userVouchers && userVouchers.data.length"
+                            class="flex flex-col w-full gap-2"
+                        >
+                            <div
+                                v-for="userVoucher in userVouchers.data"
+                                :key="userVoucher.id"
+                                class="flex items-center gap-2.5 p-3 border border-gray-200 rounded-lg"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="26"
+                                    height="26"
+                                    viewBox="0 0 26 26"
+                                    class="fill-gray-500 size-8 shrink-0"
+                                >
+                                    <path
+                                        d="M4.33317 4.33325C3.75853 4.33325 3.20743 4.56153 2.80111 4.96785C2.39478 5.37418 2.1665 5.92528 2.1665 6.49992V10.8333C2.74114 10.8333 3.29224 11.0615 3.69857 11.4679C4.1049 11.8742 4.33317 12.4253 4.33317 12.9999C4.33317 13.5746 4.1049 14.1257 3.69857 14.532C3.29224 14.9383 2.74114 15.1666 2.1665 15.1666V19.4999C2.1665 20.0746 2.39478 20.6257 2.80111 21.032C3.20743 21.4383 3.75853 21.6666 4.33317 21.6666H21.6665C22.2411 21.6666 22.7922 21.4383 23.1986 21.032C23.6049 20.6257 23.8332 20.0746 23.8332 19.4999V15.1666C23.2585 15.1666 22.7074 14.9383 22.3011 14.532C21.8948 14.1257 21.6665 13.5746 21.6665 12.9999C21.6665 12.4253 21.8948 11.8742 22.3011 11.4679C22.7074 11.0615 23.2585 10.8333 23.8332 10.8333V6.49992C23.8332 5.92528 23.6049 5.37418 23.1986 4.96785C22.7922 4.56153 22.2411 4.33325 21.6665 4.33325H4.33317ZM16.7915 7.58325L18.4165 9.20825L9.20817 18.4166L7.58317 16.7916L16.7915 7.58325ZM9.544 7.62659C10.6057 7.62659 11.4615 8.48242 11.4615 9.54409C11.4615 10.0526 11.2595 10.5404 10.8999 10.9C10.5403 11.2596 10.0526 11.4616 9.544 11.4616C8.48234 11.4616 7.6265 10.6058 7.6265 9.54409C7.6265 9.03553 7.82853 8.54781 8.18813 8.18821C8.54773 7.82861 9.03545 7.62659 9.544 7.62659ZM16.4557 14.5383C17.5173 14.5383 18.3732 15.3941 18.3732 16.4558C18.3732 16.9643 18.1711 17.452 17.8115 17.8116C17.4519 18.1712 16.9642 18.3733 16.4557 18.3733C15.394 18.3733 14.5382 17.5174 14.5382 16.4558C14.5382 15.9472 14.7402 15.4595 15.0998 15.0999C15.4594 14.7403 15.9471 14.5383 16.4557 14.5383Z"
+                                    />
+                                </svg>
+                                <div class="flex flex-col w-full gap-1">
+                                    <div
+                                        class="flex items-center justify-between"
+                                    >
+                                        <p
+                                            class="text-sm font-semibold text-gray-900"
+                                        >
+                                            {{ userVoucher.voucher.name }}
+                                        </p>
+                                        <div
+                                            class="flex items-center justify-center"
+                                        >
+                                            <span
+                                                v-if="
+                                                    userVoucher.status ===
+                                                    'active'
+                                                "
+                                                class="px-1.5 py-0.5 text-xs font-medium text-green-800 bg-green-100 rounded-md"
+                                                >Aktif</span
+                                            >
+                                            <span
+                                                v-else-if="
+                                                    userVoucher.status ===
+                                                    'used'
+                                                "
+                                                class="px-1.5 py-0.5 text-xs font-medium text-blue-800 bg-blue-100 rounded-md"
+                                                >Terpakai</span
+                                            >
+                                            <span
+                                                v-else-if="
+                                                    userVoucher.status ===
+                                                    'expired'
+                                                "
+                                                class="px-1.5 py-0.5 text-xs font-medium text-red-800 bg-red-100 rounded-md"
+                                                >Kadaluarsa</span
+                                            >
+                                            <span
+                                                v-else
+                                                class="px-1.5 py-0.5 text-xs font-medium text-gray-800 bg-gray-100 rounded-md"
+                                                >Tidak Aktif</span
+                                            >
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex items-center justify-between"
+                                    >
+                                        <p class="text-xs text-gray-600">
+                                            {{ userVoucher.voucher.code }}
+                                        </p>
+                                        <p
+                                            class="text-xs text-gray-600 text-nowrap"
+                                        >
+                                            {{ userVoucher.usage_count }}/{{
+                                                userVoucher.voucher
+                                                    .usage_limit ?? "∞"
+                                            }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            v-else
+                            class="flex items-center justify-center h-[10vh] mb-6"
+                        >
+                            <ThreeDotsLoading
+                                v-if="getVouchersStatus === 'loading'"
+                            />
+                            <p v-else class="text-sm text-center text-gray-500">
+                                Data tidak ditemukan.
+                            </p>
+                        </div>
+                    </div>
+                </DefaultCard>
+            </div>
         </div>
     </AdminLayout>
 </template>

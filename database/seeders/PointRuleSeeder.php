@@ -16,7 +16,7 @@ class PointRuleSeeder extends Seeder
         PointRule::insert([
             [
                 'store_id' => 1,
-                'name' => 'Pembelian Produk',
+                'name' => 'Pembelian',
                 'description' => 'Dapatkan 10 poin untuk setiap pembelian di toko kami minimal Rp 100.000. Poin dapat ditukarkan dengan voucher diskon di pembelian berikutnya.',
                 'type' => 'per_transaction',
                 'min_spend' => 100000,

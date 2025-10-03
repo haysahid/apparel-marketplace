@@ -50,7 +50,7 @@ class PointTransaction extends Model
         return $this->belongsTo(User::class, 'admin_id');
     }
 
-    public function pointRule()
+    public function point_rule()
     {
         return $this->belongsTo(PointRule::class);
     }

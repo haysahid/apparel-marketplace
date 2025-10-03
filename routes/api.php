@@ -10,6 +10,7 @@ use App\Http\Controllers\API\ProductVariantController;
 use App\Http\Controllers\API\ProductVariantImageController;
 use App\Http\Controllers\API\ReportController;
 use App\Http\Controllers\API\ShippingMethodController;
+use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\VoucherController;
 use App\Http\Controllers\InvoiceController;
 use Illuminate\Http\Request;
@@ -49,6 +50,9 @@ Route::name('api.')->group(function () {
 // Admin Routes
 Route::name('api.admin.')->prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('product-image', ProductImageController::class);
+    Route::apiResource('user', UserController::class);
+    Route::get('user/{userId}/point-transaction', [UserController::class, 'getUserPointTransactions'])->name('user.point-transaction');
+    Route::get('user/{userId}/voucher', [UserController::class, 'getUserVouchers'])->name('user.voucher');
 });
 
 // My Store Routes

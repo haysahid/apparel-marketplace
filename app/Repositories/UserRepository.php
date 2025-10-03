@@ -6,6 +6,7 @@ use App\Models\PointRule;
 use App\Models\PointTransaction;
 use App\Models\User;
 use App\Models\UserPoint;
+use App\Models\UserVoucher;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +26,7 @@ class UserRepository
 
             // Add user points if rule exists
             $startingPoint = 0;
-            $onRegisterPointRule = PointRule::where('type', 'on_register')->first();
+            $onRegisterPointRule = PointRule::where('type', 'on_signup')->first();
 
             if ($onRegisterPointRule) {
                 // Get the points from the point rule
@@ -87,13 +88,17 @@ class UserRepository
     }
 
     public static function getUsers(
-        $storeId,
+        $storeId = null,
         $limit = 10,
         $search = null,
         $orderBy = 'created_at',
         $orderDirection = 'desc'
     ) {
-        $query = User::with(['role']);
+        $query = User::with([
+            'role',
+            'stores',
+            'store_roles',
+        ]);
 
         if ($storeId) {
             $query->whereHas('store_roles', function ($q) use ($storeId) {
@@ -108,17 +113,120 @@ class UserRepository
             });
         }
 
-        return $query->orderBy($orderBy, $orderDirection)
+        $users = $query->orderBy($orderBy, $orderDirection)
             ->paginate($limit);
+
+        // Attach store-role pairs for each user
+        $users->getCollection()->transform(function ($user) {
+            $user->store_role_pairs = $user->getStoreRolePairsAttribute();
+            $user->makeHidden([
+                'stores',
+                'store_roles'
+            ]);
+            return $user;
+        });
+
+        return $users;
     }
 
     public static function getUserDetail($userId)
     {
-        $user =  User::with(['role', 'stores', 'user_points'])->find($userId);
+        $user =  User::with([
+            'role',
+            'stores',
+            'store_roles',
+            'user_points'
+        ])->find($userId);
+
+        $user->store_role_pairs = $user->getStoreRolePairsAttribute();
+        $user->makeHidden([
+            'stores',
+            'store_roles'
+        ]);
 
         return [
             'user' => $user,
         ];
+    }
+
+    public static function getUserVouchers(
+        $storeId = null,
+        $limit = 5,
+        $search = null,
+        $orderBy = 'created_at',
+        $orderDirection = 'desc',
+        $userId = null,
+        $activeOnly = true,
+    ) {
+        $query = UserVoucher::query();
+
+        $query->with(['voucher']);
+
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+
+        if ($storeId) {
+            $query->whereHas('voucher', function ($q) use ($storeId) {
+                $q->where('store_id', $storeId);
+            });
+        }
+
+        if ($activeOnly) {
+            $query->whereHas('voucher', function ($q) {
+                $q->whereNull('disabled_at')
+                    ->where(function ($q2) {
+                        $q2->where('redeem_start_date', '<=', now())
+                            ->orWhereNull('redeem_start_date');
+                    })
+                    ->where(function ($q2) {
+                        $q2->where('redeem_end_date', '>=', now())
+                            ->orWhereNull('redeem_end_date');
+                    });
+            });
+        }
+
+        if ($search) {
+            $query->whereHas('voucher', function ($q) use ($search) {
+                $q->where(function ($subQuery) use ($search) {
+                    $subQuery->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('code', 'like', '%' . $search . '%')
+                        ->orWhere('description', 'like', '%' . $search . '%');
+                });
+            });
+        }
+
+        return $query->orderBy($orderBy, $orderDirection)->paginate($limit);
+    }
+
+    public static function getUserPointTransactions(
+        $userId,
+        $limit = 5,
+        $search = null,
+        $orderBy = 'created_at',
+        $orderDirection = 'desc',
+        $type = null,
+    ) {
+        $query = PointTransaction::with([
+            'transaction',
+            'voucher',
+            'admin',
+            'point_rule',
+        ])->where('user_id', $userId);
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('description', 'like', "%$search%")
+                    ->orWhere('type', 'like', "%$search%");
+            });
+        }
+
+        return $query->orderBy($orderBy, $orderDirection)
+            ->paginate($limit);
     }
 
     public static function getCustomers(
@@ -162,7 +270,7 @@ class UserRepository
     {
         $customer = User::with([
             'role',
-            'stores',
+            'store_roles',
             'user_points'
         ])->find($customerId);
         $invoiceStats = DB::table('invoices')

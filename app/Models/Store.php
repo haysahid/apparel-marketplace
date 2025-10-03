@@ -30,7 +30,7 @@ class Store extends Model
     // Relationships
     public function users()
     {
-        return $this->belongsToMany(User::class, 'store_users')->withPivot('role');
+        return $this->belongsToMany(User::class, 'user_store_role')->withTimestamps()->withPivot(['store_id', 'role_id']);
     }
 
     public function advantages()

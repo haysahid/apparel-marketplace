@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AdminItemAction from "@/Components/AdminItemAction.vue";
 import { Link } from "@inertiajs/vue3";
 
 const props = defineProps({
@@ -118,9 +119,9 @@ const emit = defineEmits(["edit"]);
             </div>
         </div>
 
-        <!-- <AdminItemAction
+        <AdminItemAction
             class="absolute top-2.5 right-2.5 sm:top-4 sm:right-4"
             @edit="emit('edit')"
-        /> -->
+        />
     </div>
 </template>

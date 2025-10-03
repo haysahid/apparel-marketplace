@@ -72,6 +72,19 @@ class User extends Authenticatable
         ];
     }
 
+    // Additional Attributes
+    public function getStoreRolePairsAttribute()
+    {
+        $storesById = $this->stores->keyBy('id');
+        return $this->store_roles->map(function ($storeRole) use ($storesById) {
+            $store = $storesById->get($storeRole->pivot->store_id, null);
+            return [
+                'store' => $store,
+                'role' => $storeRole,
+            ];
+        });
+    }
+
     // Relationships
     public function role()
     {
@@ -90,7 +103,7 @@ class User extends Authenticatable
 
     public function store_roles()
     {
-        return $this->belongsToMany(Role::class, 'user_store_role', 'user_id', 'role_id')->withTimestamps()->withPivot('store_id');
+        return $this->belongsToMany(Role::class, 'user_store_role')->withTimestamps()->withPivot('store_id');
     }
 
     public function transactions()

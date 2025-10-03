@@ -14,6 +14,12 @@ interface UserEntity {
 
     // Relationships
     role: RoleEntity | null;
+    stores: StoreEntity[] | null;
     store_roles: RoleEntity[] | null;
+    store_role_pairs?: StoreRolePair[] | null;
     transactions: TransactionEntity[] | null;
+    user_points: UserPointEntity[] | null;
+
+    // Utility Attributes
+    showDeleteModal?: boolean;
 }

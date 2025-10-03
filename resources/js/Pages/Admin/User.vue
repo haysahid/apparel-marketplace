@@ -18,6 +18,7 @@ import CustomPageProps from "@/types/model/CustomPageProps";
 import { scrollToTop } from "@/plugins/helpers";
 import SearchInput from "@/Components/SearchInput.vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 const screenSize = useScreenSize();
 
@@ -127,8 +128,7 @@ const openErrorDialog = (message) => {
 const page = usePage<CustomPageProps>();
 
 function canEdit(user) {
-    return false;
-    // return page.props.auth.is_admin;
+    return page.props.auth.is_admin;
 }
 
 function setSearchFocus() {
@@ -151,14 +151,14 @@ onMounted(() => {
 <template>
     <AdminLayout title="Pengguna" :showTitle="true">
         <DefaultCard :isMain="true">
-            <div class="flex items-center justify-end gap-4">
-                <!-- <PrimaryButton
+            <div class="flex items-center justify-between gap-4">
+                <PrimaryButton
                     type="button"
                     class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
                     @click="$inertia.visit(route('admin.user.create'))"
                 >
                     Tambah
-                </PrimaryButton> -->
+                </PrimaryButton>
                 <SearchInput
                     id="search-user"
                     v-model="filters.search"
@@ -183,7 +183,8 @@ onMounted(() => {
                         <th>Pengguna</th>
                         <th>Email</th>
                         <th>No. HP</th>
-                        <th>Jenis</th>
+                        <th>Peran (Umum)</th>
+                        <th>Toko & Peran</th>
                         <th class="w-24">Aksi</th>
                     </tr>
                 </template>
@@ -241,6 +242,17 @@ onMounted(() => {
                         </td>
                         <td class="!whitespace-normal">
                             {{ user.role?.name ?? "-" }}
+                        </td>
+                        <td class="!whitespace-normal">
+                            <p
+                                v-for="(
+                                    storeRole, index
+                                ) in user.store_role_pairs"
+                                :key="index"
+                            >
+                                {{ storeRole.store?.name ?? "-" }} -
+                                {{ storeRole.role?.name ?? "-" }}
+                            </p>
                         </td>
                         <td>
                             <AdminItemAction
