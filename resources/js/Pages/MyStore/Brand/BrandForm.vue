@@ -122,7 +122,7 @@ onMounted(() => {
                     type="file"
                     accept="image/*"
                     placeholder="Upload Logo Brand"
-                    class="block w-full mt-1 h-"
+                    class="block w-full mt-1"
                     width="max-w-[180px]"
                     height="h-[120px]"
                     required

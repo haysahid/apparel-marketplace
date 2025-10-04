@@ -1,3 +1,8 @@
+interface UserRolePair {
+    user: UserEntity | null;
+    role: RoleEntity | null;
+}
+
 interface StoreEntity {
     id: number;
     name: string;
@@ -22,4 +27,12 @@ interface StoreEntity {
     advantages: StoreAdvantageEntity[];
     certificates: string[];
     social_links: StoreSocialLinkEntity[];
+    users: UserEntity[];
+    store_roles: RoleEntity[];
+
+    // Additional Attributes
+    user_role_pairs?: UserRolePair[] | null;
+
+    // Utility Attributes
+    showDeleteModal?: boolean;
 }

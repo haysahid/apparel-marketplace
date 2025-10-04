@@ -59,14 +59,14 @@ defineExpose({ clearImage });
                 >
                     <img
                         id="preview_img"
-                        class="object-cover w-full transition-all duration-300 ease-in-out border border-gray-200 rounded-lg shadow-sm aspect-square dark:border-gray-600"
+                        class="w-full transition-all duration-300 ease-in-out border border-gray-200 rounded-lg shadow-sm aspect-square dark:border-gray-600"
                         :class="[
                             {
                                 'outline outline-2 outline-red-500':
                                     props.error,
                             },
                             props.height,
-                            props.objectFit,
+                            props.objectFit ? props.objectFit : 'object-cover',
                             props.width,
                         ]"
                         :src="imagePath || getImageUrl(props.modelValue)"

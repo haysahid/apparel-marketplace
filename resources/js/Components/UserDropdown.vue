@@ -39,7 +39,7 @@ const hasShowStoreOptionsDialogCallback = computed(() => {
             >
                 <button
                     type="button"
-                    class="flex items-center justify-start w-full gap-2 px-4 py-2 text-sm font-medium leading-4 transition duration-150 ease-in-out bg-transparent border border-transparent rounded-none md:rounded-md md:px-3 text-start md:w-auto text-gray-500/90 hover:text-gray-500 focus:outline-none hover:bg-gray-500/10 focus:bg-gray-500/10 active:bg-gray-500/20 group"
+                    class="flex items-center justify-start w-full gap-2 px-4 py-2 text-sm font-medium leading-4 transition duration-150 ease-in-out bg-transparent border border-transparent rounded-md md:px-3 text-start md:w-auto text-gray-500/90 hover:text-gray-500 focus:outline-none hover:bg-gray-500/10 focus:bg-gray-500/10 active:bg-gray-500/20 group"
                     :class="{
                         '!text-white/80 hover:bg-white/10 focus:bg-white/10':
                             props.invert,
@@ -47,7 +47,7 @@ const hasShowStoreOptionsDialogCallback = computed(() => {
                 >
                     <img
                         v-if="$page.props.auth.user.avatar"
-                        class="object-cover rounded-full size-8"
+                        class="object-cover rounded-full size-8 shrink-0"
                         :src="$page.props.auth.user.avatar"
                         :alt="$page.props.auth.user.name"
                     />
@@ -57,7 +57,7 @@ const hasShowStoreOptionsDialogCallback = computed(() => {
                         width="44"
                         height="44"
                         viewBox="0 0 44 44"
-                        class="transition duration-150 ease-in-out fill-gray-400 size-8"
+                        class="transition duration-150 ease-in-out fill-gray-400 size-8 shrink-0"
                         :class="{
                             'fill-white/80 group-hover:fill-white/80 group-focus:fill-white/80':
                                 props.invert,
@@ -75,12 +75,12 @@ const hasShowStoreOptionsDialogCallback = computed(() => {
                     </span>
 
                     <svg
-                        class="size-4 md:hidden lg:inline"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke-width="1.5"
                         stroke="currentColor"
+                        class="size-4 md:hidden lg:inline shrink-0"
                     >
                         <path
                             stroke-linecap="round"
@@ -94,6 +94,16 @@ const hasShowStoreOptionsDialogCallback = computed(() => {
 
         <template #content>
             <div class="divide-y divide-gray-200">
+                <DropdownLink
+                    v-if="
+                        $page.props.auth.is_admin &&
+                        !route().current().startsWith('admin.')
+                    "
+                    :href="route('admin.dashboard')"
+                >
+                    Dashboard
+                </DropdownLink>
+
                 <template v-if="hasShowStoreOptionsDialogCallback">
                     <DropdownLink
                         v-if="$page.props.auth.has_store"
@@ -102,7 +112,6 @@ const hasShowStoreOptionsDialogCallback = computed(() => {
                     >
                         Toko Saya
                     </DropdownLink>
-
                     <DropdownLink v-else :href="route('store.create')">
                         Buat Toko
                     </DropdownLink>

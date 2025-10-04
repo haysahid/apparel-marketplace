@@ -22,6 +22,8 @@ export function getWhatsAppLink(
         phoneNumber = phoneNumber.slice(1);
     }
 
+    phoneNumber = phoneNumber.replace(/[\s-]/g, "");
+
     if (!/^\d+$/.test(phoneNumber)) {
         console.error("Invalid phone number format.");
         return null;

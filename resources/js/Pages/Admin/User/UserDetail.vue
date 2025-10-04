@@ -14,6 +14,11 @@ import WhatsAppButton from "@/Components/WhatsAppButton.vue";
 
 const props = defineProps({
     user: Object as () => UserEntity,
+    count_orders: Number,
+    count_active_orders: Number,
+    count_completed_orders: Number,
+    count_cancelled_orders: Number,
+    total_spent: Number,
 });
 
 const pointTransactions = ref<PaginationModel<PointTransactionEntity>>(null);
@@ -78,7 +83,7 @@ getUserVouchers();
         :showTitle="true"
         :breadcrumbs="[
             { text: 'Pengguna', url: '/admin/user', active: false },
-            { text: 'Detail Pengguna', active: true },
+            { text: props.user.name, active: true },
         ]"
     >
         <div class="flex flex-col w-full gap-1 sm:gap-2 p-1.5 sm:p-0">
@@ -113,6 +118,12 @@ getUserVouchers();
                     >
                         <p class="font-bold text-gray-900 md:text-lg">
                             {{ props.user.name }}
+                        </p>
+                        <p
+                            v-if="props.user.username"
+                            class="text-sm text-gray-600"
+                        >
+                            {{ props.user.username }}
                         </p>
                         <div
                             class="flex flex-wrap items-start justify-center w-full text-sm text-gray-600 max-sm:flex-col sm:justify-start gap-x-6 gap-y-1"
@@ -263,6 +274,14 @@ getUserVouchers();
                             props.user.user_points[0]?.lifetime_points || 0
                         )
                     "
+                />
+                <SummaryCard
+                    title="Total Pesanan"
+                    :value="$formatNumber(props.count_orders || 0)"
+                />
+                <SummaryCard
+                    title="Total Pengeluaran"
+                    :value="$formatCurrency(props.total_spent || 0)"
                 />
             </div>
 

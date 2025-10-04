@@ -56,10 +56,10 @@ onMounted(() => {
 
 <template>
     <MyStoreLayout title="Dashboard" :showTitle="true">
-        <div class="">
-            <div class="flex flex-col gap-4">
+        <div class="flex flex-col w-full gap-1 sm:gap-4 p-1.5 sm:p-0">
+            <div class="flex flex-col gap-1 sm:gap-4">
                 <div
-                    class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                    class="grid grid-cols-1 gap-1 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3"
                 >
                     <SummaryCard
                         title="Total Produk"

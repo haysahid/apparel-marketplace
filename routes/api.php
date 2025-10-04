@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\API\AdminStoreController;
 use App\Http\Controllers\API\BrandController;
 use App\Http\Controllers\API\CustomerController;
 use App\Http\Controllers\API\OrderController;
@@ -50,9 +51,14 @@ Route::name('api.')->group(function () {
 // Admin Routes
 Route::name('api.admin.')->prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::apiResource('product-image', ProductImageController::class);
+
+    // User
     Route::apiResource('user', UserController::class);
     Route::get('user/{userId}/point-transaction', [UserController::class, 'getUserPointTransactions'])->name('user.point-transaction');
     Route::get('user/{userId}/voucher', [UserController::class, 'getUserVouchers'])->name('user.voucher');
+
+    // Store
+    Route::get('store/{storeId}/invoice', [AdminStoreController::class, 'getStoreInvoices'])->name('store.invoice');
 });
 
 // My Store Routes

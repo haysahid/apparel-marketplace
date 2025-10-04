@@ -47,13 +47,13 @@ function getOrigins(search) {
         });
 }
 
-const debouncedGetOrigins = useDebounce(getOrigins, 400);
+const debouncedGetOrigins = useDebounce();
 
 watch(
     () => originSearch.value,
     (newValue) => {
         if (newValue) {
-            debouncedGetOrigins(newValue);
+            debouncedGetOrigins(() => getOrigins(newValue), 500);
         } else {
             origins.value = [];
             isOriginDropdownOpen.value = false;
@@ -61,12 +61,30 @@ watch(
     }
 );
 
-const form = useForm({
-    ...props.store,
-    rajaongkir_origin_id: props.store.rajaongkir_origin_id || null,
-    rajaongkir_origin: null,
-    social_links: props.store.social_links || [],
-});
+const form = useForm(
+    props.store
+        ? {
+              ...props.store,
+              rajaongkir_origin_id: props.store.rajaongkir_origin_id || null,
+              rajaongkir_origin: null,
+              social_links: props.store.social_links || [],
+          }
+        : {
+              name: "",
+              phone: "",
+              email: "",
+              address: "",
+              description: "",
+              advantages: [
+                  { name: "", description: "" },
+                  { name: "", description: "" },
+                  { name: "", description: "" },
+              ],
+              social_links: [],
+              rajaongkir_origin_id: null,
+              rajaongkir_origin: null,
+          }
+);
 
 // Initialize origin
 if (props.store.zip_code) {
@@ -142,8 +160,8 @@ const openErrorDialog = (message) => {
                                 placeholder="Masukkan Nama Toko"
                                 required
                                 autocomplete="name"
-                                :error="form.errors.username"
-                                @update:modelValue="form.errors.username = null"
+                                :error="form.errors.name"
+                                @update:modelValue="form.errors.name = null"
                             />
                         </InputGroup>
 

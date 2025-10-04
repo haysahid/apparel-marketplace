@@ -27,10 +27,23 @@ class Store extends Model
         'zip_code',
     ];
 
+    // Additional atributes
+    public function getUserRolePairsAttribute()
+    {
+        $usersById = $this->users->keyBy('id');
+        return $this->store_roles->map(function ($storeRole) use ($usersById) {
+            $user = $usersById->get($storeRole->pivot->user_id, null);
+            return [
+                'user' => $user,
+                'role' => $storeRole,
+            ];
+        });
+    }
+
     // Relationships
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_store_role')->withTimestamps()->withPivot(['store_id', 'role_id']);
+        return $this->belongsToMany(User::class, 'user_store_role')->withTimestamps()->withPivot(['role_id']);
     }
 
     public function advantages()
@@ -48,13 +61,18 @@ class Store extends Model
         return $this->hasMany(StoreSocialLink::class);
     }
 
-    public function roles()
+    public function store_roles()
     {
-        return $this->belongsToMany(Role::class, 'user_store_role');
+        return $this->belongsToMany(Role::class, 'user_store_role')->withTimestamps()->withPivot(['user_id'])->orderBy('id');
     }
 
     public function partners()
     {
         return $this->hasMany(Partner::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
     }
 }

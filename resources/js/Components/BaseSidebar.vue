@@ -44,9 +44,9 @@ const props = defineProps({
             </div>
 
             <div
-                class="overflow-y-auto h-[calc(100vh-4.5rem)]"
+                class="overflow-y-auto h-[calc(100vh-72px)]"
                 :class="{
-                    'h-[calc(100vh-12rem)]': props.responsive,
+                    'h-[calc(100vh-178px)]': props.responsive,
                 }"
             >
                 <slot name="extraMenu" />

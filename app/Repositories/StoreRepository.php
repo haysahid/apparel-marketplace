@@ -145,4 +145,63 @@ class StoreRepository
             throw new Exception('Gagal memperbarui informasi toko: ' . $e->getMessage());
         }
     }
+
+    public static function getStores(
+        $limit = 10,
+        $search = null,
+        $orderBy = 'created_at',
+        $orderDirection = 'desc',
+    ) {
+        $query = Store::query();
+
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%')
+                ->orWhere('description', 'like', '%' . $search . '%');
+        }
+
+        $query->orderBy($orderBy, $orderDirection);
+
+        return $query->paginate($limit);
+    }
+
+    public static function getStoreDetail($storeId)
+    {
+        $store = Store::with([
+            'advantages',
+            'social_links',
+            'users',
+            'store_roles'
+        ])->find($storeId);
+
+        if (!$store) {
+            throw new Exception('Toko tidak ditemukan');
+        }
+
+        $store->user_role_pairs = $store->getUserRolePairsAttribute();
+        // $store->makeHidden(['users', 'store_roles']);
+
+        $storeStats = DB::table('stores')
+            ->leftJoin('products', 'stores.id', '=', 'products.store_id')
+            ->leftJoin('invoices', 'stores.id', '=', 'invoices.store_id')
+            ->where('stores.id', $storeId)
+            ->selectRaw('
+                stores.id,
+                COUNT(DISTINCT products.id) as count_products,
+                COUNT(DISTINCT invoices.id) as count_orders,
+                COALESCE(SUM(invoices.amount), 0) as count_revenue
+            ')
+            ->groupBy('stores.id')
+            ->first();
+
+        $countProducts = (int) $storeStats->count_products ?? 0;
+        $countOrders = (int) $storeStats->count_orders ?? 0;
+        $countRevenue = (int) $storeStats->count_revenue ?? 0;
+
+        return [
+            'store' => $store,
+            'count_products' => $countProducts,
+            'count_orders' => $countOrders,
+            'count_revenue' => $countRevenue,
+        ];
+    }
 }
