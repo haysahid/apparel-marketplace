@@ -87,7 +87,7 @@ const form = useForm(
 );
 
 // Initialize origin
-if (props.store.zip_code) {
+if (props.store?.zip_code) {
     axios
         .get("/api/destinations", {
             params: {

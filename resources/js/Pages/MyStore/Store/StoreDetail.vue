@@ -1,30 +1,28 @@
 <script setup lang="ts">
 import DefaultCard from "@/Components/DefaultCard.vue";
 import SummaryCard from "@/Components/SummaryCard.vue";
-import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
-import { Link, usePage } from "@inertiajs/vue3";
+import { router, usePage } from "@inertiajs/vue3";
 import axios from "axios";
 import { onMounted, ref } from "vue";
-// import MyOrderCard from "../Order/MyOrderCard.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import ThreeDotsLoading from "@/Components/ThreeDotsLoading.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { getWhatsAppLink } from "@/plugins/helpers";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
 import cookieManager from "@/plugins/cookie-manager";
-import SuccessDialog from "@/Components/SuccessDialog.vue";
 import CustomPageProps from "@/types/model/CustomPageProps";
-import StoreProfile from "./StoreProfile.vue";
-import AdminLayout from "@/Layouts/AdminLayout.vue";
 import MyOrderCard from "@/Pages/MyStore/Order/MyOrderCard.vue";
-import storeService from "@/services/admin/store-service";
+import StoreUserList from "./StoreUserList.vue";
+import { useDialogStore } from "@/stores/dialog-store";
+import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
+import StoreProfile from "@/Pages/MyStore/Store/StoreProfile.vue";
 
 const props = defineProps({
     store: Object as () => StoreEntity,
     count_products: Number,
     count_orders: Number,
     count_revenue: Number,
+    roles: Array as () => RoleEntity[],
 });
+
+const userRolePairs = ref<UserRolePair[]>(props.store.user_role_pairs);
 
 const invoices = ref<PaginationModel<InvoiceEntity>>(null);
 const getInvoicesStatus = ref(null);
@@ -58,57 +56,33 @@ function getInvoices() {
 }
 getInvoices();
 
-const addOrUpdateUserRoleStatus = ref(null);
-function addUserRole(userId: string, roleSlug: string) {
-    storeService.addUserRole(
-        {
-            storeId: props.store.id,
-            userId: userId,
-            roleSlug: roleSlug,
-        },
-        {
-            onSuccess: () => {
-                addOrUpdateUserRoleStatus.value = "success";
-                getInvoices();
-                openSuccessDialog("Peran pengguna berhasil ditambahkan.");
-            },
-        }
-    );
-}
-
-const showSuccessDialog = ref(false);
-const successMessage = ref(null);
-
-function openSuccessDialog(message) {
-    successMessage.value = message;
-    showSuccessDialog.value = true;
-}
-
-const showErrorDialog = ref(false);
-const errorMessage = ref(null);
-
-function openErrorDialog(message) {
-    errorMessage.value = message;
-    showErrorDialog.value = true;
-}
-
 const page = usePage<CustomPageProps>();
+
+function reloadUserRolePairs() {
+    router.reload({
+        onSuccess: (page) => {
+            const newPage = page as unknown as CustomPageProps;
+            if (newPage.props.store) {
+                userRolePairs.value = newPage.props.store.user_role_pairs;
+            }
+        },
+    });
+}
+
+const dialogStore = useDialogStore();
 
 onMounted(() => {
     if (page.props?.flash?.success) {
-        openSuccessDialog(page.props.flash.success);
+        dialogStore.openSuccessDialog(page.props.flash.success);
     }
 });
 </script>
 
 <template>
-    <AdminLayout
+    <MyStoreLayout
         title="Detail Toko"
         :showTitle="true"
-        :breadcrumbs="[
-            { text: 'Toko', url: '/admin/store', active: false },
-            { text: props.store.name, active: true },
-        ]"
+        :breadcrumbs="[{ text: props.store.name, active: true }]"
     >
         <div class="flex flex-col w-full gap-1 p-1.5 sm:gap-2 sm:p-0">
             <!-- Profile -->
@@ -132,82 +106,16 @@ onMounted(() => {
 
             <div class="flex flex-col w-full gap-1 lg:flex-row sm:gap-2">
                 <!-- Users -->
-                <DefaultCard class="w-full">
-                    <h3 class="font-semibold text-gray-900">
-                        Pengguna ({{
-                            props.store.user_role_pairs?.length ?? 0
-                        }})
-                    </h3>
-                    <div class="w-full mt-2.5">
-                        <div
-                            v-if="props.store.user_role_pairs?.length"
-                            class="flex flex-col w-full gap-2"
-                        >
-                            <Link
-                                v-for="(userRole, index) in props.store
-                                    .user_role_pairs"
-                                :key="index"
-                                :href="
-                                    route('admin.user.show', {
-                                        user: userRole.user?.id,
-                                    })
-                                "
-                                class="flex items-center justify-between gap-2 p-3 transition-all duration-300 ease-in-out border border-gray-200 rounded-lg hover:border-primary-light group hover:ring-1 hover:ring-primary-light"
-                            >
-                                <div class="flex items-center gap-3">
-                                    <img
-                                        v-if="userRole.user?.avatar"
-                                        :src="
-                                            $getImageUrl(userRole.user?.avatar)
-                                        "
-                                        alt="Profile Photo"
-                                        class="object-cover rounded-full size-10 shrink-0 h-fit"
-                                    />
-                                    <svg
-                                        v-else
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="44"
-                                        height="44"
-                                        viewBox="0 0 44 44"
-                                        class="size-10 h-fit fill-gray-400 shrink-0"
-                                    >
-                                        <path
-                                            fill-rule="evenodd"
-                                            clip-rule="evenodd"
-                                            d="M40.3333 22.0003C40.3333 32.1258 32.1255 40.3337 22 40.3337C11.8745 40.3337 3.66663 32.1258 3.66663 22.0003C3.66663 11.8748 11.8745 3.66699 22 3.66699C32.1255 3.66699 40.3333 11.8748 40.3333 22.0003ZM27.5 16.5003C27.5 17.959 26.9205 19.358 25.889 20.3894C24.8576 21.4209 23.4586 22.0003 22 22.0003C20.5413 22.0003 19.1423 21.4209 18.1109 20.3894C17.0794 19.358 16.5 17.959 16.5 16.5003C16.5 15.0416 17.0794 13.6427 18.1109 12.6112C19.1423 11.5798 20.5413 11.0003 22 11.0003C23.4586 11.0003 24.8576 11.5798 25.889 12.6112C26.9205 13.6427 27.5 15.0416 27.5 16.5003ZM22 37.5837C25.1465 37.5887 28.2201 36.6366 30.8128 34.8538C31.9201 34.093 32.3931 32.6447 31.7478 31.4658C30.415 29.022 27.665 27.5003 22 27.5003C16.335 27.5003 13.585 29.022 12.2503 31.4658C11.6068 32.6447 12.0798 34.093 13.1871 34.8538C15.7798 36.6366 18.8535 37.5887 22 37.5837Z"
-                                        />
-                                    </svg>
-                                    <div
-                                        class="flex flex-col justify-start gap-1"
-                                    >
-                                        <p
-                                            class="font-semibold text-gray-900 transition-all duration-300 ease-in-out group-hover:text-primary"
-                                        >
-                                            {{ userRole.user?.name }}
-                                        </p>
-                                        <p class="text-sm text-gray-600">
-                                            {{ userRole.user?.email }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <p class="text-sm text-gray-600">
-                                    {{ userRole.role?.name }}
-                                </p>
-                            </Link>
-                        </div>
-                        <div
-                            v-else
-                            class="flex items-center justify-center h-[10vh] mb-6"
-                        >
-                            <ThreeDotsLoading
-                                v-if="getInvoicesStatus === 'loading'"
-                            />
-                            <p v-else class="text-sm text-center text-gray-500">
-                                Data tidak ditemukan.
-                            </p>
-                        </div>
-                    </div>
-                </DefaultCard>
+                <StoreUserList
+                    :storeId="
+                        route().current().startsWith('admin.')
+                            ? props.store.id
+                            : null
+                    "
+                    :userRolePairs="userRolePairs"
+                    :roles="props.roles"
+                    @reload="reloadUserRolePairs()"
+                />
 
                 <!-- Order History -->
                 <DefaultCard class="w-full h-fit">
@@ -276,11 +184,5 @@ onMounted(() => {
                 </DefaultCard>
             </div>
         </div>
-
-        <SuccessDialog
-            :show="showSuccessDialog"
-            :title="successMessage"
-            @close="showSuccessDialog = false"
-        />
-    </AdminLayout>
+    </MyStoreLayout>
 </template>

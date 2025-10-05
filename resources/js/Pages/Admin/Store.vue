@@ -28,10 +28,10 @@ const props = defineProps({
     },
 });
 
-const partners = ref<PaginationModel<StoreEntity>>({
+const stores = ref<PaginationModel<StoreEntity>>({
     ...props.stores,
-    data: props.stores.data.map((partner) => ({
-        ...partner,
+    data: props.stores.data.map((store) => ({
+        ...store,
         showDeleteModal: false,
     })),
 });
@@ -60,10 +60,10 @@ function getPartners() {
         preserveScroll: true,
         onSuccess: () => {
             getQueryParams();
-            partners.value = {
+            stores.value = {
                 ...props.stores,
-                data: props.stores.data.map((partner) => ({
-                    ...partner,
+                data: props.stores.data.map((store) => ({
+                    ...store,
                     showDeleteModal: false,
                 })),
             };
@@ -76,10 +76,10 @@ function getPartners() {
 const selectedPartner = ref(null);
 const showDeletePartnerDialog = ref(false);
 
-const openDeletePartnerDialog = (partner) => {
-    console.log("openDeletePartnerDialog", partner);
-    if (partner) {
-        selectedPartner.value = partner;
+const openDeletePartnerDialog = (store) => {
+    console.log("openDeletePartnerDialog", store);
+    if (store) {
+        selectedPartner.value = store;
         showDeletePartnerDialog.value = true;
     }
 };
@@ -97,7 +97,7 @@ const deletePartner = () => {
         const form = useForm({});
         form.delete(
             route("admin.store.destroy", {
-                partner: selectedPartner.value,
+                store: selectedPartner.value,
             }),
             {
                 onError: (errors) => {
@@ -130,12 +130,10 @@ const openErrorDialog = (message) => {
 
 const page = usePage<CustomPageProps>();
 
-function canEdit(partner) {
+function canEdit(store) {
     return (
         page.props.auth.is_admin ||
-        page.props.auth.user.stores.some(
-            (store) => store.id === partner.store_id
-        )
+        page.props.auth.user.stores.some((store) => store.id === store.store_id)
     );
 }
 
@@ -259,7 +257,7 @@ onMounted(() => {
                                 @edit="
                                     $inertia.visit(
                                         route('admin.store.edit', {
-                                            partner: store,
+                                            store: store,
                                         })
                                     )
                                 "
@@ -288,7 +286,7 @@ onMounted(() => {
                         @edit="
                             $inertia.visit(
                                 route('admin.store.edit', {
-                                    partner: store,
+                                    store: store,
                                 })
                             )
                         "

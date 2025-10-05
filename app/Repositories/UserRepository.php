@@ -58,7 +58,7 @@ class UserRepository
 
             return $user;
         } catch (Exception $e) {
-            Log::error('Gagal membuat user: ' . $e);
+            Log::error('Gagal membuat pengguna: ' . $e);
             throw $e;
         }
     }
@@ -82,7 +82,62 @@ class UserRepository
             ]);
             return $user;
         } catch (Exception $e) {
-            Log::error('Gagal membuat user tamu: ' . $e);
+            Log::error('Gagal membuat pengguna tamu: ' . $e);
+            throw $e;
+        }
+    }
+
+    public static function createUser(array $data)
+    {
+        try {
+            DB::beginTransaction();
+
+            $data['password'] = Hash::make($data['password']);
+
+            // Create the user
+            $user = User::create($data);
+
+            // Create user points record
+            UserPoint::create([
+                'user_id' => $user->id,
+                'current_balance' => 0,
+                'lifetime_points' => 0,
+            ]);
+
+            DB::commit();
+
+            return $user;
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Gagal membuat pengguna: ' . $e);
+            throw $e;
+        }
+    }
+
+    public static function updateUser(User $user, array $data)
+    {
+        try {
+            if (isset($data['password']) && $data['password']) {
+                $data['password'] = Hash::make($data['password']);
+            } else {
+                unset($data['password']);
+            }
+
+            $user->update($data);
+            return $user;
+        } catch (Exception $e) {
+            Log::error('Gagal memperbarui pengguna: ' . $e);
+            throw $e;
+        }
+    }
+
+    public static function deleteUser(User $user)
+    {
+        try {
+            $user->delete();
+            return true;
+        } catch (Exception $e) {
+            Log::error('Gagal menghapus pengguna: ' . $e);
             throw $e;
         }
     }

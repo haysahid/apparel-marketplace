@@ -18,8 +18,6 @@ const props = defineProps({
 defineEmits(["showStoreOptionsDialog"]);
 
 const logout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("selected_store_id");
     router.post(route("logout"));
 };
 

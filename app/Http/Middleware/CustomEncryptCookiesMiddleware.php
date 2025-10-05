@@ -11,5 +11,5 @@ class CustomEncryptCookiesMiddleware extends EncryptCookies
      *
      * @var array<int, string>
      */
-    protected $except = ['access_token'];
+    protected $except = ['access_token', 'selected_store_id'];
 }

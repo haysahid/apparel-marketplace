@@ -17,7 +17,7 @@ class RoleSeeder extends Seeder
             ['name' => 'Super Admin', 'slug' => 'super-admin'],
             ['name' => 'Admin', 'slug' => 'admin'],
             ['name' => 'User', 'slug' => 'user'],
-            ['name' => 'Agen', 'slug' => 'agen'],
+            ['name' => 'Agen', 'slug' => 'agent'],
             ['name' => 'Reseller', 'slug' => 'reseller'],
             ['name' => 'Member', 'slug' => 'member'],
             ['name' => 'Pemilik Toko', 'slug' => 'store-owner'],

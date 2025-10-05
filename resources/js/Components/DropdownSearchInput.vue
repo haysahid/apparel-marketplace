@@ -312,7 +312,10 @@ const filteredOptions = computed(() => {
                         </template>
                     </TextInput>
                 </div>
-                <ul class="overflow-y-auto max-h-60">
+                <div v-if="$slots.options" class="overflow-y-auto max-h-60">
+                    <slot name="options" />
+                </div>
+                <ul v-else class="overflow-y-auto max-h-60">
                     <li
                         v-for="option in filteredOptions"
                         :key="option.value"

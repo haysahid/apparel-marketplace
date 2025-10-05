@@ -4,11 +4,13 @@ namespace App\Repositories;
 
 use App\Models\Role;
 use App\Models\Store;
+use App\Models\User;
 use App\Models\UserStoreRole;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class StoreRepository
 {
@@ -203,5 +205,107 @@ class StoreRepository
             'count_orders' => $countOrders,
             'count_revenue' => $countRevenue,
         ];
+    }
+
+    public static function addUserRole($storeId, $userId, $roleSlug)
+    {
+        $role = Role::where('slug', $roleSlug)->first();
+
+        if (!$role) {
+            throw new Exception('Role tidak ditemukan', 404);
+        }
+
+        $roleId = $role->id;
+
+        // Check if the user is already assigned to the store
+        $existingAssignment = UserStoreRole::where('store_id', $storeId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if ($existingAssignment) {
+            throw new Exception('Pengguna sudah ditugaskan ke toko ini', 400);
+        }
+
+        // Assign role
+        $userStoreRole = UserStoreRole::create([
+            'store_id' => $storeId,
+            'user_id' => $userId,
+            'role_id' => $roleId,
+        ]);
+
+        return $userStoreRole;
+    }
+
+    public static function updateUserRole($storeId, $userId, $roleSlug)
+    {
+        $loggedInUser = User::with(['role'])->find(Auth::id());
+
+        $role = Role::where('slug', $roleSlug)->first();
+
+        if (!$role) {
+            throw new Exception('Role tidak ditemukan', 404);
+        }
+
+        $roleId = $role->id;
+
+        // Check if the user is the store owner
+        $ownerRole = Role::where('slug', 'store-owner')->first();
+        $isOwner = UserStoreRole::where('store_id', $storeId)
+            ->where('user_id', $userId)
+            ->where('role_id', $ownerRole->id)
+            ->exists();
+
+        if ($isOwner && !$loggedInUser->isAdmin()) {
+            throw new Exception('Tidak dapat mengubah peran pemilik toko', 403);
+        }
+
+        // Update role
+        $userStoreRole = UserStoreRole::where('store_id', $storeId)
+            ->where('user_id', $userId)
+            ->first();
+
+        Log::info('UserStoreRole found:', [
+            'user_id' => $userId,
+            'store_id' => $storeId,
+            'role_id' => $roleSlug,
+        ]);
+
+        if (!$userStoreRole) {
+            throw new Exception('Pengguna tidak ditemukan di toko ini', 404);
+        }
+
+        $userStoreRole->role_id = $roleId;
+        $userStoreRole->save();
+
+        return $userStoreRole;
+    }
+
+    public static function removeUserRole($storeId, $userId)
+    {
+        $loggedInUser = User::with(['role'])->find(Auth::id());
+
+        // Check if the user is the store owner
+        $ownerRole = Role::where('slug', 'store-owner')->first();
+        $isOwner = UserStoreRole::where('store_id', $storeId)
+            ->where('user_id', $userId)
+            ->where('role_id', $ownerRole->id)
+            ->exists();
+
+        if ($isOwner && !$loggedInUser->isAdmin()) {
+            throw new Exception('Tidak dapat menghapus peran pemilik toko', 403);
+        }
+
+        // Remove role
+        $userStoreRole = UserStoreRole::where('store_id', $storeId)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$userStoreRole) {
+            throw new Exception('Pengguna tidak ditemukan di toko ini', 404);
+        }
+
+        $userStoreRole->delete();
+
+        return true;
     }
 }

@@ -84,6 +84,7 @@ class AdminController extends Controller
     {
         session()->forget('selected_store_id');
         Cookie::queue(Cookie::forget('access_token'));
+        Cookie::queue(Cookie::forget('selected_store_id'));
         Auth::logout();
         return redirect()->route('admin.login')->with([
             'success' => 'Berhasil keluar.',

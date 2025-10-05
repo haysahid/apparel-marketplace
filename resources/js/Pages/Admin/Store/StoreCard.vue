@@ -108,10 +108,18 @@ const emit = defineEmits(["edit", "delete"]);
         <AdminItemAction class="self-start">
             <template #moreContent>
                 <div class="divide-y divide-gray-200">
-                    <DropdownLink as="button" @click="emit('edit')">
+                    <DropdownLink
+                        as="button"
+                        @click="emit('edit')"
+                        class="!text-blue-500"
+                    >
                         Ubah
                     </DropdownLink>
-                    <DropdownLink as="button" @click="emit('delete')">
+                    <DropdownLink
+                        as="button"
+                        @click="emit('delete')"
+                        class="!text-red-500"
+                    >
                         Hapus
                     </DropdownLink>
                 </div>

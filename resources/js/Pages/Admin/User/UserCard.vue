@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AdminItemAction from "@/Components/AdminItemAction.vue";
 import { Link } from "@inertiajs/vue3";
+import { computed, getCurrentInstance } from "vue";
 
 const props = defineProps({
     user: {
@@ -10,6 +11,10 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["edit"]);
+
+const hasEditCallback = computed(() => {
+    return !!getCurrentInstance()?.vnode?.props?.["onEdit"];
+});
 </script>
 
 <template>
@@ -120,6 +125,7 @@ const emit = defineEmits(["edit"]);
         </div>
 
         <AdminItemAction
+            v-if="hasEditCallback"
             class="absolute top-2.5 right-2.5 sm:top-4 sm:right-4"
             @edit="emit('edit')"
         />

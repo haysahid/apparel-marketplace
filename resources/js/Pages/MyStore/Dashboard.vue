@@ -1,7 +1,5 @@
 <script setup>
 import SummaryCard from "@/Components/SummaryCard.vue";
-import { onMounted } from "vue";
-import { usePage } from "@inertiajs/vue3";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 
@@ -15,8 +13,6 @@ const props = defineProps({
         default: 0,
     },
 });
-
-const page = usePage();
 
 const chartData = {
     options: {
@@ -46,12 +42,6 @@ const chartData = {
         },
     ],
 };
-
-onMounted(() => {
-    if (page.props.selected_store_id) {
-        localStorage.setItem("selected_store_id", page.props.selected_store_id);
-    }
-});
 </script>
 
 <template>

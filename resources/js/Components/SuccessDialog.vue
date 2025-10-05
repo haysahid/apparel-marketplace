@@ -82,6 +82,10 @@ onBeforeUnmount(() => {
                 </svg>
             </div>
         </template>
-        <template #title>{{ props.title }}</template>
+        <template #title>
+            <p class="text-lg font-medium text-gray-900">
+                {{ props.title }}
+            </p>
+        </template>
     </DialogModal>
 </template>

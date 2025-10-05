@@ -1,45 +1,27 @@
 <?php
 
-namespace App\Http\Controllers\Admin\API;
+namespace App\Http\Controllers\MyStore\API;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
-use App\Repositories\InvoiceRepository;
 use App\Repositories\StoreRepository;
 use Exception;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
-class AdminStoreController extends Controller
+class MyStoreController extends Controller
 {
-    public function getStoreInvoices(Request $request, $storeId)
+    private $storeId;
+
+    public function __construct(Request $request)
     {
-        $limit = $request->input('limit', 10);
-        $search = $request->input('search');
-        $orderBy = $request->input('order_by', 'created_at');
-        $orderDirection = $request->input('order_direction', 'desc');
-        $userId = $request->input('user_id');
-        $brandId = $request->input('brand_id');
-
-        $invoices = InvoiceRepository::getInvoices(
-            storeId: $storeId,
-            userId: $userId,
-            limit: $limit,
-            search: $search,
-            orderBy: $orderBy,
-            orderDirection: $orderDirection,
-            brandId: $brandId
-        );
-
-        return ResponseFormatter::success(
-            $invoices,
-            'Berhasil mengambil data pesanan.'
-        );
+        $this->storeId = $request->header('X-Selected-Store-ID');
     }
 
-    public function addUserRole(Request $request, $storeId)
+    public function addUserRole(Request $request, $userId)
     {
         $request->validate([
-            'user_id' => 'required|integer|exists:users,id',
             'role_slug' => 'required|string|exists:roles,slug',
         ], [
             'role_slug.required' => 'Peran harus diisi.',
@@ -47,11 +29,10 @@ class AdminStoreController extends Controller
         ]);
 
         try {
-            $userId = $request->input('user_id');
             $roleSlug = $request->input('role_slug');
 
             StoreRepository::addUserRole(
-                storeId: $storeId,
+                storeId: $this->storeId,
                 userId: $userId,
                 roleSlug: $roleSlug,
             );
@@ -68,10 +49,9 @@ class AdminStoreController extends Controller
         }
     }
 
-    public function updateUserRole(Request $request, $storeId)
+    public function updateUserRole(Request $request, $userId)
     {
         $request->validate([
-            'user_id' => 'required|integer|exists:users,id',
             'role_slug' => 'required|string|exists:roles,slug',
         ], [
             'role_slug.required' => 'Peran harus diisi.',
@@ -79,11 +59,10 @@ class AdminStoreController extends Controller
         ]);
 
         try {
-            $userId = $request->input('user_id');
             $newRole = $request->input('role_slug');
 
             StoreRepository::updateUserRole(
-                storeId: $storeId,
+                storeId: $this->storeId,
                 userId: $userId,
                 roleSlug: $newRole,
             );
@@ -100,20 +79,11 @@ class AdminStoreController extends Controller
         }
     }
 
-    public function removeUserRole(Request $request, $storeId)
+    public function removeUserRole($userId)
     {
-        $request->validate([
-            'user_id' => 'required|integer|exists:users,id',
-        ], [
-            'user_id.required' => 'ID pengguna harus diisi.',
-            'user_id.exists' => 'Pengguna yang dipilih tidak valid.',
-        ]);
-
         try {
-            $userId = $request->input('user_id');
-
             StoreRepository::removeUserRole(
-                storeId: $storeId,
+                storeId: $this->storeId,
                 userId: $userId,
             );
 

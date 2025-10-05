@@ -16,6 +16,25 @@ textarea::placeholder {
     @apply text-gray-400;
 }
 
+/* Transition styles for max-height */
+.accordion-enter-active,
+.accordion-leave-active {
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+.accordion-enter-from,
+.accordion-leave-to {
+    max-height: 0;
+    opacity: 0;
+}
+
+.accordion-enter-to,
+.accordion-leave-from {
+    max-height: 900px;
+    opacity: 1;
+}
+
 @layer components {
     .border-dashed-default {
         /* background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='%23d1d5db' stroke-width='3' stroke-dasharray='4%2c 8' stroke-dashoffset='0' stroke-linecap='round'/%3e%3c/svg%3e");
@@ -144,25 +163,6 @@ textarea::placeholder {
 
     .cart-group {
         @apply flex flex-col items-start justify-between gap-2 p-4 !pb-2 transition-all duration-200 ease-in-out border-b rounded-2xl sm:p-6 sm:!pb-4 outline outline-1 -outline-offset-1 outline-gray-300 hover:outline-primary;
-    }
-
-    /* Transition styles for max-height */
-    .accordion-enter-active,
-    .accordion-leave-active {
-        transition: all 0.3s ease-in-out;
-        overflow: hidden;
-    }
-
-    .accordion-enter-from,
-    .accordion-leave-to {
-        max-height: 0;
-        opacity: 0;
-    }
-
-    .accordion-enter-to,
-    .accordion-leave-from {
-        max-height: 900px;
-        opacity: 1;
     }
 }
 

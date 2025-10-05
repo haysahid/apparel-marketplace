@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\User;
+use App\Repositories\RoleRepository;
 use App\Repositories\StoreRepository;
 use Exception;
 use Illuminate\Http\Request;
@@ -33,6 +34,12 @@ class MyStoreController extends Controller
     public function selectStore($storeId)
     {
         session(['selected_store_id' => $storeId]);
+        Cookie::queue(Cookie::forever(
+            name: 'selected_store_id',
+            value: $storeId,
+            secure: false,
+            httpOnly: false,
+        ));
         return redirect()->route('my-store.dashboard')
             ->with('success', 'Toko berhasil dipilih.');
     }
@@ -49,6 +56,20 @@ class MyStoreController extends Controller
         return Inertia::render('MyStore/Dashboard', [
             'productCount' => $productCount,
             'userCount' => $userCount,
+        ]);
+    }
+
+    public function show()
+    {
+        $storeDetail = StoreRepository::getStoreDetail(
+            storeId: $this->storeId,
+        );
+
+        $roles = RoleRepository::getRoleDropdown();
+
+        return Inertia::render('MyStore/Store/StoreDetail', [
+            ...$storeDetail,
+            'roles' => $roles,
         ]);
     }
 

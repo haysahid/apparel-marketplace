@@ -42,7 +42,22 @@ const menus = [
             </svg>`,
         children: [
             {
-                name: "Info Toko",
+                name: "Detail Toko",
+                href: route("my-store.store.show"),
+                active: route().current("my-store.store.show"),
+                icon: `
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="26" 
+                height="27" 
+                viewBox="0 0 26 27" 
+                class="fill-primary"
+            >
+                <path d="M4.33333 6.49992V4.33325H21.6667V6.49992H4.33333ZM4.33333 21.6666V15.1666H3.25V12.9999L4.33333 7.58325H21.6667L22.75 12.9999V15.1666H21.6667V21.6666H19.5V15.1666H15.1667V21.6666H4.33333ZM6.5 19.4999H13V15.1666H6.5V19.4999Z"/>
+            </svg>`,
+            },
+            {
+                name: "Ubah Toko",
                 href: route("my-store.store.edit"),
                 active: route().current("my-store.store.edit"),
                 icon: `

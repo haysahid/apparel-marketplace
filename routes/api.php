@@ -1,19 +1,6 @@
 <?php
 
-use App\Http\Controllers\Admin\API\AdminStoreController;
-use App\Http\Controllers\API\BrandController;
-use App\Http\Controllers\API\CustomerController;
 use App\Http\Controllers\API\OrderController;
-use App\Http\Controllers\API\PaymentMethodController;
-use App\Http\Controllers\API\ProductController;
-use App\Http\Controllers\API\ProductImageController;
-use App\Http\Controllers\API\ProductVariantController;
-use App\Http\Controllers\API\ProductVariantImageController;
-use App\Http\Controllers\API\ReportController;
-use App\Http\Controllers\API\ShippingMethodController;
-use App\Http\Controllers\API\UserController;
-use App\Http\Controllers\API\VoucherController;
-use App\Http\Controllers\InvoiceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +8,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+// General Routes
 Route::name('api.')->group(function () {
     Route::post('/sync-cart', [OrderController::class, 'syncCart'])->name('sync-cart');
 
@@ -48,45 +36,5 @@ Route::name('api.')->group(function () {
     });
 });
 
-// Admin Routes
-Route::name('api.admin.')->prefix('admin')->middleware('auth:sanctum')->group(function () {
-    Route::apiResource('product-image', ProductImageController::class);
-
-    // User
-    Route::apiResource('user', UserController::class);
-    Route::get('user/{userId}/point-transaction', [UserController::class, 'getUserPointTransactions'])->name('user.point-transaction');
-    Route::get('user/{userId}/voucher', [UserController::class, 'getUserVouchers'])->name('user.voucher');
-
-    // Store
-    Route::get('store/{storeId}/invoice', [AdminStoreController::class, 'getStoreInvoices'])->name('store.invoice');
-});
-
-// My Store Routes
-Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->group(function () {
-    Route::apiResource('brand', BrandController::class);
-    Route::get('brand-dropdown', [BrandController::class, 'dropdown'])->name('brand.dropdown');
-
-    Route::apiResource('customer', CustomerController::class);
-    Route::get('customer/{userId}/voucher', [CustomerController::class, 'getUserVouchers'])->name('customer.voucher');
-
-    Route::apiResource('product', ProductController::class);
-    Route::apiResource('product-image', ProductImageController::class);
-    Route::apiResource('product-variant', ProductVariantController::class);
-    Route::apiResource('product-variant-image', ProductVariantImageController::class);
-
-    Route::post('checkout', [OrderController::class, 'checkoutStore'])->name('checkout');
-
-    Route::get('payment-method-dropdown', [PaymentMethodController::class, 'dropdown'])->name('payment-method.dropdown');
-    Route::get('shipping-method-dropdown', [ShippingMethodController::class, 'dropdown'])->name('shipping-method.dropdown');
-
-    Route::get('midtrans-payment-methods', [OrderController::class, 'midtransPaymentMethods'])->name('midtrans.payment-methods');
-
-    Route::put('change-order-status', [OrderController::class, 'changeStatus'])->name('order.change-status');
-
-    Route::apiResource('invoice', InvoiceController::class);
-
-    Route::apiResource('voucher', VoucherController::class);
-    Route::get('voucher-dropdown', [VoucherController::class, 'dropdown'])->name('voucher.dropdown');
-
-    Route::post('report/generate', [ReportController::class, 'generateReport'])->name('report.generate');
-});
+require __DIR__ . '/api_admin.php';
+require __DIR__ . '/api_my_store.php';
