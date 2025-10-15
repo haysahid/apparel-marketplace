@@ -166,7 +166,7 @@ onMounted(() => {
 <template>
     <DefaultCard
         :isMain="true"
-        class="flex flex-col w-full min-h-[80vh] gap-4 px-0 py-4 transition-all duration-300 ease-in-out sm:py-6"
+        class="flex flex-col w-full min-h-[80vh] gap-4 !px-0 py-4 transition-all duration-300 ease-in-out"
     >
         <div
             class="flex items-center justify-between gap-4 px-4 bg-white sm:px-6"
@@ -244,6 +244,7 @@ onMounted(() => {
                     <template #trailing>
                         <div class="flex items-center gap-2.5">
                             <SelectInput
+                                class="w-full"
                                 :options="
                                     props.roles.map((role) => ({
                                         label: role.name,

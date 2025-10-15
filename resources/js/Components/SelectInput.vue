@@ -31,7 +31,7 @@ const emit = defineEmits({
 
 <template>
     <select
-        class="px-3 py-1 text-sm text-gray-600 transition-all duration-300 ease-in-out border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none focus:ring-1 focus:ring-primary-light focus:border-primary-light hover:border-primary-light hover:ring-1 hover:ring-primary-light disabled:hover:border-gray-300 disabled:ring-0 disabled:cursor-default"
+        class="px-2.5 py-1 text-sm text-gray-600 transition-all duration-300 ease-in-out border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none focus:ring-1 focus:ring-primary-light focus:border-primary-light hover:border-primary-light hover:ring-1 hover:ring-primary-light disabled:hover:border-gray-300 disabled:ring-0 disabled:cursor-default"
         :disabled="props.disabled"
         @change="(e) => emit('update:modelValue', (e.target as HTMLSelectElement).value)"
     >

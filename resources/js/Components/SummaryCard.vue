@@ -1,4 +1,6 @@
 <script setup>
+import DefaultCard from "./DefaultCard.vue";
+
 defineProps({
     title: String,
     value: [String, Number],
@@ -6,15 +8,17 @@ defineProps({
 </script>
 
 <template>
-    <div
-        class="flex flex-col w-full gap-1 px-4 py-3.5 transition-all duration-300 ease-in-out bg-white border border-gray-100 sm:px-6 sm:py-5 sm:gap-2 rounded-xl"
-    >
-        <div class="flex items-center gap-1 sm:gap-2">
-            <slot name="icon"></slot>
-            <h3 class="text-xs font-medium text-gray-500 sm:text-sm">
-                {{ title }}
-            </h3>
+    <DefaultCard class="w-full">
+        <div class="flex flex-col gap-1 md:gap-2">
+            <div class="flex items-center gap-1 sm:gap-2">
+                <slot name="icon"></slot>
+                <h3 class="text-xs font-medium text-gray-500 sm:text-sm">
+                    {{ title }}
+                </h3>
+            </div>
+            <p class="text-base font-bold text-gray-900 sm:text-lg md:text-xl">
+                {{ value }}
+            </p>
         </div>
-        <p class="text-lg font-bold text-gray-900 sm:text-xl">{{ value }}</p>
-    </div>
+    </DefaultCard>
 </template>

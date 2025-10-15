@@ -22,7 +22,7 @@ const props = defineProps({
         />
 
         <div
-            class="flex flex-col w-full gap-4 p-4 items-start sm:p-6 offset-y-[-100px] mt-[-80px] sm:offset-y-[-140px] sm:mt-[-120px]"
+            class="flex flex-col w-full gap-4 p-3 sm:p-4 items-start md:p-6 offset-y-[-100px] mt-[-80px] sm:offset-y-[-140px] sm:mt-[-120px]"
         >
             <div
                 class="flex items-center justify-center size-[120px] sm:size-[140px] bg-gray-50 rounded-full shrink-0 border-4 border-white shadow"

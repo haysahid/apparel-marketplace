@@ -3,8 +3,9 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build && vite build --ssr && vite build && vite build --ssr --ssr",
-        "dev": "vite"
+        "build": "vite build && vite build --ssr",
+        "dev": "vite",
+        "dev:lan": "vite --host"
     },
     "devDependencies": {
         "@inertiajs/vue3": "^2.0",

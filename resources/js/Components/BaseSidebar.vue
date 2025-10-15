@@ -32,9 +32,9 @@ const props = defineProps({
             <!-- Logo -->
             <div
                 v-if="!props.responsive"
-                class="flex items-center px-6 py-2.5 mb-1 shrink-0"
+                class="flex items-center px-6 py-2.5 mb-1"
             >
-                <Link :href="route('home')">
+                <Link :href="route('home')" class="shrink-0">
                     <img
                         :src="getImageUrl($page.props.setting.logo)"
                         alt="Logo"
