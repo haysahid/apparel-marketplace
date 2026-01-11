@@ -6,8 +6,6 @@ import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 
 <template>
     <MyStoreLayout title="Tambah Voucher" :showTitle="true">
-        <div class="max-w-7xl">
-            <VoucherForm />
-        </div>
+        <VoucherForm />
     </MyStoreLayout>
 </template>

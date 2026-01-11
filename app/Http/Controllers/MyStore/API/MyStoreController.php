@@ -19,6 +19,158 @@ class MyStoreController extends Controller
         $this->storeId = $request->header('X-Selected-Store-ID');
     }
 
+    public function addStoreLogo(Request $request)
+    {
+        $request->validate([
+            'logo' => 'required|image|max:2048',
+        ], [
+            'logo.required' => 'Logo toko harus diunggah.',
+            'logo.image' => 'File yang diunggah harus berupa gambar.',
+            'logo.max' => 'Ukuran logo tidak boleh lebih dari 2MB.',
+        ]);
+
+        try {
+            $logoPath = StoreRepository::addStoreLogo(
+                storeId: $this->storeId,
+                file: $request->file('logo'),
+            );
+
+            return ResponseFormatter::success(
+                ['logo_url' => $logoPath],
+                'Logo toko berhasil diunggah.',
+                201
+            );
+        } catch (Exception $e) {
+            return ResponseFormatter::error(
+                $e->getMessage(),
+                $e->getCode() ?: 500
+            );
+        }
+    }
+
+    public function updateStoreLogo(Request $request)
+    {
+        $request->validate([
+            'logo' => 'required|image|max:2048',
+        ], [
+            'logo.required' => 'Logo toko harus diunggah.',
+            'logo.image' => 'File yang diunggah harus berupa gambar.',
+            'logo.max' => 'Ukuran logo tidak boleh lebih dari 2MB.',
+        ]);
+
+        try {
+            $logoPath = StoreRepository::updateStoreLogo(
+                storeId: $this->storeId,
+                file: $request->file('logo'),
+            );
+
+            return ResponseFormatter::success(
+                ['logo_url' => $logoPath],
+                'Logo toko berhasil diperbarui.'
+            );
+        } catch (Exception $e) {
+            return ResponseFormatter::error(
+                $e->getMessage(),
+                $e->getCode() ?: 500
+            );
+        }
+    }
+
+    public function deleteStoreLogo(Request $request)
+    {
+        try {
+            StoreRepository::deleteStoreLogo(
+                storeId: $this->storeId,
+            );
+
+            return ResponseFormatter::success(
+                null,
+                'Logo toko berhasil dihapus.'
+            );
+        } catch (Exception $e) {
+            return ResponseFormatter::error(
+                $e->getMessage(),
+                $e->getCode() ?: 500
+            );
+        }
+    }
+
+    public function addStoreBanner(Request $request)
+    {
+        $request->validate([
+            'banner' => 'required|image|max:4096',
+        ], [
+            'banner.required' => 'Banner toko harus diunggah.',
+            'banner.image' => 'File yang diunggah harus berupa gambar.',
+            'banner.max' => 'Ukuran banner tidak boleh lebih dari 4MB.',
+        ]);
+
+        try {
+            $bannerPath = StoreRepository::addStoreBanner(
+                storeId: $this->storeId,
+                file: $request->file('banner'),
+            );
+
+            return ResponseFormatter::success(
+                ['banner_url' => $bannerPath],
+                'Banner toko berhasil diunggah.',
+                201
+            );
+        } catch (Exception $e) {
+            return ResponseFormatter::error(
+                $e->getMessage(),
+                $e->getCode() ?: 500
+            );
+        }
+    }
+
+    public function updateStoreBanner(Request $request)
+    {
+        $request->validate([
+            'banner' => 'required|image|max:4096',
+        ], [
+            'banner.required' => 'Banner toko harus diunggah.',
+            'banner.image' => 'File yang diunggah harus berupa gambar.',
+            'banner.max' => 'Ukuran banner tidak boleh lebih dari 4MB.',
+        ]);
+
+        try {
+            $bannerPath = StoreRepository::updateStoreBanner(
+                storeId: $this->storeId,
+                file: $request->file('banner'),
+            );
+
+            return ResponseFormatter::success(
+                ['banner_url' => $bannerPath],
+                'Banner toko berhasil diperbarui.'
+            );
+        } catch (Exception $e) {
+            return ResponseFormatter::error(
+                $e->getMessage(),
+                $e->getCode() ?: 500
+            );
+        }
+    }
+
+    public function deleteStoreBanner(Request $request)
+    {
+        try {
+            StoreRepository::deleteStoreBanner(
+                storeId: $this->storeId,
+            );
+
+            return ResponseFormatter::success(
+                null,
+                'Banner toko berhasil dihapus.'
+            );
+        } catch (Exception $e) {
+            return ResponseFormatter::error(
+                $e->getMessage(),
+                $e->getCode() ?: 500
+            );
+        }
+    }
+
     public function addUserRole(Request $request, $userId)
     {
         $request->validate([
@@ -39,7 +191,8 @@ class MyStoreController extends Controller
 
             return ResponseFormatter::success(
                 null,
-                'Peran pengguna berhasil ditetapkan.'
+                'Peran pengguna berhasil ditetapkan.',
+                201
             );
         } catch (Exception $e) {
             return ResponseFormatter::error(

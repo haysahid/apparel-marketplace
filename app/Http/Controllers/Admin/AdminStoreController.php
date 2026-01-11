@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Store;
+use App\Repositories\RoleRepository;
 use App\Repositories\StoreRepository;
 use Exception;
 use Illuminate\Http\Request;
@@ -33,7 +34,13 @@ class AdminStoreController extends Controller
     public function show(Store $store)
     {
         $storeDetail = StoreRepository::getStoreDetail($store->id);
-        return Inertia::render('Admin/Store/StoreDetail', $storeDetail);
+
+        $roles = RoleRepository::getRoleDropdown();
+
+        return Inertia::render('Admin/Store/StoreDetail', [
+            ...$storeDetail,
+            'roles' => $roles,
+        ]);
     }
 
     public function create()

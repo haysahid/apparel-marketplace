@@ -12,7 +12,8 @@ import MyOrderCard from "@/Pages/MyStore/Order/MyOrderCard.vue";
 import StoreUserList from "./StoreUserList.vue";
 import { useDialogStore } from "@/stores/dialog-store";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
-import StoreProfile from "@/Pages/MyStore/Store/StoreProfile.vue";
+import BaseStoreProfile from "@/Components/BaseStoreProfile.vue";
+import myStoreService from "@/services/my-store/store-service";
 
 const props = defineProps({
     store: Object as () => StoreEntity,
@@ -22,6 +23,7 @@ const props = defineProps({
     roles: Array as () => RoleEntity[],
 });
 
+const store = ref<StoreEntity>(props.store);
 const userRolePairs = ref<UserRolePair[]>(props.store.user_role_pairs);
 
 const invoices = ref<PaginationModel<InvoiceEntity>>(null);
@@ -86,7 +88,59 @@ onMounted(() => {
     >
         <div class="flex flex-col w-full gap-1 p-1.5 sm:gap-2 sm:p-0">
             <!-- Profile -->
-            <StoreProfile :store="store" />
+            <BaseStoreProfile
+                :store="store"
+                @editLogo="
+                    (file) => {
+                        if (props.store.logo) {
+                            myStoreService().updateStoreLogo(
+                                { file },
+                                {
+                                    onSuccess: (response) => {
+                                        store.logo =
+                                            response.data.result.logo_url;
+                                    },
+                                }
+                            );
+                        } else {
+                            myStoreService().addStoreLogo(
+                                { file },
+                                {
+                                    onSuccess: (response) => {
+                                        store.logo =
+                                            response.data.result.logo_url;
+                                    },
+                                }
+                            );
+                        }
+                    }
+                "
+                @editBanner="
+                    (file) => {
+                        if (props.store.banner) {
+                            myStoreService().updateStoreBanner(
+                                { file },
+                                {
+                                    onSuccess: (response) => {
+                                        store.banner =
+                                            response.data.result.banner_url;
+                                    },
+                                }
+                            );
+                        } else {
+                            myStoreService().addStoreBanner(
+                                { file },
+                                {
+                                    onSuccess: (response) => {
+                                        store.banner =
+                                            response.data.result.banner_url;
+                                    },
+                                }
+                            );
+                        }
+                    }
+                "
+            />
 
             <!-- Summary -->
             <div class="flex items-center w-full gap-1 sm:gap-2">

@@ -80,7 +80,11 @@ const form = useForm(
                   { name: null, description: null },
                   { name: null, description: null },
               ],
-              social_links: [],
+              social_links: [
+                  { name: "Instagram", url: null, showEditForm: false },
+                  { name: "Facebook", url: null, showEditForm: false },
+                  { name: "TikTok", url: null, showEditForm: false },
+              ],
               rajaongkir_origin_id: null,
               rajaongkir_origin: null,
           }
@@ -118,9 +122,11 @@ const submit = () => {
         zip_code: data.rajaongkir_origin?.zip_code || null,
         logo: data.logo instanceof File ? data.logo : null,
     })).post(
-        route("admin.store.update", {
-            store: props.store.id,
-        }),
+        props.store
+            ? route("admin.store.update", {
+                  store: props.store.id,
+              })
+            : route("admin.store.store"),
         {
             onSuccess: () => {
                 openSuccessDialog("Informasi Toko berhasil diperbarui.");
@@ -373,8 +379,9 @@ const openErrorDialog = (message) => {
                                         @close="link.showEditForm = false"
                                     />
                                 </template>
-                            </DialogModal></div
-                    ></InputGroup>
+                            </DialogModal>
+                        </div>
+                    </InputGroup>
                 </div>
             </div>
         </div>

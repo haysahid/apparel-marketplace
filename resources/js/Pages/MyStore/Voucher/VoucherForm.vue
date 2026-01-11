@@ -168,7 +168,7 @@ const scrollToTop = () => {
                             <!-- Step 1 -->
                             <div
                                 v-if="stepIndex === 0"
-                                class="flex flex-col w-full max-w-3xl gap-4"
+                                class="flex flex-col w-full gap-4"
                             >
                                 <!-- Name -->
                                 <InputGroup id="name" label="Nama Voucher">
@@ -360,7 +360,7 @@ const scrollToTop = () => {
                             <!-- Step 2 -->
                             <div
                                 v-if="stepIndex === 1"
-                                class="flex flex-col w-full max-w-3xl gap-4"
+                                class="flex flex-col w-full gap-4"
                             >
                                 <!-- Usage Limit -->
                                 <InputGroup

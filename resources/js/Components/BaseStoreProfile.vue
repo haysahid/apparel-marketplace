@@ -1,37 +1,125 @@
 <script setup lang="ts">
 import DefaultCard from "@/Components/DefaultCard.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
-import WhatsAppButton from "@/Components/WhatsAppButton.vue";
-import { getWhatsAppLink } from "@/plugins/helpers";
-import { Link } from "@inertiajs/vue3";
+import { computed, getCurrentInstance, ref } from "vue";
+import Tooltip from "@/Components/Tooltip.vue";
 
 const props = defineProps({
     store: Object as () => StoreEntity,
+});
+
+const emit = defineEmits(["editLogo", "editBanner"]);
+
+const editBannerInput = ref<HTMLInputElement | null>(null);
+const hasEditLogoCallback = computed(() => {
+    return !!getCurrentInstance()?.vnode?.props?.["onEditLogo"];
+});
+
+const editLogoInput = ref<HTMLInputElement | null>(null);
+const hasEditBannerCallback = computed(() => {
+    return !!getCurrentInstance()?.vnode?.props?.["onEditBanner"];
 });
 </script>
 
 <template>
     <DefaultCard class="!p-0">
         <!-- Banner -->
-        <img
-            v-if="props.store.banner"
-            :src="$getImageUrl(props.store.banner)"
-            alt="Banner Toko"
-            class="object-cover w-full rounded-t-xl shadow-sm aspect-[4/1] dark:border-gray-600"
-        />
+        <div class="w-full">
+            <div class="relative w-full">
+                <img
+                    v-if="props.store.banner"
+                    :src="$getImageUrl(props.store.banner)"
+                    alt="Banner Toko"
+                    class="object-cover w-full rounded-t-xl shadow-sm aspect-[4/1] dark:border-gray-600"
+                />
+                <div
+                    v-else
+                    class="flex items-center justify-center bg-gray-100 w-full rounded-t-xl shadow-sm aspect-[4/1] dark:border-gray-600"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        class="size-8 fill-gray-400"
+                    >
+                        <path
+                            d="M5 21C4.45 21 3.97933 20.8043 3.588 20.413C3.19667 20.0217 3.00067 19.5507 3 19V5C3 4.45 3.196 3.97933 3.588 3.588C3.98 3.19667 4.45067 3.00067 5 3H19C19.55 3 20.021 3.196 20.413 3.588C20.805 3.98 21.0007 4.45067 21 5V19C21 19.55 20.8043 20.021 20.413 20.413C20.0217 20.805 19.5507 21.0007 19 21H5ZM6 17H18L14.25 12L11.25 16L9 13L6 17Z"
+                        />
+                    </svg>
+                </div>
+                <div
+                    v-if="hasEditBannerCallback"
+                    class="absolute top-3 right-3"
+                >
+                    <input
+                        ref="editBannerInput"
+                        type="file"
+                        accept="image/*"
+                        class="hidden"
+                        id="edit-banner-input"
+                        @change="
+                        (event) => {
+                            const file = (event.target as HTMLInputElement)
+                                .files?.[0];
+                            if (file) {
+                                emit('editBanner', file);
+                            }
+                            // Reset the input value to allow re-uploading the same file
+                            (event.target as HTMLInputElement).value = '';
+                        }
+                    "
+                    />
+                    <SecondaryButton
+                        size="sm"
+                        type="button"
+                        class="hidden sm:inline-block"
+                        @click="editBannerInput.click()"
+                    >
+                        Ubah Banner
+                    </SecondaryButton>
+                    <button
+                        type="button"
+                        @click="editBannerInput.click()"
+                        class="group sm:hidden"
+                    >
+                        <Tooltip placement="bottom" class="hover:scale-105">
+                            <div
+                                class="p-1 transition-all duration-300 ease-in-out bg-white border border-white rounded-full shadow group-hover:shadow-md"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    class="text-gray-500 transition-all duration-300 ease-in-out size-5 group-hover:text-gray-600"
+                                >
+                                    <path
+                                        d="M20.71 7.04006C21.1 6.65006 21.1 6.00006 20.71 5.63006L18.37 3.29006C18 2.90006 17.35 2.90006 16.96 3.29006L15.12 5.12006L18.87 8.87006M3 17.2501V21.0001H6.75L17.81 9.93006L14.06 6.18006L3 17.2501Z"
+                                        fill="currentColor"
+                                    />
+                                </svg>
+                            </div>
+
+                            <template #content> Ubah Logo </template>
+                        </Tooltip>
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <div
             class="flex flex-col w-full gap-4 p-3 sm:p-4 items-start md:p-6 offset-y-[-100px] mt-[-80px] sm:offset-y-[-140px] sm:mt-[-120px]"
         >
+            <!-- Logo -->
             <div
-                class="flex items-center justify-center size-[120px] sm:size-[140px] bg-gray-50 rounded-full shrink-0 border-4 border-white shadow"
+                class="relative flex items-center justify-center size-[120px] sm:size-[140px] bg-gray-50 rounded-full shrink-0 border-4 border-white shadow"
             >
                 <img
                     v-if="props.store.logo"
                     :src="$getImageUrl(props.store.logo)"
                     alt="Logo Toko"
-                    class="object-contain size-[120px] sm:size-[140px] h-fit shrink-0"
+                    class="object-contain size-[120px] sm:size-[140px] h-fit shrink-0 aspect-square rounded-full transition-all duration-300 ease-in-out border-4 border-white"
                 />
                 <svg
                     v-else
@@ -45,6 +133,58 @@ const props = defineProps({
                         d="M22 7.82001C22.006 7.75682 22.006 7.6932 22 7.63001L20 2.63001C19.9219 2.43237 19.7828 2.26475 19.603 2.15147C19.4232 2.03819 19.212 1.98514 19 2.00001H5C4.79972 1.99982 4.604 2.05977 4.43818 2.17209C4.27237 2.28442 4.1441 2.44395 4.07 2.63001L2.07 7.63001C2.06397 7.6932 2.06397 7.75682 2.07 7.82001C2.0371 7.87584 2.01346 7.93663 2 8.00001C2.01113 8.69125 2.20123 9.36781 2.55174 9.96369C2.90226 10.5596 3.40124 11.0544 4 11.4V21C4 21.2652 4.10536 21.5196 4.29289 21.7071C4.48043 21.8947 4.73478 22 5 22H19C19.2652 22 19.5196 21.8947 19.7071 21.7071C19.8946 21.5196 20 21.2652 20 21V11.44C20.6046 11.091 21.1072 10.5898 21.4581 9.98635C21.809 9.38287 21.9958 8.69807 22 8.00001C22.0091 7.94035 22.0091 7.87967 22 7.82001ZM13 20H11V16H13V20ZM18 20H15V15C15 14.7348 14.8946 14.4804 14.7071 14.2929C14.5196 14.1054 14.2652 14 14 14H10C9.73478 14 9.48043 14.1054 9.29289 14.2929C9.10536 14.4804 9 14.7348 9 15V20H6V12C6.56947 11.9968 7.13169 11.872 7.64905 11.634C8.16642 11.3961 8.627 11.0503 9 10.62C9.37537 11.0456 9.83701 11.3865 10.3542 11.62C10.8715 11.8535 11.4325 11.9743 12 11.9743C12.5675 11.9743 13.1285 11.8535 13.6458 11.62C14.163 11.3865 14.6246 11.0456 15 10.62C15.373 11.0503 15.8336 11.3961 16.3509 11.634C16.8683 11.872 17.4305 11.9968 18 12V20ZM18 10C17.4696 10 16.9609 9.7893 16.5858 9.41423C16.2107 9.03915 16 8.53044 16 8.00001C16 7.7348 15.8946 7.48044 15.7071 7.29291C15.5196 7.10537 15.2652 7.00001 15 7.00001C14.7348 7.00001 14.4804 7.10537 14.2929 7.29291C14.1054 7.48044 14 7.7348 14 8.00001C14 8.53044 13.7893 9.03915 13.4142 9.41423C13.0391 9.7893 12.5304 10 12 10C11.4696 10 10.9609 9.7893 10.5858 9.41423C10.2107 9.03915 10 8.53044 10 8.00001C10 7.7348 9.89464 7.48044 9.70711 7.29291C9.51957 7.10537 9.26522 7.00001 9 7.00001C8.73478 7.00001 8.48043 7.10537 8.29289 7.29291C8.10536 7.48044 8 7.7348 8 8.00001C8.00985 8.26266 7.96787 8.52467 7.87646 8.77109C7.78505 9.01751 7.646 9.24351 7.46725 9.43619C7.28849 9.62887 7.07354 9.78446 6.83466 9.89407C6.59578 10.0037 6.33764 10.0652 6.075 10.075C5.54457 10.0949 5.02796 9.90327 4.63882 9.54226C4.44614 9.36351 4.29055 9.14855 4.18094 8.90967C4.07133 8.67079 4.00985 8.41266 4 8.15001L5.68 4.00001H18.32L20 8.15001C19.9621 8.65403 19.7348 9.125 19.3637 9.46822C18.9927 9.81143 18.5054 10.0014 18 10Z"
                     />
                 </svg>
+
+                <!-- Edit Logo Button -->
+                <div
+                    v-if="hasEditLogoCallback"
+                    class="absolute bottom-0 right-0"
+                >
+                    <input
+                        ref="editLogoInput"
+                        type="file"
+                        accept="image/*"
+                        class="hidden"
+                        id="edit-logo-input"
+                        @change="
+                            (event) => {
+                                const file = (event.target as HTMLInputElement)
+                                    .files?.[0];
+                                if (file) {
+                                    emit('editLogo', file);
+                                }
+                                // Reset the input value to allow re-uploading the same file
+                                (event.target as HTMLInputElement).value = '';
+                            }
+                        "
+                    />
+
+                    <button
+                        type="button"
+                        @click="editLogoInput.click()"
+                        class="group"
+                    >
+                        <Tooltip placement="bottom" class="hover:scale-105">
+                            <div
+                                class="p-1 transition-all duration-300 ease-in-out bg-white border border-white rounded-full shadow group-hover:shadow-md"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    class="text-gray-500 transition-all duration-300 ease-in-out size-5 group-hover:text-gray-600"
+                                >
+                                    <path
+                                        d="M20.71 7.04006C21.1 6.65006 21.1 6.00006 20.71 5.63006L18.37 3.29006C18 2.90006 17.35 2.90006 16.96 3.29006L15.12 5.12006L18.87 8.87006M3 17.2501V21.0001H6.75L17.81 9.93006L14.06 6.18006L3 17.2501Z"
+                                        fill="currentColor"
+                                    />
+                                </svg>
+                            </div>
+
+                            <template #content> Ubah Logo </template>
+                        </Tooltip>
+                    </button>
+                </div>
             </div>
 
             <div class="flex flex-col items-start justify-center w-full gap-3">
@@ -114,37 +254,7 @@ const props = defineProps({
                 </p>
             </div>
 
-            <div class="flex items-center gap-2">
-                <Link
-                    :href="
-                        route('admin.store.edit', {
-                            store: props.store.id,
-                        })
-                    "
-                >
-                    <SecondaryButton
-                        @click="$event.stopPropagation()"
-                        class="px-3 py-1"
-                    >
-                        Ubah
-                    </SecondaryButton>
-                </Link>
-
-                <Link
-                    v-if="props.store.phone"
-                    :href="
-                        getWhatsAppLink(
-                            props.store.phone,
-                            'Halo, saya ingin bertanya mengenai toko Anda.'
-                        )
-                    "
-                    target="_blank"
-                >
-                    <WhatsAppButton @click="$event.stopPropagation()">
-                        Hubungi
-                    </WhatsAppButton>
-                </Link>
-            </div>
+            <slot name="actions" />
         </div>
     </DefaultCard>
 </template>

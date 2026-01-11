@@ -47,7 +47,17 @@ Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->gro
 
     Route::post('report/generate', [ReportController::class, 'generateReport'])->name('report.generate');
 
-    // User Role
+    // Store Logo
+    Route::post('store/logo', [MyStoreController::class, 'addStoreLogo'])->name('store-logo.add');
+    Route::put('store/logo', [MyStoreController::class, 'updateStoreLogo'])->name('store-logo.update');
+    Route::delete('store/logo', [MyStoreController::class, 'deleteStoreLogo'])->name('store-logo.delete');
+
+    // Store Banner
+    Route::post('store/banner', [MyStoreController::class, 'addStoreBanner'])->name('store-banner.add');
+    Route::put('store/banner', [MyStoreController::class, 'updateStoreBanner'])->name('store-banner.update');
+    Route::delete('store/banner', [MyStoreController::class, 'deleteStoreBanner'])->name('store-banner.delete');
+
+    // Store User Role
     Route::post('user/{userId}/role', [MyStoreController::class, 'addUserRole'])->name('user-role.add');
     Route::put('user/{userId}/role', [MyStoreController::class, 'updateUserRole'])->name('user-role.update');
     Route::delete('user/{userId}/role', [MyStoreController::class, 'removeUserRole'])->name('user-role.remove');

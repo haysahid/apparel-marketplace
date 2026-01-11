@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class StoreRepository
 {
@@ -305,6 +306,128 @@ class StoreRepository
         }
 
         $userStoreRole->delete();
+
+        return true;
+    }
+
+    public static function addStoreLogo($storeId, $file)
+    {
+        $store = Store::find($storeId);
+
+        if (!$store) {
+            throw new Exception('Toko tidak ditemukan', 404);
+        }
+
+        $logoPath = $file->store('store', 'public');
+
+        if (!$logoPath) {
+            throw new Exception('Gagal mengunggah logo toko', 500);
+        }
+
+        $store->logo = $logoPath;
+        $store->save();
+    }
+
+    public static function updateStoreLogo($storeId, $file)
+    {
+        $store = Store::find($storeId);
+
+        if (!$store) {
+            throw new Exception('Toko tidak ditemukan', 404);
+        }
+
+        // Delete old logo if exists
+        if ($store->logo) {
+            Storage::disk('public')->delete($store->logo);
+        }
+
+        $logoPath = $file->store('store', 'public');
+
+        if (!$logoPath) {
+            throw new Exception('Gagal mengunggah logo toko', 500);
+        }
+
+        $store->logo = $logoPath;
+        $store->save();
+
+        return $logoPath;
+    }
+
+    public static function deleteStoreLogo($storeId)
+    {
+        $store = Store::find($storeId);
+
+        if (!$store) {
+            throw new Exception('Toko tidak ditemukan', 404);
+        }
+
+        // Delete old logo if exists
+        if ($store->logo) {
+            Storage::disk('public')->delete($store->logo);
+            $store->logo = null;
+            $store->save();
+        }
+
+        return true;
+    }
+
+    public static function addStoreBanner($storeId, $file)
+    {
+        $store = Store::find($storeId);
+
+        if (!$store) {
+            throw new Exception('Toko tidak ditemukan', 404);
+        }
+
+        $bannerPath = $file->store('store', 'public');
+
+        if (!$bannerPath) {
+            throw new Exception('Gagal mengunggah banner toko', 500);
+        }
+
+        $store->banner = $bannerPath;
+        $store->save();
+    }
+
+    public static function updateStoreBanner($storeId, $file)
+    {
+        $store = Store::find($storeId);
+
+        if (!$store) {
+            throw new Exception('Toko tidak ditemukan', 404);
+        }
+
+        // Delete old banner if exists
+        if ($store->banner) {
+            Storage::disk('public')->delete($store->banner);
+        }
+
+        $bannerPath = $file->store('store', 'public');
+
+        if (!$bannerPath) {
+            throw new Exception('Gagal mengunggah banner toko', 500);
+        }
+
+        $store->banner = $bannerPath;
+        $store->save();
+
+        return $bannerPath;
+    }
+
+    public static function deleteStoreBanner($storeId)
+    {
+        $store = Store::find($storeId);
+
+        if (!$store) {
+            throw new Exception('Toko tidak ditemukan', 404);
+        }
+
+        // Delete old banner if exists
+        if ($store->banner) {
+            Storage::disk('public')->delete($store->banner);
+            $store->banner = null;
+            $store->save();
+        }
 
         return true;
     }
