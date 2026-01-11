@@ -365,7 +365,7 @@ const breadcrumbs = [
                             :basePrice="product.lowest_base_selling_price"
                             :discount="product.discount"
                             :finalPrice="product.lowest_final_selling_price"
-                            :image="product.images[0].image as string || null"
+                            :image="product.images[0]?.image as string || null"
                             :description="product.brand?.name"
                             :slug="product.slug"
                         />

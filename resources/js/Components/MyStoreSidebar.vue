@@ -12,7 +12,7 @@ const menus = [
     {
         name: "Dashboard",
         href: route("my-store.dashboard"),
-        active: route().current("my-store.dashboard"),
+        active: route().current().startsWith("my-store.dashboard"),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -44,7 +44,7 @@ const menus = [
             {
                 name: "Detail Toko",
                 href: route("my-store.store.show"),
-                active: route().current("my-store.store.show"),
+                active: route().current().startsWith("my-store.store.show"),
                 icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -59,7 +59,7 @@ const menus = [
             {
                 name: "Ubah Toko",
                 href: route("my-store.store.edit"),
-                active: route().current("my-store.store.edit"),
+                active: route().current().startsWith("my-store.store.edit"),
                 icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -74,7 +74,7 @@ const menus = [
             {
                 name: "Sertifikat",
                 href: route("my-store.certificate"),
-                active: route().current("my-store.certificate"),
+                active: route().current().startsWith("my-store.certificate"),
                 icon: `
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -108,7 +108,7 @@ const menus = [
             {
                 name: "Kategori",
                 href: route("my-store.category"),
-                active: route().current("my-store.category"),
+                active: route().current().startsWith("my-store.category"),
                 icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -125,7 +125,7 @@ const menus = [
             {
                 name: "Warna",
                 href: route("my-store.color"),
-                active: route().current("my-store.color"),
+                active: route().current().startsWith("my-store.color"),
                 icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -140,7 +140,7 @@ const menus = [
             {
                 name: "Ukuran",
                 href: route("my-store.size"),
-                active: route().current("my-store.size"),
+                active: route().current().startsWith("my-store.size"),
                 icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -155,7 +155,7 @@ const menus = [
             {
                 name: "Brand",
                 href: route("my-store.brand"),
-                active: route().current("my-store.brand"),
+                active: route().current().startsWith("my-store.brand"),
                 icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -170,7 +170,7 @@ const menus = [
             {
                 name: "Satuan",
                 href: route("my-store.unit"),
-                active: route().current("my-store.unit"),
+                active: route().current().startsWith("my-store.unit"),
                 icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -185,7 +185,7 @@ const menus = [
             {
                 name: "Produk",
                 href: route("my-store.product"),
-                active: route().current("my-store.product"),
+                active: route().current().startsWith("my-store.product"),
                 icon: `
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -205,7 +205,7 @@ const menus = [
     {
         name: "Transaksi",
         href: route("my-store.transaction"),
-        active: route().current("my-store.transaction"),
+        active: route().current().startsWith("my-store.transaction"),
         icon: `
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -220,7 +220,7 @@ const menus = [
     {
         name: "Pesanan",
         href: route("my-store.order"),
-        active: route().current("my-store.order"),
+        active: route().current().startsWith("my-store.order"),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -235,7 +235,7 @@ const menus = [
     {
         name: "Pembayaran",
         href: route("my-store.payment"),
-        active: route().current("my-store.payment"),
+        active: route().current().startsWith("my-store.payment"),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -250,7 +250,7 @@ const menus = [
     {
         name: "Voucher",
         href: route("my-store.voucher"),
-        active: route().current("my-store.voucher"),
+        active: route().current().startsWith("my-store.voucher"),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -265,7 +265,7 @@ const menus = [
     {
         name: "Pelanggan",
         href: route("my-store.customer"),
-        active: route().current("my-store.customer"),
+        active: route().current().startsWith("my-store.customer"),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -280,7 +280,7 @@ const menus = [
     {
         name: "Aturan Poin",
         href: route("my-store.point-rule"),
-        active: route().current("my-store.point-rule"),
+        active: route().current().startsWith("my-store.point-rule"),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -295,7 +295,7 @@ const menus = [
     {
         name: "Mitra",
         href: route("my-store.partner"),
-        active: route().current("my-store.partner"),
+        active: route().current().startsWith("my-store.partner"),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -310,7 +310,7 @@ const menus = [
     {
         name: "Laporan",
         href: route("my-store.report"),
-        active: route().current("my-store.report"),
+        active: route().current().startsWith("my-store.report"),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
