@@ -80,7 +80,7 @@ const openErrorDialog = (message) => {
     <form @submit.prevent="submit" class="max-w-3xl">
         <div class="flex flex-col items-start gap-4">
             <!-- Name -->
-            <InputGroup id="name" label="Nama Sertifikat">
+            <InputGroup for="name" label="Nama Sertifikat">
                 <TextInput
                     id="name"
                     v-model="form.name"
@@ -95,7 +95,7 @@ const openErrorDialog = (message) => {
             </InputGroup>
 
             <!-- Description -->
-            <InputGroup id="description" label="Deskripsi Sertifikat">
+            <InputGroup for="description" label="Deskripsi Sertifikat">
                 <TextAreaInput
                     id="description"
                     v-model="form.description"
@@ -110,7 +110,7 @@ const openErrorDialog = (message) => {
             </InputGroup>
 
             <!-- Image -->
-            <InputGroup id="image" label="Gambar Sertifikat">
+            <InputGroup for="image" label="Gambar Sertifikat">
                 <ImageInput
                     id="image"
                     v-model="form.image"

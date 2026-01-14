@@ -216,7 +216,6 @@ onMounted(() => {
 
             <div class="flex flex-col w-full gap-1 lg:flex-row sm:gap-2">
                 <!-- Users -->
-                <!-- Users -->
                 <StoreUserList
                     :storeId="
                         route().current().startsWith('admin.')

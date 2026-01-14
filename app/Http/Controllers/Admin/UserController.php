@@ -7,9 +7,10 @@ use App\Models\User;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
-class AdminUserController extends Controller
+class UserController extends Controller
 {
     public function index(Request $request)
     {
@@ -27,14 +28,21 @@ class AdminUserController extends Controller
             orderDirection: $orderDirection,
         );
 
-        return Inertia::render('Admin/User', [
+        return Inertia::render('Admin/User/Index', [
             'users' => $users,
         ]);
     }
 
     public function create()
     {
-        $roles = RoleRepository::getRoleDropdown();
+        $roles = RoleRepository::getRoleDropdown(
+            hideRoles: [
+                'member',
+                'reseller',
+                'agent',
+                'store-owner'
+            ]
+        );
         return Inertia::render('Admin/User/AddUser', [
             'roles' => $roles
         ]);
@@ -53,9 +61,12 @@ class AdminUserController extends Controller
             'avatar' => 'nullable|image|max:2048',
         ]);
 
+        Log::info('Create user', ['user' => $validatedData['username']]);
+
         UserRepository::createUser($validatedData);
 
-        return redirect()->route('admin.user')->with('success', 'Pengguna berhasil dibuat.');
+
+        return redirect()->route('admin.user.index')->with('success', 'Pengguna berhasil dibuat.');
     }
 
     public function show(User $user)
@@ -66,7 +77,14 @@ class AdminUserController extends Controller
 
     public function edit(User $user)
     {
-        $roles = RoleRepository::getRoleDropdown();
+        $roles = RoleRepository::getRoleDropdown(
+            hideRoles: [
+                'member',
+                'reseller',
+                'agent',
+                'store-owner'
+            ]
+        );
         return Inertia::render('Admin/User/EditUser', [
             'user' => $user,
             'roles' => $roles
@@ -91,12 +109,12 @@ class AdminUserController extends Controller
             data: $validatedData,
         );
 
-        return redirect()->route('admin.user')->with('success', 'Pengguna berhasil diperbarui.');
+        return redirect()->route('admin.user.index')->with('success', 'Pengguna berhasil diperbarui.');
     }
 
     public function destroy(User $user)
     {
         UserRepository::deleteUser($user);
-        return redirect()->route('admin.user')->with('success', 'Pengguna berhasil dihapus.');
+        return redirect()->route('admin.user.index')->with('success', 'Pengguna berhasil dihapus.');
     }
 }

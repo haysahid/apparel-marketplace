@@ -35,7 +35,7 @@ class StoreSeeder extends Seeder
             'zip_code' => '15560',
         ]);
 
-        $storeAdmin = User::where('username', 'adminmustika')->first();
+        $storeAdmin = User::where('username', 'admintoko')->first();
         $storeAdmin->stores()->attach(1, [
             'role_id' => 2,
             'created_at' => now(),

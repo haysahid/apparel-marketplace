@@ -95,7 +95,7 @@ onMounted(() => {
     <form @submit.prevent="submit" class="max-w-3xl">
         <div class="flex flex-col items-start gap-4">
             <!-- Name -->
-            <InputGroup id="unit-name" label="Nama Satuan">
+            <InputGroup for="unit-name" label="Nama Satuan">
                 <TextInput
                     id="unit-name"
                     v-model="form.name"
@@ -110,7 +110,7 @@ onMounted(() => {
             </InputGroup>
 
             <!-- Description -->
-            <InputGroup id="description" label="Deskripsi (Opsional)">
+            <InputGroup for="description" label="Deskripsi (Opsional)">
                 <TextAreaInput
                     id="description"
                     v-model="form.description"

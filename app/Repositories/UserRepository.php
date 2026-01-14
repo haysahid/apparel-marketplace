@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class UserRepository
 {
@@ -94,6 +95,12 @@ class UserRepository
 
             $data['password'] = Hash::make($data['password']);
 
+            // Handle avatar upload if exists
+            if (isset($data['avatar']) && $data['avatar']) {
+                $avatarPath = $data['avatar']->store('user', 'public');
+                $data['avatar'] = $avatarPath;
+            }
+
             // Create the user
             $user = User::create($data);
 
@@ -121,6 +128,19 @@ class UserRepository
                 $data['password'] = Hash::make($data['password']);
             } else {
                 unset($data['password']);
+            }
+
+            // Handle avatar upload if exists
+            if (isset($data['avatar']) && $data['avatar']) {
+                if ($user->avatar) {
+                    // Delete old avatar
+                    Storage::disk('public')->delete($user->avatar);
+                }
+
+                $avatarPath = $data['avatar']->store('user', 'public');
+                $data['avatar'] = $avatarPath;
+            } else {
+                unset($data['avatar']);
             }
 
             $user->update($data);

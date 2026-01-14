@@ -10,7 +10,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class AdminStoreController extends Controller
+class StoreController extends Controller
 {
     public function index(Request $request)
     {

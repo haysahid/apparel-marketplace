@@ -121,7 +121,7 @@ onMounted(() => {
     <form @submit.prevent="submit" class="max-w-3xl">
         <div class="flex flex-col items-start gap-4">
             <!-- Name -->
-            <InputGroup id="point-rule-name" label="Nama Aturan Poin">
+            <InputGroup for="point-rule-name" label="Nama Aturan Poin">
                 <TextInput
                     id="point-rule-name"
                     v-model="form.name"
@@ -135,7 +135,7 @@ onMounted(() => {
             </InputGroup>
 
             <!-- Description -->
-            <InputGroup id="description" label="Deskripsi (Opsional)">
+            <InputGroup for="description" label="Deskripsi (Opsional)">
                 <TextAreaInput
                     id="description"
                     v-model="form.description"
@@ -147,7 +147,7 @@ onMounted(() => {
 
             <div class="flex items-center w-full gap-4">
                 <!-- Type -->
-                <InputGroup id="type" label="Jenis Aturan Poin">
+                <InputGroup for="type" label="Jenis Aturan Poin">
                     <DropdownSearchInput
                         id="type"
                         :modelValue="
@@ -170,7 +170,7 @@ onMounted(() => {
                 </InputGroup>
 
                 <!-- Points Earned -->
-                <InputGroup id="points-earned" label="Poin yang Didapatkan">
+                <InputGroup for="points-earned" label="Poin yang Didapatkan">
                     <TextInput
                         id="points-earned"
                         v-model="form.points_earned"
@@ -241,7 +241,7 @@ onMounted(() => {
 
             <div class="flex items-center w-full gap-4">
                 <!-- Valid From -->
-                <InputGroup id="valid-from" label="Berlaku Mulai">
+                <InputGroup for="valid-from" label="Berlaku Mulai">
                     <DateInput
                         id="valid-from"
                         v-model="form.valid_from"
@@ -258,7 +258,7 @@ onMounted(() => {
                 </InputGroup>
 
                 <!-- Valid Until -->
-                <InputGroup id="valid-until" label="Berlaku Hingga">
+                <InputGroup for="valid-until" label="Berlaku Hingga">
                     <DateInput
                         id="valid-until"
                         v-model="form.valid_until"

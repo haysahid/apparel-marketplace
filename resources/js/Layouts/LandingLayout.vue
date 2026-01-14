@@ -1,18 +1,17 @@
-<script setup>
-import { ref } from "vue";
-import { Head, Link, router } from "@inertiajs/vue3";
-import ApplicationMark from "@/Components/ApplicationMark.vue";
+<script setup lang="ts">
+import { Head } from "@inertiajs/vue3";
 import Banner from "@/Components/Banner.vue";
-import Dropdown from "@/Components/Dropdown.vue";
-import DropdownLink from "@/Components/DropdownLink.vue";
-import NavLink from "@/Components/NavLink.vue";
-import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import LandingFooter from "@/Components/LandingFooter.vue";
 import LandingHeader from "@/Components/LandingHeader.vue";
+import SuccessDialog from "@/Components/SuccessDialog.vue";
+import ErrorDialog from "@/Components/ErrorDialog.vue";
+import { useDialogStore } from "@/stores/dialog-store";
 
 defineProps({
     title: String,
 });
+
+const dialogStore = useDialogStore();
 </script>
 
 <template>
@@ -40,5 +39,29 @@ defineProps({
             <!-- Footer -->
             <LandingFooter />
         </div>
+
+        <SuccessDialog
+            :show="dialogStore.showSuccessDialog"
+            :title="dialogStore.successMessage"
+            @close="dialogStore.showSuccessDialog = false"
+        />
+
+        <ErrorDialog
+            :show="dialogStore.showErrorDialog"
+            @close="dialogStore.showErrorDialog = false"
+        >
+            <template #content>
+                <div>
+                    <div
+                        class="mb-1 text-lg font-semibold text-center text-gray-900"
+                    >
+                        Terjadi Kesalahan
+                    </div>
+                    <p class="text-sm text-center text-gray-700">
+                        {{ dialogStore.errorMessage }}
+                    </p>
+                </div>
+            </template>
+        </ErrorDialog>
     </div>
 </template>

@@ -9,7 +9,7 @@ use App\Repositories\StoreRepository;
 use Exception;
 use Illuminate\Http\Request;
 
-class AdminStoreController extends Controller
+class StoreController extends Controller
 {
     public function addStoreLogo(Request $request, $storeId)
     {

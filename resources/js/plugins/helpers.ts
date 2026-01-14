@@ -50,3 +50,7 @@ export function scrollToTop({ id = null }) {
 
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
+export function goBack() {
+    window.history.back();
+}

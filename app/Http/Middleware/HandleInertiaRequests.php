@@ -43,6 +43,7 @@ class HandleInertiaRequests extends Middleware
 
         return [
             ...parent::share($request),
+            'previous_url' => url()->previous(),
             'auth' => [
                 'user' => $user,
                 'is_admin' => $user && $user->isAdmin(),

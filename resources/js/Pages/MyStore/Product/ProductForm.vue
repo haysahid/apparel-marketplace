@@ -518,7 +518,7 @@ const tabIndex = ref(0);
                             <h2 class="font-semibold">Informasi Produk</h2>
 
                             <!-- Name -->
-                            <InputGroup id="name" label="Nama Produk">
+                            <InputGroup for="name" label="Nama Produk">
                                 <TextAreaInput
                                     id="name"
                                     v-model="form.name"
@@ -536,7 +536,7 @@ const tabIndex = ref(0);
 
                             <div class="flex gap-4">
                                 <!-- Brand -->
-                                <InputGroup id="brand_id" label="Brand">
+                                <InputGroup for="brand_id" label="Brand">
                                     <DropdownSearchInput
                                         id="brand_id"
                                         :modelValue="
@@ -598,7 +598,7 @@ const tabIndex = ref(0);
                                 </InputGroup>
 
                                 <!-- SKU Prefix -->
-                                <InputGroup id="sku_prefix" label="SKU Prefix">
+                                <InputGroup for="sku_prefix" label="SKU Prefix">
                                     <TextInput
                                         id="sku_prefix"
                                         v-model="form.sku_prefix"
@@ -620,7 +620,7 @@ const tabIndex = ref(0);
                             </div>
 
                             <!-- Categories -->
-                            <InputGroup id="categories" label="Kategori Produk">
+                            <InputGroup for="categories" label="Kategori Produk">
                                 <DropdownSearchInputMultiple
                                     id="categories"
                                     :modelValue="
@@ -677,7 +677,7 @@ const tabIndex = ref(0);
                             </InputGroup>
 
                             <!-- Discount -->
-                            <InputGroup id="discount" label="Diskon (%)">
+                            <InputGroup for="discount" label="Diskon (%)">
                                 <TextInput
                                     id="discount"
                                     v-model.number="form.discount"

@@ -152,7 +152,7 @@ const openErrorDialog = (message) => {
                 >
                     <div class="flex flex-col w-full gap-4">
                         <!-- Name -->
-                        <InputGroup id="name" label="Nama Toko">
+                        <InputGroup for="name" label="Nama Toko">
                             <TextInput
                                 id="name"
                                 v-model="form.name"
@@ -166,7 +166,7 @@ const openErrorDialog = (message) => {
                         </InputGroup>
 
                         <!-- Phone -->
-                        <InputGroup id="phone" label="No. WhatsApp">
+                        <InputGroup for="phone" label="No. WhatsApp">
                             <TextInput
                                 id="phone"
                                 v-model="form.phone"
@@ -180,7 +180,7 @@ const openErrorDialog = (message) => {
                         </InputGroup>
 
                         <!-- Email -->
-                        <InputGroup id="email" label="Email">
+                        <InputGroup for="email" label="Email">
                             <TextInput
                                 id="email"
                                 v-model="form.email"
@@ -240,7 +240,7 @@ const openErrorDialog = (message) => {
                         </InputGroup>
 
                         <!-- Address -->
-                        <InputGroup id="address" label="Alamat Lengkap">
+                        <InputGroup for="address" label="Alamat Lengkap">
                             <TextAreaInput
                                 id="address"
                                 v-model="form.address"
@@ -256,7 +256,7 @@ const openErrorDialog = (message) => {
                         </InputGroup>
 
                         <!-- Description -->
-                        <InputGroup id="description" label="Deskripsi Toko">
+                        <InputGroup for="description" label="Deskripsi Toko">
                             <TextAreaInput
                                 id="description"
                                 v-model="form.description"
@@ -273,7 +273,7 @@ const openErrorDialog = (message) => {
                         </InputGroup>
 
                         <!-- Advantages -->
-                        <InputGroup id="advantages" label="Keunggulan Toko">
+                        <InputGroup for="advantages" label="Keunggulan Toko">
                             <div
                                 class="grid grid-cols-1 p-4 gap-x-6 gap-y-4 rounded-2xl sm:grid-cols-2 border-dashed-default"
                             >

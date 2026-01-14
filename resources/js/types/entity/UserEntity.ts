@@ -25,6 +25,7 @@ interface UserEntity {
     user_points: UserPointEntity[] | null;
 
     // Additional Attributes
+    profile_photo_url: string | null;
     password_confirmation?: string | null;
     store_role_pairs?: StoreRolePair[] | null;
 

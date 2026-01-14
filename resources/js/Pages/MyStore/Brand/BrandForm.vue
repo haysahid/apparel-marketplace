@@ -100,7 +100,7 @@ onMounted(() => {
     <form @submit.prevent="submit" class="max-w-3xl">
         <div class="flex flex-col items-start gap-4">
             <!-- Name -->
-            <InputGroup id="brand-name" label="Nama Brand">
+            <InputGroup for="brand-name" label="Nama Brand">
                 <TextInput
                     id="brand-name"
                     v-model="form.name"
@@ -115,7 +115,7 @@ onMounted(() => {
             </InputGroup>
 
             <!-- Logo -->
-            <InputGroup id="logo" label="Logo Brand">
+            <InputGroup for="logo" label="Logo Brand">
                 <ImageInput
                     id="logo"
                     v-model="form.logo"
@@ -132,7 +132,7 @@ onMounted(() => {
             </InputGroup>
 
             <!-- Description -->
-            <InputGroup id="description" label="Deskripsi Brand">
+            <InputGroup for="description" label="Deskripsi Brand">
                 <TextAreaInput
                     id="description"
                     v-model="form.description"

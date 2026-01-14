@@ -37,10 +37,17 @@ class UserSeeder extends Seeder
                 'role_id' => 3,
             ],
             [
-                'name' => 'Admin Mustika Collection',
-                'username' => 'adminmustika',
-                'email' => 'adminmustika@example.com',
-                'password' => Hash::make('adminmustika2025'),
+                'name' => 'Admin Toko',
+                'username' => 'admintoko',
+                'email' => 'admintoko@example.com',
+                'password' => Hash::make('admintoko2025'),
+                'role_id' => 3,
+            ],
+            [
+                'name' => 'Karyawan Toko',
+                'username' => 'karyawantoko',
+                'email' => 'karyawantoko@example.com',
+                'password' => Hash::make('karyawantoko2025'),
                 'role_id' => 3,
             ],
         ]);

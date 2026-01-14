@@ -44,9 +44,17 @@ const hasShowStoreOptionsDialogCallback = computed(() => {
                     }"
                 >
                     <img
-                        v-if="$page.props.auth.user.avatar"
+                        v-if="
+                            $page.props.auth.user.avatar ||
+                            $page.props.auth.user.profile_photo_url
+                        "
                         class="object-cover rounded-full size-8 shrink-0"
-                        :src="$page.props.auth.user.avatar"
+                        :src="
+                            $getImageUrl(
+                                $page.props.auth.user.avatar ||
+                                    $page.props.auth.user.profile_photo_url
+                            )
+                        "
                         :alt="$page.props.auth.user.name"
                     />
                     <svg
@@ -69,7 +77,12 @@ const hasShowStoreOptionsDialogCallback = computed(() => {
                     </svg>
 
                     <span class="w-full md:w-auto md:hidden lg:inline">
-                        {{ $page.props.auth.user.name }}
+                        <div class="flex flex-col items-start leading-tight">
+                            <span>{{ $page.props.auth.user.name }}</span>
+                            <span class="text-xs text-gray-400">
+                                {{ $page.props.auth.user.role?.name }}
+                            </span>
+                        </div>
                     </span>
 
                     <svg
@@ -110,7 +123,10 @@ const hasShowStoreOptionsDialogCallback = computed(() => {
                     >
                         Toko Saya
                     </DropdownLink>
-                    <DropdownLink v-else :href="route('store.create')">
+                    <DropdownLink
+                        v-else-if="$page.props.auth.is_admin"
+                        :href="route('store.create')"
+                    >
                         Buat Toko
                     </DropdownLink>
                 </template>

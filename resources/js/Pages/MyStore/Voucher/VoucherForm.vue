@@ -171,7 +171,7 @@ const scrollToTop = () => {
                                 class="flex flex-col w-full gap-4"
                             >
                                 <!-- Name -->
-                                <InputGroup id="name" label="Nama Voucher">
+                                <InputGroup for="name" label="Nama Voucher">
                                     <TextInput
                                         id="name"
                                         v-model="form.name"
@@ -187,7 +187,7 @@ const scrollToTop = () => {
                                 </InputGroup>
 
                                 <!-- Code -->
-                                <InputGroup id="code" label="Kode Voucher">
+                                <InputGroup for="code" label="Kode Voucher">
                                     <TextInput
                                         id="code"
                                         v-model="form.code"
@@ -221,7 +221,7 @@ const scrollToTop = () => {
 
                                 <div class="flex items-center w-full gap-4">
                                     <!-- Type -->
-                                    <InputGroup id="type" label="Tipe Voucher">
+                                    <InputGroup for="type" label="Tipe Voucher">
                                         <DropdownSearchInput
                                             id="type"
                                             :modelValue="
@@ -343,7 +343,7 @@ const scrollToTop = () => {
                                 </InputGroup>
 
                                 <!-- Is Public -->
-                                <InputGroup id="is_public" label="Akses Publik">
+                                <InputGroup for="is_public" label="Akses Publik">
                                     <Switch
                                         id="is_public"
                                         v-model="form.is_public"

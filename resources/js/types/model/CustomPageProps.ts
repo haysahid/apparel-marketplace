@@ -1,6 +1,7 @@
 import { PageProps } from "@inertiajs/core";
 
 export default interface CustomPageProps extends PageProps {
+    previous_url?: string;
     auth: {
         user: {
             id: number;

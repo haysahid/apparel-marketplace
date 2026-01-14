@@ -6,13 +6,12 @@ import DeleteConfirmationDialog from "@/Components/DeleteConfirmationDialog.vue"
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import { router } from "@inertiajs/vue3";
-import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultTable from "@/Components/DefaultTable.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
-import UserCard from "./User/UserCard.vue";
+import UserCard from "./UserCard.vue";
 import { getImageUrl } from "@/plugins/helpers";
 import CustomPageProps from "@/types/model/CustomPageProps";
 import { scrollToTop } from "@/plugins/helpers";
@@ -53,7 +52,7 @@ const queryParams = computed(() => {
 });
 
 function getUsers() {
-    router.get(route("admin.user"), queryParams.value, {
+    router.get(route("admin.user.index"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
@@ -128,6 +127,21 @@ const openErrorDialog = (message) => {
 const page = usePage<CustomPageProps>();
 
 function canEdit(user) {
+    if (user.role?.slug === "super-admin") {
+        return false;
+    }
+
+    return page.props.auth.is_admin;
+}
+
+function canDelete(user) {
+    if (
+        user.id === page.props.auth.user.id ||
+        user.role?.slug === "super-admin"
+    ) {
+        return false;
+    }
+
     return page.props.auth.is_admin;
 }
 
@@ -181,10 +195,11 @@ onMounted(() => {
                     <tr>
                         <th class="w-12">No</th>
                         <th>Pengguna</th>
+                        <th>Username</th>
                         <th>Email</th>
                         <th>No. HP</th>
-                        <th>Peran (Umum)</th>
-                        <th>Toko & Peran</th>
+                        <th>Peran</th>
+                        <th>Toko</th>
                         <th class="w-24">Aksi</th>
                     </tr>
                 </template>
@@ -209,10 +224,18 @@ onMounted(() => {
                             >
                                 <div class="flex items-center gap-3">
                                     <img
-                                        v-if="user.avatar"
-                                        :src="getImageUrl(user.avatar)"
+                                        v-if="
+                                            user.avatar ||
+                                            user.profile_photo_url
+                                        "
+                                        :src="
+                                            getImageUrl(
+                                                user.avatar ||
+                                                    user.profile_photo_url
+                                            )
+                                        "
                                         alt="Foto Pengguna"
-                                        class="object-contain rounded-full size-8"
+                                        class="object-cover rounded-full aspect-square size-8"
                                     />
                                     <svg
                                         v-else
@@ -235,28 +258,41 @@ onMounted(() => {
                             </Link>
                         </td>
                         <td class="!whitespace-normal">
-                            {{ user.email }}
+                            {{ user.username ?? "-" }}
                         </td>
                         <td class="!whitespace-normal">
-                            {{ user.phone }}
+                            {{ user.email ?? "-" }}
+                        </td>
+                        <td class="!whitespace-normal">
+                            {{ user.phone ?? "-" }}
                         </td>
                         <td class="!whitespace-normal">
                             {{ user.role?.name ?? "-" }}
                         </td>
                         <td class="!whitespace-normal">
-                            <p
-                                v-for="(
-                                    storeRole, index
-                                ) in user.store_role_pairs"
-                                :key="index"
-                            >
-                                {{ storeRole.store?.name ?? "-" }} -
-                                {{ storeRole.role?.name ?? "-" }}
-                            </p>
+                            <template v-if="user.store_role_pairs.length > 0">
+                                <p
+                                    v-for="(
+                                        storeRole, index
+                                    ) in user.store_role_pairs"
+                                    :key="index"
+                                >
+                                    {{ storeRole.store?.name ?? "-" }}
+                                    <span class="text-xs italic text-gray-500">
+                                        -
+                                    </span>
+                                    <span class="text-xs italic text-gray-500">
+                                        {{ storeRole.role?.name ?? "-" }}
+                                    </span>
+                                </p>
+                            </template>
+                            <template v-else> - </template>
                         </td>
                         <td>
                             <AdminItemAction
-                                v-if="canEdit(user)"
+                                v-if="canEdit(user) || canDelete(user)"
+                                :hideDeleteButton="!canDelete(user)"
+                                :hideEditButton="!canEdit(user)"
                                 @edit="
                                     $inertia.visit(
                                         route('admin.user.edit', {
@@ -280,12 +316,14 @@ onMounted(() => {
             <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <div
                     v-if="users.data.length > 0"
-                    class="grid grid-cols-1 gap-3 lg:grid-cols-2"
+                    class="grid grid-cols-1 gap-3"
                 >
                     <UserCard
                         v-for="(user, index) in users.data"
                         :key="user.id"
                         :user="user"
+                        :hideDeleteButton="!canDelete(user)"
+                        :hideEditButton="!canEdit(user)"
                         @edit="
                             $inertia.visit(
                                 route('admin.user.edit', {

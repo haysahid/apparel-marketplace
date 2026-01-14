@@ -8,12 +8,23 @@ const props = defineProps({
         type: Object as () => UserEntity,
         required: true,
     },
+    hideEditButton: {
+        type: Boolean,
+        default: false,
+    },
+    hideDeleteButton: {
+        type: Boolean,
+        default: false,
+    },
 });
 
-const emit = defineEmits(["edit"]);
+const emit = defineEmits(["edit", "delete"]);
 
 const hasEditCallback = computed(() => {
     return !!getCurrentInstance()?.vnode?.props?.["onEdit"];
+});
+const hasDeleteCallback = computed(() => {
+    return !!getCurrentInstance()?.vnode?.props?.["onDelete"];
 });
 </script>
 
@@ -23,10 +34,14 @@ const hasEditCallback = computed(() => {
     >
         <div class="flex w-full gap-2">
             <img
-                v-if="props.user.avatar"
-                :src="$getImageUrl(props.user.avatar)"
+                v-if="props.user.avatar || props.user.profile_photo_url"
+                :src="
+                    $getImageUrl(
+                        props.user.avatar || props.user.profile_photo_url
+                    )
+                "
                 alt="Foto Pelanggan"
-                class="object-contain rounded-full size-10 h-fit shrink-0"
+                class="object-cover rounded-full aspect-square size-10 shrink-0"
             />
             <svg
                 v-else
@@ -60,9 +75,29 @@ const hasEditCallback = computed(() => {
                         </Link>
                     </div>
                 </div>
+
                 <div
                     class="flex flex-wrap text-xs text-gray-600 gap-x-6 gap-y-0.5"
                 >
+                    <div
+                        v-if="props.user.username"
+                        class="flex items-center gap-0.5"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            class="inline-block size-3.5 mr-1 fill-gray-400"
+                        >
+                            <path
+                                d="M12 4C13.0609 4 14.0783 4.42143 14.8284 5.17157C15.5786 5.92172 16 6.93913 16 8C16 9.06087 15.5786 10.0783 14.8284 10.8284C14.0783 11.5786 13.0609 12 12 12C10.9391 12 9.92172 11.5786 9.17157 10.8284C8.42143 10.0783 8 9.06087 8 8C8 6.93913 8.42143 5.92172 9.17157 5.17157C9.92172 4.42143 10.9391 4 12 4ZM12 20C12 20 20 20 20 18C20 15.6 16.1 13 12 13C7.9 13 4 15.6 4 18C4 20 12 20 12 20Z"
+                            />
+                        </svg>
+                        <span>
+                            {{ props.user.username }}
+                        </span>
+                    </div>
                     <div
                         v-if="props.user.email"
                         class="flex items-center gap-0.5"
@@ -121,13 +156,44 @@ const hasEditCallback = computed(() => {
                         </span>
                     </div>
                 </div>
+
+                <div
+                    v-for="(storeRole, index) in props.user.store_role_pairs"
+                    :key="index"
+                    class="flex items-center gap-0.5 text-xs text-gray-600"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        class="inline-block size-3.5 mr-1 fill-gray-400"
+                    >
+                        <path
+                            d="M4.33333 6.49992V4.33325H21.6667V6.49992H4.33333ZM4.33333 21.6666V15.1666H3.25V12.9999L4.33333 7.58325H21.6667L22.75 12.9999V15.1666H21.6667V21.6666H19.5V15.1666H15.1667V21.6666H4.33333ZM6.5 19.4999H13V15.1666H6.5V19.4999Z"
+                        />
+                    </svg>
+                    <span>
+                        {{ storeRole.store?.name ?? "-" }}
+                        <span class="text-xs italic text-gray-500"> - </span>
+                        <span class="text-xs italic text-gray-500">
+                            {{ storeRole.role?.name ?? "-" }}
+                        </span>
+                    </span>
+                </div>
             </div>
         </div>
 
         <AdminItemAction
-            v-if="hasEditCallback"
+            v-if="
+                (hasEditCallback && !props.hideEditButton) ||
+                (hasDeleteCallback && !props.hideDeleteButton)
+            "
             class="absolute top-2.5 right-2.5 sm:top-4 sm:right-4"
+            :hideEditButton="props.hideEditButton"
+            :hideDeleteButton="props.hideDeleteButton"
             @edit="emit('edit')"
+            @delete="emit('delete')"
         />
     </div>
 </template>

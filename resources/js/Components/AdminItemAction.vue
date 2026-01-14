@@ -3,6 +3,14 @@ import { computed, getCurrentInstance } from "vue";
 import Dropdown from "./Dropdown.vue";
 
 const props = defineProps({
+    hideEditButton: {
+        type: Boolean,
+        default: false,
+    },
+    hideDeleteButton: {
+        type: Boolean,
+        default: false,
+    },
     disabled: {
         type: Boolean,
         default: false,
@@ -23,7 +31,7 @@ const hasDeleteCallback = computed(() => {
 <template>
     <div class="flex gap-2">
         <button
-            v-if="hasEditCallback"
+            v-if="hasEditCallback && !props.hideEditButton"
             type="button"
             :disabled="props.disabled"
             class="group"
@@ -47,7 +55,7 @@ const hasDeleteCallback = computed(() => {
         </button>
 
         <button
-            v-if="hasDeleteCallback"
+            v-if="hasDeleteCallback && !props.hideDeleteButton"
             type="button"
             :disabled="props.disabled"
             class="group"

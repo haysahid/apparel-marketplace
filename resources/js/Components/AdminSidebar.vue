@@ -30,8 +30,8 @@ const menus = [
     },
     {
         name: "Pengguna",
-        href: route("admin.user"),
-        active: route().current().startsWith("admin.user"),
+        href: route("admin.user.index"),
+        active: route().current().startsWith("admin.user.index"),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 

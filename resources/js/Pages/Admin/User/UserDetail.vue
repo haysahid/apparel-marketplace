@@ -11,6 +11,7 @@ import cookieManager from "@/plugins/cookie-manager";
 import ThreeDotsLoading from "@/Components/ThreeDotsLoading.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import WhatsAppButton from "@/Components/WhatsAppButton.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 
 const props = defineProps({
     user: Object as () => UserEntity,
@@ -93,10 +94,15 @@ getUserVouchers();
                     class="flex flex-col items-center w-full gap-3 sm:flex-row"
                 >
                     <img
-                        v-if="props.user.avatar"
-                        :src="$getImageUrl(props.user.avatar)"
+                        v-if="props.user.avatar || props.user.profile_photo_url"
+                        :src="
+                            $getImageUrl(
+                                props.user.avatar ||
+                                    props.user.profile_photo_url
+                            )
+                        "
                         alt="Foto Pengguna"
-                        class="object-contain rounded-full size-[100px] h-fit shrink-0"
+                        class="object-cover rounded-full size-[100px] aspect-square shrink-0"
                     />
                     <svg
                         v-else
@@ -212,8 +218,12 @@ getUserVouchers();
                             class="flex flex-wrap items-start justify-center w-full text-sm text-gray-600 max-sm:flex-col sm:justify-start gap-x-6 gap-y-1"
                         >
                             <div
-                                v-for="pair in props.user.store_role_pairs"
-                                :key="pair.store?.id + '-' + pair.role?.id"
+                                v-for="storeRole in props.user.store_role_pairs"
+                                :key="
+                                    storeRole.store?.id +
+                                    '-' +
+                                    storeRole.role?.id
+                                "
                                 class="flex items-center gap-0.5 text-sm text-gray-600"
                             >
                                 <svg
@@ -228,32 +238,53 @@ getUserVouchers();
                                     />
                                 </svg>
                                 <span>
-                                    {{ pair.store?.name || "Tidak ada toko" }}
-                                    -
-                                    {{ pair.role?.name || "Tidak ada peran" }}
+                                    {{ storeRole.store?.name ?? "-" }}
+                                    <span class="italic text-gray-500">
+                                        -
+                                    </span>
+                                    <span class="italic text-gray-500">
+                                        {{ storeRole.role?.name ?? "-" }}
+                                    </span>
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    <Link
-                        v-if="props.user.phone"
-                        :href="
-                            getWhatsAppLink(
-                                props.user.phone,
-                                'Halo, saya ingin bertanya tentang produk Anda.'
-                            )
-                        "
-                        target="_blank"
-                        class="mt-2"
+                    <div
+                        class="flex flex-col items-center gap-3 mt-2 sm:flex-row"
                     >
-                        <WhatsAppButton
-                            type="button"
-                            @click="$event.stopPropagation()"
+                        <Link
+                            :href="
+                                route('admin.user.edit', {
+                                    user: props.user,
+                                })
+                            "
                         >
-                            Hubungi
-                        </WhatsAppButton>
-                    </Link>
+                            <SecondaryButton
+                                type="button"
+                                @click="$event.stopPropagation()"
+                            >
+                                Ubah
+                            </SecondaryButton>
+                        </Link>
+                        <Link
+                            v-if="props.user.phone"
+                            :href="
+                                getWhatsAppLink(
+                                    props.user.phone,
+                                    'Halo, saya ingin bertanya tentang produk Anda.'
+                                )
+                            "
+                            target="_blank"
+                        >
+                            <WhatsAppButton
+                                type="button"
+                                @click="$event.stopPropagation()"
+                            >
+                                Hubungi
+                            </WhatsAppButton>
+                        </Link>
+                    </div>
                 </div>
             </DefaultCard>
 

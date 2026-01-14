@@ -271,7 +271,7 @@ const submit = () => {
 
         <div class="flex flex-col gap-y-4">
             <!-- Payment Method -->
-            <InputGroup id="payment-method" label="Metode Pembayaran">
+            <InputGroup for="payment-method" label="Metode Pembayaran">
                 <div class="flex flex-wrap gap-2">
                     <Chip
                         v-for="payment in paymentMethods"
@@ -284,7 +284,7 @@ const submit = () => {
             </InputGroup>
 
             <!-- Shipping Method -->
-            <InputGroup id="shipping-method" label="Metode Pengiriman">
+            <InputGroup for="shipping-method" label="Metode Pengiriman">
                 <div class="flex flex-wrap gap-2">
                     <Chip
                         v-for="shipping in shippingMethods"
@@ -301,7 +301,7 @@ const submit = () => {
 
             <template v-if="form.shipping_method?.slug == 'courier'">
                 <!-- Destination -->
-                <InputGroup id="destination" label="Alamat Pengiriman">
+                <InputGroup for="destination" label="Alamat Pengiriman">
                     <DropdownSearchInput
                         id="destination"
                         :modelValue="
@@ -343,7 +343,7 @@ const submit = () => {
                 </InputGroup>
 
                 <!-- Address -->
-                <InputGroup id="address" label="Alamat Lengkap">
+                <InputGroup for="address" label="Alamat Lengkap">
                     <TextAreaInput
                         id="address"
                         v-model="form.address"

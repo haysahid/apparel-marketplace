@@ -3,7 +3,6 @@ import { ref } from "vue";
 import UserDropdown from "./UserDropdown.vue";
 import MyStoreSidebar from "./MyStoreSidebar.vue";
 import StoreOptionsDialog from "./StoreOptionsDialog.vue";
-import { useMyStoreStore } from "@/stores/my-store-store";
 import { getImageUrl } from "@/plugins/helpers";
 import BaseHeader from "./BaseHeader.vue";
 import StoreItem from "./StoreItem.vue";
@@ -24,7 +23,6 @@ const props = defineProps({
     },
 });
 
-const myStoreStore = useMyStoreStore();
 const showStoreOptionsDialog = ref(false);
 </script>
 
@@ -178,7 +176,6 @@ const showStoreOptionsDialog = ref(false);
         :show="showStoreOptionsDialog"
         @close="showStoreOptionsDialog = false"
         @select="
-            myStoreStore.setSelectedStoreId($event.id);
             $inertia.visit(
                 route('my-store.select-store', { storeId: $event.id })
             );

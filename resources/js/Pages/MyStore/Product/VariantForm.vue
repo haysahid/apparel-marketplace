@@ -421,7 +421,7 @@ onMounted(() => {
             </h2>
 
             <!-- Motif -->
-            <InputGroup id="motif" label="Motif">
+            <InputGroup for="motif" label="Motif">
                 <TextInput
                     id="motif"
                     v-model="form.motif"
@@ -435,7 +435,7 @@ onMounted(() => {
             </InputGroup>
 
             <!-- Material -->
-            <InputGroup id="material" label="Jenis Bahan">
+            <InputGroup for="material" label="Jenis Bahan">
                 <TextInput
                     id="material"
                     v-model="form.material"
@@ -450,7 +450,7 @@ onMounted(() => {
 
             <div class="flex items-center w-full gap-4">
                 <!-- Color -->
-                <InputGroup id="color_id" label="Warna">
+                <InputGroup for="color_id" label="Warna">
                     <DropdownSearchInput
                         id="color_id"
                         :modelValue="
@@ -506,7 +506,7 @@ onMounted(() => {
                 </InputGroup>
 
                 <!-- Size -->
-                <InputGroup id="size_id" label="Ukuran">
+                <InputGroup for="size_id" label="Ukuran">
                     <DropdownSearchInput
                         id="size_id"
                         :modelValue="
@@ -564,7 +564,7 @@ onMounted(() => {
 
             <div class="flex items-center w-full gap-4">
                 <!-- Stock -->
-                <InputGroup id="current_stock_level" label="Stok">
+                <InputGroup for="current_stock_level" label="Stok">
                     <TextInput
                         id="current_stock_level"
                         v-model.number="form.current_stock_level"
@@ -580,7 +580,7 @@ onMounted(() => {
                 </InputGroup>
 
                 <!-- Unit -->
-                <InputGroup id="unit_id" label="Satuan">
+                <InputGroup for="unit_id" label="Satuan">
                     <DropdownSearchInput
                         id="unit_id"
                         :modelValue="
@@ -638,7 +638,7 @@ onMounted(() => {
 
             <div class="flex items-center w-full gap-4">
                 <!-- Base Selling Price -->
-                <InputGroup id="base_selling_price" label="Harga Dasar">
+                <InputGroup for="base_selling_price" label="Harga Dasar">
                     <TextInput
                         id="base_selling_price"
                         v-model.number="form.base_selling_price"
@@ -654,7 +654,7 @@ onMounted(() => {
                 </InputGroup>
 
                 <!-- Discount -->
-                <InputGroup id="discount" label="Diskon (%)">
+                <InputGroup for="discount" label="Diskon (%)">
                     <TextInput
                         id="discount"
                         v-model.number="form.discount"
@@ -669,7 +669,7 @@ onMounted(() => {
             </div>
 
             <!-- Images -->
-            <InputGroup id="images" label="Gambar Variasi Produk">
+            <InputGroup for="images" label="Gambar Variasi Produk">
                 <div ref="imagesContainer" class="flex flex-wrap w-full gap-2">
                     <ImageInput
                         v-for="(image, index) in form.images"

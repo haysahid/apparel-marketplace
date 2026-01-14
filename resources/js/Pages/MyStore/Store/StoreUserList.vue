@@ -67,8 +67,8 @@ function reloadUserRolePairs() {
             </h3>
             <PrimaryButton
                 v-if="
-                    $page.props.selected_store_role.slug === 'admin' ||
-                    $page.props.selected_store_role.slug === 'store-owner'
+                    $page.props.selected_store_role?.slug === 'admin' ||
+                    $page.props.selected_store_role?.slug === 'store-owner'
                 "
                 @click="showAddUserModal = true"
             >
@@ -102,9 +102,9 @@ function reloadUserRolePairs() {
                                 userRole.user?.id ===
                                     $page.props.auth.user.id ||
                                 userRole.role?.slug === 'super-admin' ||
-                                ($page.props.selected_store_role.slug !==
+                                ($page.props.selected_store_role?.slug !==
                                     'admin' &&
-                                    $page.props.selected_store_role.slug !==
+                                    $page.props.selected_store_role?.slug !==
                                         'store-owner')
                             "
                             @update:modelValue="(value) =>

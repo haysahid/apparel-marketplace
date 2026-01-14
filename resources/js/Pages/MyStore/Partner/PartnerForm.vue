@@ -98,7 +98,7 @@ const openErrorDialog = (message) => {
             <div class="flex flex-col w-full gap-y-4 gap-x-6 sm:flex-row">
                 <div class="flex flex-col w-full max-w-3xl gap-4">
                     <!-- Name -->
-                    <InputGroup id="name" label="Nama Mitra">
+                    <InputGroup for="name" label="Nama Mitra">
                         <TextInput
                             id="name"
                             v-model="form.name"
@@ -112,7 +112,7 @@ const openErrorDialog = (message) => {
                     </InputGroup>
 
                     <!-- Description -->
-                    <InputGroup id="description" label="Deskripsi Mitra">
+                    <InputGroup for="description" label="Deskripsi Mitra">
                         <TextAreaInput
                             id="description"
                             v-model="form.description"
@@ -125,7 +125,7 @@ const openErrorDialog = (message) => {
                     </InputGroup>
 
                     <!-- Logo -->
-                    <InputGroup id="logo" label="Logo Mitra">
+                    <InputGroup for="logo" label="Logo Mitra">
                         <ImageInput
                             id="logo"
                             v-model="form.logo"
@@ -140,7 +140,7 @@ const openErrorDialog = (message) => {
                     </InputGroup>
 
                     <!-- Address -->
-                    <InputGroup id="address" label="Alamat Mitra">
+                    <InputGroup for="address" label="Alamat Mitra">
                         <TextAreaInput
                             id="address"
                             v-model="form.address"
@@ -153,7 +153,7 @@ const openErrorDialog = (message) => {
                     </InputGroup>
 
                     <!-- Website -->
-                    <InputGroup id="website" label="Website Mitra (Opsional)">
+                    <InputGroup for="website" label="Website Mitra (Opsional)">
                         <TextInput
                             id="website"
                             v-model="form.website"
@@ -168,7 +168,7 @@ const openErrorDialog = (message) => {
 
                 <div class="flex flex-col w-full max-w-3xl gap-4">
                     <!-- Contact Name -->
-                    <InputGroup id="contact_name" label="Nama Kontak">
+                    <InputGroup for="contact_name" label="Nama Kontak">
                         <TextInput
                             id="contact_name"
                             v-model="form.contact_name"
@@ -181,7 +181,7 @@ const openErrorDialog = (message) => {
                     </InputGroup>
 
                     <!-- Contact Email -->
-                    <InputGroup id="contact_email" label="Email Kontak">
+                    <InputGroup for="contact_email" label="Email Kontak">
                         <TextInput
                             id="contact_email"
                             v-model="form.contact_email"
@@ -196,7 +196,7 @@ const openErrorDialog = (message) => {
                     </InputGroup>
 
                     <!-- Contact Phone -->
-                    <InputGroup id="contact_phone" label="No. Telepon Kontak">
+                    <InputGroup for="contact_phone" label="No. Telepon Kontak">
                         <TextInput
                             id="contact_phone"
                             v-model="form.contact_phone"

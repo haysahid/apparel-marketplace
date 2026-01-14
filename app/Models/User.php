@@ -85,15 +85,25 @@ class User extends Authenticatable
         });
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->role->slug === 'super-admin' || $this->role->slug === 'admin';
+    }
+
+    public function hasStoreRole(int $storeId, array $roles): bool
+    {
+        foreach ($this->store_roles as $storeRole) {
+            if ($storeRole->pivot->store_id === $storeId && in_array($storeRole->slug, $roles)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Relationships
     public function role()
     {
         return $this->belongsTo(Role::class);
-    }
-
-    public function isAdmin(): bool
-    {
-        return $this->role->slug === 'super-admin' || $this->role->slug === 'admin';
     }
 
     public function stores()

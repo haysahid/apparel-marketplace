@@ -5,9 +5,12 @@ import LandingSection from "@/Components/LandingSection.vue";
 import JoinUs from "@/Components/JoinUs.vue";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import { Link } from "@inertiajs/vue3";
+import { Link, usePage } from "@inertiajs/vue3";
 import CategoryCard from "@/Components/CategoryCard.vue";
 import { getImageUrl } from "@/plugins/helpers";
+import { onMounted } from "vue";
+import CustomPageProps from "@/types/model/CustomPageProps";
+import { useDialogStore } from "@/stores/dialog-store";
 
 const props = defineProps({
     store: Object,
@@ -22,6 +25,14 @@ const props = defineProps({
         type: Array as () => ProductEntity[],
         default: () => [],
     },
+});
+
+const page = usePage<CustomPageProps>();
+
+onMounted(() => {
+    if (page.props.flash?.error) {
+        useDialogStore().openErrorDialog(page.props.flash.error);
+    }
 });
 </script>
 

@@ -96,7 +96,7 @@ onMounted(() => {
     <form @submit.prevent="submit" class="max-w-3xl">
         <div class="flex flex-col items-start gap-4">
             <!-- Name -->
-            <InputGroup id="color-name" label="Nama Warna">
+            <InputGroup for="color-name" label="Nama Warna">
                 <TextInput
                     id="color-name"
                     v-model="form.name"
@@ -111,7 +111,7 @@ onMounted(() => {
             </InputGroup>
 
             <!-- Color -->
-            <InputGroup id="hex_code" label="Pilih Warna">
+            <InputGroup for="hex_code" label="Pilih Warna">
                 <button
                     type="button"
                     class="flex items-center p-1.5 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-1 focus:border-primary-light focus:ring-primary-light w-fit"

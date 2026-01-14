@@ -107,7 +107,7 @@ const closeErrorDialog = () => {
 
             <form @submit.prevent="submit">
                 <!-- Name -->
-                <InputGroup id="name" label="Nama Toko">
+                <InputGroup for="name" label="Nama Toko">
                     <TextInput
                         id="name"
                         v-model="form.name"
@@ -142,7 +142,7 @@ const closeErrorDialog = () => {
                 </InputGroup>
 
                 <!-- Phone -->
-                <InputGroup id="phone" label="Nomor Telepon" class="mt-4">
+                <InputGroup for="phone" label="Nomor Telepon" class="mt-4">
                     <TextInput
                         id="phone"
                         v-model="form.phone"

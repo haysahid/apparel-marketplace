@@ -99,7 +99,7 @@ onMounted(() => {
     <form @submit.prevent="submit" class="max-w-3xl">
         <div class="flex flex-col items-start gap-4">
             <!-- Name -->
-            <InputGroup id="category-name" label="Nama Kategori">
+            <InputGroup for="category-name" label="Nama Kategori">
                 <TextInput
                     id="category-name"
                     v-model="form.name"
@@ -114,7 +114,7 @@ onMounted(() => {
             </InputGroup>
 
             <!-- Image -->
-            <InputGroup id="image" label="Gambar Kategori">
+            <InputGroup for="image" label="Gambar Kategori">
                 <ImageInput
                     id="image"
                     v-model="form.image"

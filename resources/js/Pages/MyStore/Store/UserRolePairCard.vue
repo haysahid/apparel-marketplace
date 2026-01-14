@@ -15,8 +15,16 @@ const emit = defineEmits({
         class="flex items-start justify-between gap-2 p-3 transition-all duration-300 ease-in-out border border-gray-200 rounded-lg hover:border-primary-light group hover:ring-1 hover:ring-primary-light"
     >
         <img
-            v-if="props.userRolePair.user?.avatar"
-            :src="$getImageUrl(props.userRolePair.user?.avatar)"
+            v-if="
+                props.userRolePair.user?.avatar ||
+                props.userRolePair.user?.profile_photo_url
+            "
+            :src="
+                $getImageUrl(
+                    props.userRolePair.user?.avatar ||
+                        props.userRolePair.user?.profile_photo_url
+                )
+            "
             alt="Profile Photo"
             class="object-cover rounded-full size-10 shrink-0 h-fit"
         />

@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed } from "vue";
 import { useForm, usePage } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import ImageInput from "@/Components/ImageInput.vue";
-import ErrorDialog from "@/Components/ErrorDialog.vue";
 import InputGroup from "@/Components/InputGroup.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import CustomPageProps from "@/types/model/CustomPageProps";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
+import { useDialogStore } from "@/stores/dialog-store";
+import { goBack } from "@/plugins/helpers";
 
 const props = defineProps({
     user: {
@@ -26,6 +27,8 @@ const emit = defineEmits(["onSubmitted", "close"]);
 
 const page = usePage<CustomPageProps>();
 const roles = page.props.roles;
+
+const isEdit = computed(() => !!props.user?.id);
 
 const form = useForm(
     props.user
@@ -45,10 +48,10 @@ const form = useForm(
               phone: null,
               address: null,
               avatar: null,
-              role_id: null,
+              role_id: roles.find((role) => role.slug === "user")?.id || null,
 
               // Relationships
-              role: null,
+              role: roles.find((role) => role.slug === "user") || null,
           }
 );
 
@@ -69,12 +72,12 @@ const submit = () => {
             });
             return formData;
         }).post(
-            route("my-store.partner.update", {
-                partner: props.user,
+            route("admin.user.update", {
+                user: props.user,
             }),
             {
                 onError: (errors) => {
-                    openErrorDialog(errors.error);
+                    useDialogStore().openErrorDialog(errors.error);
                 },
             }
         );
@@ -84,11 +87,9 @@ const submit = () => {
                 ...data,
                 is_dialog: props.isDialog ? 1 : 0,
             };
-        }).post(route("my-store.partner.store"), {
-            preserveScroll: props.isDialog,
-            preserveState: props.isDialog,
+        }).post(route("admin.user.store"), {
             onError: (errors) => {
-                openErrorDialog(errors.error);
+                useDialogStore().openErrorDialog(errors.error);
             },
             onSuccess: () => {
                 if (props.isDialog) emit("onSubmitted", form.name);
@@ -97,14 +98,6 @@ const submit = () => {
         });
     }
 };
-
-const showErrorDialog = ref(false);
-const errorMessage = ref(null);
-
-const openErrorDialog = (message) => {
-    errorMessage.value = message;
-    showErrorDialog.value = true;
-};
 </script>
 
 <template>
@@ -112,61 +105,64 @@ const openErrorDialog = (message) => {
         <div class="flex flex-col items-start gap-4">
             <div class="flex flex-col w-full gap-y-4 gap-x-6 sm:flex-row">
                 <div class="flex flex-col w-full max-w-3xl gap-4">
-                    <!-- Name -->
-                    <InputGroup id="name" label="Nama">
-                        <TextInput
-                            id="name"
-                            v-model="form.name"
-                            type="text"
-                            placeholder="Masukkan Nama"
-                            required
-                            :autofocus="true"
-                            :error="form.errors.name"
-                            @update:modelValue="form.errors.name = null"
-                        />
-                    </InputGroup>
+                    <div class="flex flex-col gap-4 sm:flex-row">
+                        <!-- Name -->
+                        <InputGroup for="name" label="Nama" required>
+                            <TextInput
+                                id="name"
+                                v-model="form.name"
+                                type="text"
+                                placeholder="Masukkan Nama"
+                                required
+                                :autofocus="true"
+                                :error="form.errors.name"
+                                @update:modelValue="form.errors.name = null"
+                            />
+                        </InputGroup>
 
-                    <!-- Username -->
-                    <InputGroup id="username" label="Username">
-                        <TextInput
-                            id="username"
-                            v-model="form.username"
-                            type="text"
-                            placeholder="Masukkan Username"
-                            required
-                            :error="form.errors.username"
-                            @update:modelValue="form.errors.username = null"
-                        />
-                    </InputGroup>
+                        <!-- Username -->
+                        <InputGroup for="username" label="Username" required>
+                            <TextInput
+                                id="username"
+                                v-model="form.username"
+                                type="text"
+                                placeholder="Masukkan Username"
+                                required
+                                :error="form.errors.username"
+                                @update:modelValue="form.errors.username = null"
+                            />
+                        </InputGroup>
+                    </div>
 
-                    <!-- Email -->
-                    <InputGroup id="email" label="Email Mitra">
-                        <TextInput
-                            id="email"
-                            v-model="form.email"
-                            type="email"
-                            placeholder="Masukkan Email Mitra"
-                            required
-                            :error="form.errors.email"
-                            @update:modelValue="form.errors.email = null"
-                        />
-                    </InputGroup>
+                    <div class="flex flex-col gap-4 sm:flex-row">
+                        <!-- Email -->
+                        <InputGroup for="email" label="Email" required>
+                            <TextInput
+                                id="email"
+                                v-model="form.email"
+                                type="email"
+                                placeholder="Masukkan Email"
+                                required
+                                :error="form.errors.email"
+                                @update:modelValue="form.errors.email = null"
+                            />
+                        </InputGroup>
 
-                    <!-- Phone -->
-                    <InputGroup id="phone" label="Telepon Mitra">
-                        <TextInput
-                            id="phone"
-                            v-model="form.phone"
-                            type="tel"
-                            placeholder="Masukkan Telepon Mitra"
-                            required
-                            :error="form.errors.phone"
-                            @update:modelValue="form.errors.phone = null"
-                        />
-                    </InputGroup>
+                        <!-- Phone -->
+                        <InputGroup for="phone" label="Telepon">
+                            <TextInput
+                                id="phone"
+                                v-model="form.phone"
+                                type="tel"
+                                placeholder="Masukkan Telepon"
+                                :error="form.errors.phone"
+                                @update:modelValue="form.errors.phone = null"
+                            />
+                        </InputGroup>
+                    </div>
 
                     <!-- Address -->
-                    <InputGroup id="address" label="Alamat">
+                    <InputGroup for="address" label="Alamat">
                         <TextAreaInput
                             id="address"
                             v-model="form.address"
@@ -179,7 +175,7 @@ const openErrorDialog = (message) => {
                     </InputGroup>
 
                     <!-- Avatar -->
-                    <InputGroup id="avatar" label="Avatar">
+                    <InputGroup for="avatar" label="Avatar">
                         <ImageInput
                             id="avatar"
                             v-model="form.avatar"
@@ -194,7 +190,7 @@ const openErrorDialog = (message) => {
                     </InputGroup>
 
                     <!-- Role -->
-                    <InputGroup id="role_id" label="Role">
+                    <InputGroup for="role_id" label="Role" required>
                         <DropdownSearchInput
                             id="role_id"
                             :modelValue="
@@ -212,6 +208,7 @@ const openErrorDialog = (message) => {
                                 }))
                             "
                             :searchable="true"
+                            required
                             placeholder="Pilih Role"
                             :error="form.errors.role_id"
                             @update:modelValue="
@@ -228,34 +225,43 @@ const openErrorDialog = (message) => {
                         />
                     </InputGroup>
 
-                    <!-- Password -->
-                    <InputGroup id="password" label="Password">
-                        <TextInput
-                            id="password"
-                            v-model="form.password"
-                            type="password"
-                            placeholder="Masukkan Password"
-                            :error="form.errors.password"
-                            @update:modelValue="form.errors.password = null"
-                        />
-                    </InputGroup>
+                    <div class="flex flex-col gap-4 sm:flex-row">
+                        <!-- Password -->
+                        <InputGroup
+                            for="password"
+                            label="Password"
+                            :required="!isEdit"
+                        >
+                            <TextInput
+                                id="password"
+                                v-model="form.password"
+                                type="password"
+                                placeholder="Masukkan Password"
+                                :required="!isEdit"
+                                :error="form.errors.password"
+                                @update:modelValue="form.errors.password = null"
+                            />
+                        </InputGroup>
 
-                    <!-- Confirm Password -->
-                    <InputGroup
-                        id="password_confirmation"
-                        label="Konfirmasi Password"
-                    >
-                        <TextInput
-                            id="password_confirmation"
-                            v-model="form.password_confirmation"
-                            type="password"
-                            placeholder="Masukkan Konfirmasi Password"
-                            :error="form.errors.password_confirmation"
-                            @update:modelValue="
-                                form.errors.password_confirmation = null
-                            "
-                        />
-                    </InputGroup>
+                        <!-- Confirm Password -->
+                        <InputGroup
+                            for="password_confirmation"
+                            label="Konfirmasi Password"
+                            :required="!isEdit"
+                        >
+                            <TextInput
+                                id="password_confirmation"
+                                v-model="form.password_confirmation"
+                                type="password"
+                                placeholder="Masukkan Konfirmasi Password"
+                                :required="!isEdit"
+                                :error="form.errors.password_confirmation"
+                                @update:modelValue="
+                                    form.errors.password_confirmation = null
+                                "
+                            />
+                        </InputGroup>
+                    </div>
                 </div>
             </div>
 
@@ -264,7 +270,7 @@ const openErrorDialog = (message) => {
                 <SecondaryButton
                     v-if="!isDialog"
                     type="button"
-                    @click="$inertia.visit(route('my-store.partner'))"
+                    @click="goBack()"
                 >
                     Kembali
                 </SecondaryButton>
@@ -273,18 +279,5 @@ const openErrorDialog = (message) => {
                 </SecondaryButton>
             </div>
         </div>
-
-        <ErrorDialog :show="showErrorDialog" @close="showErrorDialog = false">
-            <template #content>
-                <div>
-                    <div
-                        class="mb-1 text-lg font-medium text-center text-gray-900"
-                    >
-                        Terjadi Kesalahan
-                    </div>
-                    <p class="text-center text-gray-700">{{ errorMessage }}</p>
-                </div>
-            </template>
-        </ErrorDialog>
     </form>
 </template>

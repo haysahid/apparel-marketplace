@@ -7,13 +7,11 @@ import { useCartStore } from "@/stores/cart-store";
 import MyOrderButton from "./MyOrderButton.vue";
 import Tooltip from "./Tooltip.vue";
 import StoreOptionsDialog from "./StoreOptionsDialog.vue";
-import { useMyStoreStore } from "@/stores/my-store-store";
 import UserDropdown from "./UserDropdown.vue";
 import HamburgerButton from "./HamburgerButton.vue";
 import { getImageUrl } from "@/plugins/helpers";
 
 const cartStore = useCartStore();
-const myStoreStore = useMyStoreStore();
 
 const showingNavigationDropdown = ref(false);
 
@@ -276,7 +274,6 @@ onMounted(() => {
             :show="showStoreOptionsDialog"
             @close="showStoreOptionsDialog = false"
             @select="
-                myStoreStore.setSelectedStoreId($event.id);
                 $inertia.visit(
                     route('my-store.select-store', { storeId: $event.id })
                 );
