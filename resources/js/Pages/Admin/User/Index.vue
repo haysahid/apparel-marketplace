@@ -18,6 +18,7 @@ import { scrollToTop } from "@/plugins/helpers";
 import SearchInput from "@/Components/SearchInput.vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import Tooltip from "@/Components/Tooltip.vue";
 
 const screenSize = useScreenSize();
 
@@ -274,7 +275,7 @@ onMounted(() => {
                                 <p
                                     v-for="(
                                         storeRole, index
-                                    ) in user.store_role_pairs"
+                                    ) in user.store_role_pairs.slice(0, 1)"
                                     :key="index"
                                 >
                                     {{ storeRole.store?.name ?? "-" }}
@@ -285,6 +286,19 @@ onMounted(() => {
                                         {{ storeRole.role?.name ?? "-" }}
                                     </span>
                                 </p>
+                                <span v-if="user.store_role_pairs.length > 3">
+                                    <Link
+                                        :href="
+                                            route('admin.store.index', {
+                                                search: user.username,
+                                            })
+                                        "
+                                        class="text-xs italic text-gray-500"
+                                    >
+                                        +{{ user.store_role_pairs.length - 1 }}
+                                        more
+                                    </Link>
+                                </span>
                             </template>
                             <template v-else> - </template>
                         </td>

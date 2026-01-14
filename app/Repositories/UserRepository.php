@@ -193,7 +193,7 @@ class UserRepository
 
         // Attach store-role pairs for each user
         $users->getCollection()->transform(function ($user) {
-            $user->store_role_pairs = $user->getStoreRolePairsAttribute();
+            $user->store_role_pairs = $user->getStoreRolePairs();
             $user->makeHidden([
                 'stores',
                 'store_roles'
@@ -213,7 +213,7 @@ class UserRepository
             'user_points'
         ])->find($userId);
 
-        $user->store_role_pairs = $user->getStoreRolePairsAttribute();
+        $user->store_role_pairs = $user->getStoreRolePairs();
         $user->makeHidden([
             'stores',
             'store_roles'

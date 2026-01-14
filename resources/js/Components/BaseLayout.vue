@@ -27,7 +27,7 @@ const dialogStore = useDialogStore();
             >
                 <slot name="header" />
 
-                <main class="sm:p-6">
+                <main class="mx-auto sm:p-6 max-w-7xl">
                     <slot />
                 </main>
             </div>

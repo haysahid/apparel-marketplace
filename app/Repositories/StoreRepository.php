@@ -31,6 +31,8 @@ class StoreRepository
         $data,
         $advantages = null,
         $socialLinks = null,
+        $logo = null,
+        $banner = null,
     ) {
         try {
             DB::beginTransaction();
@@ -38,12 +40,43 @@ class StoreRepository
             // Create store
             $store = Store::create($data);
 
+            // Handle logo upload
+            if (isset($logo)) {
+                $store->logo = $logo->store('store', 'public');
+            }
+
+            // Handle banner upload
+            if (isset($banner)) {
+                $store->banner = $banner->store('store', 'public');
+            }
+
+            if (isset($store->logo) || isset($store->banner)) {
+                $store->save();
+            }
+
             // Create user store relationship
             UserStoreRole::create([
                 'store_id' => $store->id,
                 'user_id' => Auth::id(),
                 'role_id' => Role::where('slug', 'store-owner')->first()->id,
             ]);
+
+            // Auto assign super-admin and admin users to the store being created
+            $users = User::whereHas('role', function ($query) {
+                $query->whereIn('slug', ['super-admin', 'admin']);
+            })->get();
+
+            foreach ($users as $user) {
+                UserStoreRole::updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'store_id' => $store->id,
+                    ],
+                    [
+                        'role_id' => $user->role->id,
+                    ]
+                );
+            }
 
             // Create advantages
             if ($advantages === null) {
@@ -99,11 +132,32 @@ class StoreRepository
         $data,
         $advantages,
         $socialLinks,
+        $logo = null,
+        $banner = null,
     ) {
         try {
             DB::beginTransaction();
 
             $store = Store::with(['advantages', 'social_links'])->find($this->store->id);
+
+            // Update logo if provided
+            if (isset($logo)) {
+                // Delete old logo if exists
+                if ($store->logo) {
+                    Storage::disk('public')->delete($store->logo);
+                }
+
+                $store->logo = $logo->store('store', 'public');
+            }
+
+            if (isset($banner)) {
+                // Delete old banner if exists
+                if ($store->banner) {
+                    Storage::disk('public')->delete($store->banner);
+                }
+
+                $store->banner = $banner->store('store', 'public');
+            }
 
             $store->update($data);
 
@@ -154,12 +208,24 @@ class StoreRepository
         $search = null,
         $orderBy = 'created_at',
         $orderDirection = 'desc',
+        $userId = null,
     ) {
         $query = Store::query();
 
+        if ($userId) {
+            $query->whereHas('users', function ($q) use ($userId) {
+                $q->where('user_id', $userId)
+                    ->whereHas('store_roles', function ($roleQuery) {
+                        $roleQuery->whereIn('slug', ['store-owner']);
+                    });
+            });
+        }
+
         if ($search) {
-            $query->where('name', 'like', '%' . $search . '%')
-                ->orWhere('description', 'like', '%' . $search . '%');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%');
+            });
         }
 
         $query->orderBy($orderBy, $orderDirection);

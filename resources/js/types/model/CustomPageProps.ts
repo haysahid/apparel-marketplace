@@ -3,13 +3,7 @@ import { PageProps } from "@inertiajs/core";
 export default interface CustomPageProps extends PageProps {
     previous_url?: string;
     auth: {
-        user: {
-            id: number;
-            name: string;
-            email: string;
-            // Add other user properties as needed
-            [key: string]: any;
-        } | null;
+        user: UserEntity | null;
         is_admin: boolean | null;
         has_store: boolean | null;
         // Add other auth properties as needed

@@ -9,8 +9,9 @@ import UserRolePairCard from "./UserRolePairCard.vue";
 import SelectInput from "@/Components/SelectInput.vue";
 import storeService from "@/services/my-store/store-service";
 import adminStoreService from "@/services/admin/store-service";
-import { router } from "@inertiajs/vue3";
+import { router, usePage } from "@inertiajs/vue3";
 import { useDialogStore } from "@/stores/dialog-store";
+import CustomPageProps from "@/types/model/CustomPageProps";
 
 const props = defineProps({
     storeId: {
@@ -57,6 +58,37 @@ function reloadUserRolePairs() {
     useDialogStore().openSuccessDialog("Peran pengguna berhasil diperbarui.");
     emit("reload");
 }
+
+const page = usePage<CustomPageProps>();
+
+function canChangeRole(userRolePair: UserRolePair): boolean {
+    const selectedStoreRole = page.props.selected_store_role;
+
+    // Prevent changing own role
+    if (userRolePair.user.id === page.props.auth.user.id) {
+        return false;
+    }
+
+    // Prevent changing super-admin role
+    if (userRolePair.role?.slug === "super-admin") {
+        return false;
+    }
+
+    // Only allow if current user is admin or store-owner
+    if (
+        selectedStoreRole?.slug === "admin" ||
+        selectedStoreRole?.slug === "store-owner"
+    ) {
+        return true;
+    }
+
+    // Allow if current user is admin of the application
+    if (page.props.auth.is_admin) {
+        return true;
+    }
+
+    return false;
+}
 </script>
 
 <template>
@@ -99,13 +131,8 @@ function reloadUserRolePairs() {
                             "
                             :modelValue="userRole.role?.slug"
                             :disabled="
-                                userRole.user?.id ===
-                                    $page.props.auth.user.id ||
-                                userRole.role?.slug === 'super-admin' ||
-                                ($page.props.selected_store_role?.slug !==
-                                    'admin' &&
-                                    $page.props.selected_store_role?.slug !==
-                                        'store-owner')
+                                !canChangeRole(userRole) ||
+                                addOrUpdateUserRoleStatus === 'loading'
                             "
                             @update:modelValue="(value) =>
                                 updateUserRole({

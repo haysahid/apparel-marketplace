@@ -14,7 +14,7 @@ import DefaultPagination from "@/Components/DefaultPagination.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
 import { getImageUrl } from "@/plugins/helpers.js";
 import CustomPageProps from "@/types/model/CustomPageProps";
-import StoreCard from "./Store/StoreCard.vue";
+import StoreCard from "./StoreCard.vue";
 import { scrollToTop } from "@/plugins/helpers";
 import SearchInput from "@/Components/SearchInput.vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
@@ -54,8 +54,8 @@ const queryParams = computed(() => {
     };
 });
 
-function getPartners() {
-    router.get(route("admin.store"), queryParams.value, {
+function getStores() {
+    router.get(route("admin.store.index"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
@@ -105,7 +105,7 @@ const deletePartner = () => {
                 },
                 onSuccess: () => {
                     closeDeletePartnerDialog(true);
-                    getPartners();
+                    getStores();
                 },
             }
         );
@@ -172,7 +172,7 @@ onMounted(() => {
                     class="max-w-48"
                     @search="
                         filters.page = 1;
-                        getPartners();
+                        getStores();
                     "
                 />
             </div>
@@ -312,7 +312,7 @@ onMounted(() => {
                     @change="
                         (page) => {
                             filters.page = page;
-                            getPartners();
+                            getStores();
                         }
                     "
                 />

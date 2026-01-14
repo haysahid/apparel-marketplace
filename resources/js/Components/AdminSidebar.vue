@@ -31,7 +31,7 @@ const menus = [
     {
         name: "Pengguna",
         href: route("admin.user.index"),
-        active: route().current().startsWith("admin.user.index"),
+        active: route().current().startsWith("admin.user"),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -45,7 +45,7 @@ const menus = [
     },
     {
         name: "Toko",
-        href: route("admin.store"),
+        href: route("admin.store.index"),
         active: route().current().startsWith("admin.store"),
         icon: `
             <svg 

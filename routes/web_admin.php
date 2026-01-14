@@ -25,7 +25,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('user.destroy');
 
         // Store
-        Route::get('/store', [StoreController::class, 'index'])->name('store');
+        Route::get('/store', [StoreController::class, 'index'])->name('store.index');
         Route::get('/store/create', [StoreController::class, 'create'])->name('store.create');
         Route::get('/store/{store}', [StoreController::class, 'show'])->name('store.show');
         Route::post('/store', [StoreController::class, 'store'])->name('store.store');

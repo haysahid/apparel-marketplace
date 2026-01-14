@@ -47,7 +47,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $user,
                 'is_admin' => $user && $user->isAdmin(),
-                'has_store' => $user && $user->stores->isNotEmpty(),
+                'has_store' => $user && $user->hasStoreRoles(),
             ],
             'ziggy' => fn() => [
                 ...(new Ziggy)->toArray(),

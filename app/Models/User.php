@@ -73,7 +73,11 @@ class User extends Authenticatable
     }
 
     // Additional Attributes
-    public function getStoreRolePairsAttribute()
+
+    /**
+     * Get store and role pairs for the user
+     */
+    public function getStoreRolePairs()
     {
         $storesById = $this->stores->keyBy('id');
         return $this->store_roles->map(function ($storeRole) use ($storesById) {
@@ -85,11 +89,30 @@ class User extends Authenticatable
         });
     }
 
+    /**
+     * Check if user is admin (super-admin or admin)
+     */
     public function isAdmin(): bool
     {
         return $this->role->slug === 'super-admin' || $this->role->slug === 'admin';
     }
 
+    /**
+     * Check if user has any store roles (super-admin, admin, store-owner)
+     */
+    public function hasStoreRoles(): bool
+    {
+        foreach ($this->store_roles as $storeRole) {
+            if (in_array($storeRole->slug, ['super-admin', 'admin', 'store-owner'])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if user has specific store role for a given store
+     */
     public function hasStoreRole(int $storeId, array $roles): bool
     {
         foreach ($this->store_roles as $storeRole) {

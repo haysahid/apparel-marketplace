@@ -104,7 +104,7 @@ const submit = () => {
     <form @submit.prevent="submit">
         <div class="flex flex-col items-start gap-4">
             <div class="flex flex-col w-full gap-y-4 gap-x-6 sm:flex-row">
-                <div class="flex flex-col w-full max-w-3xl gap-4">
+                <div class="flex flex-col w-full gap-4">
                     <div class="flex flex-col gap-4 sm:flex-row">
                         <!-- Name -->
                         <InputGroup for="name" label="Nama" required>

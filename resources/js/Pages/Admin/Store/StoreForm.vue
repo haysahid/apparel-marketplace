@@ -75,7 +75,9 @@ const form = useForm(
               address: null,
               description: null,
               logo: null,
+              banner: null,
               advantages: [
+                  { name: null, description: null },
                   { name: null, description: null },
                   { name: null, description: null },
                   { name: null, description: null },
@@ -121,6 +123,7 @@ const submit = () => {
         subdistrict_name: data.rajaongkir_origin?.subdistrict_name || null,
         zip_code: data.rajaongkir_origin?.zip_code || null,
         logo: data.logo instanceof File ? data.logo : null,
+        banner: data.banner instanceof File ? data.banner : null,
     })).post(
         props.store
             ? route("admin.store.update", {
@@ -157,10 +160,10 @@ const openErrorDialog = (message) => {
 
 <template>
     <form @submit.prevent="submit">
-        <div class="flex flex-col items-start gap-y-4 gap-x-6 lg:flex-row">
+        <div class="flex flex-col items-start gap-y-4 gap-x-6 xl:flex-row">
             <div class="flex flex-col w-full gap-4">
                 <!-- Name -->
-                <InputGroup for="name" label="Nama Toko">
+                <InputGroup for="name" label="Nama Toko" required>
                     <TextInput
                         id="name"
                         v-model="form.name"
@@ -168,41 +171,48 @@ const openErrorDialog = (message) => {
                         placeholder="Masukkan Nama Toko"
                         required
                         autocomplete="name"
+                        autofocus
                         :error="form.errors.name"
                         @update:modelValue="form.errors.name = null"
                     />
                 </InputGroup>
 
-                <!-- Phone -->
-                <InputGroup for="phone" label="No. WhatsApp">
-                    <TextInput
-                        id="phone"
-                        v-model="form.phone"
-                        type="text"
-                        placeholder="Masukkan No. WhatsApp"
-                        required
-                        autocomplete="phone"
-                        :error="form.errors.phone"
-                        @update:modelValue="form.errors.phone = null"
-                    />
-                </InputGroup>
+                <div class="flex flex-col gap-4 sm:flex-row">
+                    <!-- Phone -->
+                    <InputGroup for="phone" label="No. WhatsApp" required>
+                        <TextInput
+                            id="phone"
+                            v-model="form.phone"
+                            type="text"
+                            placeholder="Masukkan No. WhatsApp"
+                            required
+                            autocomplete="phone"
+                            :error="form.errors.phone"
+                            @update:modelValue="form.errors.phone = null"
+                        />
+                    </InputGroup>
 
-                <!-- Email -->
-                <InputGroup for="email" label="Email">
-                    <TextInput
-                        id="email"
-                        v-model="form.email"
-                        type="email"
-                        placeholder="Masukkan Email"
-                        required
-                        autocomplete="email"
-                        :error="form.errors.email"
-                        @update:modelValue="form.errors.email = null"
-                    />
-                </InputGroup>
+                    <!-- Email -->
+                    <InputGroup for="email" label="Email" required>
+                        <TextInput
+                            id="email"
+                            v-model="form.email"
+                            type="email"
+                            placeholder="Masukkan Email"
+                            required
+                            autocomplete="email"
+                            :error="form.errors.email"
+                            @update:modelValue="form.errors.email = null"
+                        />
+                    </InputGroup>
+                </div>
 
                 <!-- Origin -->
-                <InputGroup for="rajaongkir_origin_id" label="Alamat Toko">
+                <InputGroup
+                    for="rajaongkir_origin_id"
+                    label="Alamat Toko"
+                    required
+                >
                     <DropdownSearchInput
                         id="rajaongkir_origin_id"
                         :modelValue="
@@ -243,7 +253,7 @@ const openErrorDialog = (message) => {
                 </InputGroup>
 
                 <!-- Address -->
-                <InputGroup for="address" label="Alamat Lengkap">
+                <InputGroup for="address" label="Alamat Lengkap" required>
                     <TextAreaInput
                         id="address"
                         v-model="form.address"
@@ -259,7 +269,7 @@ const openErrorDialog = (message) => {
                 </InputGroup>
 
                 <!-- Description -->
-                <InputGroup for="description" label="Deskripsi Toko">
+                <InputGroup for="description" label="Deskripsi Toko" required>
                     <TextAreaInput
                         id="description"
                         v-model="form.description"
@@ -273,18 +283,33 @@ const openErrorDialog = (message) => {
                     />
                 </InputGroup>
 
-                <!-- Logo -->
-                <InputGroup for="logo" label="Logo Toko">
-                    <ImageInput
-                        id="logo"
-                        v-model="form.logo"
-                        width="max-w-[120px]"
-                        height="h-[120px]"
-                        objectFit="object-contain"
-                        :error="form.errors.logo"
-                        @update:modelValue="form.errors.logo = null"
-                    />
-                </InputGroup>
+                <div class="flex gap-4">
+                    <!-- Logo -->
+                    <InputGroup for="logo" label="Logo Toko" class="!w-fit">
+                        <ImageInput
+                            id="logo"
+                            v-model="form.logo"
+                            width="max-w-[120px] min-w-[120px]"
+                            height="h-[120px]"
+                            objectFit="object-cover"
+                            :error="form.errors.logo"
+                            @update:modelValue="form.errors.logo = null"
+                        />
+                    </InputGroup>
+
+                    <!-- Banner -->
+                    <InputGroup for="banner" label="Banner Toko">
+                        <ImageInput
+                            id="banner"
+                            v-model="form.banner"
+                            width="max-w-[300px]"
+                            height="h-[120px]"
+                            objectFit="object-cover"
+                            :error="form.errors.banner"
+                            @update:modelValue="form.errors.banner = null"
+                        />
+                    </InputGroup>
+                </div>
 
                 <!-- Advantages -->
                 <InputGroup for="advantages" label="Keunggulan Toko">
@@ -344,7 +369,7 @@ const openErrorDialog = (message) => {
                             <LinkItem
                                 :name="link.name"
                                 :url="link.url"
-                                :index="index"
+                                :index="(index as number)"
                                 :showDeleteButton="false"
                                 @click="link.showEditForm = true"
                             >
