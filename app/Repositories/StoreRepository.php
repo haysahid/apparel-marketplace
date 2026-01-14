@@ -212,11 +212,12 @@ class StoreRepository
     ) {
         $query = Store::query();
 
+        // Filter stores by user who has store-owner role in store scope
         if ($userId) {
-            $query->whereHas('users', function ($q) use ($userId) {
+            $query->whereHas('user_store_roles', function ($q) use ($userId) {
                 $q->where('user_id', $userId)
-                    ->whereHas('store_roles', function ($roleQuery) {
-                        $roleQuery->whereIn('slug', ['store-owner']);
+                    ->whereHas('role', function ($qr) {
+                        $qr->whereIn('slug', ['store-owner', 'admin', 'member', 'reseller', 'agent']);
                     });
             });
         }

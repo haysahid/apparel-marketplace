@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue";
 
 const props = defineProps({
@@ -28,7 +28,7 @@ const discountText = computed(() => {
 
 <template>
     <div
-        class="px-1.5 py-0.5 text-xs sm:text-sm text-white bg-red-500 rounded-md h-fit font-normal sm:font-medium w-fit"
+        class="px-2 py-1 text-xs font-medium text-red-600 bg-red-100 rounded-md"
     >
         {{ discountText }}
     </div>

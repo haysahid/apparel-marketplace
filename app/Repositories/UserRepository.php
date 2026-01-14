@@ -204,6 +204,31 @@ class UserRepository
         return $users;
     }
 
+    public static function getUserDropdown(
+        $storeId = null,
+        $search = null,
+        $limit = 10,
+    ) {
+        $query = User::query();
+
+        if ($storeId) {
+            $query->whereHas('store_roles', function ($q) use ($storeId) {
+                $q->where('store_id', $storeId);
+            });
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('email', 'like', "%$search%");
+            });
+        }
+
+        return $query->orderBy('name', 'asc')
+            ->limit($limit)
+            ->get();
+    }
+
     public static function getUserDetail($userId)
     {
         $user =  User::with([

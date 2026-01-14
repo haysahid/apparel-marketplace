@@ -112,6 +112,8 @@ if (props.store?.zip_code) {
         });
 }
 
+const fromMyStore = route().current().startsWith("my-store.");
+
 const submit = () => {
     form.transform((data) => ({
         ...data,
@@ -125,7 +127,10 @@ const submit = () => {
         logo: data.logo instanceof File ? data.logo : null,
         banner: data.banner instanceof File ? data.banner : null,
     })).post(
-        props.store
+        // Whether the form is used in My Store or Admin routes
+        fromMyStore
+            ? route("my-store.store.update")
+            : props.store
             ? route("admin.store.update", {
                   store: props.store.id,
               })

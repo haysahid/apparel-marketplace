@@ -3,7 +3,7 @@ import DefaultCard from "@/Components/DefaultCard.vue";
 import DialogModal from "@/Components/DialogModal.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import ThreeDotsLoading from "@/Components/ThreeDotsLoading.vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import AddStoreUserForm from "./AddStoreUserForm.vue";
 import UserRolePairCard from "./UserRolePairCard.vue";
 import SelectInput from "@/Components/SelectInput.vue";
@@ -74,10 +74,11 @@ function canChangeRole(userRolePair: UserRolePair): boolean {
         return false;
     }
 
-    // Only allow if current user is admin or store-owner
+    // Only allow if current user is admin or store-owner or global admin
     if (
         selectedStoreRole?.slug === "admin" ||
-        selectedStoreRole?.slug === "store-owner"
+        selectedStoreRole?.slug === "store-owner" ||
+        page.props.auth.is_admin
     ) {
         return true;
     }
@@ -89,18 +90,33 @@ function canChangeRole(userRolePair: UserRolePair): boolean {
 
     return false;
 }
+
+const filteredUserRolePairs = computed(() => {
+    const selectedStoreRole = page.props.selected_store_role;
+
+    // If current user is super-admin or global admin, show all user-role pairs
+    if (selectedStoreRole?.slug === "super-admin" || page.props.auth.is_admin) {
+        return props.userRolePairs;
+    }
+
+    // Otherwise, filter out super-admin user-role pairs
+    return props.userRolePairs?.filter(
+        (userRolePair) => userRolePair.role?.slug !== "super-admin"
+    );
+});
 </script>
 
 <template>
     <DefaultCard class="w-full">
         <div class="flex items-center justify-between">
             <h3 class="font-semibold text-gray-900">
-                Pengguna ({{ props.userRolePairs?.length ?? 0 }})
+                Pengguna ({{ filteredUserRolePairs?.length ?? 0 }})
             </h3>
             <PrimaryButton
                 v-if="
-                    $page.props.selected_store_role?.slug === 'admin' ||
-                    $page.props.selected_store_role?.slug === 'store-owner'
+                    ['super-admin', 'admin', 'store-owner'].includes(
+                        $page.props.selected_store_role?.slug
+                    ) || $page.props.auth.is_admin
                 "
                 @click="showAddUserModal = true"
             >
@@ -109,11 +125,11 @@ function canChangeRole(userRolePair: UserRolePair): boolean {
         </div>
         <div class="w-full mt-2.5">
             <div
-                v-if="props.userRolePairs?.length"
+                v-if="filteredUserRolePairs && filteredUserRolePairs.length > 0"
                 class="flex flex-col w-full gap-2"
             >
                 <UserRolePairCard
-                    v-for="(userRole, index) in props.userRolePairs"
+                    v-for="(userRole, index) in filteredUserRolePairs"
                     :key="index"
                     :userRolePair="userRole"
                     :roles="props.roles"

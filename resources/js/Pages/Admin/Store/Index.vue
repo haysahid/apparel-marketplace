@@ -18,12 +18,20 @@ import StoreCard from "./StoreCard.vue";
 import { scrollToTop } from "@/plugins/helpers";
 import SearchInput from "@/Components/SearchInput.vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
+import axios from "axios";
+import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
+import cookieManager from "@/plugins/cookie-manager";
+import useDebounce from "@/plugins/debounce";
 
 const screenSize = useScreenSize();
 
 const props = defineProps({
     stores: {
         type: Object as () => PaginationModel<StoreEntity>,
+        default: null,
+    },
+    filteredUser: {
+        type: Object as () => UserEntity | null,
         default: null,
     },
 });
@@ -39,11 +47,15 @@ const stores = ref<PaginationModel<StoreEntity>>({
 const filters = useForm({
     page: null,
     search: null,
+    user_id: null,
+    user: null,
 });
 
 const getQueryParams = () => {
     filters.page = route().params.page || null;
     filters.search = route().params.search || null;
+    filters.user_id = route().params.user_id || null;
+    filters.user = props.filteredUser;
 };
 getQueryParams();
 
@@ -51,6 +63,7 @@ const queryParams = computed(() => {
     return {
         page: filters.page || undefined,
         search: filters.search || undefined,
+        user_id: filters.user_id || undefined,
     };
 });
 
@@ -73,38 +86,74 @@ function getStores() {
     });
 }
 
-const selectedPartner = ref(null);
-const showDeletePartnerDialog = ref(false);
+// User filter
+const users = ref<UserEntity[]>([]);
+const getUsersSearch = ref(null);
+const filteredUsers = computed(() => {
+    if (getUsersSearch.value) {
+        return (
+            users.value?.filter((user) =>
+                user.name
+                    .toLowerCase()
+                    .includes(getUsersSearch.value.toLowerCase())
+            ) || []
+        );
+    }
+    return users.value || [];
+});
+const userSearchDebounce = useDebounce();
 
-const openDeletePartnerDialog = (store) => {
-    console.log("openDeletePartnerDialog", store);
+const getUsers = () => {
+    axios
+        .get(route("api.admin.user.dropdown"), {
+            params: {
+                search: getUsersSearch.value,
+                limit: 10,
+            },
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${cookieManager.getItem(
+                    "access_token"
+                )}`,
+            },
+        })
+        .then((response) => {
+            users.value = response.data.result;
+        });
+};
+getUsers();
+
+const selectedStore = ref(null);
+const showDeleteStoreDialog = ref(false);
+
+const openDeleteStoreDialog = (store) => {
     if (store) {
-        selectedPartner.value = store;
-        showDeletePartnerDialog.value = true;
+        selectedStore.value = store;
+        showDeleteStoreDialog.value = true;
     }
 };
 
-const closeDeletePartnerDialog = (result = false) => {
-    showDeletePartnerDialog.value = false;
+const closeDeleteStoreDialog = (result = false) => {
+    showDeleteStoreDialog.value = false;
     if (result) {
-        selectedPartner.value = null;
+        selectedStore.value = null;
         openSuccessDialog("Data Berhasil Dihapus");
     }
 };
 
-const deletePartner = () => {
-    if (selectedPartner.value) {
+const deleteStore = () => {
+    if (selectedStore.value) {
         const form = useForm({});
         form.delete(
             route("admin.store.destroy", {
-                store: selectedPartner.value,
+                store: selectedStore.value,
             }),
             {
                 onError: (errors) => {
                     openErrorDialog(errors.error);
                 },
                 onSuccess: () => {
-                    closeDeletePartnerDialog(true);
+                    closeDeleteStoreDialog(true);
                     getStores();
                 },
             }
@@ -130,10 +179,10 @@ const openErrorDialog = (message) => {
 
 const page = usePage<CustomPageProps>();
 
-function canEdit(store) {
+function canEdit(store: StoreEntity) {
     return (
         page.props.auth.is_admin ||
-        page.props.auth.user.stores.some((store) => store.id === store.store_id)
+        page.props.auth.user.stores.some((s) => s.id === store.id)
     );
 }
 
@@ -165,16 +214,63 @@ onMounted(() => {
                 >
                     Tambah
                 </PrimaryButton>
-                <SearchInput
-                    id="search-store"
-                    v-model="filters.search"
-                    placeholder="Cari toko..."
-                    class="max-w-48"
-                    @search="
-                        filters.page = 1;
-                        getStores();
-                    "
-                />
+
+                <div class="flex items-center gap-2">
+                    <DropdownSearchInput
+                        id="user_id"
+                        :modelValue="
+                            filters.user_id
+                                ? {
+                                      label: filters.user?.name,
+                                      value: filters.user_id,
+                                  }
+                                : null
+                        "
+                        :options="
+                            filteredUsers.map((user) => ({
+                                label: user.name,
+                                value: user.id,
+                            }))
+                        "
+                        placeholder="Filter pengguna..."
+                        class="max-w-48"
+                        :autoResize="true"
+                        :error="filters.errors.user_id"
+                        @update:modelValue="
+                            (option) => {
+                                filters.user_id = option?.value;
+                                filters.user = option
+                                    ? filteredUsers.find(
+                                          (user) => user.id === option.value
+                                      )
+                                    : null;
+                                filters.page = 1;
+                                getStores();
+                            }
+                        "
+                        @search="
+                            getUsersSearch = $event;
+                            userSearchDebounce(() => getUsers(), 600);
+                        "
+                        @clear="
+                            filters.user_id = null;
+                            filters.user = null;
+                            getUsersSearch = '';
+                            filters.page = 1;
+                            getStores();
+                        "
+                    />
+                    <SearchInput
+                        id="search-store"
+                        v-model="filters.search"
+                        placeholder="Cari toko..."
+                        class="max-w-48"
+                        @search="
+                            filters.page = 1;
+                            getStores();
+                        "
+                    />
+                </div>
             </div>
 
             <!-- Table -->
@@ -261,7 +357,7 @@ onMounted(() => {
                                         })
                                     )
                                 "
-                                @delete="openDeletePartnerDialog(store)"
+                                @delete="openDeleteStoreDialog(store)"
                             />
                             <InfoTooltip
                                 v-if="!canEdit(store)"
@@ -290,7 +386,7 @@ onMounted(() => {
                                 })
                             )
                         "
-                        @delete="openDeletePartnerDialog(store)"
+                        @delete="openDeleteStoreDialog(store)"
                     />
                 </div>
                 <div v-else class="flex items-center justify-center py-10">
@@ -320,10 +416,10 @@ onMounted(() => {
         </DefaultCard>
 
         <DeleteConfirmationDialog
-            :show="showDeletePartnerDialog"
-            :title="`Hapus Mitra <b>${selectedPartner?.name}</b>?`"
-            @close="closeDeletePartnerDialog()"
-            @delete="deletePartner()"
+            :show="showDeleteStoreDialog"
+            :title="`Hapus Mitra <b>${selectedStore?.name}</b>?`"
+            @close="closeDeleteStoreDialog()"
+            @delete="deleteStore()"
         />
 
         <SuccessDialog

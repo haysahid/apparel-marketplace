@@ -12,6 +12,7 @@ class Role extends Model
         'description',
     ];
 
+    // Relationships
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_store_role')->withTimestamps()->withPivot('store_id');
@@ -20,5 +21,10 @@ class Role extends Model
     public function stores()
     {
         return $this->belongsToMany(Store::class, 'user_store_role')->withTimestamps()->withPivot('user_id');
+    }
+
+    public function user_store_roles()
+    {
+        return $this->hasMany(UserStoreRole::class);
     }
 }

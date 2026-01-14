@@ -47,6 +47,16 @@ class Store extends Model
         return $this->belongsToMany(User::class, 'user_store_role')->withTimestamps()->withPivot(['role_id']);
     }
 
+    public function store_roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_store_role')->withTimestamps()->withPivot(['user_id'])->orderBy('id');
+    }
+
+    public function user_store_roles()
+    {
+        return $this->hasMany(UserStoreRole::class);
+    }
+
     public function advantages()
     {
         return $this->hasMany(StoreAdvantage::class);
@@ -60,11 +70,6 @@ class Store extends Model
     public function social_links()
     {
         return $this->hasMany(StoreSocialLink::class);
-    }
-
-    public function store_roles()
-    {
-        return $this->belongsToMany(Role::class, 'user_store_role')->withTimestamps()->withPivot(['user_id'])->orderBy('id');
     }
 
     public function partners()

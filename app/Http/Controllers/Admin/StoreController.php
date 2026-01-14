@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Store;
+use App\Models\User;
 use App\Repositories\RoleRepository;
 use App\Repositories\StoreRepository;
 use Exception;
@@ -28,8 +29,11 @@ class StoreController extends Controller
             userId: $userId,
         );
 
+        $filteredUser = isset($userId) ? User::find($userId) : null;
+
         return Inertia::render('Admin/Store/Index', [
             'stores' => $stores,
+            'filteredUser' => $filteredUser,
         ]);
     }
 

@@ -97,6 +97,8 @@ class MyStoreController extends Controller
                 'district_name' => 'nullable|string|max:255',
                 'subdistrict_name' => 'nullable|string|max:255',
                 'zip_code' => 'nullable|string|max:10',
+                'logo' => 'nullable|image|max:2048',
+                'banner' => 'nullable|image|max:2048',
                 'advantages' => 'nullable|array',
                 'social_links' => 'nullable|array',
             ],
@@ -111,6 +113,10 @@ class MyStoreController extends Controller
                 'district_name.max' => 'Nama kecamatan tidak boleh lebih dari 255 karakter.',
                 'subdistrict_name.max' => 'Nama kelurahan tidak boleh lebih dari 255 karakter.',
                 'zip_code.max' => 'Kode pos tidak boleh lebih dari 10 karakter.',
+                'logo.image' => 'Logo harus berupa gambar.',
+                'logo.max' => 'Logo tidak boleh lebih dari 2MB.',
+                'banner.image' => 'Banner harus berupa gambar.',
+                'banner.max' => 'Banner tidak boleh lebih dari 2MB.',
                 'advantages.array' => 'Keunggulan harus berupa array.',
                 'social_links.array' => 'Tautan sosial harus berupa array.',
             ]
@@ -136,9 +142,11 @@ class MyStoreController extends Controller
             $socialLinks = $request->input('social_links');
 
             $this->storeRepository->updateStoreInfo(
-                $data,
-                $advantages,
-                $socialLinks
+                data: $data,
+                advantages: $advantages,
+                socialLinks: $socialLinks,
+                logo: $request->hasFile('logo') ? $request->file('logo') : null,
+                banner: $request->hasFile('banner') ? $request->file('banner') : null,
             );
 
             return redirect()->back()
