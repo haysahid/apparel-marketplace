@@ -129,7 +129,7 @@ function reloadUserRolePairs() {
             :show="showAddUserModal"
             title="Tambah Pengguna"
             @close="showAddUserModal = false"
-            maxWidth="md"
+            maxWidth="lg"
             dialogClass="overflow-y-hidden"
             containerClass="!p-0"
         >

@@ -23,7 +23,7 @@ Route::name('api.admin.')->prefix('admin')->middleware('auth:sanctum')->group(fu
         // Store User Role
         Route::prefix('{storeId}/user-role')->name('user-role.')->group(function () {
             Route::post('/', [StoreController::class, 'addUserRole'])->name('add');
-            Route::put('{userId}', [StoreController::class, 'updateUserRole'])->name('update');
+            Route::put('/', [StoreController::class, 'updateUserRole'])->name('update');
             Route::delete('{userId}', [StoreController::class, 'removeUserRole'])->name('remove');
         });
 

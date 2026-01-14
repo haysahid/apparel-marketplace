@@ -263,7 +263,7 @@ onMounted(() => {
                             <InfoTooltip
                                 v-if="!canEdit(customer)"
                                 :id="`table-tooltip-hint-${customer.id}`"
-                                text="Pelanggan tidak dapat diedit atau dihapus"
+                                text="Pelanggan tidak dapat diubah atau dihapus"
                             />
                         </td>
                     </tr>
