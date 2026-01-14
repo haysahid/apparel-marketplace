@@ -119,17 +119,32 @@ onMounted(() => {
                         <div
                             class="grid w-full grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4 sm:gap-9"
                         >
-                            <ProductCard
-                                v-for="product in props.popularProducts || []"
+                            <template
+                                v-for="(
+                                    product, index
+                                ) in props.popularProducts || []"
                                 :key="product.id"
-                                :name="product.name"
-                                :basePrice="product.lowest_base_selling_price"
-                                :discount="product.discount"
-                                :finalPrice="product.lowest_final_selling_price"
-                                :image="product.images[0]?.image as string || null"
-                                :description="product.brand?.name"
-                                :slug="product.slug"
-                            />
+                            >
+                                <div
+                                    data-aos="fade-up"
+                                    data-aos-duration="600"
+                                    :data-aos-delay="index * 50"
+                                >
+                                    <ProductCard
+                                        :name="product.name"
+                                        :basePrice="
+                                            product.lowest_base_selling_price
+                                        "
+                                        :discount="product.discount"
+                                        :finalPrice="
+                                            product.lowest_final_selling_price
+                                        "
+                                        :image="product.images[0]?.image as string || null"
+                                        :description="product.brand?.name"
+                                        :slug="product.slug"
+                                    />
+                                </div>
+                            </template>
                         </div>
                     </div>
 

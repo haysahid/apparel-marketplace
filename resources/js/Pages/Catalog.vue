@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import LandingLayout from "@/Layouts/LandingLayout.vue";
 import LandingSection from "@/Components/LandingSection.vue";
 import ProductCard from "@/Components/ProductCard.vue";
@@ -9,11 +9,15 @@ import { usePage, router } from "@inertiajs/vue3";
 import CatalogPagination from "@/Components/CatalogPagination.vue";
 import Chip from "@/Components/Chip.vue";
 import ColorChip from "@/Components/ColorChip.vue";
+import CustomPageProps from "@/types/model/CustomPageProps";
 
-const page = usePage();
+const page = usePage<CustomPageProps>();
 
 const props = defineProps({
-    products: null,
+    products: {
+        type: Object as () => PaginationModel<ProductEntity>,
+        required: true,
+    },
     filters: null,
 });
 
@@ -439,30 +443,51 @@ function onChangeSearch() {
                         </div>
 
                         <!-- Products -->
-                        <div
-                            data-aos="fade-up"
-                            data-aos-duration="600"
-                            class="flex flex-col items-start w-full gap-12"
-                        >
+                        <div class="flex flex-col items-start w-full gap-12">
                             <div
                                 v-if="products.length > 0"
                                 class="grid w-full grid-cols-2 gap-6 lg:gap-8 lg:grid-cols-3"
                             >
-                                <ProductCard
-                                    v-for="product in products || []"
+                                <template
+                                    v-for="(product, index) in products"
                                     :key="product.id"
-                                    :name="product.name"
-                                    :basePrice="
-                                        product.lowest_base_selling_price
-                                    "
-                                    :discount="product.discount"
-                                    :finalPrice="
-                                        product.lowest_final_selling_price
-                                    "
-                                    :image="product.images[0]?.image"
-                                    :description="product.brand?.name"
-                                    :slug="product.slug"
-                                />
+                                >
+                                    <Transition
+                                        name="fade-up"
+                                        mode="out-in"
+                                        appear
+                                        @before-enter="
+                                                (el: HTMLElement) => {
+                                                    el.style.transitionDelay =
+                                                        index % 10 * 100 + 'ms';
+                                                }
+                                            "
+                                        @after-enter="
+                                                (el: HTMLElement) => {
+                                                    el.style.transitionDelay = '';
+                                                }
+                                            "
+                                        @after-leave="
+                                                (el: HTMLElement) => {
+                                                    el.style.transitionDelay = '';
+                                                }
+                                            "
+                                    >
+                                        <ProductCard
+                                            :name="product.name"
+                                            :basePrice="
+                                                product.lowest_base_selling_price
+                                            "
+                                            :discount="product.discount"
+                                            :finalPrice="
+                                                product.lowest_final_selling_price
+                                            "
+                                            :image="(product.images[0]?.image as string | null)"
+                                            :description="product.brand?.name"
+                                            :slug="product.slug"
+                                        />
+                                    </Transition>
+                                </template>
                             </div>
                             <div
                                 v-else
