@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
-class MyStoreSizeController extends Controller
+class SizeController extends Controller
 {
     protected $storeId;
 

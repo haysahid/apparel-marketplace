@@ -9,7 +9,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class MyStoreColorController extends Controller
+class ColorController extends Controller
 {
     protected $storeId;
 

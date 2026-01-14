@@ -8,7 +8,7 @@ use App\Repositories\ReportRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class MyStoreReportController extends Controller
+class ReportController extends Controller
 {
     /**
      * Display a listing of the resource.

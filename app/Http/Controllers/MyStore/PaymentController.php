@@ -3,20 +3,18 @@
 namespace App\Http\Controllers\MyStore;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Repositories\UserRepository;
+use App\Repositories\PaymentRepository;
+use App\Repositories\TransactionTypeRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class MyStoreCustomerController extends Controller
+class PaymentController extends Controller
 {
     protected $storeId;
-    private $userRepository;
 
     public function __construct()
     {
         $this->storeId = session('selected_store_id');
-        $this->userRepository = new UserRepository();
     }
 
     public function index(Request $request)
@@ -25,23 +23,23 @@ class MyStoreCustomerController extends Controller
         $search = $request->input('search');
         $orderBy = $request->input('order_by', 'created_at');
         $orderDirection = $request->input('order_direction', 'desc');
+        $typeId = $request->input('type_id');
 
-        $customers = $this->userRepository->getCustomers(
+        $payments = PaymentRepository::getPayments(
             storeId: $this->storeId,
             limit: $limit,
             search: $search,
             orderBy: $orderBy,
             orderDirection: $orderDirection,
+            typeId: $typeId,
         );
 
-        return Inertia::render('MyStore/Customer', [
-            'customers' => $customers,
+        return Inertia::render('MyStore/Payment', [
+            'payments' => $payments,
+            'transactionTypes' => TransactionTypeRepository::getTransactionTypeDropdown(
+                orderBy: 'name',
+                orderDirection: 'asc',
+            ),
         ]);
-    }
-
-    public function show(User $customer)
-    {
-        $customerDetail = $this->userRepository->getCustomerDetail($customer->id, $this->storeId);
-        return Inertia::render('MyStore/Customer/CustomerDetail', $customerDetail);
     }
 }

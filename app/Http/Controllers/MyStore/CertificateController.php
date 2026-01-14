@@ -9,7 +9,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class MyStoreCertificateController extends Controller
+class CertificateController extends Controller
 {
     /**
      * Display a listing of the resource.

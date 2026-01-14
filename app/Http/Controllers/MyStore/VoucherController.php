@@ -8,7 +8,7 @@ use App\Repositories\VoucherRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class MyStoreVoucherController extends Controller
+class VoucherController extends Controller
 {
     protected $storeId;
 

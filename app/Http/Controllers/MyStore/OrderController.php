@@ -3,18 +3,17 @@
 namespace App\Http\Controllers\MyStore;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\TransactionRepository;
-use App\Models\Brand;
 use App\Models\Invoice;
-use App\Models\Transaction;
-use App\Models\TransactionItem;
-use App\Repositories\TransactionTypeRepository;
+use App\Repositories\BrandRepository;
+use App\Repositories\InvoiceRepository;
+use App\Repositories\ProductRepository;
+use App\Repositories\TransactionRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class MyStoreTransactionController extends Controller
+class OrderController extends Controller
 {
-    private $storeId;
+    protected $storeId;
 
     public function __construct()
     {
@@ -27,29 +26,27 @@ class MyStoreTransactionController extends Controller
     public function index(Request $request)
     {
         $limit = $request->input('limit', 10);
+        $search = $request->input('search');
         $orderBy = $request->input('order_by', 'created_at');
         $orderDirection = $request->input('order_direction', 'desc');
-        $typeId = $request->input('type_id');
         $brandId = $request->input('brand_id');
-        $search = $request->input('search');
 
-        $transactions = TransactionRepository::getTransactions(
-            storeId: session('selected_store_id'),
+        $invoices = InvoiceRepository::getInvoices(
+            storeId: $this->storeId,
             limit: $limit,
             search: $search,
             orderBy: $orderBy,
             orderDirection: $orderDirection,
-            typeId: $typeId,
-            brandId: $brandId,
+            brandId: $brandId
         );
 
-        return Inertia::render('MyStore/Transaction', [
-            'transactions' => $transactions,
-            'transactionTypes' => TransactionTypeRepository::getTransactionTypeDropdown(
-                orderBy: 'name',
-                orderDirection: 'asc',
-            ),
-            'brands' => Brand::orderBy('name', 'asc')->get(),
+        $brands = BrandRepository::getBrandDropdown(
+            storeId: $this->storeId,
+        );
+
+        return Inertia::render('MyStore/Order', [
+            'invoices' => $invoices,
+            'brands' => $brands,
         ]);
     }
 
@@ -58,7 +55,7 @@ class MyStoreTransactionController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('MyStore/Order/AddOrder');
     }
 
     /**
@@ -72,7 +69,7 @@ class MyStoreTransactionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Transaction $transaction)
+    public function show(Invoice $invoice)
     {
         //
     }
@@ -80,17 +77,19 @@ class MyStoreTransactionController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Transaction $transaction)
+    public function edit(Invoice $invoice)
     {
-        $transactionDetail = TransactionRepository::getTransactionDetail($transaction->code);
+        $invoiceDetail = InvoiceRepository::getInvoiceDetail(
+            invoiceId: $invoice->id,
+        );
 
-        return Inertia::render('MyStore/Transaction/TransactionDetail', $transactionDetail);
+        return Inertia::render('MyStore/Order/EditInvoice', $invoiceDetail);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Transaction $transaction)
+    public function update(Request $request, Invoice $invoice)
     {
         //
     }
@@ -98,7 +97,7 @@ class MyStoreTransactionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Transaction $transaction)
+    public function destroy(Invoice $invoice)
     {
         //
     }

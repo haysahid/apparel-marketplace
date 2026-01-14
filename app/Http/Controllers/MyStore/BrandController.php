@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
-class MyStoreBrandController extends Controller
+class BrandController extends Controller
 {
     protected $storeId;
 

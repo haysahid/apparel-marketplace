@@ -20,7 +20,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class MyStoreProductController extends Controller
+class ProductController extends Controller
 {
     protected $storeId;
 

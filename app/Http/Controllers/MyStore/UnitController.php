@@ -9,7 +9,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class MyStoreUnitController extends Controller
+class UnitController extends Controller
 {
     private $storeId;
 
