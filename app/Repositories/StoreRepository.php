@@ -217,7 +217,7 @@ class StoreRepository
             $query->whereHas('user_store_roles', function ($q) use ($userId) {
                 $q->where('user_id', $userId)
                     ->whereHas('role', function ($qr) {
-                        $qr->whereIn('slug', ['store-owner', 'admin', 'member', 'reseller', 'agent']);
+                        $qr->whereIn('slug', ['store-owner', 'admin']);
                     });
             });
         }

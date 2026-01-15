@@ -79,9 +79,7 @@ class UserController extends Controller
     {
         $roles = RoleRepository::getRoleDropdown(
             hideRoles: [
-                'member',
-                'reseller',
-                'agent',
+                'super-admin',
                 'store-owner'
             ]
         );

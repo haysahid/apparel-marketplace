@@ -35,12 +35,6 @@ class StoreSeeder extends Seeder
             'zip_code' => '15560',
         ]);
 
-        $storeAdmin = User::where('username', 'admintoko')->first();
-        $storeAdmin->stores()->attach(1, [
-            'role_id' => 2,
-            'created_at' => now(),
-        ]);
-
         StoreAdvantage::insert([
             [
                 'store_id' => 1,
@@ -101,38 +95,29 @@ class StoreSeeder extends Seeder
             ],
         ]);
 
-        // UserStoreRole::insert([
-        //     [
-        //         'store_id' => 1,
-        //         'user_id' => 1, // Super Admin
-        //         'role_id' => 1,
-        //     ],
-        //     [
-        //         'store_id' => 1,
-        //         'user_id' => 2, // Admin
-        //         'role_id' => 2,
-        //     ],
-        //     [
-        //         'store_id' => 1,
-        //         'user_id' => 5, // Karyawan Toko
-        //         'role_id' => 8,
-        //     ]
-        // ]);
+        // Assign users to store with roles
+        $superAdmin = User::where('username', 'superadmin')->first();
+        $superAdmin->stores()->attach(1, [
+            'role_id' => 1, // Super Admin role
+            'created_at' => now(),
+        ]);
 
-        $users = User::whereHas('role', function ($query) {
-            $query->whereIn('slug', ['super-admin', 'admin', 'employee']);
-        })->get();
+        $admin = User::where('username', 'admin')->first();
+        $admin->stores()->attach(1, [
+            'role_id' => 2, // Admin role
+            'created_at' => now(),
+        ]);
 
-        foreach ($users as $user) {
-            UserStoreRole::updateOrCreate(
-                [
-                    'store_id' => 1,
-                    'user_id' => $user->id,
-                ],
-                [
-                    'role_id' => $user->role_id,
-                ]
-            );
-        }
+        $storeAdmin = User::where('username', 'pemiliktoko')->first();
+        $storeAdmin->stores()->attach(1, [
+            'role_id' => 4, // Store Owner role
+            'created_at' => now(),
+        ]);
+
+        $employee = User::where('username', 'karyawantoko')->first();
+        $employee->stores()->attach(1, [
+            'role_id' => 5, // Employee role
+            'created_at' => now(),
+        ]);
     }
 }
