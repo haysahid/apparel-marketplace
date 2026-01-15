@@ -18,36 +18,26 @@ class CategorySeeder extends Seeder
                 'store_id' => null,
                 'name' => 'T-Shirts',
                 'image' => 'category/t-shirt.png',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'store_id' => null,
                 'name' => 'Jeans',
-                'image' => 'category/trouser.png',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'image' => 'category/trouser.png'
             ],
             [
                 'store_id' => null,
                 'name' => 'Jackets',
-                'image' => 'category/jacket.png',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'image' => 'category/jacket.png'
             ],
             [
                 'store_id' => null,
                 'name' => 'Shoes',
-                'image' => 'category/shoe.png',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'image' => 'category/shoe.png'
             ],
             [
                 'store_id' => null,
                 'name' => 'Accessories',
-                'image' => 'category/ribbon.png',
-                'created_at' => now(),
-                'updated_at' => now(),
+                'image' => 'category/ribbon.png'
             ],
         ]);
     }
