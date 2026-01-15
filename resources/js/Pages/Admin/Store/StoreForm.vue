@@ -296,7 +296,7 @@ const openErrorDialog = (message) => {
                             v-model="form.logo"
                             width="max-w-[120px] min-w-[120px]"
                             height="h-[120px]"
-                            objectFit="object-cover"
+                            objectFit="object-contain"
                             :error="form.errors.logo"
                             @update:modelValue="form.errors.logo = null"
                         />

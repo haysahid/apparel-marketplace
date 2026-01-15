@@ -140,9 +140,11 @@ const filteredUserRolePairs = computed(() => {
                                 props.roles.map((role) => ({
                                     label: role.name,
                                     value: role.slug,
-                                    disabled:
-                                        role.slug === 'super-admin' ||
-                                        role.slug === 'guest',
+                                    disabled: [
+                                        'super-admin',
+                                        'user',
+                                        'guest',
+                                    ].includes(role.slug),
                                 }))
                             "
                             :modelValue="userRole.role?.slug"

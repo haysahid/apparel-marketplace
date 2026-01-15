@@ -12,6 +12,7 @@ import ThreeDotsLoading from "@/Components/ThreeDotsLoading.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import WhatsAppButton from "@/Components/WhatsAppButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import Tooltip from "@/Components/Tooltip.vue";
 
 const props = defineProps({
     user: Object as () => UserEntity,
@@ -218,7 +219,10 @@ getUserVouchers();
                             class="flex flex-wrap items-start justify-center w-full text-sm text-gray-600 max-sm:flex-col sm:justify-start gap-x-6 gap-y-1"
                         >
                             <div
-                                v-for="storeRole in props.user.store_role_pairs"
+                                v-for="storeRole in props.user.store_role_pairs.slice(
+                                    0,
+                                    1
+                                )"
                                 :key="
                                     storeRole.store?.id +
                                     '-' +
@@ -247,6 +251,78 @@ getUserVouchers();
                                     </span>
                                 </span>
                             </div>
+                            <Tooltip
+                                v-if="props.user.store_role_pairs.length > 1"
+                                id="more-store-role-pairs-info"
+                                placement="bottom"
+                                class="cursor-pointer"
+                            >
+                                <div
+                                    class="flex items-center gap-0.5 text-sm text-gray-600"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        class="inline-block mr-1 size-5 fill-gray-400"
+                                    >
+                                        <path
+                                            d="M4.33333 6.49992V4.33325H21.6667V6.49992H4.33333ZM4.33333 21.6666V15.1666H3.25V12.9999L4.33333 7.58325H21.6667L22.75 12.9999V15.1666H21.6667V21.6666H19.5V15.1666H15.1667V21.6666H4.33333ZM6.5 19.4999H13V15.1666H6.5V19.4999Z"
+                                        />
+                                    </svg>
+                                    <span class="italic text-gray-500">
+                                        +{{
+                                            props.user.store_role_pairs.length -
+                                            1
+                                        }}
+                                        more
+                                    </span>
+                                </div>
+
+                                <template #content>
+                                    <div
+                                        class="flex flex-col gap-1 p-1 overflow-y-auto max-h-60"
+                                    >
+                                        <div
+                                            v-for="storeRole in props.user.store_role_pairs.slice(
+                                                1
+                                            )"
+                                            :key="
+                                                storeRole.store?.id +
+                                                '-' +
+                                                storeRole.role?.id
+                                            "
+                                            class="flex items-center gap-0.5 text-sm"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="24"
+                                                height="24"
+                                                viewBox="0 0 24 24"
+                                                class="inline-block mr-1 size-5"
+                                            >
+                                                <path
+                                                    d="M4.33333 6.49992V4.33325H21.6667V6.49992H4.33333ZM4.33333 21.6666V15.1666H3.25V12.9999L4.33333 7.58325H21.6667L22.75 12.9999V15.1666H21.6667V21.6666H19.5V15.1666H15.1667V21.6666H4.33333ZM6.5 19.4999H13V15.1666H6.5V19.4999Z"
+                                                    fill="currentColor"
+                                                />
+                                            </svg>
+                                            <span>
+                                                {{
+                                                    storeRole.store?.name ?? "-"
+                                                }}
+                                                <span class="italic"> - </span>
+                                                <span class="italic">
+                                                    {{
+                                                        storeRole.role?.name ??
+                                                        "-"
+                                                    }}
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </Tooltip>
                         </div>
                     </div>
 

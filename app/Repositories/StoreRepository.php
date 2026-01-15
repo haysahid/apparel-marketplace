@@ -73,7 +73,7 @@ class StoreRepository
                         'store_id' => $store->id,
                     ],
                     [
-                        'role_id' => $user->role->id,
+                        'role_id' => $user->role_id,
                     ]
                 );
             }

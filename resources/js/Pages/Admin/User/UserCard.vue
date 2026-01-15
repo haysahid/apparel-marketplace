@@ -157,30 +157,56 @@ const hasDeleteCallback = computed(() => {
                     </div>
                 </div>
 
-                <div
-                    v-for="(storeRole, index) in props.user.store_role_pairs"
-                    :key="index"
-                    class="flex items-center gap-0.5 text-xs text-gray-600"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        class="inline-block size-3.5 mr-1 fill-gray-400"
+                <template v-if="user.store_role_pairs.length > 0">
+                    <div
+                        v-for="(
+                            storeRole, index
+                        ) in props.user.store_role_pairs.slice(0, 1)"
+                        :key="index"
+                        class="flex items-center gap-0.5 text-xs text-gray-600"
                     >
-                        <path
-                            d="M4.33333 6.49992V4.33325H21.6667V6.49992H4.33333ZM4.33333 21.6666V15.1666H3.25V12.9999L4.33333 7.58325H21.6667L22.75 12.9999V15.1666H21.6667V21.6666H19.5V15.1666H15.1667V21.6666H4.33333ZM6.5 19.4999H13V15.1666H6.5V19.4999Z"
-                        />
-                    </svg>
-                    <span>
-                        {{ storeRole.store?.name ?? "-" }}
-                        <span class="text-xs italic text-gray-500"> - </span>
-                        <span class="text-xs italic text-gray-500">
-                            {{ storeRole.role?.name ?? "-" }}
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            class="inline-block size-3.5 mr-1 fill-gray-400"
+                        >
+                            <path
+                                d="M4.33333 6.49992V4.33325H21.6667V6.49992H4.33333ZM4.33333 21.6666V15.1666H3.25V12.9999L4.33333 7.58325H21.6667L22.75 12.9999V15.1666H21.6667V21.6666H19.5V15.1666H15.1667V21.6666H4.33333ZM6.5 19.4999H13V15.1666H6.5V19.4999Z"
+                            />
+                        </svg>
+                        <span>
+                            {{ storeRole.store?.name ?? "-" }}
+                            <span class="text-xs italic text-gray-500">
+                                -
+                            </span>
+                            <span class="text-xs italic text-gray-500">
+                                {{ storeRole.role?.name ?? "-" }}
+                            </span>
                         </span>
-                    </span>
-                </div>
+                    </div>
+                    <div
+                        v-if="props.user.store_role_pairs.length > 1"
+                        class="flex items-center gap-0.5 text-xs text-gray-600"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            class="inline-block size-3.5 mr-1 fill-gray-400"
+                        >
+                            <path
+                                d="M4.33333 6.49992V4.33325H21.6667V6.49992H4.33333ZM4.33333 21.6666V15.1666H3.25V12.9999L4.33333 7.58325H21.6667L22.75 12.9999V15.1666H21.6667V21.6666H19.5V15.1666H15.1667V21.6666H4.33333ZM6.5 19.4999H13V15.1666H6.5V19.4999Z"
+                            />
+                        </svg>
+                        <span class="text-xs italic text-gray-500">
+                            +{{ props.user.store_role_pairs.length - 1 }}
+                            more
+                        </span>
+                    </div>
+                </template>
             </div>
         </div>
 

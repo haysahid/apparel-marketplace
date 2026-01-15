@@ -249,21 +249,14 @@ onMounted(() => {
                                     props.roles.map((role) => ({
                                         label: role.name,
                                         value: role.slug,
-                                        disabled:
-                                            role.slug === 'super-admin' ||
-                                            role.slug === 'guest',
+                                        disabled: [
+                                            'super-admin',
+                                            'user',
+                                            'guest',
+                                        ].includes(role.slug),
                                     }))
                                 "
                                 :modelValue="userRole.role?.slug"
-                                :disabled="
-                                    userRole.user?.id ===
-                                        $page.props.auth.user.id ||
-                                    userRole.role?.slug === 'super-admin' ||
-                                    ($page.props.selected_store_role.slug !==
-                                        'admin' &&
-                                        $page.props.selected_store_role.slug !==
-                                            'store-owner')
-                                "
                                 placeholder="Pilih Peran"
                                 @update:modelValue="
                                     (value) => {

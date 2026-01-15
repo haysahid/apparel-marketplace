@@ -136,7 +136,12 @@ class User extends Authenticatable
 
     public function store_roles()
     {
-        return $this->belongsToMany(Role::class, 'user_store_role')->withTimestamps()->withPivot('store_id');
+        return $this->belongsToMany(Role::class, 'user_store_role')
+            ->withTimestamps()
+            ->withPivot('store_id')
+            ->whereNull('store.deleted_at')
+            ->join('stores as store', 'user_store_role.store_id', '=', 'store.id')
+        ;
     }
 
     public function user_store_roles()

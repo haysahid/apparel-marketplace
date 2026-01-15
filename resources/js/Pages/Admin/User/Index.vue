@@ -18,7 +18,6 @@ import { scrollToTop } from "@/plugins/helpers";
 import SearchInput from "@/Components/SearchInput.vue";
 import AdminLayout from "@/Layouts/AdminLayout.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import Tooltip from "@/Components/Tooltip.vue";
 
 const screenSize = useScreenSize();
 
@@ -286,7 +285,7 @@ onMounted(() => {
                                         {{ storeRole.role?.name ?? "-" }}
                                     </span>
                                 </p>
-                                <span v-if="user.store_role_pairs.length > 3">
+                                <span v-if="user.store_role_pairs.length > 1">
                                     <Link
                                         :href="
                                             route('admin.store.index', {

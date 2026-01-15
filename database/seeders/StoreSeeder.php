@@ -101,17 +101,38 @@ class StoreSeeder extends Seeder
             ],
         ]);
 
-        UserStoreRole::insert([
-            [
-                'store_id' => 1,
-                'user_id' => 1, // Super Admin
-                'role_id' => 1,
-            ],
-            [
-                'store_id' => 1,
-                'user_id' => 2, // Admin
-                'role_id' => 2,
-            ],
-        ]);
+        // UserStoreRole::insert([
+        //     [
+        //         'store_id' => 1,
+        //         'user_id' => 1, // Super Admin
+        //         'role_id' => 1,
+        //     ],
+        //     [
+        //         'store_id' => 1,
+        //         'user_id' => 2, // Admin
+        //         'role_id' => 2,
+        //     ],
+        //     [
+        //         'store_id' => 1,
+        //         'user_id' => 5, // Karyawan Toko
+        //         'role_id' => 8,
+        //     ]
+        // ]);
+
+        $users = User::whereHas('role', function ($query) {
+            $query->whereIn('slug', ['super-admin', 'admin', 'employee']);
+        })->get();
+
+        foreach ($users as $user) {
+            UserStoreRole::updateOrCreate(
+                [
+                    'store_id' => 1,
+                    'user_id' => $user->id,
+                ],
+                [
+                    'role_id' => $user->role_id,
+                ]
+            );
+        }
     }
 }
