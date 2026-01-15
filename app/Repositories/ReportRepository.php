@@ -42,17 +42,24 @@ class ReportRepository
             'users.name as customer',
             'transactions.status',
             'COUNT(transaction_items.id) as total_items',
-            'CAST(SUM(transaction_items.unit_base_price * transaction_items.quantity) AS SIGNED) as total_purchase',
-            'CAST(SUM(transaction_items.subtotal) AS SIGNED) as total_sales',
-            'CAST(SUM(transaction_items.unit_base_price * transaction_items.quantity - transaction_items.subtotal) AS SIGNED) as total_discounts',
-            'CAST(SUM(transaction_items.subtotal) - SUM(transaction_items.unit_base_price * transaction_items.quantity) AS SIGNED) as margin'
+            'CAST(SUM(transaction_items.unit_base_price::numeric * transaction_items.quantity) AS INTEGER) as total_purchase',
+            'CAST(SUM(transaction_items.subtotal) AS INTEGER) as total_sales',
+            'CAST(SUM(transaction_items.unit_base_price::numeric * transaction_items.quantity - transaction_items.subtotal) AS INTEGER) as total_discounts',
+            'CAST(SUM(transaction_items.subtotal) - SUM(transaction_items.unit_base_price::numeric * transaction_items.quantity) AS INTEGER) as margin'
         ];
 
-        $report = $this->reportQuery
+        $query = $this->reportQuery
             ->selectRaw(implode(', ', $selects))
-            ->where('transaction_types.slug', 'purchase')
-            ->whereDate('transactions.created_at', '>=', "$this->startDate")
-            ->whereDate('transactions.created_at', '<=', "$this->endDate")
+            ->where('transaction_types.slug', 'purchase');
+
+        if ($this->startDate) {
+            $query->whereDate('transactions.created_at', '>=', $this->startDate);
+        }
+        if ($this->endDate) {
+            $query->whereDate('transactions.created_at', '<=', $this->endDate);
+        }
+
+        $report = $query
             ->groupBy('transactions.id')
             ->get();
 
@@ -94,18 +101,25 @@ class ReportRepository
             'users.name as customer',
             'transactions.status',
             'COUNT(transaction_items.id) as total_items',
-            'CAST(SUM(transaction_items.unit_base_price * transaction_items.quantity) AS SIGNED) as total_purchase',
-            'CAST(SUM(transaction_items.subtotal) AS SIGNED) as total_sales',
-            'CAST(SUM(transaction_items.unit_base_price * transaction_items.quantity - transaction_items.subtotal) AS SIGNED) as total_discounts',
-            'CAST(SUM(transaction_items.subtotal) - SUM(transaction_items.unit_base_price * transaction_items.quantity) AS SIGNED) as margin',
+            'CAST(SUM(transaction_items.unit_base_price::numeric * transaction_items.quantity) AS INTEGER) as total_purchase',
+            'CAST(SUM(transaction_items.subtotal) AS INTEGER) as total_sales',
+            'CAST(SUM(transaction_items.unit_base_price::numeric * transaction_items.quantity - transaction_items.subtotal) AS INTEGER) as total_discounts',
+            'CAST(SUM(transaction_items.subtotal) - SUM(transaction_items.unit_base_price::numeric * transaction_items.quantity) AS INTEGER) as margin',
         ];
 
-        $report = $this->reportQuery
+        $query = $this->reportQuery
             ->selectRaw(implode(', ', $selects))
-            ->where('transaction_types.slug', 'sale')
-            ->whereDate('transactions.created_at', '>=', "$this->startDate")
-            ->whereDate('transactions.created_at', '<=', "$this->endDate")
-            ->groupBy('transactions.id')
+            ->where('transaction_types.slug', 'sale');
+
+        if ($this->startDate) {
+            $query->whereDate('transactions.created_at', '>=', $this->startDate);
+        }
+        if ($this->endDate) {
+            $query->whereDate('transactions.created_at', '<=', $this->endDate);
+        }
+
+        $report = $query
+            ->groupBy('transactions.id', 'transactions.code', 'users.name', 'transactions.status')
             ->get();
 
         $totals = [
@@ -155,7 +169,7 @@ class ReportRepository
             ->when($brand, function ($query) use ($brand) {
                 return $query->where('brands.name', $brand);
             })
-            ->groupBy('product_variants.id')
+            ->groupBy('product_variants.id', 'products.id', 'brands.name', 'colors.name', 'sizes.name')
             ->orderBy('products.name', 'asc')
             ->get();
 
