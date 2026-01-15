@@ -49,24 +49,24 @@ class TransactionRepository
 
         if ($search) {
             $transactions->where(function ($query) use ($search) {
-                $query->where('code', 'like', '%' . $search . '%')
+                $query->where('code', 'ilike', '%' . $search . '%')
                     ->orWhereHas('user', function ($q) use ($search) {
-                        $q->where('name', 'like', '%' . $search . '%');
+                        $q->where('name', 'ilike', '%' . $search . '%');
                     })
                     ->orWhereHas('items.variant', function ($q) use ($search) {
-                        $q->where('motif', 'like', '%' . $search . '%')
+                        $q->where('motif', 'ilike', '%' . $search . '%')
                             ->orWhereHas('color', function ($q) use ($search) {
-                                $q->where('name', 'like', '%' . $search . '%');
+                                $q->where('name', 'ilike', '%' . $search . '%');
                             })
                             ->orWhereHas('size', function ($q) use ($search) {
-                                $q->where('name', 'like', '%' . $search . '%');
+                                $q->where('name', 'ilike', '%' . $search . '%');
                             })
-                            ->where('material', 'like', '%' . $search . '%');
+                            ->where('material', 'ilike', '%' . $search . '%');
                     })
                     ->orWhereHas('items.variant.product', function ($q) use ($search) {
-                        $q->where('name', 'like', '%' . $search . '%')
+                        $q->where('name', 'ilike', '%' . $search . '%')
                             ->orWhereHas('brand', function ($q) use ($search) {
-                                $q->where('name', 'like', '%' . $search . '%');
+                                $q->where('name', 'ilike', '%' . $search . '%');
                             });
                     });
             });

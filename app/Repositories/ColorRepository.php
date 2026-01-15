@@ -30,8 +30,8 @@ class ColorRepository
         if ($search) {
             $colors->where(
                 function ($query) use ($search) {
-                    $query->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('hex_code', 'like', '%' . $search . '%');
+                    $query->where('name', 'ilike', '%' . $search . '%')
+                        ->orWhere('hex_code', 'ilike', '%' . $search . '%');
                 }
             );
         }

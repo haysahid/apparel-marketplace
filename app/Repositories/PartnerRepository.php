@@ -28,12 +28,12 @@ class PartnerRepository
 
         if ($search) {
             $partners->where(function ($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%')
-                    ->orWhere('contact_name', 'like', '%' . $search . '%')
-                    ->orWhere('contact_email', 'like', '%' . $search . '%')
-                    ->orWhere('contact_phone', 'like', '%' . $search . '%')
-                    ->orWhere('website', 'like', '%' . $search . '%');
+                $q->where('name', 'ilike', '%' . $search . '%')
+                    ->orWhere('description', 'ilike', '%' . $search . '%')
+                    ->orWhere('contact_name', 'ilike', '%' . $search . '%')
+                    ->orWhere('contact_email', 'ilike', '%' . $search . '%')
+                    ->orWhere('contact_phone', 'ilike', '%' . $search . '%')
+                    ->orWhere('website', 'ilike', '%' . $search . '%');
             });
         }
 

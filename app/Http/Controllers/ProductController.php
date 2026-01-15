@@ -58,8 +58,8 @@ class ProductController extends Controller
         }
 
         if ($search) {
-            $products->where('name', 'like', '%' . $search . '%')
-                ->orWhere('description', 'like', '%' . $search . '%');
+            $products->where('name', 'ilike', '%' . $search . '%')
+                ->orWhere('description', 'ilike', '%' . $search . '%');
         }
 
         $products->orderBy($orderBy, $orderDirection);

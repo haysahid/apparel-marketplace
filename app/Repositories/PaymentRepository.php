@@ -75,13 +75,13 @@ class PaymentRepository
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('note', 'like', '%' . $search . '%')
-                    ->orWhere('reason', 'like', '%' . $search . '%')
+                $q->where('note', 'ilike', '%' . $search . '%')
+                    ->orWhere('reason', 'ilike', '%' . $search . '%')
                     ->orWhereHas('transaction', function ($q2) use ($search) {
-                        $q2->where('code', 'like', '%' . $search . '%')
+                        $q2->where('code', 'ilike', '%' . $search . '%')
                             ->orWhereHas('user', function ($q3) use ($search) {
-                                $q3->where('name', 'like', '%' . $search . '%')
-                                    ->orWhere('email', 'like', '%' . $search . '%');
+                                $q3->where('name', 'ilike', '%' . $search . '%')
+                                    ->orWhere('email', 'ilike', '%' . $search . '%');
                             });
                     });
             });

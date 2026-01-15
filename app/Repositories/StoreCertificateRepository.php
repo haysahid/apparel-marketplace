@@ -25,8 +25,8 @@ class StoreCertificateRepository
 
         if ($search) {
             $certificates->where(function ($query) use ($search) {
-                $query->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%');
+                $query->where('name', 'ilike', '%' . $search . '%')
+                    ->orWhere('description', 'ilike', '%' . $search . '%');
             });
         }
 

@@ -17,8 +17,8 @@ class TransactionTypeRepository
         if ($search) {
             $transactionTypes->where(
                 function ($query) use ($search) {
-                    $query->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('effect_on_stock', 'like', '%' . $search . '%');
+                    $query->where('name', 'ilike', '%' . $search . '%')
+                        ->orWhere('effect_on_stock', 'ilike', '%' . $search . '%');
                 }
             );
         }

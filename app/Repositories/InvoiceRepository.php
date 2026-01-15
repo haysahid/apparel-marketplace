@@ -56,10 +56,10 @@ class InvoiceRepository
 
         if ($search) {
             $invoices->where(function ($query) use ($search) {
-                $query->where('code', 'like', '%' . $search . '%')
+                $query->where('code', 'ilike', '%' . $search . '%')
                     ->orWhereHas('transaction', function ($q) use ($search) {
                         $q->whereHas('user', function ($qq) use ($search) {
-                            $qq->where('name', 'like', '%' . $search . '%');
+                            $qq->where('name', 'ilike', '%' . $search . '%');
                         });
                     });
             });

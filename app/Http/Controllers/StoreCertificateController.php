@@ -25,8 +25,8 @@ class StoreCertificateController extends Controller
         $certificates = StoreCertificate::query();
 
         if ($search) {
-            $certificates->where('name', 'like', '%' . $search . '%')
-                ->orWhere('description', 'like', '%' . $search . '%');
+            $certificates->where('name', 'ilike', '%' . $search . '%')
+                ->orWhere('description', 'ilike', '%' . $search . '%');
         }
 
         $certificates->orderBy($sortBy, $sortDirection);

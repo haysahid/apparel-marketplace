@@ -15,34 +15,39 @@ class CategorySeeder extends Seeder
     {
         Category::insert([
             [
-                'id' => 1,
                 'store_id' => null,
                 'name' => 'T-Shirts',
-                'image' => 'category/t-shirt.png'
+                'image' => 'category/t-shirt.png',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
-                'id' => 2,
                 'store_id' => null,
                 'name' => 'Jeans',
-                'image' => 'category/trouser.png'
+                'image' => 'category/trouser.png',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
-                'id' => 3,
                 'store_id' => null,
                 'name' => 'Jackets',
-                'image' => 'category/jacket.png'
+                'image' => 'category/jacket.png',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
-                'id' => 4,
                 'store_id' => null,
                 'name' => 'Shoes',
-                'image' => 'category/shoe.png'
+                'image' => 'category/shoe.png',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
-                'id' => 5,
                 'store_id' => null,
                 'name' => 'Accessories',
-                'image' => 'category/ribbon.png'
+                'image' => 'category/ribbon.png',
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
         ]);
     }

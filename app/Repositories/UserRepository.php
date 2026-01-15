@@ -183,8 +183,8 @@ class UserRepository
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%$search%")
-                    ->orWhere('email', 'like', "%$search%");
+                $q->where('name', 'ilike', "%$search%")
+                    ->orWhere('email', 'ilike', "%$search%");
             });
         }
 
@@ -219,8 +219,8 @@ class UserRepository
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%$search%")
-                    ->orWhere('email', 'like', "%$search%");
+                $q->where('name', 'ilike', "%$search%")
+                    ->orWhere('email', 'ilike', "%$search%");
             });
         }
 
@@ -312,9 +312,9 @@ class UserRepository
         if ($search) {
             $query->whereHas('voucher', function ($q) use ($search) {
                 $q->where(function ($subQuery) use ($search) {
-                    $subQuery->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('code', 'like', '%' . $search . '%')
-                        ->orWhere('description', 'like', '%' . $search . '%');
+                    $subQuery->where('name', 'ilike', '%' . $search . '%')
+                        ->orWhere('code', 'ilike', '%' . $search . '%')
+                        ->orWhere('description', 'ilike', '%' . $search . '%');
                 });
             });
         }
@@ -343,8 +343,8 @@ class UserRepository
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('description', 'like', "%$search%")
-                    ->orWhere('type', 'like', "%$search%");
+                $q->where('description', 'ilike', "%$search%")
+                    ->orWhere('type', 'ilike', "%$search%");
             });
         }
 
@@ -380,8 +380,8 @@ class UserRepository
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%$search%")
-                    ->orWhere('email', 'like', "%$search%");
+                $q->where('name', 'ilike', "%$search%")
+                    ->orWhere('email', 'ilike', "%$search%");
             });
         }
 

@@ -42,9 +42,9 @@ class VoucherRepository
 
         if ($search) {
             $vouchers->where(function ($query) use ($search) {
-                $query->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('code', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%');
+                $query->where('name', 'ilike', '%' . $search . '%')
+                    ->orWhere('code', 'ilike', '%' . $search . '%')
+                    ->orWhere('description', 'ilike', '%' . $search . '%');
             });
         }
 

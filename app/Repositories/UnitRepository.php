@@ -29,7 +29,7 @@ class UnitRepository
         }
 
         if ($search) {
-            $units->where('name', 'like', '%' . $search . '%');
+            $units->where('name', 'ilike', '%' . $search . '%');
         }
 
         $units->orderBy($orderBy, $orderDirection);

@@ -27,7 +27,7 @@ class PlatformRepository
         }
 
         if ($search) {
-            $platforms->where('name', 'like', '%' . $search . '%');
+            $platforms->where('name', 'ilike', '%' . $search . '%');
         }
 
         $platforms->orderBy($orderBy, $orderDirection);

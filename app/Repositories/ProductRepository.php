@@ -60,13 +60,13 @@ class ProductRepository
 
         if ($search) {
             $products->where(function ($query) use ($search) {
-                $query->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%')
+                $query->where('name', 'ilike', '%' . $search . '%')
+                    ->orWhere('description', 'ilike', '%' . $search . '%')
                     ->orWhereHas('brand', function ($q) use ($search) {
-                        $q->where('name', 'like', '%' . $search . '%');
+                        $q->where('name', 'ilike', '%' . $search . '%');
                     })
                     ->orWhereHas('categories', function ($q) use ($search) {
-                        $q->where('name', 'like', '%' . $search . '%');
+                        $q->where('name', 'ilike', '%' . $search . '%');
                     });
             });
         }

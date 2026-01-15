@@ -27,7 +27,7 @@ class SizeRepository
         }
 
         if ($search) {
-            $sizes->where('name', 'like', '%' . $search . '%');
+            $sizes->where('name', 'ilike', '%' . $search . '%');
         }
 
         $sizes->orderBy($orderBy, $orderDirection);

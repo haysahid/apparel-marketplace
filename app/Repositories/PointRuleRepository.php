@@ -21,9 +21,9 @@ class PointRuleRepository
 
         if ($search) {
             $pointRules->where(function ($query) use ($search) {
-                $query->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%')
-                    ->orWhere('type', 'like', '%' . $search . '%');
+                $query->where('name', 'ilike', '%' . $search . '%')
+                    ->orWhere('description', 'ilike', '%' . $search . '%')
+                    ->orWhere('type', 'ilike', '%' . $search . '%');
             });
         }
 

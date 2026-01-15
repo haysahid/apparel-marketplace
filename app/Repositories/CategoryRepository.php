@@ -27,7 +27,7 @@ class CategoryRepository
         }
 
         if ($search) {
-            $categories->where('name', 'like', '%' . $search . '%');
+            $categories->where('name', 'ilike', '%' . $search . '%');
         }
 
         $categories->orderBy($orderBy, $orderDirection);

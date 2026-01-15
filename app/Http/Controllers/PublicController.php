@@ -87,21 +87,21 @@ class PublicController extends Controller
         if ($search) {
             $search = trim($search);
             $products->where(function ($query) use ($search) {
-                $query->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%');
+                $query->where('name', 'ilike', '%' . $search . '%')
+                    ->orWhere('description', 'ilike', '%' . $search . '%');
                 $query->orWhereHas('brand', function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%');
+                    $q->where('name', 'ilike', '%' . $search . '%');
                 });
                 $query->orWhereHas('categories', function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%');
+                    $q->where('name', 'ilike', '%' . $search . '%');
                 });
                 $query->orWhereHas('variants', function ($q) use ($search) {
-                    $q->where('motif', 'like', '%' . $search . '%');
+                    $q->where('motif', 'ilike', '%' . $search . '%');
                     $q->orWhereHas('color', function ($q2) use ($search) {
-                        $q2->where('name', 'like', '%' . $search . '%');
+                        $q2->where('name', 'ilike', '%' . $search . '%');
                     });
                     $q->orWhereHas('size', function ($q2) use ($search) {
-                        $q2->where('name', 'like', '%' . $search . '%');
+                        $q2->where('name', 'ilike', '%' . $search . '%');
                     });
                 });
             });
