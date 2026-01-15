@@ -41,7 +41,7 @@ class Store extends Model
         });
     }
 
-    // Relationships
+    // Relationships - Users and Roles
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_store_role')->withTimestamps()->withPivot(['role_id']);
@@ -52,11 +52,30 @@ class Store extends Model
         return $this->belongsToMany(Role::class, 'user_store_role')->withTimestamps()->withPivot(['user_id'])->orderBy('id');
     }
 
+    // Relationships - Memberships
+
     public function user_store_roles()
     {
         return $this->hasMany(UserStoreRole::class);
     }
 
+    public function membership_types()
+    {
+        return $this->hasMany(MembershipType::class);
+    }
+
+    public function members()
+    {
+        return $this->belongsToMany(User::class, 'store_memberships', 'store_id', 'user_id')
+            ->withTimestamps();
+    }
+
+    public function store_memberships()
+    {
+        return $this->hasMany(StoreMembership::class);
+    }
+
+    // Relationships - Other
     public function advantages()
     {
         return $this->hasMany(StoreAdvantage::class);

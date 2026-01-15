@@ -18,11 +18,13 @@ return new class extends Migration
             $table->string('name');
             $table->string('alias')->nullable();
             $table->integer('level')->default(0);
-            $table->string('slug')->unique();
+            $table->string('slug')->index();
             $table->string('description')->nullable();
             $table->integer('item_discount_percentage')->default(0);
             $table->integer('shipping_discount_percentage')->default(0);
             $table->integer('min_purchase_amount')->default(0);
+            $table->string('hex_code_bg')->nullable();
+            $table->string('hex_code_text')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

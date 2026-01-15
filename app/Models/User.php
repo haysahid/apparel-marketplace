@@ -123,7 +123,37 @@ class User extends Authenticatable
         return false;
     }
 
-    // Relationships
+    /**
+     * Get store and membership pairs for the user
+     */
+    public function getStoreMembershipPairs()
+    {
+        $storesById = $this->member_of_stores->keyBy('id');
+        return $this->membership_types->map(function ($membershipType) use ($storesById) {
+            $store = $storesById->get($membershipType->pivot->store_id, null);
+            return [
+                'store' => $store,
+                'membership_type' => $membershipType,
+            ];
+        });
+    }
+
+    /**
+     * Check if user has specific store membership for a given store
+     */
+    public function hasStoreMembership(
+        int $storeId,
+        array $membershipTypes
+    ): bool {
+        foreach ($this->membership_types as $membershipType) {
+            if ($membershipType->pivot->store_id === $storeId && in_array($membershipType->slug, $membershipTypes)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Relationships - Roles and Stores
     public function role()
     {
         return $this->belongsTo(Role::class);
@@ -149,6 +179,26 @@ class User extends Authenticatable
         return $this->hasMany(UserStoreRole::class);
     }
 
+    // Relationships - Memberships
+    public function membership_types()
+    {
+        return $this->belongsToMany(MembershipType::class, 'store_memberships', 'user_id', 'membership_type_id')
+            ->withTimestamps();
+    }
+
+    public function member_of_stores()
+    {
+        return $this->belongsToMany(Store::class, 'store_memberships', 'user_id', 'store_id')
+            ->withTimestamps();
+    }
+
+    public function store_memberships()
+    {
+        return $this->hasMany(StoreMembership::class);
+    }
+
+
+    // Relationships - Other
     public function transactions()
     {
         return $this->hasMany(Transaction::class);

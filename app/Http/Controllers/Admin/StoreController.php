@@ -127,7 +127,7 @@ class StoreController extends Controller
                 ['store' => $store]
             )->with(
                 'success',
-                'Toko berhasil dibuat. Silakan lengkapi informasi toko Anda di halaman pengaturan toko.'
+                'Toko berhasil dibuat.'
             );
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()])->withInput();

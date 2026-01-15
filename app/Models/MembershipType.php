@@ -20,5 +20,25 @@ class MembershipType extends Model
         'item_discount_percentage',
         'shipping_discount_percentage',
         'min_purchase_amount',
+        'hex_code_bg',
+        'hex_code_text',
     ];
+
+    // Relationships
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
+
+    public function members()
+    {
+        return $this->belongsToMany(User::class, 'store_memberships', 'membership_type_id', 'user_id')
+            ->withTimestamps();
+    }
+
+    public function stores()
+    {
+        return $this->belongsToMany(Store::class, 'store_memberships', 'membership_type_id', 'store_id')
+            ->withTimestamps();
+    }
 }

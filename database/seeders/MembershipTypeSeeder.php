@@ -24,6 +24,8 @@ class MembershipTypeSeeder extends Seeder
                 'item_discount_percentage' => 10,
                 'shipping_discount_percentage' => 0,
                 'min_purchase_amount' => 0,
+                'hex_code_bg' => '#808080',
+                'hex_code_text' => '#FFFFFF',
                 'description' => 'Keanggotaan Member memberikan diskon 10% untuk setiap pembelian produk di toko kami.',
             ],
             [
@@ -36,6 +38,8 @@ class MembershipTypeSeeder extends Seeder
                 'item_discount_percentage' => 15,
                 'shipping_discount_percentage' => 0,
                 'min_purchase_amount' => 0,
+                'hex_code_bg' => '#C28C42',
+                'hex_code_text' => '#FFFFFF',
                 'description' => 'Keanggotaan Reseller memberikan diskon 15% untuk setiap pembelian produk di toko kami.',
             ],
             [
@@ -48,6 +52,8 @@ class MembershipTypeSeeder extends Seeder
                 'item_discount_percentage' => 20,
                 'shipping_discount_percentage' => 0,
                 'min_purchase_amount' => 0,
+                'hex_code_bg' => '#C28C42',
+                'hex_code_text' => '#FFFFFF',
                 'description' => 'Keanggotaan Reseller memberikan diskon 20% untuk setiap pembelian produk di toko kami.',
             ],
             [
@@ -60,6 +66,8 @@ class MembershipTypeSeeder extends Seeder
                 'item_discount_percentage' => 30,
                 'shipping_discount_percentage' => 0,
                 'min_purchase_amount' => 0,
+                'hex_code_bg' => '#4d6fbd',
+                'hex_code_text' => '#FFFFFF',
                 'description' => 'Keanggotaan Agen memberikan diskon 30% untuk setiap pembelian produk di toko kami.',
             ],
             [
@@ -72,6 +80,8 @@ class MembershipTypeSeeder extends Seeder
                 'item_discount_percentage' => 35,
                 'shipping_discount_percentage' => 0,
                 'min_purchase_amount' => 0,
+                'hex_code_bg' => '#4d6fbd',
+                'hex_code_text' => '#FFFFFF',
                 'description' => 'Keanggotaan Agen memberikan diskon 35% untuk setiap pembelian produk di toko kami.',
             ],
         ]);
