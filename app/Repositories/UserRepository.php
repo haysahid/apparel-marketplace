@@ -373,8 +373,6 @@ class UserRepository
                 $q1->whereHas('invoices', function ($q2) use ($storeId) {
                     $q2->where('store_id', $storeId);
                 });
-            })->orWhereHas('store_roles', function ($q3) use ($storeId) {
-                $q3->where('store_id', $storeId);
             });
         });
 
