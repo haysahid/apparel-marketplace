@@ -11,12 +11,10 @@ interface TransactionEntity {
     city_id: number | null;
     city_name: string | null;
     address: string | null;
+    voucher_id: number | null;
+    voucher_amount: number;
     shipping_cost: number;
-    shipping_estimate: string | null;
     paid_at: string | null;
-    shipped_at: string | null;
-    picked_up_at: string | null;
-    delivered_at: string | null;
     status: string;
     created_at: string | null;
     updated_at: string | null;

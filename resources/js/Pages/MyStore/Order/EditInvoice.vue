@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { router } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import ChangeTransactionStatusDialog from "./ChangeTransactionStatusDialog.vue";
@@ -10,6 +10,8 @@ import InvoiceDetail from "./InvoiceDetail.vue";
 import OrderContentRow from "@/Components/OrderContentRow.vue";
 import StatusChip from "@/Components/StatusChip.vue";
 import cookieManager from "@/plugins/cookie-manager";
+import midtransPayment from "@/plugins/midtrans-payment";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 
 const props = defineProps({
     invoice: {
@@ -26,10 +28,88 @@ const props = defineProps({
     },
 });
 
+const transaction = computed(() => props.invoice.transaction);
+
+const checkPaymentStatus = ref(null);
+function checkPayment() {
+    midtransPayment.checkPayment(
+        {
+            transactionCode: transaction.value.code,
+            isGuest: false,
+        },
+        {
+            onSuccess: (response) => {
+                payment.value = response.data.result;
+                router.reload();
+            },
+            onChangeStatus: (status) => {
+                checkPaymentStatus.value = status;
+            },
+        }
+    );
+}
+
+function showSnap() {
+    midtransPayment.showSnap(
+        {
+            snapToken: payment.value.midtrans_snap_token,
+        },
+        {
+            onSuccess: (result) => {
+                checkPayment();
+            },
+            onPending: (result) => {
+                checkPayment();
+            },
+            onError: (error) => {
+                checkPayment();
+            },
+            onClose: () => {
+                checkPayment();
+            },
+            onChangeStatus: (status) => {
+                resumePaymentStatus.value = status;
+            },
+        }
+    );
+}
+
+function changePaymentType() {
+    midtransPayment.changePaymentType(
+        {
+            transactionCode: transaction.value.code,
+        },
+        {
+            onSuccess: (response) => {
+                payment.value = response.data.result;
+
+                if (payment.value.midtrans_snap_token) {
+                    showSnap();
+                }
+            },
+        }
+    );
+}
+
+// Check payment
+const payment = ref(null);
+const resumePaymentStatus = ref(null);
+
+const showPaymentActions = computed(() => {
+    return (
+        transaction.value.status === "pending" &&
+        transaction.value.payment_method.slug === "transfer"
+    );
+});
+
+// Change Status
 const showChangeStatusDialog = ref(false);
+const changeStatusStatus = ref(null);
 
 function changeStatus(newStatus: string) {
     const token = `Bearer ${cookieManager.getItem("access_token")}`;
+
+    changeStatusStatus.value = "loading";
 
     axios
         .put(
@@ -45,24 +125,45 @@ function changeStatus(newStatus: string) {
             }
         )
         .then(() => {
+            changeStatusStatus.value = "success";
             window.location.reload();
         })
         .catch((error) => {
+            changeStatusStatus.value = "error";
             console.error("Error changing transaction status:", error);
         });
 }
 
-const showPaymentActions = computed(() => {
-    return true;
-
+// Shipping
+const showShippingActions = computed(() => {
     return (
-        props.invoice.transaction.status === "pending" &&
-        props.invoice.transaction.payment_method.slug === "transfer"
+        props.invoice.status === "paid" &&
+        transaction.value.shipping_method.slug === "courier"
     );
 });
 
-const payment = computed(() => {
-    return props.payments.length > 0 ? props.payments[0] : null;
+// Completed
+const showCompletedActions = computed(() => {
+    return (
+        props.invoice.status === "processing" &&
+        transaction.value.shipping_method.slug === "courier"
+    );
+});
+
+onMounted(() => {
+    if (props.payments.length) {
+        payment.value = props.payments[0];
+    }
+
+    if (route().params?.transaction_status == "settlement") {
+        router.reload();
+    } else if (transaction.value.status == "pending") {
+        if (route().params?.success == "true") {
+            showSnap();
+        } else {
+            checkPayment();
+        }
+    }
 });
 
 window.onpopstate = function () {
@@ -153,13 +254,59 @@ window.onpopstate = function () {
                     </template>
                 </template>
 
-                <template #actions v-if="props.invoice.status !== 'cancelled'">
-                    <PrimaryButton
+                <template #actions>
+                    <!-- Payment Buttons -->
+                    <div
+                        v-if="
+                            showPaymentActions ||
+                            showShippingActions ||
+                            showCompletedActions
+                        "
+                        class="flex flex-col gap-2 mt-2"
+                    >
+                        <template v-if="showPaymentActions">
+                            <PrimaryButton
+                                class="w-full py-3"
+                                :disabled="resumePaymentStatus === 'loading'"
+                                @click="showSnap()"
+                            >
+                                Lanjutkan Pembayaran
+                            </PrimaryButton>
+                            <SecondaryButton
+                                v-if="payment?.midtrans_response"
+                                class="w-full py-3"
+                                :disabled="resumePaymentStatus === 'loading'"
+                                @click="changePaymentType()"
+                            >
+                                Ubah Tipe Pembayaran
+                            </SecondaryButton>
+                        </template>
+                        <template v-if="showShippingActions">
+                            <PrimaryButton
+                                class="w-full py-3"
+                                :disabled="changeStatusStatus === 'loading'"
+                                @click="changeStatus('processing')"
+                            >
+                                Lanjutkan Pengiriman
+                            </PrimaryButton>
+                        </template>
+                        <template v-if="showCompletedActions">
+                            <PrimaryButton
+                                class="w-full py-3"
+                                :disabled="changeStatusStatus === 'loading'"
+                                @click="changeStatus('completed')"
+                            >
+                                Selesai
+                            </PrimaryButton>
+                        </template>
+                    </div>
+
+                    <!-- <PrimaryButton
                         @click="showChangeStatusDialog = true"
                         class="w-full py-3"
                     >
                         Ubah Status
-                    </PrimaryButton>
+                    </PrimaryButton> -->
                 </template>
             </InvoiceDetail>
         </DefaultCard>

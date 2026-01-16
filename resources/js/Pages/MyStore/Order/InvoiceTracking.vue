@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import formatDate from "@/plugins/date-formatter";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 const props = defineProps({
     invoice: {
@@ -287,18 +287,20 @@ function buildHistories() {
     return [orderCreated(formatDate(props.invoice?.created_at), true)];
 }
 
-histories.value = buildHistories();
-
 const progress = ref(0);
 
-// Delay 100 ms
-setTimeout(() => {
-    // Calculate progress based on done histories
-    progress.value =
-        (histories.value.filter((h) => h.done).length /
-            histories.value.length) *
-        100;
-}, 100);
+onMounted(() => {
+    histories.value = buildHistories();
+
+    // Animate progress
+    progress.value = 0;
+    setTimeout(() => {
+        progress.value =
+            (histories.value.filter((h) => h.done).length /
+                histories.value.length) *
+            100;
+    }, 100);
+});
 </script>
 
 <template>

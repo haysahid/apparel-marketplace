@@ -35,12 +35,8 @@ class Transaction extends Model
         'address',
         'voucher_id',
         'voucher_amount',
-        'shipping_estimate',
         'shipping_cost',
         'paid_at',
-        'shipped_at',
-        'picked_up_at',
-        'delivered_at',
         'status',
     ];
 

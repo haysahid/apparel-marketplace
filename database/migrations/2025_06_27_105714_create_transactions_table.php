@@ -30,11 +30,6 @@ return new class extends Migration
             $table->foreignId('voucher_id')->nullable()->constrained('vouchers')->onDelete('set null');
             $table->integer('voucher_amount')->default(0);
             $table->integer('shipping_cost')->nullable();
-            $table->string('shipping_estimate')->nullable();
-            $table->timestamp('paid_at')->nullable();
-            $table->timestamp('shipped_at')->nullable();
-            $table->timestamp('picked_up_at')->nullable();
-            $table->timestamp('delivered_at')->nullable();
             $table->enum('status', ['pending', 'paid', 'processing', 'completed', 'cancelled'])->default('pending');
             $table->timestamps();
             $table->softDeletes();

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import LandingLayout from "@/Layouts/LandingLayout.vue";
-import OrderDetail from "./Order/OrderDetail.vue";
+import OrderTransactionDetail from "./Order/OrderTransactionDetail.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { ref, computed, onMounted } from "vue";
@@ -142,14 +142,13 @@ onMounted(() => {
             />
         </div>
 
-        <OrderDetail
+        <OrderTransactionDetail
             data-aos="fade-up"
             data-aos-delay="2000"
             data-aos-duration="600"
             data-aos-once="true"
             :transaction="props.transaction"
             :groups="props.groups"
-            :showTracking="false"
             class="p-6 !pt-0 sm:p-12 md:p-[100px] flex flex-col gap-4"
             @continuePayment="showSnap()"
         >
@@ -236,6 +235,6 @@ onMounted(() => {
                     </SecondaryButton>
                 </div>
             </template>
-        </OrderDetail>
+        </OrderTransactionDetail>
     </LandingLayout>
 </template>

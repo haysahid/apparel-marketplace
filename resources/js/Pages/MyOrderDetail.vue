@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import LandingLayout from "@/Layouts/LandingLayout.vue";
-import OrderDetail from "./Order/OrderDetail.vue";
+import OrderTransactionDetail from "./Order/OrderTransactionDetail.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { ref, computed, onMounted } from "vue";
@@ -132,13 +132,9 @@ onMounted(() => {
             </p>
         </div>
 
-        <OrderDetail
+        <OrderTransactionDetail
             :transaction="props.transaction"
             :groups="props.groups"
-            :showTracking="
-                !showPaymentActions ||
-                props.transaction.payment_method.slug === 'cod'
-            "
             class="mt-12"
         >
             <template #additionalInfo>
@@ -224,6 +220,6 @@ onMounted(() => {
                     </SecondaryButton>
                 </div>
             </template>
-        </OrderDetail>
+        </OrderTransactionDetail>
     </LandingLayout>
 </template>

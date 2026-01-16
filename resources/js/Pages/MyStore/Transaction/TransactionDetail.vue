@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import OrderDetail from "@/Pages/Order/OrderDetail.vue";
+import OrderTransactionDetail from "@/Pages/Order/OrderTransactionDetail.vue";
 import ChangeTransactionStatusDialog from "./ChangeTransactionStatusDialog.vue";
 import axios from "axios";
 import OrderContentRow from "@/Components/OrderContentRow.vue";
@@ -90,10 +90,6 @@ function changePaymentType() {
 const payment = ref(null);
 const resumePaymentStatus = ref(null);
 
-if (props.transaction.payments) {
-    payment.value = props.transaction.payments[0];
-}
-
 const showPaymentActions = computed(() => {
     return (
         props.transaction.status === "pending" &&
@@ -102,6 +98,10 @@ const showPaymentActions = computed(() => {
 });
 
 onMounted(() => {
+    if (props.transaction.payments) {
+        payment.value = props.transaction.payments[0];
+    }
+
     if (route().params?.transaction_status == "settlement") {
         router.reload();
     } else if (props.transaction.status == "pending") {
@@ -159,14 +159,13 @@ const showSuccessView = route().params.success == "true";
     >
         <DefaultCard :isMain="true">
             <SuccessView v-if="showSuccessView" title="Transaksi Berhasil!" />
-            <OrderDetail
+            <OrderTransactionDetail
                 :data-aos="showSuccessView ? 'fade-up' : 'none'"
                 data-aos-delay="1600"
                 data-aos-duration="600"
                 data-aos-once="true"
                 :transaction="props.transaction"
                 :groups="props.groups"
-                :showTracking="false"
                 :isShowingFromMyStore="true"
                 :isLoading="checkPaymentStatus === 'loading'"
                 class="!px-0"
@@ -257,17 +256,15 @@ const showSuccessView = route().params.success == "true";
                             Ubah Tipe Pembayaran
                         </SecondaryButton>
                     </div>
-                </template>
 
-                <!-- <template #actions>
-                    <PrimaryButton
+                    <!-- <PrimaryButton
                         @click="showChangeStatusDialog = true"
                         class="w-full"
                     >
                         Ubah Status
-                    </PrimaryButton>
-                </template> -->
-            </OrderDetail>
+                    </PrimaryButton> -->
+                </template>
+            </OrderTransactionDetail>
         </DefaultCard>
 
         <ChangeTransactionStatusDialog

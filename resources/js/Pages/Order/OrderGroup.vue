@@ -5,6 +5,7 @@ import { ref } from "vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import CustomPageProps from "@/types/model/CustomPageProps";
 
 const props = defineProps({
     orderGroup: {
@@ -27,7 +28,7 @@ function copyToClipboard(text: string) {
     }, 2000);
 }
 
-const page = usePage();
+const page = usePage<CustomPageProps>();
 
 const showDetailButton =
     route().current("order.success") ||
