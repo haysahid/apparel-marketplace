@@ -293,7 +293,9 @@ const submit = () => {
                         :selected="form.shipping_method?.id == shipping.id"
                         @click="
                             form.shipping_method = shipping;
-                            getShippingCost();
+                            if (form.destination_id) {
+                                getShippingCost();
+                            }
                         "
                     />
                 </div>

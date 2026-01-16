@@ -31,7 +31,7 @@ class UserFactory extends Factory
         $lastName = fake()->lastName();
         $name = "{$firstName} {$lastName}";
         $username = strtolower($firstName . '.' . $lastName . rand(1, 9999));
-        $email = strtolower($firstName . '.' . $lastName . rand(1, 9999)) . '@example.com';
+        $email = $username . '@example.com';
 
         return [
             'name' => $name,

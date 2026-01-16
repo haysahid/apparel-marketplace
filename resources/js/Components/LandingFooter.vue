@@ -33,7 +33,7 @@ const isHome = route().current("home");
                         <img
                             :src="getImageUrl($page.props.setting.logo_white)"
                             alt="Logo"
-                            class="h-20 mb-8"
+                            class="object-contain h-20 mb-8"
                         />
                     </Link>
 

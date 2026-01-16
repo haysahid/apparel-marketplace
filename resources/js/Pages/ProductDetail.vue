@@ -388,7 +388,7 @@ const breadcrumbs = [
             </LandingSection>
 
             <!-- Join Us -->
-            <LandingSection id="join">
+            <LandingSection v-if="!$page.props.auth.user" id="join">
                 <JoinUs />
             </LandingSection>
         </div>
