@@ -129,7 +129,7 @@ class User extends Authenticatable
     public function getStoreMembershipPairs()
     {
         $storesById = $this->member_of_stores->keyBy('id');
-        return $this->membership_types->map(function ($membershipType) use ($storesById) {
+        return $this->store_memberships->map(function ($membershipType) use ($storesById) {
             $store = $storesById->get($membershipType->pivot->store_id, null);
             return [
                 'store' => $store,
@@ -145,7 +145,7 @@ class User extends Authenticatable
         int $storeId,
         array $membershipTypes
     ): bool {
-        foreach ($this->membership_types as $membershipType) {
+        foreach ($this->store_memberships as $membershipType) {
             if ($membershipType->pivot->store_id === $storeId && in_array($membershipType->slug, $membershipTypes)) {
                 return true;
             }
@@ -180,19 +180,23 @@ class User extends Authenticatable
     }
 
     // Relationships - Memberships
-    public function membership_types()
-    {
-        return $this->belongsToMany(MembershipType::class, 'store_memberships', 'user_id', 'membership_type_id')
-            ->withTimestamps();
-    }
-
     public function member_of_stores()
     {
-        return $this->belongsToMany(Store::class, 'store_memberships', 'user_id', 'store_id')
+        return $this->belongsToMany(Store::class, 'store_membership', 'user_id', 'store_id')
             ->withTimestamps();
     }
 
     public function store_memberships()
+    {
+        return $this->belongsToMany(MembershipType::class, 'store_membership', 'user_id', 'membership_type_id')
+            ->withTimestamps()
+            ->withPivot('store_id')
+            ->whereNull('store.deleted_at')
+            ->join('stores as store', 'store_membership.store_id', '=', 'store.id')
+        ;
+    }
+
+    public function user_store_memberships()
     {
         return $this->hasMany(StoreMembership::class);
     }

@@ -18,9 +18,13 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class,
             RoleSeeder::class,
             PlatformSeeder::class,
-            UserSeeder::class,
+
             StoreSeeder::class,
             MembershipTypeSeeder::class,
+            UserSeeder::class,
+            StoreRoleSeeder::class,
+            StoreMembershipSeeder::class,
+
             ProductSeeder::class,
             TransactionSeeder::class,
             PointRuleSeeder::class,

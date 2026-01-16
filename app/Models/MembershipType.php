@@ -41,4 +41,9 @@ class MembershipType extends Model
         return $this->belongsToMany(Store::class, 'store_memberships', 'membership_type_id', 'store_id')
             ->withTimestamps();
     }
+
+    public function store_memberships()
+    {
+        return $this->hasMany(StoreMembership::class, 'membership_type_id');
+    }
 }

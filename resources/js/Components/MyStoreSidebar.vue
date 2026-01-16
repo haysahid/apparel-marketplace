@@ -222,7 +222,7 @@ const menus = [
                 href: route("my-store.membership-type.index"),
                 active: route()
                     .current()
-                    .startsWith("my-store.membership-type"),
+                    .startsWith("my-store.membership-type."),
                 icon: `
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -236,10 +236,8 @@ const menus = [
             },
             {
                 name: "Anggota",
-                href: route("my-store.membership-type.index"),
-                active: route()
-                    .current()
-                    .startsWith("my-store.membership-type"),
+                href: route("my-store.member.index"),
+                active: route().current().startsWith("my-store.member."),
                 icon: `
             <svg
                 xmlns="http://www.w3.org/2000/svg"

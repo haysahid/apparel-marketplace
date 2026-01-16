@@ -425,4 +425,49 @@ class UserRepository
             'total_spent' => $totalSpent,
         ];
     }
+
+    public static function getMembers(
+        $storeId,
+        $limit = 10,
+        $search = null,
+        $orderBy = 'created_at',
+        $orderDirection = 'desc'
+    ) {
+        // Exclude superadmin and admin roles
+        $query = User::with([
+            'role',
+            'member_of_stores' => function ($q) use ($storeId) {
+                $q->where('store_id', $storeId);
+            },
+        ])->whereNotIn('role_id', [1, 2]);
+
+        // Filter users who have transactions or roles in the specified store
+        $query->where(function ($q) use ($storeId) {
+            $q->whereHas('user_store_memberships', function ($q1) use ($storeId) {
+                $q1->where('store_id', $storeId);
+            });
+        });
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'ilike', "%$search%")
+                    ->orWhere('email', 'ilike', "%$search%");
+            });
+        }
+
+        $members = $query->orderBy($orderBy, $orderDirection)
+            ->paginate($limit);
+
+        // Attach store-membership pairs for each user
+        $members->getCollection()->transform(function ($user) {
+            $user->store_membership_pairs = $user->getStoreMembershipPairs();
+            $user->makeHidden([
+                'stores',
+                'member_of_stores'
+            ]);
+            return $user;
+        });
+
+        return $members;
+    }
 }

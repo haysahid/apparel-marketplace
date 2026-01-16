@@ -3,6 +3,11 @@ interface StoreRolePair {
     role: RoleEntity | null;
 }
 
+interface StoreMembershipPair {
+    store: StoreEntity | null;
+    membership_type: MembershipTypeEntity | null;
+}
+
 interface UserEntity {
     id: number;
     name: string;
@@ -21,6 +26,7 @@ interface UserEntity {
     role: RoleEntity | null;
     stores: StoreEntity[] | null;
     store_roles: RoleEntity[] | null;
+    store_memberships: MembershipTypeEntity[] | null;
     transactions: TransactionEntity[] | null;
     user_points: UserPointEntity[] | null;
 
@@ -28,6 +34,7 @@ interface UserEntity {
     profile_photo_url: string | null;
     password_confirmation?: string | null;
     store_role_pairs?: StoreRolePair[] | null;
+    store_membership_pairs?: StoreMembershipPair[] | null;
 
     // Utility Attributes
     showDeleteModal?: boolean;

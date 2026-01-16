@@ -6,6 +6,7 @@ use App\Http\Controllers\MyStore\CategoryController;
 use App\Http\Controllers\MyStore\CertificateController;
 use App\Http\Controllers\MyStore\ColorController;
 use App\Http\Controllers\MyStore\CustomerController;
+use App\Http\Controllers\MyStore\MemberController;
 use App\Http\Controllers\MyStore\MembershipTypeController;
 use App\Http\Controllers\MyStore\OrderController;
 use App\Http\Controllers\MyStore\PartnerController;
@@ -141,6 +142,12 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth'])->group(functi
             Route::get('/{membershipType}/edit', [MembershipTypeController::class, 'edit'])->name('edit');
             Route::post('/{membershipType}', [MembershipTypeController::class, 'update'])->name('update');
             Route::delete('/{membershipType}', [MembershipTypeController::class, 'destroy'])->name('destroy');
+        });
+
+        // Member
+        Route::prefix('member')->name('member.')->group(function () {
+            Route::get('/', [MemberController::class, 'index'])->name('index');
+            Route::get('/{member}', [MemberController::class, 'show'])->name('show');
         });
     });
 });
