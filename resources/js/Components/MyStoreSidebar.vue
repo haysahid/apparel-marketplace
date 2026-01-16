@@ -218,7 +218,7 @@ const menus = [
             </svg>`,
         children: [
             {
-                name: "Jenis Keanggotaan",
+                name: "Keanggotaan",
                 href: route("my-store.membership.index"),
                 active: route().current().startsWith("my-store.membership."),
                 icon: `

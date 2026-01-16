@@ -16,7 +16,8 @@ import CustomPageProps from "@/types/model/CustomPageProps";
 import SearchInput from "@/Components/SearchInput.vue";
 import { scrollToTop } from "@/plugins/helpers";
 import { useDialogStore } from "@/stores/dialog-store";
-import MemberBadge from "@/Components/MemberBadge.vue";
+import MembershipBadge from "@/Components/MembershipBadge.vue";
+import MembershipCard from "./MembershipCard.vue";
 
 const screenSize = useScreenSize();
 
@@ -109,7 +110,16 @@ const deleteMembership = () => {
 
 const page = usePage<CustomPageProps>();
 
-function canEdit(membership) {
+function canEdit(membership: MembershipEntity) {
+    return (
+        page.props.auth.is_admin ||
+        page.props.auth.user.stores.some(
+            (store) => store.id === membership.store_id
+        )
+    );
+}
+
+function canDelete(membership: MembershipEntity) {
     return (
         page.props.auth.is_admin ||
         page.props.auth.user.stores.some(
@@ -136,7 +146,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <MyStoreLayout title="Jenis Keanggotaan" :showTitle="true">
+    <MyStoreLayout title="Keanggotaan" :showTitle="true">
         <DefaultCard :isMain="true">
             <div class="flex items-center justify-between gap-4">
                 <PrimaryButton
@@ -149,7 +159,7 @@ onMounted(() => {
                 <SearchInput
                     id="search-membership"
                     v-model="filters.search"
-                    placeholder="Cari jenis..."
+                    placeholder="Cari keanggotaan..."
                     class="max-w-48"
                     @search="
                         filters.page = 1;
@@ -172,6 +182,7 @@ onMounted(() => {
                         <th>Grup</th>
                         <th>Diskon Item</th>
                         <th>Diskon Pengiriman</th>
+                        <th>Minimal Pembelian</th>
                         <th>Deskripsi</th>
                         <th class="w-24">Aksi</th>
                     </tr>
@@ -190,7 +201,7 @@ onMounted(() => {
                             }}
                         </td>
                         <td>
-                            <MemberBadge :membership="membership" />
+                            <MembershipBadge :membership="membership" />
                         </td>
                         <td>
                             <div>
@@ -210,6 +221,11 @@ onMounted(() => {
                         </td>
                         <td>{{ membership.item_discount_percentage }}%</td>
                         <td>{{ membership.shipping_discount_percentage }}%</td>
+                        <td>
+                            {{
+                                $formatCurrency(membership.min_purchase_amount)
+                            }}
+                        </td>
                         <td class="!whitespace-normal">
                             <p class="line-clamp-2">
                                 {{ membership.description || "-" }}
@@ -241,15 +257,14 @@ onMounted(() => {
             <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <div
                     v-if="memberships.data.length > 0"
-                    class="grid grid-cols-1 gap-3 sm:grid-cols-2"
+                    class="grid grid-cols-1 gap-3"
                 >
-                    <AdminItemCard
+                    <MembershipCard
                         v-for="(membership, index) in memberships.data"
                         :key="membership.id"
-                        :name="membership.name"
-                        :description="membership.description"
-                        :hideActions="!canEdit(membership)"
-                        disabledHint="Membership bawaan sistem"
+                        :membership="membership"
+                        :hideEditButton="!canEdit(membership)"
+                        :hideDeleteButton="!canDelete(membership)"
                         @edit="
                             $inertia.visit(
                                 route('my-store.membership.edit', {

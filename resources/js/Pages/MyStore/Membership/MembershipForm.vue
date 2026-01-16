@@ -106,16 +106,12 @@ onMounted(() => {
                 <div class="flex flex-col w-full gap-4">
                     <div class="flex w-full gap-4">
                         <!-- Name -->
-                        <InputGroup
-                            for="membership-name"
-                            label="Nama Jenis"
-                            required
-                        >
+                        <InputGroup for="membership-name" label="Nama" required>
                             <TextInput
                                 id="membership_name"
                                 v-model="form.name"
                                 type="text"
-                                placeholder="Masukkan Nama Jenis"
+                                placeholder="Masukkan Nama"
                                 class="block w-full"
                                 required
                                 :autofocus="true"
@@ -156,7 +152,7 @@ onMounted(() => {
                                 id="membership_group"
                                 v-model="form.group"
                                 type="text"
-                                placeholder="Contoh: Member / Reseller / Agen"
+                                placeholder="Member / Reseller / Agen"
                                 class="block w-full"
                                 required
                                 :error="form.errors.group"
@@ -381,7 +377,7 @@ onMounted(() => {
                                             'opacity-50 italic': !form.name,
                                         }"
                                     >
-                                        {{ form.name || "Jenis" }}
+                                        {{ form.name || "Nama" }}
                                     </span>
                                     <span
                                         v-if="form.alias"

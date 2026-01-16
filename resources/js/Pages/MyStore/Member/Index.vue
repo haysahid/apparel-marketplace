@@ -17,7 +17,7 @@ import { getImageUrl } from "@/plugins/helpers";
 import CustomPageProps from "@/types/model/CustomPageProps";
 import { scrollToTop } from "@/plugins/helpers";
 import SearchInput from "@/Components/SearchInput.vue";
-import MemberBadge from "@/Components/MemberBadge.vue";
+import MembershipBadge from "@/Components/MembershipBadge.vue";
 
 const screenSize = useScreenSize();
 
@@ -253,16 +253,16 @@ onMounted(() => {
                         <td class="!whitespace-normal">
                             <div
                                 v-for="store_membership in member.store_memberships"
-                                class="flex gap-2"
+                                class="flex items-center gap-2"
                             >
-                                <MemberBadge
+                                <MembershipBadge
                                     :membership="store_membership"
                                 />
                                 <p>
                                     <span>{{ store_membership.name }}</span>
                                     <span
                                         v-if="store_membership.alias"
-                                        class="text-xs italic text-gray-500"
+                                        class="text-xs italic text-gray-500 whitespace-nowrap"
                                     >
                                         - {{ store_membership.alias }}
                                     </span>

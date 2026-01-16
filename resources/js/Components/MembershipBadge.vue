@@ -9,7 +9,7 @@ const props = defineProps({
 
 <template>
     <div
-        class="flex items-center justify-center gap-1 px-2 py-1 text-xs font-semibold text-center rounded-full w-fit h-fit"
+        class="flex items-center justify-center gap-1 px-2 py-1 text-xs font-semibold text-center rounded-full w-fit h-fit whitespace-nowrap"
         :style="{
             backgroundColor: props.membership.hex_code_bg,
             color: props.membership.hex_code_text,

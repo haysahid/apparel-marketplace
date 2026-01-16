@@ -6,15 +6,15 @@ import MembershipForm from "./MembershipForm.vue";
 
 <template>
     <MyStoreLayout
-        title="Tambah Jenis Keanggotaan"
+        title="Tambah Keanggotaan"
         :showTitle="true"
         :breadcrumbs="[
             {
-                text: 'Jenis Keanggotaan',
+                text: 'Keanggotaan',
                 url: '/my-store/membership',
                 active: false,
             },
-            { text: 'Tambah Jenis Keanggotaan', active: true },
+            { text: 'Tambah Keanggotaan', active: true },
         ]"
     >
         <div class="max-w-7xl">
