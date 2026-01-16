@@ -12,12 +12,14 @@ import DefaultCard from "@/Components/DefaultCard.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
-import MyMemberCard from "./MyMemberCard.vue";
+import MemberCard from "./MemberCard.vue";
 import { getImageUrl } from "@/plugins/helpers";
 import CustomPageProps from "@/types/model/CustomPageProps";
 import { scrollToTop } from "@/plugins/helpers";
 import SearchInput from "@/Components/SearchInput.vue";
 import MembershipBadge from "@/Components/MembershipBadge.vue";
+import Tooltip from "@/Components/Tooltip.vue";
+import MembershipBadgeSmall from "@/Components/MembershipBadgeSmall.vue";
 
 const screenSize = useScreenSize();
 
@@ -181,10 +183,13 @@ onMounted(() => {
                     <tr>
                         <th class="w-12">No</th>
                         <th>Anggota</th>
-                        <th>Email</th>
-                        <th>No. HP</th>
+                        <th>Kontak</th>
                         <th>Keanggotaan</th>
-                        <th class="w-24">Aksi</th>
+                        <th class="w-12">Pesanan Aktif</th>
+                        <th class="w-12">Pesanan Selesai</th>
+                        <th class="w-12">Pesanan Dibatalkan</th>
+                        <th class="w-12">Total Belanja</th>
+                        <th class="w-12">Aksi</th>
                     </tr>
                 </template>
                 <template #tbody>
@@ -250,29 +255,70 @@ onMounted(() => {
                             </Link>
                         </td>
                         <td class="!whitespace-normal">
-                            {{ member.email }}
-                        </td>
-                        <td class="!whitespace-normal">
-                            {{ member.phone }}
+                            <p>{{ member.email }}</p>
+                            <p>{{ member.phone }}</p>
                         </td>
                         <td class="!whitespace-normal">
                             <div
-                                v-for="store_membership in member.store_memberships"
-                                class="flex items-center gap-2"
+                                v-for="membership in member.store_memberships"
+                                class="flex flex-col items-start gap-0.5"
                             >
-                                <MembershipBadge
-                                    :membership="store_membership"
-                                />
-                                <p>
-                                    <span>{{ store_membership.name }}</span>
+                                <Tooltip
+                                    :id="`membership-tooltip-${member.id}-${membership.id}`"
+                                    placement="bottom"
+                                    :bgColorHexCode="membership.hex_code_bg"
+                                    :textColorHexCode="membership.hex_code_text"
+                                >
+                                    <MembershipBadgeSmall
+                                        :membership="membership"
+                                        class="cursor-pointer"
+                                    />
+
+                                    <template #content>
+                                        <div class="pb-1">
+                                            <p class="font-medium">
+                                                <span>
+                                                    {{ membership.name }}
+                                                </span>
+                                                <span
+                                                    v-if="membership.alias"
+                                                    class="text-xs italic whitespace-nowrap"
+                                                >
+                                                    -
+                                                    {{ membership.alias }}
+                                                </span>
+                                            </p>
+                                            <p
+                                                v-if="membership.description"
+                                                class="mt-1 text-xs"
+                                            >
+                                                {{ membership.description }}
+                                            </p>
+                                        </div>
+                                    </template>
+                                </Tooltip>
+                                <p class="whitespace-nowrap">
+                                    <span>{{ membership.name }}</span>
                                     <span
-                                        v-if="store_membership.alias"
-                                        class="text-xs italic text-gray-500 whitespace-nowrap"
+                                        v-if="membership.alias"
+                                        class="text-xs italic text-gray-500"
                                     >
-                                        - {{ store_membership.alias }}
+                                        - {{ membership.alias }}
                                     </span>
                                 </p>
                             </div>
+                        </td>
+                        <td class="font-medium text-blue-600">
+                            {{ $formatNumber(member.count_active_orders) }}
+                        </td>
+                        <td class="font-medium text-green-600">
+                            {{ $formatNumber(member.count_completed_orders) }}
+                        </td>
+                        <td class="font-medium text-red-600">
+                            {{ $formatNumber(member.count_cancelled_orders) }}
+                        </td>
+                        <td>
+                            {{ $formatCurrency(member.total_spent) }}
                         </td>
                         <td>
                             <AdminItemAction
@@ -300,9 +346,9 @@ onMounted(() => {
             <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <div
                     v-if="members.data.length > 0"
-                    class="grid grid-cols-1 gap-3 lg:grid-cols-2"
+                    class="grid grid-cols-1 gap-3"
                 >
-                    <MyMemberCard
+                    <MemberCard
                         v-for="(member, index) in members.data"
                         :key="member.id"
                         :member="member"

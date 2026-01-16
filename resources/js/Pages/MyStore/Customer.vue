@@ -12,7 +12,7 @@ import DefaultCard from "@/Components/DefaultCard.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
-import MyCustomerCard from "./Customer/MyCustomerCard.vue";
+import CustomerCard from "./Customer/CustomerCard.vue";
 import { getImageUrl } from "@/plugins/helpers";
 import CustomPageProps from "@/types/model/CustomPageProps";
 import { scrollToTop } from "@/plugins/helpers";
@@ -188,13 +188,14 @@ onMounted(() => {
                         <th class="w-12">Pesanan Aktif</th>
                         <th class="w-12">Pesanan Selesai</th>
                         <th class="w-12">Pesanan Dibatalkan</th>
-                        <th>Total Belanja</th>
-                        <th class="w-24">Aksi</th>
+                        <th class="w-12">Total Belanja</th>
+                        <th class="w-12">Aksi</th>
                     </tr>
                 </template>
                 <template #tbody>
                     <tr
                         v-for="(customer, index) in customers.data"
+                        w
                         :key="customer.id"
                     >
                         <td>
@@ -255,54 +256,55 @@ onMounted(() => {
                                                 "
                                             >
                                                 <div
-                                                    v-for="store_membership in customer.store_memberships"
+                                                    v-for="membership in customer.store_memberships"
                                                     class="flex items-center gap-2"
                                                 >
                                                     <Tooltip
-                                                        :id="`membership-tooltip-${customer.id}-${store_membership.id}`"
+                                                        :id="`membership-tooltip-${customer.id}-${membership.id}`"
                                                         placement="bottom"
                                                         :bgColorHexCode="
-                                                            store_membership.hex_code_bg
+                                                            membership.hex_code_bg
                                                         "
                                                         :textColorHexCode="
-                                                            store_membership.hex_code_text
+                                                            membership.hex_code_text
                                                         "
                                                     >
                                                         <MembershipBadgeSmall
                                                             :membership="
-                                                                store_membership
+                                                                membership
                                                             "
+                                                            class="cursor-pointer"
                                                         />
                                                         <template #content>
-                                                            <div class="p-2">
+                                                            <div class="pb-1">
                                                                 <p
                                                                     class="font-medium"
                                                                 >
                                                                     <span>
                                                                         {{
-                                                                            store_membership.name
+                                                                            membership.name
                                                                         }}
                                                                     </span>
                                                                     <span
                                                                         v-if="
-                                                                            store_membership.alias
+                                                                            membership.alias
                                                                         "
                                                                         class="text-xs italic whitespace-nowrap"
                                                                     >
                                                                         -
                                                                         {{
-                                                                            store_membership.alias
+                                                                            membership.alias
                                                                         }}
                                                                     </span>
                                                                 </p>
                                                                 <p
                                                                     v-if="
-                                                                        store_membership.description
+                                                                        membership.description
                                                                     "
                                                                     class="mt-1 text-xs"
                                                                 >
                                                                     {{
-                                                                        store_membership.description
+                                                                        membership.description
                                                                     }}
                                                                 </p>
                                                             </div>
@@ -363,9 +365,9 @@ onMounted(() => {
             <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <div
                     v-if="customers.data.length > 0"
-                    class="grid grid-cols-1 gap-3 lg:grid-cols-2"
+                    class="grid grid-cols-1 gap-3"
                 >
-                    <MyCustomerCard
+                    <CustomerCard
                         v-for="(customer, index) in customers.data"
                         :key="customer.id"
                         :customer="customer"

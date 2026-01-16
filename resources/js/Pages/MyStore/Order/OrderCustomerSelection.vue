@@ -7,7 +7,7 @@ import DefaultCard from "@/Components/DefaultCard.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import axios from "axios";
-import MyCustomerCard from "../Customer/MyCustomerCard.vue";
+import CustomerCard from "../Customer/CustomerCard.vue";
 import Chip from "@/Components/Chip.vue";
 import GuestForm from "@/Pages/Cart/GuestForm.vue";
 import cookieManager from "@/plugins/cookie-manager";
@@ -309,7 +309,7 @@ onMounted(() => {
                     class="flex flex-col gap-3 mt-1"
                 >
                     <div v-for="customer in customers" :key="customer.id">
-                        <MyCustomerCard
+                        <CustomerCard
                             :customer="customer"
                             class="cursor-pointer"
                             :class="{
