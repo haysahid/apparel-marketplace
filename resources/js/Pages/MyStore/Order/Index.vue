@@ -12,7 +12,7 @@ import DefaultTable from "@/Components/DefaultTable.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
-import MyOrderCard from "./Order/MyOrderCard.vue";
+import MyOrderCard from "./MyOrderCard.vue";
 import StatusChip from "@/Components/StatusChip.vue";
 import CustomPageProps from "@/types/model/CustomPageProps";
 import SearchInput from "@/Components/SearchInput.vue";
@@ -123,7 +123,7 @@ const queryParams = computed(() => {
 });
 
 function getOrders() {
-    router.get(route("my-store.order"), queryParams.value, {
+    router.get(route("my-store.order.index"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {

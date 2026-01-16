@@ -31,7 +31,7 @@ class ReportController extends Controller
             $data = $reportRepository->getSalesReport($startDate, $endDate);
         }
 
-        return Inertia::render('MyStore/Report', $data);
+        return Inertia::render('MyStore/Report/Index', $data);
     }
 
     public function reportPreview(Request $request)

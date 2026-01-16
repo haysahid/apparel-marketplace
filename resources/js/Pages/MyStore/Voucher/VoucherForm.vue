@@ -15,6 +15,7 @@ import Stepper from "@/Components/Stepper.vue";
 import VoucherPreview from "./VoucherPreview.vue";
 import Checkbox from "@/Components/Checkbox.vue";
 import Switch from "@/Components/Switch.vue";
+import { goBack } from "@/plugins/helpers";
 
 const props = defineProps({
     voucher: {
@@ -343,7 +344,10 @@ const scrollToTop = () => {
                                 </InputGroup>
 
                                 <!-- Is Public -->
-                                <InputGroup for="is_public" label="Akses Publik">
+                                <InputGroup
+                                    for="is_public"
+                                    label="Akses Publik"
+                                >
                                     <Switch
                                         id="is_public"
                                         v-model="form.is_public"
@@ -570,9 +574,7 @@ const scrollToTop = () => {
                                         stepIndex--;
                                         scrollToTop();
                                     } else {
-                                        $inertia.visit(
-                                            route('my-store.voucher')
-                                        );
+                                        goBack();
                                     }
                                 "
                             >

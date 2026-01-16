@@ -34,7 +34,7 @@ class PaymentController extends Controller
             typeId: $typeId,
         );
 
-        return Inertia::render('MyStore/Payment', [
+        return Inertia::render('MyStore/Payment/Index', [
             'payments' => $payments,
             'transactionTypes' => TransactionTypeRepository::getTransactionTypeDropdown(
                 orderBy: 'name',

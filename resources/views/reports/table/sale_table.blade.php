@@ -1,4 +1,7 @@
-<?php use App\Helpers\AppNumberFormatter; ?>
+<?php
+use App\Helpers\AppNumberFormatter;
+use Carbon\Carbon;
+?>
 
 <table class="table-report">
     <thead>
@@ -17,7 +20,15 @@
         @foreach ($report as $index => $transaction)
             <tr>
                 <td>{{ $index + 1 }}</td>
-                <td>{{ $transaction['date'] }}</td>
+                <td class="!whitespace-normal">
+                    <span class="whitespace-nowrap">
+                        {{ Carbon::parse($transaction['date'])->format('Y-m-d') }}
+                    </span>
+                    <br>
+                    <span class="whitespace-nowrap">
+                        {{ Carbon::parse($transaction['date'])->format('H:i:s') }}
+                    </span>
+                </td>
                 <td>{{ $transaction['code'] }}</td>
                 <td class="!whitespace-normal">{{ $transaction['customer'] }}</td>
                 <td class="text-center">

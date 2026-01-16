@@ -36,7 +36,7 @@ class VoucherController extends Controller
             activeOnly: false,
         );
 
-        return Inertia::render('MyStore/Voucher', [
+        return Inertia::render('MyStore/Voucher/Index', [
             'vouchers' => $vouchers,
         ]);
     }
@@ -115,7 +115,7 @@ class VoucherController extends Controller
 
         VoucherRepository::createVoucher($validated);
 
-        return redirect()->route('my-store.voucher');
+        return redirect()->route('my-store.voucher.index');
     }
 
     /**
@@ -201,7 +201,7 @@ class VoucherController extends Controller
 
         VoucherRepository::updateVoucher($voucher, $validated);
 
-        return redirect()->route('my-store.voucher');
+        return redirect()->route('my-store.voucher.index');
     }
 
     /**
@@ -211,6 +211,6 @@ class VoucherController extends Controller
     {
         VoucherRepository::deleteVoucher($voucher);
 
-        return redirect()->route('my-store.voucher');
+        return redirect()->route('my-store.voucher.index');
     }
 }

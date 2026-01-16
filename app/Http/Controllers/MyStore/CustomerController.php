@@ -34,7 +34,7 @@ class CustomerController extends Controller
             orderDirection: $orderDirection,
         );
 
-        return Inertia::render('MyStore/Customer', [
+        return Inertia::render('MyStore/Customer/Index', [
             'customers' => $customers,
         ]);
     }

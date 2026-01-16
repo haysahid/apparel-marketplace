@@ -10,6 +10,7 @@ import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
 import DateInput from "@/Components/DateInput.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
+import { goBack } from "@/plugins/helpers";
 
 const props = defineProps({
     pointRule: {
@@ -280,7 +281,7 @@ onMounted(() => {
                 <SecondaryButton
                     v-if="!props.isDialog"
                     type="button"
-                    @click="$inertia.visit(route('my-store.point-rule'))"
+                    @click="goBack()"
                 >
                     Kembali
                 </SecondaryButton>

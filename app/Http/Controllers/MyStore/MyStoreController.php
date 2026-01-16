@@ -54,7 +54,7 @@ class MyStoreController extends Controller
     {
         $productCount = Product::where('store_id', $this->storeId)->count();
         $userCount = User::count();
-        return Inertia::render('MyStore/Dashboard', [
+        return Inertia::render('MyStore/Dashboard/Index', [
             'productCount' => $productCount,
             'userCount' => $userCount,
         ]);
@@ -76,7 +76,7 @@ class MyStoreController extends Controller
 
     public function storeInfo()
     {
-        return Inertia::render('MyStore/StoreInfo', [
+        return Inertia::render('MyStore/Store/StoreInfo', [
             'store' => $this->storeRepository->getStoreInfo(),
         ]);
     }

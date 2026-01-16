@@ -8,6 +8,7 @@ import ImageInput from "@/Components/ImageInput.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import InputGroup from "@/Components/InputGroup.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { goBack } from "@/plugins/helpers";
 
 const props = defineProps({
     partner: {
@@ -217,7 +218,7 @@ const openErrorDialog = (message) => {
                 <SecondaryButton
                     v-if="!isDialog"
                     type="button"
-                    @click="$inertia.visit(route('my-store.partner'))"
+                    @click="goBack()"
                 >
                     Kembali
                 </SecondaryButton>

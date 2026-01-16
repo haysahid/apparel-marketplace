@@ -12,12 +12,11 @@ import DefaultCard from "@/Components/DefaultCard.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
-import CustomerCard from "./Customer/CustomerCard.vue";
+import CustomerCard from "./CustomerCard.vue";
 import { getImageUrl } from "@/plugins/helpers";
 import CustomPageProps from "@/types/model/CustomPageProps";
 import { scrollToTop } from "@/plugins/helpers";
 import SearchInput from "@/Components/SearchInput.vue";
-import MembershipBadge from "@/Components/MembershipBadge.vue";
 import Tooltip from "@/Components/Tooltip.vue";
 import MembershipBadgeSmall from "@/Components/MembershipBadgeSmall.vue";
 
@@ -54,7 +53,7 @@ const queryParams = computed(() => {
 });
 
 function getCustomers() {
-    router.get(route("my-store.customer"), queryParams.value, {
+    router.get(route("my-store.customer.index"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {

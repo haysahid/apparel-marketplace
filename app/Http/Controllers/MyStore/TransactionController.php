@@ -43,7 +43,7 @@ class TransactionController extends Controller
             brandId: $brandId,
         );
 
-        return Inertia::render('MyStore/Transaction', [
+        return Inertia::render('MyStore/Transaction/Index', [
             'transactions' => $transactions,
             'transactionTypes' => TransactionTypeRepository::getTransactionTypeDropdown(
                 orderBy: 'name',

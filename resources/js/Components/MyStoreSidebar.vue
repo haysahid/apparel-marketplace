@@ -255,8 +255,8 @@ const menus = [
     },
     {
         name: "Transaksi",
-        href: route("my-store.transaction"),
-        active: route().current().startsWith("my-store.transaction"),
+        href: route("my-store.transaction.index"),
+        active: route().current().startsWith("my-store.transaction."),
         icon: `
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -270,8 +270,8 @@ const menus = [
     },
     {
         name: "Pesanan",
-        href: route("my-store.order"),
-        active: route().current().startsWith("my-store.order"),
+        href: route("my-store.order.index"),
+        active: route().current().startsWith("my-store.order."),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -285,8 +285,8 @@ const menus = [
     },
     {
         name: "Pembayaran",
-        href: route("my-store.payment"),
-        active: route().current().startsWith("my-store.payment"),
+        href: route("my-store.payment.index"),
+        active: route().current().startsWith("my-store.payment."),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -300,8 +300,8 @@ const menus = [
     },
     {
         name: "Voucher",
-        href: route("my-store.voucher"),
-        active: route().current().startsWith("my-store.voucher"),
+        href: route("my-store.voucher.index"),
+        active: route().current().startsWith("my-store.voucher."),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -315,8 +315,8 @@ const menus = [
     },
     {
         name: "Pelanggan",
-        href: route("my-store.customer"),
-        active: route().current().startsWith("my-store.customer"),
+        href: route("my-store.customer.index"),
+        active: route().current().startsWith("my-store.customer."),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -330,8 +330,8 @@ const menus = [
     },
     {
         name: "Aturan Poin",
-        href: route("my-store.point-rule"),
-        active: route().current().startsWith("my-store.point-rule"),
+        href: route("my-store.point-rule.index"),
+        active: route().current().startsWith("my-store.point-rule."),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -345,8 +345,8 @@ const menus = [
     },
     {
         name: "Mitra",
-        href: route("my-store.partner"),
-        active: route().current().startsWith("my-store.partner"),
+        href: route("my-store.partner.index"),
+        active: route().current().startsWith("my-store.partner."),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -360,8 +360,8 @@ const menus = [
     },
     {
         name: "Laporan",
-        href: route("my-store.report"),
-        active: route().current().startsWith("my-store.report"),
+        href: route("my-store.report.index"),
+        active: route().current().startsWith("my-store.report."),
         icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 

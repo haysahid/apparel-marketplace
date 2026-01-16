@@ -104,6 +104,10 @@
             white-space: normal !important;
         }
 
+        .whitespace-nowrap {
+            white-space: nowrap;
+        }
+
         .break-all {
             word-break: break-all;
         }

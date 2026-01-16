@@ -33,7 +33,7 @@ class PointRuleController extends Controller
             orderDirection: $orderDirection,
         );
 
-        return Inertia::render('MyStore/PointRule', [
+        return Inertia::render('MyStore/PointRule/Index', [
             'pointRules' => $pointRules,
         ]);
     }
@@ -91,7 +91,7 @@ class PointRuleController extends Controller
                 return redirect()->back()->with('success', 'Aturan poin berhasil ditambahkan.')->with('closeDialog', true);
             }
 
-            return redirect()->route('my-store.point-rule')->with('success', 'Aturan poin berhasil ditambahkan.');
+            return redirect()->route('my-store.point-rule.index')->with('success', 'Aturan poin berhasil ditambahkan.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => 'Terjadi kesalahan saat menambahkan aturan poin.'])->withInput();
         }
@@ -152,7 +152,7 @@ class PointRuleController extends Controller
                 'valid_until' => $validated['valid_until'] ?? null,
             ]);
 
-            return redirect()->route('my-store.point-rule')->with('success', 'Aturan poin berhasil diperbarui.');
+            return redirect()->route('my-store.point-rule.index')->with('success', 'Aturan poin berhasil diperbarui.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => 'Terjadi kesalahan saat memperbarui aturan poin.'])->withInput();
         }
@@ -162,7 +162,7 @@ class PointRuleController extends Controller
     {
         try {
             PointRuleRepository::deletePointRule($pointRule);
-            return redirect()->route('my-store.point-rule')->with('success', 'Aturan poin berhasil dihapus.');
+            return redirect()->route('my-store.point-rule.index')->with('success', 'Aturan poin berhasil dihapus.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => 'Terjadi kesalahan saat menghapus aturan poin.']);
         }

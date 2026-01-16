@@ -107,7 +107,7 @@ const queryParams = computed(() => {
 });
 
 function getVouchers() {
-    router.get(route("my-store.voucher"), queryParams.value, {
+    router.get(route("my-store.voucher.index"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {

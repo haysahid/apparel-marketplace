@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, computed } from "vue";
-import { usePage, useForm } from "@inertiajs/vue3";
+import { usePage, useForm, Link } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import AdminItemAction from "@/Components/AdminItemAction.vue";
 import DeleteConfirmationDialog from "@/Components/DeleteConfirmationDialog.vue";
@@ -12,22 +12,26 @@ import DefaultTable from "@/Components/DefaultTable.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
-import AdminItemCard from "@/Components/AdminItemCard.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
+import { getImageUrl } from "@/plugins/helpers.js";
 import CustomPageProps from "@/types/model/CustomPageProps";
+import MyStorePartnerCard from "./MyStorePartnerCard.vue";
 import { scrollToTop } from "@/plugins/helpers";
 import SearchInput from "@/Components/SearchInput.vue";
 
 const screenSize = useScreenSize();
 
 const props = defineProps({
-    pointRules: Object as () => PaginationModel<PointRuleEntity>,
+    partners: {
+        type: Object as () => PaginationModel<PartnerEntity>,
+        default: null,
+    },
 });
 
-const pointRules = ref<PaginationModel<PointRuleEntity>>({
-    ...props.pointRules,
-    data: props.pointRules.data.map((pointRule) => ({
-        ...pointRule,
+const partners = ref<PaginationModel<PartnerEntity>>({
+    ...props.partners,
+    data: props.partners.data.map((partner) => ({
+        ...partner,
         showDeleteModal: false,
     })),
 });
@@ -50,16 +54,16 @@ const queryParams = computed(() => {
     };
 });
 
-function getPointRules() {
-    router.get(route("my-store.point-rule"), queryParams.value, {
+function getPartners() {
+    router.get(route("my-store.partner.index"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
             getQueryParams();
-            pointRules.value = {
-                ...props.pointRules,
-                data: props.pointRules.data.map((pointRule) => ({
-                    ...pointRule,
+            partners.value = {
+                ...props.partners,
+                data: props.partners.data.map((partner) => ({
+                    ...partner,
                     showDeleteModal: false,
                 })),
             };
@@ -69,38 +73,39 @@ function getPointRules() {
     });
 }
 
-const selectedPointRule = ref(null);
-const showDeletePointRuleDialog = ref(false);
+const selectedPartner = ref(null);
+const showDeletePartnerDialog = ref(false);
 
-const openDeletePointRuleDialog = (pointRule) => {
-    if (pointRule) {
-        selectedPointRule.value = pointRule;
-        showDeletePointRuleDialog.value = true;
+const openDeletePartnerDialog = (partner) => {
+    console.log("openDeletePartnerDialog", partner);
+    if (partner) {
+        selectedPartner.value = partner;
+        showDeletePartnerDialog.value = true;
     }
 };
 
-const closeDeletePointRuleDialog = (result = false) => {
-    showDeletePointRuleDialog.value = false;
+const closeDeletePartnerDialog = (result = false) => {
+    showDeletePartnerDialog.value = false;
     if (result) {
-        selectedPointRule.value = null;
+        selectedPartner.value = null;
         openSuccessDialog("Data Berhasil Dihapus");
     }
 };
 
-const deletePointRule = () => {
-    if (selectedPointRule.value) {
+const deletePartner = () => {
+    if (selectedPartner.value) {
         const form = useForm({});
         form.delete(
-            route("my-store.point-rule.destroy", {
-                pointRule: selectedPointRule.value,
+            route("my-store.partner.destroy", {
+                partner: selectedPartner.value,
             }),
             {
                 onError: (errors) => {
                     openErrorDialog(errors.error);
                 },
                 onSuccess: () => {
-                    closeDeletePointRuleDialog(true);
-                    getPointRules();
+                    closeDeletePartnerDialog(true);
+                    getPartners();
                 },
             }
         );
@@ -125,11 +130,11 @@ const openErrorDialog = (message) => {
 
 const page = usePage<CustomPageProps>();
 
-function canEdit(pointRule) {
+function canEdit(partner) {
     return (
         page.props.auth.is_admin ||
         page.props.auth.user.stores.some(
-            (store) => store.id === pointRule.store_id
+            (store) => store.id === partner.store_id
         )
     );
 }
@@ -137,7 +142,7 @@ function canEdit(pointRule) {
 function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
-            "search-point-rule"
+            "search-partner"
         ) as HTMLInputElement;
         input?.focus({ preventScroll: true });
     });
@@ -152,24 +157,24 @@ onMounted(() => {
 </script>
 
 <template>
-    <MyStoreLayout title="Aturan Poin" :showTitle="true">
+    <MyStoreLayout title="Mitra" :showTitle="true">
         <DefaultCard :isMain="true">
             <div class="flex items-center justify-between gap-4">
                 <PrimaryButton
                     type="button"
                     class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
-                    @click="$inertia.visit(route('my-store.point-rule.create'))"
+                    @click="$inertia.visit(route('my-store.partner.create'))"
                 >
                     Tambah
                 </PrimaryButton>
                 <SearchInput
-                    id="search-point-rule"
+                    id="search-partner"
                     v-model="filters.search"
-                    placeholder="Cari aturan poin..."
+                    placeholder="Cari mitra..."
                     class="max-w-48"
                     @search="
                         filters.page = 1;
-                        getPointRules();
+                        getPartners();
                     "
                 />
             </div>
@@ -177,85 +182,107 @@ onMounted(() => {
             <!-- Table -->
             <DefaultTable
                 v-if="screenSize.is('xl')"
-                :isEmpty="pointRules.data.length === 0"
+                :isEmpty="partners.data.length === 0"
                 class="mt-6"
             >
                 <template #thead>
                     <tr>
                         <th class="w-12">No</th>
-                        <th>Nama Aturan</th>
-                        <th>Jenis</th>
-                        <th>Poin</th>
+                        <th class="w-24">Logo</th>
+                        <th>Nama</th>
                         <th>Deskripsi</th>
-                        <th>Tgl. Berlaku</th>
-                        <th>Tgl. Kadaluarsa</th>
+                        <th>Alamat</th>
+                        <th>Nama Kontak</th>
+                        <th>Email Kontak</th>
+                        <th>No. HP Kontak</th>
                         <th class="w-24">Aksi</th>
                     </tr>
                 </template>
                 <template #tbody>
                     <tr
-                        v-for="(pointRule, index) in pointRules.data"
-                        :key="pointRule.id"
+                        v-for="(partner, index) in partners.data"
+                        :key="partner.id"
                     >
                         <td>
                             {{
                                 index +
                                 1 +
-                                (props.pointRules.current_page - 1) *
-                                    props.pointRules.per_page
+                                (props.partners.current_page - 1) *
+                                    props.partners.per_page
                             }}
                         </td>
                         <td>
-                            {{ pointRule.name }}
-                        </td>
-                        <td>
+                            <img
+                                v-if="partner.logo"
+                                :src="getImageUrl(partner.logo)"
+                                alt="Logo Partner"
+                                class="object-contain h-[60px] rounded aspect-[3/2]"
+                            />
                             <div
-                                class="px-2 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded-md w-fit"
+                                v-else
+                                class="flex items-center justify-center h-[60px] bg-gray-100 rounded aspect-[3/2]"
                             >
-                                {{ pointRule.type.replaceAll("_", " ") }}
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    class="size-6 fill-gray-400"
+                                >
+                                    <path
+                                        d="M5 21C4.45 21 3.97933 20.8043 3.588 20.413C3.19667 20.0217 3.00067 19.5507 3 19V5C3 4.45 3.196 3.97933 3.588 3.588C3.98 3.19667 4.45067 3.00067 5 3H19C19.55 3 20.021 3.196 20.413 3.588C20.805 3.98 21.0007 4.45067 21 5V19C21 19.55 20.8043 20.021 20.413 20.413C20.0217 20.805 19.5507 21.0007 19 21H5ZM6 17H18L14.25 12L11.25 16L9 13L6 17Z"
+                                    />
+                                </svg>
                             </div>
                         </td>
-                        <td>+{{ pointRule.points_earned }}</td>
+                        <td>
+                            <Link
+                                :href="
+                                    route('my-store.partner.show', {
+                                        partner: partner.id,
+                                    })
+                                "
+                                class="hover:underline"
+                            >
+                                {{ partner.name }}
+                            </Link>
+                        </td>
                         <td class="!whitespace-normal">
                             <p class="line-clamp-2">
-                                {{ pointRule.description }}
+                                {{ partner.description ?? "-" }}
+                            </p>
+                        </td>
+                        <td class="!whitespace-normal">
+                            <p class="line-clamp-2">
+                                {{ partner.address ?? "-" }}
                             </p>
                         </td>
                         <td>
-                            {{
-                                $formatDate(pointRule.valid_from, {
-                                    dateStyle: "medium",
-                                }) ?? "-"
-                            }}
+                            {{ partner.contact_name ?? "-" }}
                         </td>
                         <td>
-                            {{
-                                $formatDate(pointRule.valid_until, {
-                                    dateStyle: "medium",
-                                }) ?? "-"
-                            }}
+                            {{ partner.contact_email ?? "-" }}
                         </td>
                         <td>
-                            <div class="flex items-center justify-start gap-2">
-                                <AdminItemAction
-                                    v-if="canEdit(pointRule)"
-                                    @edit="
-                                        $inertia.visit(
-                                            route('my-store.point-rule.edit', {
-                                                pointRule: pointRule,
-                                            })
-                                        )
-                                    "
-                                    @delete="
-                                        openDeletePointRuleDialog(pointRule)
-                                    "
-                                />
-                                <InfoTooltip
-                                    v-if="!canEdit(pointRule)"
-                                    :id="`table-tooltip-hint-${pointRule.id}`"
-                                    text="Aturan bawaan sistem"
-                                />
-                            </div>
+                            {{ partner.contact_phone ?? "-" }}
+                        </td>
+                        <td>
+                            <AdminItemAction
+                                v-if="canEdit(partner)"
+                                @edit="
+                                    $inertia.visit(
+                                        route('my-store.partner.edit', {
+                                            partner: partner,
+                                        })
+                                    )
+                                "
+                                @delete="openDeletePartnerDialog(partner)"
+                            />
+                            <InfoTooltip
+                                v-if="!canEdit(partner)"
+                                :id="`table-tooltip-hint-${partner.id}`"
+                                text="Partner bawaan sistem"
+                            />
                         </td>
                     </tr>
                 </template>
@@ -264,34 +291,22 @@ onMounted(() => {
             <!-- Mobile View -->
             <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <div
-                    v-if="pointRules.data.length > 0"
-                    class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                    v-if="partners.data.length > 0"
+                    class="grid grid-cols-1 gap-3"
                 >
-                    <AdminItemCard
-                        v-for="(pointRule, index) in pointRules.data"
-                        :key="pointRule.id"
-                        :name="pointRule.name"
-                        :description="pointRule.type.replaceAll('_', ' ')"
-                        :showImage="false"
-                        :hideActions="!canEdit(pointRule)"
-                        disabledHint="Aturan bawaan sistem"
+                    <MyStorePartnerCard
+                        v-for="(partner, index) in partners.data"
+                        :key="partner.id"
+                        :partner="partner"
                         @edit="
                             $inertia.visit(
-                                route('my-store.point-rule.edit', {
-                                    pointRule: pointRule,
+                                route('my-store.partner.edit', {
+                                    partner: partner,
                                 })
                             )
                         "
-                        @delete="openDeletePointRuleDialog(pointRule)"
-                    >
-                        <template #leading>
-                            <p
-                                class="w-16 text-lg font-bold text-center text-yellow-600"
-                            >
-                                +{{ pointRule.points_earned }}
-                            </p>
-                        </template>
-                    </AdminItemCard>
+                        @delete="openDeletePartnerDialog(partner)"
+                    />
                 </div>
                 <div v-else class="flex items-center justify-center py-10">
                     <p class="text-sm text-center text-gray-500">
@@ -301,18 +316,18 @@ onMounted(() => {
             </div>
 
             <!-- Pagination -->
-            <div v-if="pointRules.total > 0" class="flex flex-col gap-2 mt-4">
+            <div v-if="partners.total > 0" class="flex flex-col gap-2 mt-4">
                 <p class="text-xs text-gray-500 sm:text-sm">
-                    Menampilkan {{ pointRules.from }} - {{ pointRules.to }} dari
-                    {{ pointRules.total }} item
+                    Menampilkan {{ partners.from }} - {{ partners.to }} dari
+                    {{ partners.total }} item
                 </p>
                 <DefaultPagination
                     :isApi="true"
-                    :links="pointRules.links"
+                    :links="partners.links"
                     @change="
                         (page) => {
                             filters.page = page;
-                            getPointRules();
+                            getPartners();
                         }
                     "
                 />
@@ -320,10 +335,10 @@ onMounted(() => {
         </DefaultCard>
 
         <DeleteConfirmationDialog
-            :show="showDeletePointRuleDialog"
-            :title="`Hapus Kategori <b>${selectedPointRule?.name}</b>?`"
-            @close="closeDeletePointRuleDialog()"
-            @delete="deletePointRule()"
+            :show="showDeletePartnerDialog"
+            :title="`Hapus Mitra <b>${selectedPartner?.name}</b>?`"
+            @close="closeDeletePartnerDialog()"
+            @delete="deletePartner()"
         />
 
         <SuccessDialog

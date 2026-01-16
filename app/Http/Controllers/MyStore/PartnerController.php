@@ -33,7 +33,7 @@ class PartnerController extends Controller
             orderDirection: $orderDirection,
         );
 
-        return Inertia::render('MyStore/Partner', [
+        return Inertia::render('MyStore/Partner/Index', [
             'partners' => $partners,
         ]);
     }
@@ -90,7 +90,7 @@ class PartnerController extends Controller
 
             PartnerRepository::createPartner($validated);
 
-            return redirect()->route('my-store.partner')->with('success', 'Mitra berhasil ditambahkan.');
+            return redirect()->route('my-store.partner.index')->with('success', 'Mitra berhasil ditambahkan.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => 'Gagal menambahkan mitra: ' . $e->getMessage()])->withInput();
         }
@@ -144,7 +144,7 @@ class PartnerController extends Controller
 
             PartnerRepository::updatePartner($partner, $validated);
 
-            return redirect()->route('my-store.partner')->with('success', 'Mitra berhasil diperbarui.');
+            return redirect()->route('my-store.partner.index')->with('success', 'Mitra berhasil diperbarui.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => 'Gagal memperbarui mitra: ' . $e->getMessage()])->withInput();
         }
@@ -155,7 +155,7 @@ class PartnerController extends Controller
         try {
             PartnerRepository::deletePartner($partner);
 
-            return redirect()->route('my-store.partner')->with('success', 'Mitra berhasil dihapus.');
+            return redirect()->route('my-store.partner.index')->with('success', 'Mitra berhasil dihapus.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => 'Gagal menghapus mitra: ' . $e->getMessage()]);
         }

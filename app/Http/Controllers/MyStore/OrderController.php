@@ -44,7 +44,7 @@ class OrderController extends Controller
             storeId: $this->storeId,
         );
 
-        return Inertia::render('MyStore/Order', [
+        return Inertia::render('MyStore/Order/Index', [
             'invoices' => $invoices,
             'brands' => $brands,
         ]);

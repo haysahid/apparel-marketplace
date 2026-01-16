@@ -4,12 +4,11 @@ import { usePage } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
-import Dropdown from "@/Components/Dropdown.vue";
 import TextInput from "@/Components/TextInput.vue";
-import SalesReportTable from "./Report/SalesReportTable.vue";
-import PurchaseReportTable from "./Report/PurchaseReportTable.vue";
+import SalesReportTable from "./SalesReportTable.vue";
+import PurchaseReportTable from "./PurchaseReportTable.vue";
 import axios from "axios";
-import StockReportTable from "./Report/StockReportTable.vue";
+import StockReportTable from "./StockReportTable.vue";
 import LoadingDialog from "@/Components/LoadingDialog.vue";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
@@ -227,7 +226,7 @@ onMounted(() => {
                                     endDate = null;
                                 }
 
-                                $inertia.get(route('my-store.report'), {
+                                $inertia.get(route('my-store.report.index'), {
                                     report_type: selectedReportType.value,
                                     brand: selectedBrand
                                         ? selectedBrand.name
@@ -267,7 +266,7 @@ onMounted(() => {
                                     ? brands.find((b) => b.id === option.value)
                                     : null;
 
-                                $inertia.get(route('my-store.report'), {
+                                $inertia.get(route('my-store.report.index'), {
                                     report_type: selectedReportType.value,
                                     brand: selectedBrand
                                         ? selectedBrand.name
@@ -277,7 +276,7 @@ onMounted(() => {
                         "
                         @clear="
                             selectedBrand = null;
-                            $inertia.get(route('my-store.report'), {
+                            $inertia.get(route('my-store.report.index'), {
                                 report_type: selectedReportType.value,
                                 brand: selectedBrand
                                     ? selectedBrand.name
@@ -295,7 +294,7 @@ onMounted(() => {
                             placeholder="Tanggal Mulai"
                             :disabled="isStockReport"
                             @change="
-                                $inertia.get(route('my-store.report'), {
+                                $inertia.get(route('my-store.report.index'), {
                                     report_type: selectedReportType.value,
                                     start_date: startDate
                                         ? startDate
@@ -340,7 +339,7 @@ onMounted(() => {
                             placeholder="Tanggal Selesai"
                             :disabled="isStockReport"
                             @change="
-                                $inertia.get(route('my-store.report'), {
+                                $inertia.get(route('my-store.report.index'), {
                                     report_type: selectedReportType.value,
                                     start_date: startDate
                                         ? startDate

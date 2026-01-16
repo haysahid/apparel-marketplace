@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
-import StoreForm from "../Admin/Store/StoreForm.vue";
+import StoreForm from "@/Pages/Admin/Store/StoreForm.vue";
 
 const props = defineProps({
     store: {

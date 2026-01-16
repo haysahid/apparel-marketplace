@@ -25,7 +25,15 @@ const props = defineProps({
                 :key="transaction.id"
             >
                 <td>{{ index + 1 }}</td>
-                <td>{{ transaction.date }}</td>
+                <td class="!whitespace-normal">
+                    <span class="whitespace-nowrap">
+                        {{ transaction.date?.split(" ")[0] }}
+                    </span>
+                    <br />
+                    <span class="whitespace-nowrap">
+                        {{ transaction.date?.split(" ")[1] }}
+                    </span>
+                </td>
                 <td>{{ transaction.code }}</td>
                 <td class="!whitespace-normal">{{ transaction.customer }}</td>
                 <td class="text-center">
