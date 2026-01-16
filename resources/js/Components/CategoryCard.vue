@@ -13,7 +13,7 @@ const props = defineProps({
     >
         <img
             :src="props.image"
-            alt=""
+            :alt="props.name"
             class="object-contain w-full h-12 sm:h-16 md:h-20"
         />
         <p class="font-medium text-gray-700 sm:text-lg">

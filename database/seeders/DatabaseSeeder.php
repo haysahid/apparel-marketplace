@@ -28,6 +28,8 @@ class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             TransactionSeeder::class,
             PointRuleSeeder::class,
+
+            TransactionFactorySeeder::class,
         ]);
     }
 }

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { router } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import ChangeTransactionStatusDialog from "./ChangeTransactionStatusDialog.vue";
 import axios from "axios";
@@ -65,7 +66,7 @@ const payment = computed(() => {
 });
 
 window.onpopstate = function () {
-    location.reload();
+    router.reload();
 };
 </script>
 

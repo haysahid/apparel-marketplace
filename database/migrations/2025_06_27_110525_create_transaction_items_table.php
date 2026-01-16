@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('store_id')->constrained('stores')->onDelete('cascade');
             $table->foreignId('transaction_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('variant_id')->constrained('product_variants')->onDelete('cascade');
             $table->integer('quantity');
             $table->string('unit_base_price')->default(0);
@@ -23,6 +24,9 @@ return new class extends Migration
             $table->integer('unit_final_price')->default(0);
             $table->integer('subtotal')->default(0);
             $table->enum('fullfillment_status', ['pending', 'paid', 'processing', 'completed', 'cancelled'])->default('pending');
+            $table->unsignedTinyInteger('rating')->nullable();
+            $table->text('review')->nullable();
+            $table->timestamp('reviewed_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

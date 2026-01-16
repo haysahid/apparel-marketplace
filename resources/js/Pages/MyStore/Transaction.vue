@@ -462,7 +462,7 @@ const showTransactionTypeOptionDialog = ref(false);
                                     effect_on_stock: 'outbound',
                                 },
                             ]"
-                            :key="type.id"
+                            :key="type.slug"
                         >
                             <button
                                 type="button"

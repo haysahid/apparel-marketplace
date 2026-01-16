@@ -2,12 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+enum TransactionStatus: string
+{
+    case PENDING = 'pending';
+    case PAID = 'paid';
+    case PROCESSING = 'processing';
+    case COMPLETED = 'completed';
+    case CANCELLED = 'cancelled';
+}
+
 class Transaction extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasFactory;
 
     protected $fillable = [
         'user_id',

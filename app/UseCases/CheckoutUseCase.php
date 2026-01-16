@@ -181,6 +181,7 @@ class CheckoutUseCase
                     $this->transactionRepository->createTransactionItem([
                         'store_id' => $store->id,
                         'transaction_id' => $transaction->id,
+                        'user_id' => $customer->id,
                         'variant_id' => $variant->id,
                         'quantity' => $item['quantity'],
                         'unit_base_price' => $variant->base_selling_price,
@@ -222,6 +223,7 @@ class CheckoutUseCase
                     $invoice = $this->invoiceRepository->createInvoice([
                         'store_id' => $store->id,
                         'transaction_id' => $transaction->id,
+                        'user_id' => $customer->id,
                         'code' => 'INV-' . date('YmdHis') . '-' . $key,
                         'base_amount' => $baseTotal,
                         'shipping_cost' => $shippingCost,
@@ -235,6 +237,7 @@ class CheckoutUseCase
                     $invoice = $this->invoiceRepository->createInvoice([
                         'store_id' => $store->id,
                         'transaction_id' => $transaction->id,
+                        'user_id' => $customer->id,
                         'code' => 'INV-' . date('YmdHis') . '-' . $key,
                         'base_amount' => $baseTotal,
                         'shipping_cost' => 0,

@@ -2,12 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+enum PaymentStatus: string
+{
+    case PENDING = 'pending';
+    case COMPLETED = 'completed';
+    case FAILED = 'failed';
+}
+
 class Payment extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasFactory;
 
     protected $fillable = [
         'transaction_id',

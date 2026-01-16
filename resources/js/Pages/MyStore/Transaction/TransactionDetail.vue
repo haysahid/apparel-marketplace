@@ -142,7 +142,7 @@ function changeStatus(newStatus: string) {
 }
 
 window.onpopstate = function () {
-    location.reload();
+    router.reload();
 };
 
 const showSuccessView = route().params.success == "true";
