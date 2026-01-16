@@ -82,11 +82,12 @@ function getCustomers() {
         page: filters.page,
         brand_id: filters.brand_id,
         search: filters.search,
+        limit: 5,
     };
 
     getCustomersStatus.value = "loading";
     axios
-        .get("/api/my-store/customer", {
+        .get("/api/my-store/user", {
             params: queryParams,
             headers: {
                 Authorization:
@@ -249,9 +250,24 @@ onMounted(() => {
 
         <!-- Tab 1: Users -->
         <template v-if="tabIndex === 0">
+            <!-- Pagination -->
+            <div
+                v-if="data.total > 0"
+                class="flex flex-col gap-2"
+                :class="{
+                    'px-4 sm:px-6': props.isModal,
+                }"
+            >
+                <DefaultPagination
+                    :isApi="true"
+                    :links="data.links"
+                    @change="changePage"
+                />
+            </div>
+
             <div
                 id="customer-list"
-                class="flex flex-col gap-3 mt-4"
+                class="flex flex-col gap-3"
                 :class="{
                     'min-h-auto h-[68vh]': customers.length == 0,
                     'overflow-y-auto h-[calc(80vh-240px)] px-4 sm:px-6 mt-0':
@@ -309,25 +325,6 @@ onMounted(() => {
                         Data tidak ditemukan.
                     </p>
                 </div>
-            </div>
-
-            <!-- Pagination -->
-            <div
-                v-if="data.total > 0"
-                class="flex flex-col gap-2 mt-4"
-                :class="{
-                    'px-4 sm:px-6 mt-0': props.isModal,
-                }"
-            >
-                <p class="text-xs text-gray-500 sm:text-sm text-start">
-                    Menampilkan {{ data.from }} - {{ data.to }} dari
-                    {{ data.total }} item
-                </p>
-                <DefaultPagination
-                    :isApi="true"
-                    :links="data.links"
-                    @change="changePage"
-                />
             </div>
         </template>
 

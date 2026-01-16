@@ -13,6 +13,7 @@ use App\Http\Controllers\API\InvoiceController;
 use App\Http\Controllers\API\ReportController;
 use App\Http\Controllers\API\VoucherController;
 use App\Http\Controllers\MyStore\API\MyStoreController;
+use App\Http\Controllers\MyStore\API\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->group(function () {
@@ -61,4 +62,8 @@ Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->gro
     Route::post('user/{userId}/role', [MyStoreController::class, 'addUserRole'])->name('user-role.add');
     Route::put('user/{userId}/role', [MyStoreController::class, 'updateUserRole'])->name('user-role.update');
     Route::delete('user/{userId}/role', [MyStoreController::class, 'removeUserRole'])->name('user-role.remove');
+
+    // User
+    Route::get('user', [UserController::class, 'index'])->name('user.index');
+    Route::get('user-dropdown', [UserController::class, 'dropdown'])->name('user.dropdown');
 });

@@ -36,6 +36,13 @@ interface UserEntity {
     store_role_pairs?: StoreRolePair[] | null;
     store_membership_pairs?: StoreMembershipPair[] | null;
 
+    // Computed Attributes
+    count_orders?: number | null;
+    count_active_orders?: number | null;
+    count_completed_orders?: number | null;
+    count_cancelled_orders?: number | null;
+    total_spent?: number | null;
+
     // Utility Attributes
     showDeleteModal?: boolean;
 }

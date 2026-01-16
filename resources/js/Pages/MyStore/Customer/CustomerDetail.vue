@@ -237,17 +237,20 @@ getUserVouchers();
                 <SummaryCard
                     title="Pesanan Aktif"
                     :value="$formatNumber(props.count_active_orders)"
+                    valueColor="text-blue-600"
                 />
                 <SummaryCard
                     title="Pesanan Selesai"
                     :value="$formatNumber(props.count_completed_orders)"
+                    valueColor="text-green-600"
                 />
                 <SummaryCard
                     title="Pesanan Dibatalkan"
                     :value="$formatNumber(props.count_cancelled_orders)"
+                    valueColor="text-red-600"
                 />
                 <SummaryCard
-                    title="Pengeluaran"
+                    title="Total Belanja"
                     :value="$formatCurrency(props.total_spent)"
                 />
             </div>

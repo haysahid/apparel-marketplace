@@ -17,6 +17,9 @@ import { getImageUrl } from "@/plugins/helpers";
 import CustomPageProps from "@/types/model/CustomPageProps";
 import { scrollToTop } from "@/plugins/helpers";
 import SearchInput from "@/Components/SearchInput.vue";
+import MembershipBadge from "@/Components/MembershipBadge.vue";
+import Tooltip from "@/Components/Tooltip.vue";
+import MembershipBadgeSmall from "@/Components/MembershipBadgeSmall.vue";
 
 const screenSize = useScreenSize();
 
@@ -180,9 +183,12 @@ onMounted(() => {
                     <tr>
                         <th class="w-12">No</th>
                         <th>Pelanggan</th>
-                        <th>Email</th>
-                        <th>No. HP</th>
+                        <th>Kontak</th>
                         <th>Jenis</th>
+                        <th class="w-12">Pesanan Aktif</th>
+                        <th class="w-12">Pesanan Selesai</th>
+                        <th class="w-12">Pesanan Dibatalkan</th>
+                        <th>Total Belanja</th>
                         <th class="w-24">Aksi</th>
                     </tr>
                 </template>
@@ -210,8 +216,16 @@ onMounted(() => {
                             >
                                 <div class="flex items-center gap-3">
                                     <img
-                                        v-if="customer.avatar"
-                                        :src="getImageUrl(customer.avatar)"
+                                        v-if="
+                                            customer.avatar ||
+                                            customer.profile_photo_url
+                                        "
+                                        :src="
+                                            getImageUrl(
+                                                customer.avatar ||
+                                                    customer.profile_photo_url
+                                            )
+                                        "
                                         alt="Foto Pelanggan"
                                         class="object-contain rounded-full size-8"
                                     />
@@ -229,24 +243,99 @@ onMounted(() => {
                                             d="M40.3333 22.0003C40.3333 32.1258 32.1255 40.3337 22 40.3337C11.8745 40.3337 3.66663 32.1258 3.66663 22.0003C3.66663 11.8748 11.8745 3.66699 22 3.66699C32.1255 3.66699 40.3333 11.8748 40.3333 22.0003ZM27.5 16.5003C27.5 17.959 26.9205 19.358 25.889 20.3894C24.8576 21.4209 23.4586 22.0003 22 22.0003C20.5413 22.0003 19.1423 21.4209 18.1109 20.3894C17.0794 19.358 16.5 17.959 16.5 16.5003C16.5 15.0416 17.0794 13.6427 18.1109 12.6112C19.1423 11.5798 20.5413 11.0003 22 11.0003C23.4586 11.0003 24.8576 11.5798 25.889 12.6112C26.9205 13.6427 27.5 15.0416 27.5 16.5003ZM22 37.5837C25.1465 37.5887 28.2201 36.6366 30.8128 34.8538C31.9201 34.093 32.3931 32.6447 31.7478 31.4658C30.415 29.022 27.665 27.5003 22 27.5003C16.335 27.5003 13.585 29.022 12.2503 31.4658C11.6068 32.6447 12.0798 34.093 13.1871 34.8538C15.7798 36.6366 18.8535 37.5887 22 37.5837Z"
                                         />
                                     </svg>
-                                    <p class="group-hover:underline">
-                                        {{ customer.name }}
-                                    </p>
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="group-hover:underline">
+                                                {{ customer.name }}
+                                            </span>
+                                            <template
+                                                v-if="
+                                                    customer.store_memberships
+                                                        .length > 0
+                                                "
+                                            >
+                                                <div
+                                                    v-for="store_membership in customer.store_memberships"
+                                                    class="flex items-center gap-2"
+                                                >
+                                                    <Tooltip
+                                                        :id="`membership-tooltip-${customer.id}-${store_membership.id}`"
+                                                        placement="bottom"
+                                                        :bgColorHexCode="
+                                                            store_membership.hex_code_bg
+                                                        "
+                                                        :textColorHexCode="
+                                                            store_membership.hex_code_text
+                                                        "
+                                                    >
+                                                        <MembershipBadgeSmall
+                                                            :membership="
+                                                                store_membership
+                                                            "
+                                                        />
+                                                        <template #content>
+                                                            <div class="p-2">
+                                                                <p
+                                                                    class="font-medium"
+                                                                >
+                                                                    <span>
+                                                                        {{
+                                                                            store_membership.name
+                                                                        }}
+                                                                    </span>
+                                                                    <span
+                                                                        v-if="
+                                                                            store_membership.alias
+                                                                        "
+                                                                        class="text-xs italic whitespace-nowrap"
+                                                                    >
+                                                                        -
+                                                                        {{
+                                                                            store_membership.alias
+                                                                        }}
+                                                                    </span>
+                                                                </p>
+                                                                <p
+                                                                    v-if="
+                                                                        store_membership.description
+                                                                    "
+                                                                    class="mt-1 text-xs"
+                                                                >
+                                                                    {{
+                                                                        store_membership.description
+                                                                    }}
+                                                                </p>
+                                                            </div>
+                                                        </template>
+                                                    </Tooltip>
+                                                </div>
+                                            </template>
+                                        </div>
+                                        <p class="text-xs text-gray-500">
+                                            {{ customer.username }}
+                                        </p>
+                                    </div>
                                 </div>
                             </Link>
                         </td>
                         <td class="!whitespace-normal">
-                            {{ customer.email }}
+                            <p>{{ customer.email }}</p>
+                            <p>{{ customer.phone }}</p>
                         </td>
-                        <td class="!whitespace-normal">
-                            {{ customer.phone }}
+                        <td>
+                            {{ customer.role.name }}
                         </td>
-                        <td class="!whitespace-normal">
-                            {{
-                                customer.store_roles
-                                    ?.map((role) => role.name)
-                                    ?.join(", ") || "-"
-                            }}
+                        <td class="font-medium text-blue-600">
+                            {{ $formatNumber(customer.count_active_orders) }}
+                        </td>
+                        <td class="font-medium text-green-600">
+                            {{ $formatNumber(customer.count_completed_orders) }}
+                        </td>
+                        <td class="font-medium text-red-600">
+                            {{ $formatNumber(customer.count_cancelled_orders) }}
+                        </td>
+                        <td>
+                            {{ $formatCurrency(customer.total_spent) }}
                         </td>
                         <td>
                             <AdminItemAction

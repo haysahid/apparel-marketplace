@@ -57,7 +57,7 @@ class CheckoutUseCase
             if ($isStoreCheckout) {
                 if (isset($data['customer_id'])) {
                     $customer = User::find($data['customer_id']);
-                } else if (isset($data['guest_name'], $data['guest_email'], $data['guest_phone'])) {
+                } elseif (isset($data['guest_name'], $data['guest_email'], $data['guest_phone'])) {
                     $customer = $this->userRepository->createGuestUser([
                         'name' => $data['guest_name'],
                         'email' => $data['guest_email'],
@@ -66,7 +66,7 @@ class CheckoutUseCase
                 } else {
                     $customer = User::find(Auth::id());
                 }
-            } else if ($isGuestCheckout) {
+            } elseif ($isGuestCheckout) {
                 $customer = $this->userRepository->createGuestUser([
                     'name' => $data['guest_name'],
                     'email' => $data['guest_email'],
@@ -75,6 +75,8 @@ class CheckoutUseCase
             } else {
                 $customer = User::find(Auth::id());
             }
+
+            Log::info('Checkout for user: ' . $customer->name);
 
             // Get transaction voucher if provided
             $transactionVoucher = null;
@@ -393,7 +395,7 @@ class CheckoutUseCase
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Gagal melakukan checkout: ' . $e->getMessage());
-            return DataState::error($e->getMessage(), $e->getCode() ?: 500);
+            return DataState::error($e->getMessage(), 500);
         }
     }
 }

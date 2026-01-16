@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\PointRule;
 use App\Models\PointTransaction;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\UserPoint;
 use App\Models\UserVoucher;
@@ -67,8 +68,10 @@ class UserRepository
     public static function createGuestUser(array $data)
     {
         try {
+            $guestRole = Role::where('slug', 'guest')->first();
+
             $existingGuest = User::where('email', $data['email'])
-                ->where('role_id', 8)
+                ->where('role_id', $guestRole->id)
                 ->first();
 
             if ($existingGuest) {
@@ -77,11 +80,10 @@ class UserRepository
                 return $existingGuest;
             }
 
-            $user = User::create([
+            return User::create([
                 ...$data,
-                'role_id' => 8, // guest role
+                'role_id' => $guestRole->id,
             ]);
-            return $user;
         } catch (Exception $e) {
             Log::error('Gagal membuat pengguna tamu: ' . $e);
             throw $e;
@@ -359,32 +361,51 @@ class UserRepository
         $orderBy = 'created_at',
         $orderDirection = 'desc'
     ) {
-        // Exclude superadmin and admin roles
-        $query = User::with([
-            'role',
-            'store_roles' => function ($q) use ($storeId) {
-                $q->where('store_id', $storeId);
-            },
-        ])->whereNotIn('role_id', [1, 2]);
-
-        // Filter users who have transactions or roles in the specified store
-        $query->where(function ($q) use ($storeId) {
-            $q->whereHas('transactions', function ($q1) use ($storeId) {
-                $q1->whereHas('invoices', function ($q2) use ($storeId) {
-                    $q2->where('store_id', $storeId);
-                });
-            });
-        });
+        // Use a raw query for better performance and flexibility
+        $query = User::query()
+            ->select('users.*')
+            ->with([
+                'role',
+                'store_roles' => function ($q) use ($storeId) {
+                    $q->where('store_id', $storeId);
+                },
+            ])
+            ->join('transactions', 'transactions.user_id', '=', 'users.id')
+            ->join('invoices', function ($join) use ($storeId) {
+                $join->on('invoices.transaction_id', '=', 'transactions.id')
+                    ->where('invoices.store_id', $storeId);
+            })
+            ->groupBy('users.id')
+            ->addSelect([
+                DB::raw("MAX(transactions.created_at) as latest_transaction_at"),
+                DB::raw("COUNT(invoices.id) as count_orders"),
+                DB::raw("COUNT(CASE WHEN invoices.status IN ('pending', 'paid', 'processing') THEN 1 END) as count_active_orders"),
+                DB::raw("COUNT(CASE WHEN invoices.status = 'completed' THEN 1 END) as count_completed_orders"),
+                DB::raw("COUNT(CASE WHEN invoices.status = 'cancelled' THEN 1 END) as count_cancelled_orders"),
+                DB::raw("SUM(CASE WHEN invoices.status IN ('completed', 'processing', 'paid') THEN invoices.amount ELSE 0 END) as total_spent")
+            ])
+            ->orderByDesc('latest_transaction_at');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'ilike', "%$search%")
-                    ->orWhere('email', 'ilike', "%$search%");
+                $q->where('users.name', 'ilike', "%$search%")
+                    ->orWhere('users.email', 'ilike', "%$search%");
             });
         }
 
-        return $query->orderBy($orderBy, $orderDirection)
-            ->paginate($limit);
+        $customers = $query->paginate($limit);
+
+        // Attach store-membership pairs for each user
+        $customers->getCollection()->transform(function ($user) {
+            $user->store_membership_pairs = $user->getStoreMembershipPairs();
+            $user->makeHidden([
+                'stores',
+                'member_of_stores'
+            ]);
+            return $user;
+        });
+
+        return $customers;
     }
 
     public static function getCustomerDetail($userId, $storeId = null)
@@ -406,7 +427,7 @@ class UserRepository
                 "COUNT(CASE WHEN invoices.status IN ('pending', 'paid', 'processing') THEN 1 END) as count_active_orders",
                 "COUNT(CASE WHEN invoices.status = 'completed' THEN 1 END) as count_completed_orders",
                 "COUNT(CASE WHEN invoices.status = 'cancelled' THEN 1 END) as count_cancelled_orders",
-                'SUM(invoices.amount) as total_spent',
+                "SUM(CASE WHEN invoices.status IN ('completed', 'processing', 'paid') THEN invoices.amount ELSE 0 END) as total_spent",
             ]))
             ->first();
 
@@ -433,30 +454,43 @@ class UserRepository
         $orderBy = 'created_at',
         $orderDirection = 'desc'
     ) {
-        // Exclude superadmin and admin roles
-        $query = User::with([
-            'role',
-            'member_of_stores' => function ($q) use ($storeId) {
-                $q->where('store_id', $storeId);
-            },
-        ])->whereNotIn('role_id', [1, 2]);
-
-        // Filter users who have transactions or roles in the specified store
-        $query->where(function ($q) use ($storeId) {
-            $q->whereHas('user_store_memberships', function ($q1) use ($storeId) {
-                $q1->where('store_id', $storeId);
-            });
-        });
+        // Use a raw query for better performance and flexibility, similar to getCustomers
+        $query = User::query()
+            ->select('users.*')
+            ->with([
+                'role',
+                'member_of_stores' => function ($q) use ($storeId) {
+                    $q->where('store_id', $storeId);
+                },
+            ])
+            ->join('store_membership', function ($join) use ($storeId) {
+                $join->on('store_membership.user_id', '=', 'users.id')
+                    ->where('store_membership.store_id', $storeId);
+            })
+            ->leftJoin('transactions', 'transactions.user_id', '=', 'users.id')
+            ->leftJoin('invoices', function ($join) use ($storeId) {
+                $join->on('invoices.transaction_id', '=', 'transactions.id')
+                    ->where('invoices.store_id', $storeId);
+            })
+            ->groupBy('users.id')
+            ->addSelect([
+                DB::raw("MAX(transactions.created_at) as latest_transaction_at"),
+                DB::raw("COUNT(invoices.id) as count_orders"),
+                DB::raw("COUNT(CASE WHEN invoices.status IN ('pending', 'paid', 'processing') THEN 1 END) as count_active_orders"),
+                DB::raw("COUNT(CASE WHEN invoices.status = 'completed' THEN 1 END) as count_completed_orders"),
+                DB::raw("COUNT(CASE WHEN invoices.status = 'cancelled' THEN 1 END) as count_cancelled_orders"),
+                DB::raw("SUM(CASE WHEN invoices.status IN ('completed', 'processing', 'paid') THEN invoices.amount ELSE 0 END) as total_spent")
+            ])
+            ->orderBy($orderBy, $orderDirection);
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'ilike', "%$search%")
-                    ->orWhere('email', 'ilike', "%$search%");
+                $q->where('users.name', 'ilike', "%$search%")
+                    ->orWhere('users.email', 'ilike', "%$search%");
             });
         }
 
-        $members = $query->orderBy($orderBy, $orderDirection)
-            ->paginate($limit);
+        $members = $query->paginate($limit);
 
         // Attach store-membership pairs for each user
         $members->getCollection()->transform(function ($user) {

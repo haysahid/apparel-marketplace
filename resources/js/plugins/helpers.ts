@@ -10,11 +10,11 @@ export function isFile(image: any) {
     return image instanceof File;
 }
 
-export function getWhatsAppLink(
-    phoneNumber: string,
-    message: string | number | boolean
-) {
+export function getWhatsAppLink(phoneNumber: string, message: string = null) {
     if (!phoneNumber) return null;
+
+    // Replace non-digit characters except '+' sign
+    phoneNumber = phoneNumber.replace(/[^\d+]/g, "");
 
     if (phoneNumber.startsWith("08")) {
         phoneNumber = "62" + phoneNumber.slice(1);
@@ -29,7 +29,13 @@ export function getWhatsAppLink(
         return null;
     }
 
-    return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    const url = `https://wa.me/${phoneNumber}`;
+
+    if (message != null) {
+        return `${url}?text=${encodeURIComponent(message)}`;
+    }
+
+    return url;
 }
 
 export function openWhatsAppChat(phoneNumber: any, message: any) {

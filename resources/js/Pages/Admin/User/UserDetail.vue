@@ -387,7 +387,7 @@ getUserVouchers();
                     :value="$formatNumber(props.count_orders || 0)"
                 />
                 <SummaryCard
-                    title="Total Pengeluaran"
+                    title="Total Belanja"
                     :value="$formatCurrency(props.total_spent || 0)"
                 />
             </div>
