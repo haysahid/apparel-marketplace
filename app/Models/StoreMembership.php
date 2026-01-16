@@ -14,7 +14,7 @@ class StoreMembership extends Model
     protected $fillable = [
         'store_id',
         'user_id',
-        'membership_type_id',
+        'membership_id',
     ];
 
     // Relationships
@@ -23,8 +23,8 @@ class StoreMembership extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function membership_type()
+    public function membership()
     {
-        return $this->belongsTo(MembershipType::class);
+        return $this->belongsTo(Membership::class);
     }
 }

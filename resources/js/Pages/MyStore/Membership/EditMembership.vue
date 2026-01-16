@@ -1,10 +1,10 @@
 <script setup>
-import MembershipTypeForm from "./MembershipTypeForm.vue";
+import MembershipForm from "./MembershipForm.vue";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 
 const props = defineProps({
-    membershipType: {
+    membership: {
         type: Object,
         default: () => ({}),
     },
@@ -18,7 +18,7 @@ const props = defineProps({
         :breadcrumbs="[
             {
                 text: 'Jenis Keanggotaan',
-                url: '/my-store/membership-type',
+                url: '/my-store/membership',
                 active: false,
             },
             { text: 'Ubah Jenis Keanggotaan', active: true },
@@ -26,7 +26,7 @@ const props = defineProps({
     >
         <div class="max-w-7xl">
             <DefaultCard>
-                <MembershipTypeForm :membershipType="props.membershipType" />
+                <MembershipForm :membership="props.membership" />
             </DefaultCard>
         </div>
     </MyStoreLayout>

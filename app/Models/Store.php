@@ -59,9 +59,9 @@ class Store extends Model
         return $this->hasMany(UserStoreRole::class);
     }
 
-    public function membership_types()
+    public function memberships()
     {
-        return $this->hasMany(MembershipType::class);
+        return $this->hasMany(Membership::class);
     }
 
     public function members()

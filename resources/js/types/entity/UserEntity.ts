@@ -5,7 +5,7 @@ interface StoreRolePair {
 
 interface StoreMembershipPair {
     store: StoreEntity | null;
-    membership_type: MembershipTypeEntity | null;
+    membership: MembershipEntity | null;
 }
 
 interface UserEntity {
@@ -26,7 +26,7 @@ interface UserEntity {
     role: RoleEntity | null;
     stores: StoreEntity[] | null;
     store_roles: RoleEntity[] | null;
-    store_memberships: MembershipTypeEntity[] | null;
+    store_memberships: MembershipEntity[] | null;
     transactions: TransactionEntity[] | null;
     user_points: UserPointEntity[] | null;
 

@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\MyStore;
 
 use App\Http\Controllers\Controller;
-use App\Models\MembershipType;
-use App\Repositories\MembershipTypeRepository;
+use App\Models\Membership;
+use App\Repositories\MembershipRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
-class MembershipTypeController extends Controller
+class MembershipController extends Controller
 {
     protected $storeId;
 
@@ -27,7 +27,7 @@ class MembershipTypeController extends Controller
         $orderBy = $request->input('order_by', 'level');
         $orderDirection = $request->input('order_direction', 'asc');
 
-        $membershipTypes = MembershipTypeRepository::getMembershipTypes(
+        $memberships = MembershipRepository::getMemberships(
             storeId: $this->storeId,
             limit: $limit,
             search: $search,
@@ -35,14 +35,14 @@ class MembershipTypeController extends Controller
             orderDirection: $orderDirection,
         );
 
-        return Inertia::render('MyStore/MembershipType/Index', [
-            'membershipTypes' => $membershipTypes,
+        return Inertia::render('MyStore/Membership/Index', [
+            'memberships' => $memberships,
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('MyStore/MembershipType/AddMembershipType');
+        return Inertia::render('MyStore/Membership/AddMembership');
     }
 
     public function store(Request $request)
@@ -86,25 +86,25 @@ class MembershipTypeController extends Controller
             }
             $validated['slug'] = Str::slug($textToSlug);
 
-            MembershipTypeRepository::createMembershipType($validated);
+            MembershipRepository::createMembership($validated);
 
-            Log::info('Membership type created', ['store_id' => $this->storeId, 'membership_type' => $validated]);
+            Log::info('Membership type created', ['store_id' => $this->storeId, 'membership' => $validated]);
 
-            return redirect()->route('my-store.membership-type.index')
+            return redirect()->route('my-store.membership.index')
                 ->with('success', 'Jenis keanggotaan berhasil ditambahkan.');
         } catch (Exception $e) {
             return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
     }
 
-    public function edit(MembershipType $membershipType)
+    public function edit(Membership $membership)
     {
-        return Inertia::render('MyStore/MembershipType/EditMembershipType', [
-            'membershipType' => $membershipType,
+        return Inertia::render('MyStore/Membership/EditMembership', [
+            'membership' => $membership,
         ]);
     }
 
-    public function update(Request $request, MembershipType $membershipType)
+    public function update(Request $request, Membership $membership)
     {
         $validated = $request->validate([
             'group' => 'required|string|max:255',
@@ -144,21 +144,21 @@ class MembershipTypeController extends Controller
             }
             $validated['slug'] = Str::slug($textToSlug);
 
-            MembershipTypeRepository::updateMembershipType($membershipType, $validated);
+            MembershipRepository::updateMembership($membership, $validated);
 
-            return redirect()->route('my-store.membership-type.index')
+            return redirect()->route('my-store.membership.index')
                 ->with('success', 'Jenis keanggotaan berhasil diperbarui.');
         } catch (Exception $e) {
             return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
     }
 
-    public function destroy(MembershipType $membershipType)
+    public function destroy(Membership $membership)
     {
         try {
-            MembershipTypeRepository::deleteMembershipType($membershipType);
+            MembershipRepository::deleteMembership($membership);
 
-            return redirect()->route('my-store.membership-type.index')
+            return redirect()->route('my-store.membership.index')
                 ->with('success', 'Jenis keanggotaan berhasil dihapus.');
         } catch (Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());

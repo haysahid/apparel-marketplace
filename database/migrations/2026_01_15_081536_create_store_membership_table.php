@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('store_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('membership_type_id')->constrained('membership_types')->onDelete('cascade');
+            $table->foreignId('membership_id')->constrained('memberships')->onDelete('cascade');
             $table->timestamps();
         });
     }

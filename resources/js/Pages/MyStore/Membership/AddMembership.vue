@@ -1,7 +1,7 @@
 <script setup>
 import DefaultCard from "@/Components/DefaultCard.vue";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
-import MembershipTypeForm from "./MembershipTypeForm.vue";
+import MembershipForm from "./MembershipForm.vue";
 </script>
 
 <template>
@@ -11,7 +11,7 @@ import MembershipTypeForm from "./MembershipTypeForm.vue";
         :breadcrumbs="[
             {
                 text: 'Jenis Keanggotaan',
-                url: '/my-store/membership-type',
+                url: '/my-store/membership',
                 active: false,
             },
             { text: 'Tambah Jenis Keanggotaan', active: true },
@@ -19,7 +19,7 @@ import MembershipTypeForm from "./MembershipTypeForm.vue";
     >
         <div class="max-w-7xl">
             <DefaultCard>
-                <MembershipTypeForm />
+                <MembershipForm />
             </DefaultCard>
         </div>
     </MyStoreLayout>

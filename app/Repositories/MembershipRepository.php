@@ -2,67 +2,67 @@
 
 namespace App\Repositories;
 
-use App\Models\MembershipType;
+use App\Models\Membership;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-class MembershipTypeRepository
+class MembershipRepository
 {
-    public static function getMembershipTypes(
+    public static function getMemberships(
         $storeId = null,
         $limit = 5,
         $search = null,
         $orderBy = 'created_at',
         $orderDirection = 'desc',
     ) {
-        $membershipTypes = MembershipType::query();
+        $memberships = Membership::query();
 
         if ($storeId) {
-            $membershipTypes->where(function ($query) use ($storeId) {
+            $memberships->where(function ($query) use ($storeId) {
                 $query->where('store_id', $storeId)
                     ->orWhereNull('store_id');
             });
         }
 
         if ($search) {
-            $membershipTypes->where(function ($query) use ($search) {
+            $memberships->where(function ($query) use ($search) {
                 $query->where('name', 'ilike', '%' . $search . '%')
                     ->orWhere('description', 'ilike', '%' . $search . '%');
             });
         }
 
-        $membershipTypes->orderBy($orderBy, $orderDirection);
+        $memberships->orderBy($orderBy, $orderDirection);
 
-        return $membershipTypes->paginate($limit);
+        return $memberships->paginate($limit);
     }
 
-    public static function getMembershipTypeDropdown($storeId = null, $orderBy = 'name', $orderDirection = 'asc', $limit = null)
+    public static function getMembershipDropdown($storeId = null, $orderBy = 'name', $orderDirection = 'asc', $limit = null)
     {
-        $membershipTypeDropdown = MembershipType::query();
+        $membershipDropdown = Membership::query();
 
         if ($storeId) {
-            $membershipTypeDropdown->where(function ($q) use ($storeId) {
+            $membershipDropdown->where(function ($q) use ($storeId) {
                 $q->where('store_id', $storeId)
                     ->orWhereNull('store_id');
             });
         }
 
-        return $membershipTypeDropdown->orderBy($orderBy, $orderDirection)->limit($limit)->get();
+        return $membershipDropdown->orderBy($orderBy, $orderDirection)->limit($limit)->get();
     }
 
-    public static function isMembershipTypeExists($name, $storeId = null, $excludeId = null)
+    public static function isMembershipExists($name, $storeId = null, $excludeId = null)
     {
-        return MembershipType::where('name', $name)
+        return Membership::where('name', $name)
             ->where('store_id', $storeId)
             ->where('id', '!=', $excludeId)
             ->exists();
     }
 
-    public static function createMembershipType(array $data)
+    public static function createMembership(array $data)
     {
-        $isExists = self::isMembershipTypeExists(
+        $isExists = self::isMembershipExists(
             name: $data['name'],
             storeId: $data['store_id'] ?? null,
         );
@@ -73,21 +73,21 @@ class MembershipTypeRepository
         }
 
         try {
-            return MembershipType::create($data);
+            return Membership::create($data);
         } catch (Exception $e) {
             Log::error('Failed to create membership type: ' . $e);
             throw new Exception('Gagal menyimpan jenis keanggotaan: ' . $e->getMessage());
         }
     }
 
-    public static function updateMembershipType(
-        MembershipType $membershipType,
+    public static function updateMembership(
+        Membership $membership,
         array $data
     ) {
-        $isExists = self::isMembershipTypeExists(
+        $isExists = self::isMembershipExists(
             name: $data['name'],
             storeId: $data['store_id'] ?? null,
-            excludeId: $membershipType->id,
+            excludeId: $membership->id,
         );
 
         if ($isExists) {
@@ -96,24 +96,24 @@ class MembershipTypeRepository
         }
 
         try {
-            return $membershipType->update($data);
+            return $membership->update($data);
         } catch (Exception $e) {
             Log::error('Failed to update membership type: ' . $e);
             throw new Exception('Gagal memperbarui jenis keanggotaan: ' . $e);
         }
     }
 
-    public static function deleteMembershipType(MembershipType $membershipType)
+    public static function deleteMembership(Membership $membership)
     {
         try {
             DB::beginTransaction();
 
             // Delete the brand logo if it exists
-            if ($membershipType->logo) {
-                Storage::disk('public')->delete($membershipType->logo);
+            if ($membership->logo) {
+                Storage::disk('public')->delete($membership->logo);
             }
 
-            $membershipType->delete();
+            $membership->delete();
 
             DB::commit();
         } catch (Exception $e) {

@@ -21,13 +21,13 @@ import MemberBadge from "@/Components/MemberBadge.vue";
 const screenSize = useScreenSize();
 
 const props = defineProps({
-    membershipTypes: Object as () => PaginationModel<MembershipTypeEntity>,
+    memberships: Object as () => PaginationModel<MembershipEntity>,
 });
 
-const membershipTypes = ref<PaginationModel<MembershipTypeEntity>>({
-    ...props.membershipTypes,
-    data: props.membershipTypes.data.map((membershipType) => ({
-        ...membershipType,
+const memberships = ref<PaginationModel<MembershipEntity>>({
+    ...props.memberships,
+    data: props.memberships.data.map((membership) => ({
+        ...membership,
         showDeleteModal: false,
     })),
 });
@@ -50,16 +50,16 @@ const queryParams = computed(() => {
     };
 });
 
-function getMembershipTypes() {
-    router.get(route("my-store.membership-type.index"), queryParams.value, {
+function getMemberships() {
+    router.get(route("my-store.membership.index"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
             getQueryParams();
-            membershipTypes.value = {
-                ...props.membershipTypes,
-                data: props.membershipTypes.data.map((membershipType) => ({
-                    ...membershipType,
+            memberships.value = {
+                ...props.memberships,
+                data: props.memberships.data.map((membership) => ({
+                    ...membership,
                     showDeleteModal: false,
                 })),
             };
@@ -69,38 +69,38 @@ function getMembershipTypes() {
     });
 }
 
-const selectedMembershipType = ref(null);
-const showDeleteMembershipTypeDialog = ref(false);
+const selectedMembership = ref(null);
+const showDeleteMembershipDialog = ref(false);
 
-const openDeleteMembershipTypeDialog = (membershipType) => {
-    if (membershipType) {
-        selectedMembershipType.value = membershipType;
-        showDeleteMembershipTypeDialog.value = true;
+const openDeleteMembershipDialog = (membership) => {
+    if (membership) {
+        selectedMembership.value = membership;
+        showDeleteMembershipDialog.value = true;
     }
 };
 
-const closeDeleteMembershipTypeDialog = (result = false) => {
-    showDeleteMembershipTypeDialog.value = false;
+const closeDeleteMembershipDialog = (result = false) => {
+    showDeleteMembershipDialog.value = false;
     if (result) {
-        selectedMembershipType.value = null;
+        selectedMembership.value = null;
         useDialogStore().openSuccessDialog("Data Berhasil Dihapus");
     }
 };
 
-const deleteMembershipType = () => {
-    if (selectedMembershipType.value) {
+const deleteMembership = () => {
+    if (selectedMembership.value) {
         const form = useForm({});
         form.delete(
-            route("my-store.membership-type.destroy", {
-                membershipType: selectedMembershipType.value,
+            route("my-store.membership.destroy", {
+                membership: selectedMembership.value,
             }),
             {
                 onError: (errors) => {
                     useDialogStore().openErrorDialog(errors.error);
                 },
                 onSuccess: () => {
-                    closeDeleteMembershipTypeDialog(true);
-                    getMembershipTypes();
+                    closeDeleteMembershipDialog(true);
+                    getMemberships();
                 },
             }
         );
@@ -109,11 +109,11 @@ const deleteMembershipType = () => {
 
 const page = usePage<CustomPageProps>();
 
-function canEdit(membershipType) {
+function canEdit(membership) {
     return (
         page.props.auth.is_admin ||
         page.props.auth.user.stores.some(
-            (store) => store.id === membershipType.store_id
+            (store) => store.id === membership.store_id
         )
     );
 }
@@ -121,7 +121,7 @@ function canEdit(membershipType) {
 function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
-            "search-membershipType"
+            "search-membership"
         ) as HTMLInputElement;
         input?.focus({ preventScroll: true });
     });
@@ -142,20 +142,18 @@ onMounted(() => {
                 <PrimaryButton
                     type="button"
                     class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
-                    @click="
-                        $inertia.visit(route('my-store.membership-type.create'))
-                    "
+                    @click="$inertia.visit(route('my-store.membership.create'))"
                 >
                     Tambah
                 </PrimaryButton>
                 <SearchInput
-                    id="search-membershipType"
+                    id="search-membership"
                     v-model="filters.search"
                     placeholder="Cari jenis..."
                     class="max-w-48"
                     @search="
                         filters.page = 1;
-                        getMembershipTypes();
+                        getMemberships();
                     "
                 />
             </div>
@@ -163,7 +161,7 @@ onMounted(() => {
             <!-- Table -->
             <DefaultTable
                 v-if="screenSize.is('xl')"
-                :isEmpty="membershipTypes.data.length === 0"
+                :isEmpty="memberships.data.length === 0"
                 class="mt-6"
             >
                 <template #thead>
@@ -180,65 +178,59 @@ onMounted(() => {
                 </template>
                 <template #tbody>
                     <tr
-                        v-for="(membershipType, index) in membershipTypes.data"
-                        :key="membershipType.id"
+                        v-for="(membership, index) in memberships.data"
+                        :key="membership.id"
                     >
                         <td>
                             {{
                                 index +
                                 1 +
-                                (props.membershipTypes.current_page - 1) *
-                                    props.membershipTypes.per_page
+                                (props.memberships.current_page - 1) *
+                                    props.memberships.per_page
                             }}
                         </td>
                         <td>
-                            <MemberBadge :membershipType="membershipType" />
+                            <MemberBadge :membership="membership" />
                         </td>
                         <td>
                             <div>
-                                <span>{{ membershipType.name }}</span>
-                                <template v-if="membershipType.alias">
+                                <span>{{ membership.name }}</span>
+                                <template v-if="membership.alias">
                                     <span class="text-xs text-gray-500">
                                         -
                                     </span>
                                     <span class="text-xs text-gray-500">
-                                        {{ membershipType.alias }}
+                                        {{ membership.alias }}
                                     </span>
                                 </template>
                             </div>
                         </td>
                         <td>
-                            {{ membershipType.group }}
+                            {{ membership.group }}
                         </td>
-                        <td>{{ membershipType.item_discount_percentage }}%</td>
-                        <td>
-                            {{ membershipType.shipping_discount_percentage }}%
-                        </td>
+                        <td>{{ membership.item_discount_percentage }}%</td>
+                        <td>{{ membership.shipping_discount_percentage }}%</td>
                         <td class="!whitespace-normal">
                             <p class="line-clamp-2">
-                                {{ membershipType.description || "-" }}
+                                {{ membership.description || "-" }}
                             </p>
                         </td>
                         <td>
                             <AdminItemAction
-                                v-if="canEdit(membershipType)"
+                                v-if="canEdit(membership)"
                                 @edit="
                                     $inertia.visit(
-                                        route('my-store.membership-type.edit', {
-                                            membershipType: membershipType,
+                                        route('my-store.membership.edit', {
+                                            membership: membership,
                                         })
                                     )
                                 "
-                                @delete="
-                                    openDeleteMembershipTypeDialog(
-                                        membershipType
-                                    )
-                                "
+                                @delete="openDeleteMembershipDialog(membership)"
                             />
                             <InfoTooltip
-                                v-if="!canEdit(membershipType)"
-                                :id="`table-tooltip-hint-${membershipType.id}`"
-                                text="MembershipType bawaan sistem"
+                                v-if="!canEdit(membership)"
+                                :id="`table-tooltip-hint-${membership.id}`"
+                                text="Membership bawaan sistem"
                             />
                         </td>
                     </tr>
@@ -248,24 +240,24 @@ onMounted(() => {
             <!-- Mobile View -->
             <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <div
-                    v-if="membershipTypes.data.length > 0"
+                    v-if="memberships.data.length > 0"
                     class="grid grid-cols-1 gap-3 sm:grid-cols-2"
                 >
                     <AdminItemCard
-                        v-for="(membershipType, index) in membershipTypes.data"
-                        :key="membershipType.id"
-                        :name="membershipType.name"
-                        :description="membershipType.description"
-                        :hideActions="!canEdit(membershipType)"
-                        disabledHint="MembershipType bawaan sistem"
+                        v-for="(membership, index) in memberships.data"
+                        :key="membership.id"
+                        :name="membership.name"
+                        :description="membership.description"
+                        :hideActions="!canEdit(membership)"
+                        disabledHint="Membership bawaan sistem"
                         @edit="
                             $inertia.visit(
-                                route('my-store.membership-type.edit', {
-                                    membershipType: membershipType,
+                                route('my-store.membership.edit', {
+                                    membership: membership,
                                 })
                             )
                         "
-                        @delete="openDeleteMembershipTypeDialog(membershipType)"
+                        @delete="openDeleteMembershipDialog(membership)"
                     />
                 </div>
                 <div v-else class="flex items-center justify-center py-10">
@@ -276,22 +268,18 @@ onMounted(() => {
             </div>
 
             <!-- Pagination -->
-            <div
-                v-if="membershipTypes.total > 0"
-                class="flex flex-col gap-2 mt-4"
-            >
+            <div v-if="memberships.total > 0" class="flex flex-col gap-2 mt-4">
                 <p class="text-xs text-gray-500 sm:text-sm">
-                    Menampilkan {{ membershipTypes.from }} -
-                    {{ membershipTypes.to }} dari
-                    {{ membershipTypes.total }} item
+                    Menampilkan {{ memberships.from }} -
+                    {{ memberships.to }} dari {{ memberships.total }} item
                 </p>
                 <DefaultPagination
                     :isApi="true"
-                    :links="membershipTypes.links"
+                    :links="memberships.links"
                     @change="
                         (page) => {
                             filters.page = page;
-                            getMembershipTypes();
+                            getMemberships();
                         }
                     "
                 />
@@ -299,10 +287,10 @@ onMounted(() => {
         </DefaultCard>
 
         <DeleteConfirmationDialog
-            :show="showDeleteMembershipTypeDialog"
-            :title="`Hapus MembershipType <b>${selectedMembershipType?.name}</b>?`"
-            @close="closeDeleteMembershipTypeDialog()"
-            @delete="deleteMembershipType()"
+            :show="showDeleteMembershipDialog"
+            :title="`Hapus Membership <b>${selectedMembership?.name}</b>?`"
+            @close="closeDeleteMembershipDialog()"
+            @delete="deleteMembership()"
         />
     </MyStoreLayout>
 </template>

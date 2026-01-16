@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = defineProps({
-    membershipType: {
-        type: Object as () => MembershipTypeEntity,
+    membership: {
+        type: Object as () => MembershipEntity,
         required: true,
     },
 });
@@ -11,8 +11,8 @@ const props = defineProps({
     <div
         class="flex items-center justify-center gap-1 px-2 py-1 text-xs font-semibold text-center rounded-full w-fit h-fit"
         :style="{
-            backgroundColor: props.membershipType.hex_code_bg,
-            color: props.membershipType.hex_code_text,
+            backgroundColor: props.membership.hex_code_bg,
+            color: props.membership.hex_code_text,
         }"
     >
         <svg
@@ -28,6 +28,6 @@ const props = defineProps({
                 fill="currentColor"
             />
         </svg>
-        <span>VIP {{ props.membershipType.level }}</span>
+        <span>VIP {{ props.membership.level }}</span>
     </div>
 </template>

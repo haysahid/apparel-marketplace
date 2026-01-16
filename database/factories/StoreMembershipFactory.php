@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\MembershipType;
+use App\Models\Membership;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -18,12 +18,12 @@ class StoreMembershipFactory extends Factory
      */
     public function definition(): array
     {
-        $membershipTypeId = MembershipType::inRandomOrder()->first()->id;
+        $membershipId = Membership::inRandomOrder()->first()->id;
 
         return [
             'store_id' => 1,
             'user_id' => User::factory(),
-            'membership_type_id' => $membershipTypeId,
+            'membership_id' => $membershipId,
         ];
     }
 }

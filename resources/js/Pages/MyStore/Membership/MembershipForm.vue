@@ -13,7 +13,7 @@ import InfoTooltip from "@/Components/InfoTooltip.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
 
 const props = defineProps({
-    membershipType: {
+    membership: {
         type: Object,
         default: null,
     },
@@ -26,8 +26,8 @@ const props = defineProps({
 const emit = defineEmits(["onSubmitted", "close"]);
 
 const form = useForm(
-    props.membershipType
-        ? props.membershipType
+    props.membership
+        ? props.membership
         : {
               group: null,
               name: null,
@@ -43,7 +43,7 @@ const form = useForm(
 );
 
 const submit = () => {
-    if (props.membershipType?.id) {
+    if (props.membership?.id) {
         form.transform((data) => {
             return {
                 ...data,
@@ -51,8 +51,8 @@ const submit = () => {
                 hex_code_text: data.hex_code_text?.toUpperCase(),
             };
         }).post(
-            route("my-store.membership-type.update", {
-                membershipType: props.membershipType,
+            route("my-store.membership.update", {
+                membership: props.membership,
             }),
             {
                 onError: (errors) => {
@@ -71,7 +71,7 @@ const submit = () => {
                 hex_code_text: data.hex_code_text?.toUpperCase(),
                 is_dialog: props.isDialog ? 1 : 0,
             };
-        }).post(route("my-store.membership-type.store"), {
+        }).post(route("my-store.membership.store"), {
             preserveState: false,
             preserveScroll: false,
             onError: (errors) => {
@@ -91,7 +91,7 @@ const textColorPicker = ref(null);
 onMounted(() => {
     nextTick(() => {
         const input = document.getElementById(
-            "membership_type_name"
+            "membership_name"
         ) as HTMLInputElement;
         input?.focus();
     });
@@ -107,12 +107,12 @@ onMounted(() => {
                     <div class="flex w-full gap-4">
                         <!-- Name -->
                         <InputGroup
-                            for="membership-type-name"
+                            for="membership-name"
                             label="Nama Jenis"
                             required
                         >
                             <TextInput
-                                id="membership_type_name"
+                                id="membership_name"
                                 v-model="form.name"
                                 type="text"
                                 placeholder="Masukkan Nama Jenis"
@@ -125,9 +125,9 @@ onMounted(() => {
                         </InputGroup>
 
                         <!-- Alias -->
-                        <InputGroup for="membership_type_alias" label="Alias">
+                        <InputGroup for="membership_alias" label="Alias">
                             <TextInput
-                                id="membership_type_alias"
+                                id="membership_alias"
                                 v-model="form.alias"
                                 type="text"
                                 placeholder="Masukkan Alias"
@@ -138,7 +138,7 @@ onMounted(() => {
 
                             <template #suffix>
                                 <InfoTooltip
-                                    id="membership-type-alias-info"
+                                    id="membership-alias-info"
                                     text="Alias digunakan untuk referensi internal."
                                 />
                             </template>
@@ -148,12 +148,12 @@ onMounted(() => {
                     <div class="flex w-full gap-4">
                         <!-- Group -->
                         <InputGroup
-                            for="membership_type_group"
+                            for="membership_group"
                             label="Grup"
                             required
                         >
                             <TextInput
-                                id="membership_type_group"
+                                id="membership_group"
                                 v-model="form.group"
                                 type="text"
                                 placeholder="Contoh: Member / Reseller / Agen"
@@ -166,12 +166,12 @@ onMounted(() => {
 
                         <!-- Level -->
                         <InputGroup
-                            for="membership_type_level"
+                            for="membership_level"
                             label="Level VIP"
                             required
                         >
                             <TextInput
-                                id="membership_type_level"
+                                id="membership_level"
                                 v-model.number="form.level"
                                 type="number"
                                 min="0"
@@ -184,7 +184,7 @@ onMounted(() => {
 
                             <template #suffix>
                                 <InfoTooltip
-                                    id="membership-type-level-info"
+                                    id="membership-level-info"
                                     text="Level VIP menentukan urutan keanggotaan. Level yang lebih tinggi menunjukkan keanggotaan yang lebih eksklusif."
                                 />
                             </template>
@@ -285,12 +285,9 @@ onMounted(() => {
                     </InputGroup>
 
                     <!-- Description -->
-                    <InputGroup
-                        for="membership_type_description"
-                        label="Deskripsi"
-                    >
+                    <InputGroup for="membership_description" label="Deskripsi">
                         <TextAreaInput
-                            id="membership_type_description"
+                            id="membership_description"
                             v-model="form.description"
                             type="text"
                             placeholder="Masukkan Deskripsi"

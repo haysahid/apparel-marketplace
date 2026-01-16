@@ -256,7 +256,7 @@ onMounted(() => {
                                 class="flex gap-2"
                             >
                                 <MemberBadge
-                                    :membershipType="store_membership"
+                                    :membership="store_membership"
                                 />
                                 <p>
                                     <span>{{ store_membership.name }}</span>

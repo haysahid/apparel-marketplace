@@ -7,7 +7,7 @@ use App\Http\Controllers\MyStore\CertificateController;
 use App\Http\Controllers\MyStore\ColorController;
 use App\Http\Controllers\MyStore\CustomerController;
 use App\Http\Controllers\MyStore\MemberController;
-use App\Http\Controllers\MyStore\MembershipTypeController;
+use App\Http\Controllers\MyStore\MembershipController;
 use App\Http\Controllers\MyStore\OrderController;
 use App\Http\Controllers\MyStore\PartnerController;
 use App\Http\Controllers\MyStore\PaymentController;
@@ -134,14 +134,14 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth'])->group(functi
         Route::get('/report', [ReportController::class, 'index'])->name('report');
         Route::get('/report/preview', [ReportController::class, 'reportPreview'])->name('report.preview');
 
-        // Membership Type
-        Route::prefix('membership-type')->name('membership-type.')->group(function () {
-            Route::get('/', [MembershipTypeController::class, 'index'])->name('index');
-            Route::get('/create', [MembershipTypeController::class, 'create'])->name('create');
-            Route::post('/', [MembershipTypeController::class, 'store'])->name('store');
-            Route::get('/{membershipType}/edit', [MembershipTypeController::class, 'edit'])->name('edit');
-            Route::post('/{membershipType}', [MembershipTypeController::class, 'update'])->name('update');
-            Route::delete('/{membershipType}', [MembershipTypeController::class, 'destroy'])->name('destroy');
+        // Membership
+        Route::prefix('membership')->name('membership.')->group(function () {
+            Route::get('/', [MembershipController::class, 'index'])->name('index');
+            Route::get('/create', [MembershipController::class, 'create'])->name('create');
+            Route::post('/', [MembershipController::class, 'store'])->name('store');
+            Route::get('/{membership}/edit', [MembershipController::class, 'edit'])->name('edit');
+            Route::post('/{membership}', [MembershipController::class, 'update'])->name('update');
+            Route::delete('/{membership}', [MembershipController::class, 'destroy'])->name('destroy');
         });
 
         // Member

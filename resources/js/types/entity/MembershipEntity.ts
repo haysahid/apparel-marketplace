@@ -1,4 +1,4 @@
-interface MembershipTypeEntity {
+interface MembershipEntity {
     id: number;
     store_id: number;
     group: string;

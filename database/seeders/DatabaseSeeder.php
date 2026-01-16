@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             PlatformSeeder::class,
 
             StoreSeeder::class,
-            MembershipTypeSeeder::class,
+            MembershipSeeder::class,
             UserSeeder::class,
             StoreRoleSeeder::class,
             StoreMembershipSeeder::class,

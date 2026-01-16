@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MembershipType extends Model
+class Membership extends Model
 {
     use SoftDeletes;
 
@@ -32,18 +32,18 @@ class MembershipType extends Model
 
     public function members()
     {
-        return $this->belongsToMany(User::class, 'store_memberships', 'membership_type_id', 'user_id')
+        return $this->belongsToMany(User::class, 'store_memberships', 'membership_id', 'user_id')
             ->withTimestamps();
     }
 
     public function stores()
     {
-        return $this->belongsToMany(Store::class, 'store_memberships', 'membership_type_id', 'store_id')
+        return $this->belongsToMany(Store::class, 'store_memberships', 'membership_id', 'store_id')
             ->withTimestamps();
     }
 
     public function store_memberships()
     {
-        return $this->hasMany(StoreMembership::class, 'membership_type_id');
+        return $this->hasMany(StoreMembership::class, 'membership_id');
     }
 }

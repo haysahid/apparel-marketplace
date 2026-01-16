@@ -219,10 +219,8 @@ const menus = [
         children: [
             {
                 name: "Jenis Keanggotaan",
-                href: route("my-store.membership-type.index"),
-                active: route()
-                    .current()
-                    .startsWith("my-store.membership-type."),
+                href: route("my-store.membership.index"),
+                active: route().current().startsWith("my-store.membership."),
                 icon: `
             <svg
                 xmlns="http://www.w3.org/2000/svg"
