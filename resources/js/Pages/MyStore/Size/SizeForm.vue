@@ -6,6 +6,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import InputGroup from "@/Components/InputGroup.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { goBack } from "@/plugins/helpers";
 
 const props = defineProps({
     size: {
@@ -112,7 +113,7 @@ onMounted(() => {
                 <SecondaryButton
                     v-if="!props.isDialog"
                     type="button"
-                    @click="$inertia.visit(route('my-store.size'))"
+                    @click="goBack()"
                 >
                     Kembali
                 </SecondaryButton>

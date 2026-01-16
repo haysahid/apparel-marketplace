@@ -39,7 +39,7 @@ class BrandController extends Controller
             orderDirection: $orderDirection,
         );
 
-        return Inertia::render('MyStore/Brand', [
+        return Inertia::render('MyStore/Brand/Index', [
             'brands' => $brands,
         ]);
     }
@@ -83,7 +83,7 @@ class BrandController extends Controller
                 return redirect()->back()->with('success', 'Brand berhasil dibuat.');
             }
 
-            return redirect()->route('my-store.brand')->with('success', 'Brand berhasil dibuat.');
+            return redirect()->route('my-store.brand.index')->with('success', 'Brand berhasil dibuat.');
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -126,7 +126,7 @@ class BrandController extends Controller
 
             BrandRepository::updateBrand($brand, $data);
 
-            return redirect()->route('my-store.brand')->with('success', 'Brand berhasil diperbarui.');
+            return redirect()->route('my-store.brand.index')->with('success', 'Brand berhasil diperbarui.');
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -140,7 +140,7 @@ class BrandController extends Controller
         try {
             BrandRepository::deleteBrand($brand);
 
-            return redirect()->route('my-store.brand')->with('success', 'Brand berhasil dihapus.');
+            return redirect()->route('my-store.brand.index')->with('success', 'Brand berhasil dihapus.');
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }

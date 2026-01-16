@@ -37,7 +37,7 @@ class SizeController extends Controller
             orderDirection: $orderDirection,
         );
 
-        return inertia('MyStore/Size', [
+        return inertia('MyStore/Size/Index', [
             'sizes' => $sizes,
         ]);
     }
@@ -74,7 +74,7 @@ class SizeController extends Controller
                 return redirect()->back()->with('success', 'Ukuran berhasil ditambahkan.');
             }
 
-            return redirect()->route('my-store.size')->with('success', 'Ukuran berhasil ditambahkan.');
+            return redirect()->route('my-store.size.index')->with('success', 'Ukuran berhasil ditambahkan.');
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Gagal menambahkan ukuran: ' . $e->getMessage()]);
         }
@@ -117,7 +117,7 @@ class SizeController extends Controller
                 'name' => $validated['name'],
             ]);
 
-            return redirect()->route('my-store.size')->with('success', 'Ukuran berhasil diperbarui.');
+            return redirect()->route('my-store.size.index')->with('success', 'Ukuran berhasil diperbarui.');
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Gagal memperbarui ukuran: ' . $e->getMessage()]);
         }
@@ -131,7 +131,7 @@ class SizeController extends Controller
         try {
             SizeRepository::deleteSize($size);
 
-            return redirect()->route('my-store.size')->with('success', 'Ukuran berhasil dihapus.');
+            return redirect()->route('my-store.size.index')->with('success', 'Ukuran berhasil dihapus.');
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Gagal menghapus ukuran: ' . $e->getMessage()]);
         }

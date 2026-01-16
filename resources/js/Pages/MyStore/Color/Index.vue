@@ -14,21 +14,20 @@ import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import AdminItemCard from "@/Components/AdminItemCard.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
-import { getImageUrl } from "@/plugins/helpers.js";
 import CustomPageProps from "@/types/model/CustomPageProps";
-import SearchInput from "@/Components/SearchInput.vue";
 import { scrollToTop } from "@/plugins/helpers";
+import SearchInput from "@/Components/SearchInput.vue";
 
 const screenSize = useScreenSize();
 
 const props = defineProps({
-    brands: Object as () => PaginationModel<BrandEntity>,
+    colors: Object as () => PaginationModel<ColorEntity>,
 });
 
-const brands = ref<PaginationModel<BrandEntity>>({
-    ...props.brands,
-    data: props.brands.data.map((brand) => ({
-        ...brand,
+const colors = ref<PaginationModel<ColorEntity>>({
+    ...props.colors,
+    data: props.colors.data.map((color) => ({
+        ...color,
         showDeleteModal: false,
     })),
 });
@@ -51,16 +50,16 @@ const queryParams = computed(() => {
     };
 });
 
-function getBrands() {
-    router.get(route("my-store.brand"), queryParams.value, {
+function getColors() {
+    router.get(route("my-store.color.index"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
             getQueryParams();
-            brands.value = {
-                ...props.brands,
-                data: props.brands.data.map((brand) => ({
-                    ...brand,
+            colors.value = {
+                ...props.colors,
+                data: props.colors.data.map((color) => ({
+                    ...color,
                     showDeleteModal: false,
                 })),
             };
@@ -70,39 +69,38 @@ function getBrands() {
     });
 }
 
-const selectedBrand = ref(null);
-const showDeleteBrandDialog = ref(false);
+const selectedColor = ref(null);
+const showDeleteColorDialog = ref(false);
 
-const openDeleteBrandDialog = (brand) => {
-    console.log("openDeleteBrandDialog", brand);
-    if (brand) {
-        selectedBrand.value = brand;
-        showDeleteBrandDialog.value = true;
+const openDeleteColorDialog = (color) => {
+    if (color) {
+        selectedColor.value = color;
+        showDeleteColorDialog.value = true;
     }
 };
 
-const closeDeleteBrandDialog = (result = false) => {
-    showDeleteBrandDialog.value = false;
+const closeDeleteColorDialog = (result = false) => {
+    showDeleteColorDialog.value = false;
     if (result) {
-        selectedBrand.value = null;
+        selectedColor.value = null;
         openSuccessDialog("Data Berhasil Dihapus");
     }
 };
 
-const deleteBrand = () => {
-    if (selectedBrand.value) {
+const deleteColor = () => {
+    if (selectedColor.value) {
         const form = useForm({});
         form.delete(
-            route("my-store.brand.destroy", {
-                brand: selectedBrand.value,
+            route("my-store.color.destroy", {
+                color: selectedColor.value,
             }),
             {
                 onError: (errors) => {
                     openErrorDialog(errors.error);
                 },
                 onSuccess: () => {
-                    closeDeleteBrandDialog(true);
-                    getBrands();
+                    closeDeleteColorDialog(true);
+                    getColors();
                 },
             }
         );
@@ -127,17 +125,17 @@ const openErrorDialog = (message) => {
 
 const page = usePage<CustomPageProps>();
 
-function canEdit(brand) {
+function canEdit(color) {
     return (
         page.props.auth.is_admin ||
-        page.props.auth.user.stores.some((store) => store.id === brand.store_id)
+        page.props.auth.user.stores.some((store) => store.id === color.store_id)
     );
 }
 
 function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
-            "search-brand"
+            "search-color"
         ) as HTMLInputElement;
         input?.focus({ preventScroll: true });
     });
@@ -152,24 +150,24 @@ onMounted(() => {
 </script>
 
 <template>
-    <MyStoreLayout title="Brand" :showTitle="true">
+    <MyStoreLayout title="Warna" :showTitle="true">
         <DefaultCard :isMain="true">
             <div class="flex items-center justify-between gap-4">
                 <PrimaryButton
                     type="button"
                     class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
-                    @click="$inertia.visit(route('my-store.brand.create'))"
+                    @click="$inertia.visit(route('my-store.color.create'))"
                 >
                     Tambah
                 </PrimaryButton>
                 <SearchInput
-                    id="search-brand"
+                    id="search-color"
                     v-model="filters.search"
-                    placeholder="Cari brand..."
+                    placeholder="Cari warna..."
                     class="max-w-48"
                     @search="
                         filters.page = 1;
-                        getBrands();
+                        getColors();
                     "
                 />
             </div>
@@ -177,77 +175,63 @@ onMounted(() => {
             <!-- Table -->
             <DefaultTable
                 v-if="screenSize.is('xl')"
-                :isEmpty="brands.data.length === 0"
+                :isEmpty="colors.data.length === 0"
                 class="mt-6"
             >
                 <template #thead>
                     <tr>
                         <th class="w-12">No</th>
-                        <th>Logo Brand</th>
-                        <th>Nama Brand</th>
-                        <th>Deskripsi</th>
+                        <th>Warna</th>
+                        <th>Kode Warna</th>
                         <th class="w-24">Aksi</th>
                     </tr>
                 </template>
                 <template #tbody>
-                    <tr v-for="(brand, index) in brands.data" :key="brand.id">
+                    <tr v-for="(color, index) in colors.data" :key="color.id">
                         <td>
                             {{
                                 index +
                                 1 +
-                                (props.brands.current_page - 1) *
-                                    props.brands.per_page
+                                (props.colors.current_page - 1) *
+                                    props.colors.per_page
                             }}
                         </td>
                         <td>
-                            <img
-                                v-if="brand.logo"
-                                :src="getImageUrl(brand.logo)"
-                                alt="Logo Brand"
-                                class="object-contain h-[60px] rounded aspect-[3/2]"
-                            />
+                            {{ color.name }}
+                        </td>
+                        <td>
                             <div
-                                v-else
-                                class="flex items-center justify-center h-[60px] bg-gray-100 rounded aspect-[3/2]"
+                                v-if="color.hex_code"
+                                class="flex items-center gap-2"
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    class="size-6 fill-gray-400"
-                                >
-                                    <path
-                                        d="M5 21C4.45 21 3.97933 20.8043 3.588 20.413C3.19667 20.0217 3.00067 19.5507 3 19V5C3 4.45 3.196 3.97933 3.588 3.588C3.98 3.19667 4.45067 3.00067 5 3H19C19.55 3 20.021 3.196 20.413 3.588C20.805 3.98 21.0007 4.45067 21 5V19C21 19.55 20.8043 20.021 20.413 20.413C20.0217 20.805 19.5507 21.0007 19 21H5ZM6 17H18L14.25 12L11.25 16L9 13L6 17Z"
-                                    />
-                                </svg>
+                                <span
+                                    class="inline-block w-4 h-4 rounded-full"
+                                    :style="{
+                                        backgroundColor: color.hex_code,
+                                    }"
+                                ></span>
+                                <p>{{ color.hex_code }}</p>
                             </div>
                         </td>
                         <td>
-                            {{ brand.name }}
-                        </td>
-                        <td class="!whitespace-normal">
-                            <p class="line-clamp-2">
-                                {{ brand.description }}
-                            </p>
-                        </td>
-                        <td>
-                            <AdminItemAction
-                                v-if="canEdit(brand)"
-                                @edit="
-                                    $inertia.visit(
-                                        route('my-store.brand.edit', {
-                                            brand: brand,
-                                        })
-                                    )
-                                "
-                                @delete="openDeleteBrandDialog(brand)"
-                            />
-                            <InfoTooltip
-                                v-if="!canEdit(brand)"
-                                :id="`table-tooltip-hint-${brand.id}`"
-                                text="Brand bawaan sistem"
-                            />
+                            <div class="flex items-center justify-start gap-2">
+                                <AdminItemAction
+                                    v-if="canEdit(color)"
+                                    @edit="
+                                        $inertia.visit(
+                                            route('my-store.color.edit', {
+                                                color: color,
+                                            })
+                                        )
+                                    "
+                                    @delete="openDeleteColorDialog(color)"
+                                />
+                                <InfoTooltip
+                                    v-if="!canEdit(color)"
+                                    :id="`table-tooltip-hint-${color.id}`"
+                                    text="Warna bawaan sistem"
+                                />
+                            </div>
                         </td>
                     </tr>
                 </template>
@@ -256,27 +240,35 @@ onMounted(() => {
             <!-- Mobile View -->
             <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <div
-                    v-if="brands.data.length > 0"
-                    class="grid grid-cols-1 gap-3 sm:grid-cols-2"
+                    v-if="colors.data.length > 0"
+                    class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
                 >
                     <AdminItemCard
-                        v-for="(brand, index) in brands.data"
-                        :key="brand.id"
-                        :name="brand.name"
-                        :description="brand.description"
-                        :image="brand.logo"
-                        :showImage="true"
-                        :hideActions="!canEdit(brand)"
-                        disabledHint="Brand bawaan sistem"
+                        v-for="(color, index) in colors.data"
+                        :key="color.id"
+                        :name="color.name"
+                        :showImage="false"
+                        :description="color.hex_code"
+                        :hideActions="!canEdit(color)"
+                        disabledHint="Warna bawaan sistem"
                         @edit="
                             $inertia.visit(
-                                route('my-store.brand.edit', {
-                                    brand: brand,
+                                route('my-store.color.edit', {
+                                    color: color,
                                 })
                             )
                         "
-                        @delete="openDeleteBrandDialog(brand)"
-                    />
+                        @delete="openDeleteColorDialog(color)"
+                    >
+                        <template #leading>
+                            <div
+                                class="inline-block rounded-full size-6 aspect-square"
+                                :style="{
+                                    backgroundColor: color.hex_code,
+                                }"
+                            ></div>
+                        </template>
+                    </AdminItemCard>
                 </div>
                 <div v-else class="flex items-center justify-center py-10">
                     <p class="text-sm text-center text-gray-500">
@@ -286,18 +278,18 @@ onMounted(() => {
             </div>
 
             <!-- Pagination -->
-            <div v-if="brands.total > 0" class="flex flex-col gap-2 mt-4">
+            <div v-if="colors.total > 0" class="flex flex-col gap-2 mt-4">
                 <p class="text-xs text-gray-500 sm:text-sm">
-                    Menampilkan {{ brands.from }} - {{ brands.to }} dari
-                    {{ brands.total }} item
+                    Menampilkan {{ colors.from }} - {{ colors.to }} dari
+                    {{ colors.total }} item
                 </p>
                 <DefaultPagination
                     :isApi="true"
-                    :links="brands.links"
+                    :links="colors.links"
                     @change="
                         (page) => {
                             filters.page = page;
-                            getBrands();
+                            getColors();
                         }
                     "
                 />
@@ -305,10 +297,10 @@ onMounted(() => {
         </DefaultCard>
 
         <DeleteConfirmationDialog
-            :show="showDeleteBrandDialog"
-            :title="`Hapus Brand <b>${selectedBrand?.name}</b>?`"
-            @close="closeDeleteBrandDialog()"
-            @delete="deleteBrand()"
+            :show="showDeleteColorDialog"
+            :title="`Hapus Kategori <b>${selectedColor?.name}</b>?`"
+            @close="closeDeleteColorDialog()"
+            @delete="deleteColor()"
         />
 
         <SuccessDialog

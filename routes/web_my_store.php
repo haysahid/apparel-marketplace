@@ -34,60 +34,74 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth'])->group(functi
         Route::post('/store-info', [MyStoreController::class, 'updateStore'])->name('store.update');
 
         // Certificate
-        Route::get('/certificate', [CertificateController::class, 'index'])->name('certificate');
-        Route::get('/certificate/create', [CertificateController::class, 'create'])->name('certificate.create');
-        Route::post('/certificate', [CertificateController::class, 'store'])->name('certificate.store');
-        Route::get('/certificate/{storeCertificate}', [CertificateController::class, 'edit'])->name('certificate.edit');
-        Route::post('/certificate/{storeCertificate}', [CertificateController::class, 'update'])->name('certificate.update');
-        Route::delete('/certificate/{storeCertificate}', [CertificateController::class, 'destroy'])->name('certificate.destroy');
+        Route::prefix('certificate')->name('certificate.')->group(function () {
+            Route::get('/', [CertificateController::class, 'index'])->name('index');
+            Route::get('/create', [CertificateController::class, 'create'])->name('create');
+            Route::post('/', [CertificateController::class, 'store'])->name('store');
+            Route::get('/{storeCertificate}', [CertificateController::class, 'edit'])->name('edit');
+            Route::post('/{storeCertificate}', [CertificateController::class, 'update'])->name('update');
+            Route::delete('/{storeCertificate}', [CertificateController::class, 'destroy'])->name('destroy');
+        });
 
         // Category
-        Route::get('/category', [CategoryController::class, 'index'])->name('category');
-        Route::get('/category/create', [CategoryController::class, 'create'])->name('category.create');
-        Route::post('/category', [CategoryController::class, 'store'])->name('category.store');
-        Route::get('/category/{category}', [CategoryController::class, 'edit'])->name('category.edit');
-        Route::post('/category/{category}', [CategoryController::class, 'update'])->name('category.update');
-        Route::delete('/category/{category}', [CategoryController::class, 'destroy'])->name('category.destroy');
+        Route::prefix('category')->name('category.')->group(function () {
+            Route::get('/', [CategoryController::class, 'index'])->name('index');
+            Route::get('/create', [CategoryController::class, 'create'])->name('create');
+            Route::post('/', [CategoryController::class, 'store'])->name('store');
+            Route::get('/{category}', [CategoryController::class, 'edit'])->name('edit');
+            Route::post('/{category}', [CategoryController::class, 'update'])->name('update');
+            Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
+        });
 
         // Color
-        Route::get('/color', [ColorController::class, 'index'])->name('color');
-        Route::get('/color/create', [ColorController::class, 'create'])->name('color.create');
-        Route::post('/color', [ColorController::class, 'store'])->name('color.store');
-        Route::get('/color/{color}', [ColorController::class, 'edit'])->name('color.edit');
-        Route::post('/color/{color}', [ColorController::class, 'update'])->name('color.update');
-        Route::delete('/color/{color}', [ColorController::class, 'destroy'])->name('color.destroy');
+        Route::prefix('color')->name('color.')->group(function () {
+            Route::get('/', [ColorController::class, 'index'])->name('index');
+            Route::get('/create', [ColorController::class, 'create'])->name('create');
+            Route::post('/', [ColorController::class, 'store'])->name('store');
+            Route::get('/{color}', [ColorController::class, 'edit'])->name('edit');
+            Route::post('/{color}', [ColorController::class, 'update'])->name('update');
+            Route::delete('/{color}', [ColorController::class, 'destroy'])->name('destroy');
+        });
 
         // Size
-        Route::get('/size', [SizeController::class, 'index'])->name('size');
-        Route::get('/size/create', [SizeController::class, 'create'])->name('size.create');
-        Route::post('/size', [SizeController::class, 'store'])->name('size.store');
-        Route::get('/size/{size}', [SizeController::class, 'edit'])->name('size.edit');
-        Route::post('/size/{size}', [SizeController::class, 'update'])->name('size.update');
-        Route::delete('/size/{size}', [SizeController::class, 'destroy'])->name('size.destroy');
+        Route::prefix('size')->name('size.')->group(function () {
+            Route::get('/', [SizeController::class, 'index'])->name('index');
+            Route::get('/create', [SizeController::class, 'create'])->name('create');
+            Route::post('/', [SizeController::class, 'store'])->name('store');
+            Route::get('/{size}', [SizeController::class, 'edit'])->name('edit');
+            Route::post('/{size}', [SizeController::class, 'update'])->name('update');
+            Route::delete('/{size}', [SizeController::class, 'destroy'])->name('destroy');
+        });
 
         // Brand
-        Route::get('/brand', [BrandController::class, 'index'])->name('brand');
-        Route::get('/brand/create', [BrandController::class, 'create'])->name('brand.create');
-        Route::post('/brand', [BrandController::class, 'store'])->name('brand.store');
-        Route::get('/brand/{brand}', [BrandController::class, 'edit'])->name('brand.edit');
-        Route::post('/brand/{brand}', [BrandController::class, 'update'])->name('brand.update');
-        Route::delete('/brand/{brand}', [BrandController::class, 'destroy'])->name('brand.destroy');
+        Route::prefix('brand')->name('brand.')->group(function () {
+            Route::get('/', [BrandController::class, 'index'])->name('index');
+            Route::get('/create', [BrandController::class, 'create'])->name('create');
+            Route::post('/', [BrandController::class, 'store'])->name('store');
+            Route::get('/{brand}', [BrandController::class, 'edit'])->name('edit');
+            Route::post('/{brand}', [BrandController::class, 'update'])->name('update');
+            Route::delete('/{brand}', [BrandController::class, 'destroy'])->name('destroy');
+        });
 
         // Unit
-        Route::get('/unit', [UnitController::class, 'index'])->name('unit');
-        Route::get('/unit/create', [UnitController::class, 'create'])->name('unit.create');
-        Route::post('/unit', [UnitController::class, 'store'])->name('unit.store');
-        Route::get('/unit/{unit}', [UnitController::class, 'edit'])->name('unit.edit');
-        Route::post('/unit/{unit}', [UnitController::class, 'update'])->name('unit.update');
-        Route::delete('/unit/{unit}', [UnitController::class, 'destroy'])->name('unit.destroy');
+        Route::prefix('unit')->name('unit.')->group(function () {
+            Route::get('/', [UnitController::class, 'index'])->name('index');
+            Route::get('/create', [UnitController::class, 'create'])->name('create');
+            Route::post('/', [UnitController::class, 'store'])->name('store');
+            Route::get('/{unit}', [UnitController::class, 'edit'])->name('edit');
+            Route::post('/{unit}', [UnitController::class, 'update'])->name('update');
+            Route::delete('/{unit}', [UnitController::class, 'destroy'])->name('destroy');
+        });
 
         // Product
-        Route::get('/product', [ProductController::class, 'index'])->name('product');
-        Route::get('/product/create', [ProductController::class, 'create'])->name('product.create');
-        Route::post('/product', [ProductController::class, 'store'])->name('product.store');
-        Route::get('/product/{product}', [ProductController::class, 'edit'])->name('product.edit');
-        Route::post('/product/{product}', [ProductController::class, 'update'])->name('product.update');
-        Route::delete('/product/{product}', [ProductController::class, 'destroy'])->name('product.destroy');
+        Route::prefix('product')->name('product.')->group(function () {
+            Route::get('/', [ProductController::class, 'index'])->name('index');
+            Route::get('/create', [ProductController::class, 'create'])->name('create');
+            Route::post('/', [ProductController::class, 'store'])->name('store');
+            Route::get('/{product}', [ProductController::class, 'edit'])->name('edit');
+            Route::post('/{product}', [ProductController::class, 'update'])->name('update');
+            Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
+        });
 
         // Transaction
         Route::get('/transaction', [TransactionController::class, 'index'])->name('transaction');

@@ -8,6 +8,7 @@ import ImageInput from "@/Components/ImageInput.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import InputGroup from "@/Components/InputGroup.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { goBack } from "@/plugins/helpers";
 
 const props = defineProps({
     certificate: {
@@ -128,10 +129,7 @@ const openErrorDialog = (message) => {
 
             <div class="flex items-center gap-4 mt-4">
                 <PrimaryButton type="submit"> Simpan </PrimaryButton>
-                <SecondaryButton
-                    type="button"
-                    @click="$inertia.visit(route('my-store.certificate'))"
-                >
+                <SecondaryButton type="button" @click="goBack()">
                     Kembali
                 </SecondaryButton>
             </div>

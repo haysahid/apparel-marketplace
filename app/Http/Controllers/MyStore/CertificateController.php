@@ -29,7 +29,7 @@ class CertificateController extends Controller
             orderDirection: $orderDirection,
         );
 
-        return Inertia::render('MyStore/Certificate', [
+        return Inertia::render('MyStore/Certificate/Index', [
             'certificates' => $certificates,
         ]);
     }
@@ -73,7 +73,7 @@ class CertificateController extends Controller
 
             StoreCertificateRepository::createCertificate($data);
 
-            return redirect()->route('my-store.certificate')->with('success', 'Sertifikat berhasil dibuat.');
+            return redirect()->route('my-store.certificate.index')->with('success', 'Sertifikat berhasil dibuat.');
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => $e]);
         }
@@ -126,7 +126,7 @@ class CertificateController extends Controller
 
             StoreCertificateRepository::updateCertificate($storeCertificate, $data);
 
-            return redirect()->route('my-store.certificate')->with('success', 'Sertifikat berhasil diperbarui.');
+            return redirect()->route('my-store.certificate.index')->with('success', 'Sertifikat berhasil diperbarui.');
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => $e]);
         }
@@ -140,7 +140,7 @@ class CertificateController extends Controller
         try {
             StoreCertificateRepository::deleteCertificate($storeCertificate);
 
-            return redirect()->route('my-store.certificate')->with('success', 'Sertifikat berhasil dihapus.');
+            return redirect()->route('my-store.certificate.index')->with('success', 'Sertifikat berhasil dihapus.');
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => $e]);
         }

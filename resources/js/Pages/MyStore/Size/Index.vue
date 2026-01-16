@@ -51,7 +51,7 @@ const queryParams = computed(() => {
 });
 
 function getSizes() {
-    router.get(route("my-store.size"), queryParams.value, {
+    router.get(route("my-store.size.index"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {

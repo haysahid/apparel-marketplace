@@ -7,6 +7,7 @@ import ImageInput from "@/Components/ImageInput.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import InputGroup from "@/Components/InputGroup.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { goBack } from "@/plugins/helpers";
 
 const props = defineProps({
     category: {
@@ -135,7 +136,7 @@ onMounted(() => {
                 <SecondaryButton
                     v-if="!props.isDialog"
                     type="button"
-                    @click="$inertia.visit(route('my-store.category'))"
+                    @click="goBack()"
                 >
                     Kembali
                 </SecondaryButton>

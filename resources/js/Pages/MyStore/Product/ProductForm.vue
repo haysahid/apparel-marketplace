@@ -23,6 +23,7 @@ import TabButton from "@/Components/TabButton.vue";
 import axios from "axios";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
 import cookieManager from "@/plugins/cookie-manager";
+import { goBack } from "@/plugins/helpers";
 
 const props = defineProps({
     product: {
@@ -467,10 +468,7 @@ const tabIndex = ref(0);
                         </p>
                     </div>
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <SecondaryButton
-                            type="button"
-                            @click="$inertia.visit(route('my-store.product'))"
-                        >
+                        <SecondaryButton type="button" @click="goBack()">
                             Kembali
                         </SecondaryButton>
                         <PrimaryButton type="submit"> Simpan </PrimaryButton>
@@ -620,7 +618,10 @@ const tabIndex = ref(0);
                             </div>
 
                             <!-- Categories -->
-                            <InputGroup for="categories" label="Kategori Produk">
+                            <InputGroup
+                                for="categories"
+                                label="Kategori Produk"
+                            >
                                 <DropdownSearchInputMultiple
                                     id="categories"
                                     :modelValue="

@@ -9,6 +9,7 @@ import InputGroup from "@/Components/InputGroup.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { ColorPicker } from "vue3-colorpicker";
 import "vue3-colorpicker/style.css";
+import { goBack } from "@/plugins/helpers";
 
 const props = defineProps({
     color: {
@@ -146,7 +147,7 @@ onMounted(() => {
                 <SecondaryButton
                     v-if="!props.isDialog"
                     type="button"
-                    @click="$inertia.visit(route('my-store.color'))"
+                    @click="goBack()"
                 >
                     Kembali
                 </SecondaryButton>

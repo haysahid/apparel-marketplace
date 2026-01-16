@@ -36,7 +36,7 @@ class ColorController extends Controller
             orderDirection: $orderDirection,
         );
 
-        return Inertia::render('MyStore/Color', [
+        return Inertia::render('MyStore/Color/Index', [
             'colors' => $colors,
         ]);
     }
@@ -78,7 +78,7 @@ class ColorController extends Controller
                 return redirect()->back()->with('success', 'Warna berhasil ditambahkan.');
             }
 
-            return redirect()->route('my-store.color')->with('success', 'Warna berhasil ditambahkan.');
+            return redirect()->route('my-store.color.index')->with('success', 'Warna berhasil ditambahkan.');
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -126,7 +126,7 @@ class ColorController extends Controller
                 'hex_code' => $validated['hex_code'],
             ]);
 
-            return redirect()->route('my-store.color')->with('success', 'Warna berhasil diperbarui.');
+            return redirect()->route('my-store.color.index')->with('success', 'Warna berhasil diperbarui.');
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -140,7 +140,7 @@ class ColorController extends Controller
         try {
             ColorRepository::deleteColor($color);
 
-            return redirect()->route('my-store.color')->with('success', 'Warna berhasil dihapus.');
+            return redirect()->route('my-store.color.index')->with('success', 'Warna berhasil dihapus.');
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }

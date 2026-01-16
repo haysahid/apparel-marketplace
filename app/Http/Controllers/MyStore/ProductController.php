@@ -60,7 +60,7 @@ class ProductController extends Controller
             storeId: $this->storeId
         );
 
-        return Inertia::render('MyStore/Product', [
+        return Inertia::render('MyStore/Product/Index', [
             'products' => $products,
             'brands' => $brands,
         ]);
@@ -175,7 +175,7 @@ class ProductController extends Controller
                 data: $data,
             );
 
-            return redirect()->route('my-store.product')
+            return redirect()->route('my-store.product.index')
                 ->with('success', 'Produk berhasil dibuat.');
         } catch (Exception $e) {
             return redirect()->back()
@@ -268,7 +268,7 @@ class ProductController extends Controller
         try {
             ProductRepository::updateProduct($product, $validated);
 
-            return redirect()->route('my-store.product')
+            return redirect()->route('my-store.product.index')
                 ->with('success', 'Produk berhasil diperbarui.');
         } catch (Exception $e) {
             return redirect()->back()
@@ -284,7 +284,7 @@ class ProductController extends Controller
         try {
             ProductRepository::deleteProduct($product);
 
-            return redirect()->route('my-store.product')
+            return redirect()->route('my-store.product.index')
                 ->with('success', 'Produk berhasil dihapus.');
         } catch (Exception $e) {
 

@@ -36,7 +36,7 @@ class CategoryController extends Controller
             orderDirection: $orderDirection,
         );
 
-        return Inertia::render('MyStore/Category', [
+        return Inertia::render('MyStore/Category/Index', [
             'categories' => $categories,
         ]);
     }
@@ -78,7 +78,7 @@ class CategoryController extends Controller
                 return redirect()->back()->with('success', 'Kategori berhasil ditambahkan.');
             }
 
-            return redirect()->route('my-store.category')->with('success', 'Kategori berhasil ditambahkan.');
+            return redirect()->route('my-store.category.index')->with('success', 'Kategori berhasil ditambahkan.');
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -125,7 +125,7 @@ class CategoryController extends Controller
                 'image' => $request->file('image') ? $request->file('image') : null,
             ]);
 
-            return redirect()->route('my-store.category')->with('success', 'Kategori berhasil diperbarui.');
+            return redirect()->route('my-store.category.index')->with('success', 'Kategori berhasil diperbarui.');
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
@@ -139,7 +139,7 @@ class CategoryController extends Controller
         try {
             CategoryRepository::deleteCategory($category);
 
-            return redirect()->route('my-store.category')->with('success', 'Kategori berhasil dihapus.');
+            return redirect()->route('my-store.category.index')->with('success', 'Kategori berhasil dihapus.');
         } catch (Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }

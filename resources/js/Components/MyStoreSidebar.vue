@@ -73,8 +73,8 @@ const menus = [
             },
             {
                 name: "Sertifikat",
-                href: route("my-store.certificate"),
-                active: route().current().startsWith("my-store.certificate"),
+                href: route("my-store.certificate.index"),
+                active: route().current().startsWith("my-store.certificate."),
                 icon: `
             <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -107,8 +107,8 @@ const menus = [
         children: [
             {
                 name: "Kategori",
-                href: route("my-store.category"),
-                active: route().current().startsWith("my-store.category"),
+                href: route("my-store.category.index"),
+                active: route().current().startsWith("my-store.category."),
                 icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -124,8 +124,8 @@ const menus = [
             },
             {
                 name: "Warna",
-                href: route("my-store.color"),
-                active: route().current().startsWith("my-store.color"),
+                href: route("my-store.color.index"),
+                active: route().current().startsWith("my-store.color."),
                 icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -139,8 +139,8 @@ const menus = [
             },
             {
                 name: "Ukuran",
-                href: route("my-store.size"),
-                active: route().current().startsWith("my-store.size"),
+                href: route("my-store.size.index"),
+                active: route().current().startsWith("my-store.size."),
                 icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -154,8 +154,8 @@ const menus = [
             },
             {
                 name: "Brand",
-                href: route("my-store.brand"),
-                active: route().current().startsWith("my-store.brand"),
+                href: route("my-store.brand.index"),
+                active: route().current().startsWith("my-store.brand."),
                 icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -169,8 +169,8 @@ const menus = [
             },
             {
                 name: "Satuan",
-                href: route("my-store.unit"),
-                active: route().current().startsWith("my-store.unit"),
+                href: route("my-store.unit.index"),
+                active: route().current().startsWith("my-store.unit."),
                 icon: `
             <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -184,8 +184,8 @@ const menus = [
             },
             {
                 name: "Produk",
-                href: route("my-store.product"),
-                active: route().current().startsWith("my-store.product"),
+                href: route("my-store.product.index"),
+                active: route().current().startsWith("my-store.product."),
                 icon: `
             <svg
                 xmlns="http://www.w3.org/2000/svg"

@@ -7,6 +7,7 @@ import ErrorDialog from "@/Components/ErrorDialog.vue";
 import InputGroup from "@/Components/InputGroup.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
+import { goBack } from "@/plugins/helpers";
 
 const props = defineProps({
     unit: {
@@ -126,7 +127,7 @@ onMounted(() => {
                 <SecondaryButton
                     v-if="!props.isDialog"
                     type="button"
-                    @click="$inertia.visit(route('my-store.unit'))"
+                    @click="goBack()"
                 >
                     Kembali
                 </SecondaryButton>

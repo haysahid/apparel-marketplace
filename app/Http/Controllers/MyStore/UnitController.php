@@ -33,7 +33,7 @@ class UnitController extends Controller
             orderDirection: $orderDirection,
         );
 
-        return Inertia::render('MyStore/Unit', [
+        return Inertia::render('MyStore/Unit/Index', [
             'units' => $units,
         ]);
     }
@@ -68,7 +68,7 @@ class UnitController extends Controller
                 return redirect()->back()->with('success', 'Satuan berhasil ditambahkan.')->with('closeDialog', true);
             }
 
-            return redirect()->route('my-store.unit')->with('success', 'Satuan berhasil ditambahkan.');
+            return redirect()->route('my-store.unit.index')->with('success', 'Satuan berhasil ditambahkan.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => 'Gagal menambahkan satuan: ' . $e->getMessage()])->withInput();
         }
@@ -100,7 +100,7 @@ class UnitController extends Controller
                 'description' => $validated['description'] ?? null,
             ]);
 
-            return redirect()->route('my-store.unit')->with('success', 'Satuan berhasil diperbarui.');
+            return redirect()->route('my-store.unit.index')->with('success', 'Satuan berhasil diperbarui.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => 'Terjadi kesalahan saat memperbarui satuan: ' . $e->getMessage()])->withInput();
         }
@@ -111,7 +111,7 @@ class UnitController extends Controller
         try {
             UnitRepository::deleteUnit($unit);
 
-            return redirect()->route('my-store.unit')->with('success', 'Satuan berhasil dihapus.');
+            return redirect()->route('my-store.unit.index')->with('success', 'Satuan berhasil dihapus.');
         } catch (Exception $e) {
             return back()->withErrors(['error' => 'Terjadi kesalahan saat menghapus satuan: ' . $e->getMessage()]);
         }

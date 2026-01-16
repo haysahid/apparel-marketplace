@@ -10,7 +10,7 @@ import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
-import MyProductCard from "./Product/MyProductCard.vue";
+import MyProductCard from "./MyProductCard.vue";
 import DefaultTable from "@/Components/DefaultTable.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import { formatCurrency } from "@/plugins/number-formatter";
@@ -158,7 +158,7 @@ const queryParams = computed(() => {
 });
 
 function getProducts() {
-    router.get(route("my-store.product"), queryParams.value, {
+    router.get(route("my-store.product.index"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
@@ -292,7 +292,7 @@ onMounted(() => {
                         <td>
                             <img
                                 v-if="product.images.length > 0"
-                                :src="getImageUrl(product.images[0].image)"
+                                :src="getImageUrl(product.images[0].image as string)"
                                 :alt="product.name"
                                 class="object-cover h-[60px] sm:h-[80px] aspect-square rounded border border-gray-200"
                             />

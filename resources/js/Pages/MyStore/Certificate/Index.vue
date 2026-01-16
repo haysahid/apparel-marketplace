@@ -10,7 +10,7 @@ import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import DefaultTable from "@/Components/DefaultTable.vue";
-import MyStoreCertificateCard from "./Certificate/MyStoreCertificateCard.vue";
+import MyStoreCertificateCard from "./MyStoreCertificateCard.vue";
 import { useScreenSize } from "@/plugins/screen-size";
 import { getImageUrl, scrollToTop } from "@/plugins/helpers";
 import CustomPageProps from "@/types/model/CustomPageProps";
@@ -103,7 +103,7 @@ const queryParams = computed(() => {
 });
 
 function getCertificates() {
-    router.get(route("my-store.certificate"), queryParams.value, {
+    router.get(route("my-store.certificate.index"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {

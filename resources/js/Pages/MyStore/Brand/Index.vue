@@ -14,20 +14,21 @@ import { useScreenSize } from "@/plugins/screen-size";
 import DefaultPagination from "@/Components/DefaultPagination.vue";
 import AdminItemCard from "@/Components/AdminItemCard.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
-import { getImageUrl, scrollToTop } from "@/plugins/helpers";
+import { getImageUrl } from "@/plugins/helpers.js";
 import CustomPageProps from "@/types/model/CustomPageProps";
 import SearchInput from "@/Components/SearchInput.vue";
+import { scrollToTop } from "@/plugins/helpers";
 
 const screenSize = useScreenSize();
 
 const props = defineProps({
-    categories: Object as () => PaginationModel<CategoryEntity>,
+    brands: Object as () => PaginationModel<BrandEntity>,
 });
 
-const categories = ref<PaginationModel<CategoryEntity>>({
-    ...props.categories,
-    data: props.categories.data.map((category) => ({
-        ...category,
+const brands = ref<PaginationModel<BrandEntity>>({
+    ...props.brands,
+    data: props.brands.data.map((brand) => ({
+        ...brand,
         showDeleteModal: false,
     })),
 });
@@ -50,16 +51,16 @@ const queryParams = computed(() => {
     };
 });
 
-function getCategories() {
-    router.get(route("my-store.category"), queryParams.value, {
+function getBrands() {
+    router.get(route("my-store.brand.index"), queryParams.value, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
             getQueryParams();
-            categories.value = {
-                ...props.categories,
-                data: props.categories.data.map((category) => ({
-                    ...category,
+            brands.value = {
+                ...props.brands,
+                data: props.brands.data.map((brand) => ({
+                    ...brand,
                     showDeleteModal: false,
                 })),
             };
@@ -69,38 +70,39 @@ function getCategories() {
     });
 }
 
-const selectedCategory = ref(null);
-const showDeleteCategoryDialog = ref(false);
+const selectedBrand = ref(null);
+const showDeleteBrandDialog = ref(false);
 
-const openDeleteCategoryDialog = (category) => {
-    if (category) {
-        selectedCategory.value = category;
-        showDeleteCategoryDialog.value = true;
+const openDeleteBrandDialog = (brand) => {
+    console.log("openDeleteBrandDialog", brand);
+    if (brand) {
+        selectedBrand.value = brand;
+        showDeleteBrandDialog.value = true;
     }
 };
 
-const closeDeleteCategoryDialog = (result = false) => {
-    showDeleteCategoryDialog.value = false;
+const closeDeleteBrandDialog = (result = false) => {
+    showDeleteBrandDialog.value = false;
     if (result) {
-        selectedCategory.value = null;
+        selectedBrand.value = null;
         openSuccessDialog("Data Berhasil Dihapus");
     }
 };
 
-const deleteCategory = () => {
-    if (selectedCategory.value) {
+const deleteBrand = () => {
+    if (selectedBrand.value) {
         const form = useForm({});
         form.delete(
-            route("my-store.category.destroy", {
-                category: selectedCategory.value,
+            route("my-store.brand.destroy", {
+                brand: selectedBrand.value,
             }),
             {
                 onError: (errors) => {
                     openErrorDialog(errors.error);
                 },
                 onSuccess: () => {
-                    closeDeleteCategoryDialog(true);
-                    getCategories();
+                    closeDeleteBrandDialog(true);
+                    getBrands();
                 },
             }
         );
@@ -125,19 +127,17 @@ const openErrorDialog = (message) => {
 
 const page = usePage<CustomPageProps>();
 
-function canEdit(category) {
+function canEdit(brand) {
     return (
         page.props.auth.is_admin ||
-        page.props.auth.user.stores.some(
-            (store) => store.id === category.store_id
-        )
+        page.props.auth.user.stores.some((store) => store.id === brand.store_id)
     );
 }
 
 function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
-            "search-category"
+            "search-brand"
         ) as HTMLInputElement;
         input?.focus({ preventScroll: true });
     });
@@ -152,24 +152,24 @@ onMounted(() => {
 </script>
 
 <template>
-    <MyStoreLayout title="Kategori" :showTitle="true">
+    <MyStoreLayout title="Brand" :showTitle="true">
         <DefaultCard :isMain="true">
             <div class="flex items-center justify-between gap-4">
                 <PrimaryButton
                     type="button"
                     class="max-sm:text-sm max-sm:px-4 max-sm:py-2"
-                    @click="$inertia.visit(route('my-store.category.create'))"
+                    @click="$inertia.visit(route('my-store.brand.create'))"
                 >
                     Tambah
                 </PrimaryButton>
                 <SearchInput
-                    id="search-category"
+                    id="search-brand"
                     v-model="filters.search"
-                    placeholder="Cari kategori..."
+                    placeholder="Cari brand..."
                     class="max-w-48"
                     @search="
                         filters.page = 1;
-                        getCategories();
+                        getBrands();
                     "
                 />
             </div>
@@ -177,41 +177,38 @@ onMounted(() => {
             <!-- Table -->
             <DefaultTable
                 v-if="screenSize.is('xl')"
-                :isEmpty="categories.data.length === 0"
+                :isEmpty="brands.data.length === 0"
                 class="mt-6"
             >
                 <template #thead>
                     <tr>
                         <th class="w-12">No</th>
-                        <th class="w-24">Gambar</th>
-                        <th>Nama Kategori</th>
-                        <th>Jumlah Produk</th>
+                        <th>Logo Brand</th>
+                        <th>Nama Brand</th>
+                        <th>Deskripsi</th>
                         <th class="w-24">Aksi</th>
                     </tr>
                 </template>
                 <template #tbody>
-                    <tr
-                        v-for="(category, index) in categories.data"
-                        :key="category.id"
-                    >
+                    <tr v-for="(brand, index) in brands.data" :key="brand.id">
                         <td>
                             {{
                                 index +
                                 1 +
-                                (props.categories.current_page - 1) *
-                                    props.categories.per_page
+                                (props.brands.current_page - 1) *
+                                    props.brands.per_page
                             }}
                         </td>
                         <td>
                             <img
-                                v-if="category.image"
-                                :src="getImageUrl(category.image)"
+                                v-if="brand.logo"
+                                :src="getImageUrl(brand.logo)"
                                 alt="Logo Brand"
-                                class="object-contain h-[40px] rounded aspect-[3/2]"
+                                class="object-contain h-[60px] rounded aspect-[3/2]"
                             />
                             <div
                                 v-else
-                                class="flex items-center justify-center h-[40px] bg-gray-100 rounded aspect-[3/2]"
+                                class="flex items-center justify-center h-[60px] bg-gray-100 rounded aspect-[3/2]"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -227,30 +224,30 @@ onMounted(() => {
                             </div>
                         </td>
                         <td>
-                            {{ category.name }}
+                            {{ brand.name }}
+                        </td>
+                        <td class="!whitespace-normal">
+                            <p class="line-clamp-2">
+                                {{ brand.description }}
+                            </p>
                         </td>
                         <td>
-                            {{ category.total_products }}
-                        </td>
-                        <td>
-                            <div class="flex items-center justify-start gap-2">
-                                <AdminItemAction
-                                    v-if="canEdit(category)"
-                                    @edit="
-                                        $inertia.visit(
-                                            route('my-store.category.edit', {
-                                                category: category,
-                                            })
-                                        )
-                                    "
-                                    @delete="openDeleteCategoryDialog(category)"
-                                />
-                                <InfoTooltip
-                                    v-if="!canEdit(category)"
-                                    :id="`table-tooltip-hint-${category.id}`"
-                                    text="Kategori bawaan sistem"
-                                />
-                            </div>
+                            <AdminItemAction
+                                v-if="canEdit(brand)"
+                                @edit="
+                                    $inertia.visit(
+                                        route('my-store.brand.edit', {
+                                            brand: brand,
+                                        })
+                                    )
+                                "
+                                @delete="openDeleteBrandDialog(brand)"
+                            />
+                            <InfoTooltip
+                                v-if="!canEdit(brand)"
+                                :id="`table-tooltip-hint-${brand.id}`"
+                                text="Brand bawaan sistem"
+                            />
                         </td>
                     </tr>
                 </template>
@@ -259,26 +256,26 @@ onMounted(() => {
             <!-- Mobile View -->
             <div v-if="!screenSize.is('xl')" class="flex flex-col gap-3 mt-4">
                 <div
-                    v-if="categories.data.length > 0"
+                    v-if="brands.data.length > 0"
                     class="grid grid-cols-1 gap-3 sm:grid-cols-2"
                 >
                     <AdminItemCard
-                        v-for="(category, index) in categories.data"
-                        :key="category.id"
-                        :name="category.name"
-                        :description="`${category.total_products} Produk`"
-                        :image="category.image"
-                        :hideActions="!canEdit(category)"
-                        disabledHint="Kategori bawaan sistem"
-                        imageClass="!w-[60px]"
+                        v-for="(brand, index) in brands.data"
+                        :key="brand.id"
+                        :name="brand.name"
+                        :description="brand.description"
+                        :image="brand.logo"
+                        :showImage="true"
+                        :hideActions="!canEdit(brand)"
+                        disabledHint="Brand bawaan sistem"
                         @edit="
                             $inertia.visit(
-                                route('my-store.category.edit', {
-                                    category: category,
+                                route('my-store.brand.edit', {
+                                    brand: brand,
                                 })
                             )
                         "
-                        @delete="openDeleteCategoryDialog(category)"
+                        @delete="openDeleteBrandDialog(brand)"
                     />
                 </div>
                 <div v-else class="flex items-center justify-center py-10">
@@ -289,18 +286,18 @@ onMounted(() => {
             </div>
 
             <!-- Pagination -->
-            <div v-if="categories.total > 0" class="flex flex-col gap-2 mt-4">
+            <div v-if="brands.total > 0" class="flex flex-col gap-2 mt-4">
                 <p class="text-xs text-gray-500 sm:text-sm">
-                    Menampilkan {{ categories.from }} - {{ categories.to }} dari
-                    {{ categories.total }} item
+                    Menampilkan {{ brands.from }} - {{ brands.to }} dari
+                    {{ brands.total }} item
                 </p>
                 <DefaultPagination
                     :isApi="true"
-                    :links="categories.links"
+                    :links="brands.links"
                     @change="
                         (page) => {
                             filters.page = page;
-                            getCategories();
+                            getBrands();
                         }
                     "
                 />
@@ -308,10 +305,10 @@ onMounted(() => {
         </DefaultCard>
 
         <DeleteConfirmationDialog
-            :show="showDeleteCategoryDialog"
-            :title="`Hapus Kategori <b>${selectedCategory?.name}</b>?`"
-            @close="closeDeleteCategoryDialog()"
-            @delete="deleteCategory()"
+            :show="showDeleteBrandDialog"
+            :title="`Hapus Brand <b>${selectedBrand?.name}</b>?`"
+            @close="closeDeleteBrandDialog()"
+            @delete="deleteBrand()"
         />
 
         <SuccessDialog
