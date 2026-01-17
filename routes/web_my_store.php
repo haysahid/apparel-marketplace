@@ -14,6 +14,7 @@ use App\Http\Controllers\MyStore\PaymentController;
 use App\Http\Controllers\MyStore\PointRuleController;
 use App\Http\Controllers\MyStore\ProductController;
 use App\Http\Controllers\MyStore\ReportController;
+use App\Http\Controllers\MyStore\ShipmentController;
 use App\Http\Controllers\MyStore\SizeController;
 use App\Http\Controllers\MyStore\TransactionController;
 use App\Http\Controllers\MyStore\UnitController;
@@ -118,6 +119,13 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth'])->group(functi
 
         // Payment
         Route::get('/payment', [PaymentController::class, 'index'])->name('payment.index');
+
+        // Shipment
+        Route::prefix('shipment')->name('shipment.')->group(function () {
+            Route::get('/', [ShipmentController::class, 'index'])->name('index');
+            Route::get('/{id}', [ShipmentController::class, 'show'])->name('show');
+            Route::delete('/{id}', [ShipmentController::class, 'destroy'])->name('destroy');
+        });
 
         // Voucher
         Route::prefix('voucher')->name('voucher.')->group(function () {

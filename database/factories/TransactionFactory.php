@@ -6,6 +6,9 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\PaymentMethod;
 use App\Models\PaymentStatus;
+use App\Models\Shipment;
+use App\Models\ShipmentItem;
+use App\Models\ShipmentStatus;
 use App\Models\ShippingMethod;
 use App\Models\TransactionItem;
 use App\Models\TransactionStatus;
@@ -63,12 +66,9 @@ class TransactionFactory extends Factory
             'shipping_method_id' => $shippingMethod->id,
             'voucher_id' => null,
             'voucher_amount' => 0,
-            'paid_at' => null,
-            'shipped_at' => null,
-            'picked_up_at' => null,
-            'delivered_at' => null,
-            'status' => $status,
             'shipping_cost' => 0,
+            'paid_at' => null,
+            'status' => $status,
             'created_at' => $createdAt,
         ];
 
@@ -80,7 +80,6 @@ class TransactionFactory extends Factory
             $data['subdistrict_name'] = fake()->word();
             $data['zip_code'] = fake()->postcode();
             $data['address'] = fake()->address();
-            $data['shipping_estimate'] = fake()->numberBetween(1, 7) . ' days';
             $data['shipping_cost'] = fake()->numberBetween(5000, 50000);
         }
 
@@ -90,8 +89,15 @@ class TransactionFactory extends Factory
     public function configure()
     {
         return $this->afterCreating(function ($transaction) {
+            $shippingEstimate = null;
+            $shippedAt = null;
+            $deliveredAt = null;
+            $pickedUpAt = null;
+
             // Handle logic for 'courier' shipping method
             if ($transaction->shipping_method && $transaction->shipping_method->slug === 'courier') {
+                $shippingEstimate = fake()->numberBetween(1, 7) . ' days';
+
                 // Payment method logic
                 if ($transaction->payment_method && $transaction->payment_method->slug === 'transfer') {
                     // If status is paid or beyond, set paid_at between 0 - 1 days after created_at
@@ -110,7 +116,7 @@ class TransactionFactory extends Factory
                 } elseif ($transaction->payment_method && $transaction->payment_method->slug === 'cod') {
                     // For COD, payment is made at the same time as completed
                     if ($transaction->status === TransactionStatus::COMPLETED->value) {
-                        $transaction->paid_at = $transaction->delivered_at ?? $transaction->created_at;
+                        $transaction->paid_at = $deliveredAt ?? $transaction->created_at;
                         $transaction->save();
                     }
                 }
@@ -126,8 +132,8 @@ class TransactionFactory extends Factory
                     $startDate = $transaction->paid_at ?? $transaction->created_at;
                     // Extract days from shipping_estimate string (e.g., "3 days")
                     $estimateDays = 7;
-                    if ($transaction->shipping_estimate) {
-                        preg_match('/\d+/', $transaction->shipping_estimate, $matches);
+                    if ($shippingEstimate) {
+                        preg_match('/\d+/', $shippingEstimate, $matches);
                         $estimateDays = isset($matches[0]) ? (int)$matches[0] : 7;
                     }
                     $maxShippedAt = (clone $startDate)->modify('+' . ($estimateDays - 1) . ' days');
@@ -136,26 +142,23 @@ class TransactionFactory extends Factory
                     if ($endDate > $maxShippedAt) {
                         $endDate = $maxShippedAt;
                     }
-                    $transaction->shipped_at = $this->faker->dateTimeBetween($startDate, $endDate);
-                    $transaction->save();
+                    $shippedAt = $this->faker->dateTimeBetween($startDate, $endDate);
                 }
 
                 // If status is completed, set delivered_at after shipped_at, up to shipping_estimate
                 if ($transaction->status === TransactionStatus::COMPLETED->value) {
-                    $startDate = $transaction->shipped_at ?? ($transaction->paid_at ?? $transaction->created_at);
+                    $startDate = $shippedAt ?? ($transaction->paid_at ?? $transaction->created_at);
                     $estimateDays = 7;
-                    if ($transaction->shipping_estimate) {
-                        preg_match('/\d+/', $transaction->shipping_estimate, $matches);
+                    if ($shippingEstimate) {
+                        preg_match('/\d+/', $shippingEstimate, $matches);
                         $estimateDays = isset($matches[0]) ? (int)$matches[0] : 7;
                     }
                     $endDate = (clone $transaction->paid_at ?? $transaction->created_at)->modify('+' . $estimateDays . ' days');
-                    $transaction->delivered_at = $this->faker
-                        ->dateTimeBetween($startDate, $endDate);
-                    $transaction->save();
+                    $deliveredAt = $this->faker->dateTimeBetween($startDate, $endDate);
 
                     // For COD, override set paid_at at delivered_at
                     if ($transaction->payment_method && $transaction->payment_method->slug === 'cod') {
-                        $transaction->paid_at = $transaction->delivered_at;
+                        $transaction->paid_at = $deliveredAt;
                         $transaction->save();
                     }
                 }
@@ -196,14 +199,13 @@ class TransactionFactory extends Factory
                 // If status is completed, set picked_up_at and delivered_at (delivered_at = picked_up_at for pickup)
                 if ($transaction->status === TransactionStatus::COMPLETED->value) {
                     $startDate = $transaction->paid_at ?? $transaction->created_at;
-                    $transaction->picked_up_at = $this->faker
+                    $pickedUpAt = $this->faker
                         ->dateTimeBetween($startDate, (clone $startDate)->modify('+7 days'));
-                    $transaction->delivered_at = $transaction->picked_up_at;
-                    $transaction->save();
+                    $deliveredAt = $pickedUpAt;
 
                     // For COD, set paid_at at picked_up_at
                     if ($transaction->payment_method && $transaction->payment_method->slug === 'cod') {
-                        $transaction->paid_at = $transaction->picked_up_at;
+                        $transaction->paid_at = $pickedUpAt;
                         $transaction->save();
                     }
                 }
@@ -211,7 +213,14 @@ class TransactionFactory extends Factory
 
             // Create transaction items, invoice, and payment
             $items = $this->withItems($transaction);
-            $this->withInvoice($transaction, $items);
+            $this->withInvoice(
+                transaction: $transaction,
+                items: $items,
+                shippingEstimate: $shippingEstimate,
+                shippedAt: $shippedAt,
+                deliveredAt: $deliveredAt,
+                pickedUpAt: $pickedUpAt
+            );
             $this->withPayment($transaction, $items);
         });
     }
@@ -228,24 +237,49 @@ class TransactionFactory extends Factory
     }
 
     // Invoices
-    public function withInvoice($transaction, $items)
-    {
+    public function withInvoice(
+        $transaction,
+        $items,
+        $shippingEstimate = null,
+        $shippedAt = null,
+        $deliveredAt = null,
+        $pickedUpAt = null
+    ) {
         $finalAmount = $items->sum('subtotal') + $transaction->shipping_cost;
 
-        Invoice::factory()->create([
+        $invoice = Invoice::factory()->create([
             'transaction_id' => $transaction->id,
             'user_id' => $transaction->user_id,
             'base_amount' => $items->sum('subtotal'),
             'shipping_cost' => $transaction->shipping_cost,
             'amount' => $finalAmount,
             'paid_at' => $transaction->paid_at,
-            'shipping_estimate' => $transaction->shipping_estimate,
-            'shipped_at' => $transaction->shipped_at,
-            'picked_up_at' => $transaction->picked_up_at,
-            'delivered_at' => $transaction->delivered_at,
+            'shipping_estimate' => $shippingEstimate,
+            'shipped_at' => $shippedAt,
+            'picked_up_at' => $pickedUpAt,
+            'delivered_at' => $deliveredAt,
             'status' => $transaction->status,
             'created_at' => $transaction->created_at,
         ]);
+
+        // Add shipment if shipping method is courier
+        if ($transaction->shipping_method && $transaction->shipping_method->slug === 'courier') {
+            $shipment = Shipment::factory()->create([
+                'store_id' => $invoice->store_id,
+                'invoice_id' => $invoice->id,
+                'shipping_cost' => $transaction->shipping_cost,
+                'status' => $deliveredAt ? ShipmentStatus::DELIVERED->value : ($shippedAt ? ShipmentStatus::IN_TRANSIT->value : ShipmentStatus::PENDING->value),
+            ]);
+
+            // Create shipment items
+            foreach ($items as $item) {
+                ShipmentItem::factory()->create([
+                    'shipment_id' => $shipment->id,
+                    'transaction_item_id' => $item->id,
+                    'shipped_quantity' => $item->quantity,
+                ]);
+            }
+        }
     }
 
     // Payments

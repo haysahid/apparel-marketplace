@@ -4,8 +4,11 @@ namespace App\Repositories;
 
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\Transaction;
 use App\Models\TransactionItem;
+use App\Models\TransactionStatus;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class InvoiceRepository
@@ -105,6 +108,58 @@ class InvoiceRepository
         } catch (Exception $e) {
             Log::error("Gagal membuat invoice: " . $e);
             throw new Exception('Gagal membuat invoice: ' . $e);
+        }
+    }
+
+    public static function updateInvoice(Invoice $invoice, array $data): Invoice
+    {
+        try {
+            $invoice->update($data);
+            return $invoice;
+        } catch (Exception $e) {
+            Log::error("Gagal memperbarui invoice: " . $e);
+            throw new Exception('Gagal memperbarui invoice: ' . $e);
+        }
+    }
+
+    public static function deleteInvoice(Invoice $invoice): bool
+    {
+        try {
+            return $invoice->delete();
+        } catch (Exception $e) {
+            Log::error("Gagal menghapus invoice: " . $e);
+            throw new Exception('Gagal menghapus invoice: ' . $e);
+        }
+    }
+
+    public function setDelivering(Invoice $invoice, string $trackingNumber): Invoice
+    {
+        try {
+            DB::beginTransaction();
+
+            // Update invoice status and tracking number
+            $invoice->status = TransactionStatus::PROCESSING->value;
+            $invoice->tracking_number = $trackingNumber;
+            $invoice->shipped_at = now();
+            $invoice->save();
+
+            // Update related transaction_items fulfillment status
+            TransactionItem::where('store_id', $invoice->store_id)
+                ->where('transaction_id', $invoice->transaction_id)
+                ->update(['fulfillment_status' => TransactionStatus::PROCESSING->value]);
+
+            // Update related transaction status if needed
+            Transaction::whereHas('invoices', function ($query) use ($invoice) {
+                $query->where('id', $invoice->id);
+            })->update(['status' => TransactionStatus::PROCESSING->value]);
+
+            DB::commit();
+
+            return $invoice->load(['transaction']);
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error("Gagal memperbarui status pengiriman invoice: " . $e);
+            throw new Exception('Gagal memperbarui status pengiriman invoice: ' . $e);
         }
     }
 }

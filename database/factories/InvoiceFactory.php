@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,8 +24,8 @@ class InvoiceFactory extends Factory
 
         return [
             'store_id' => 1,
-            'transaction_id' => null,
-            'user_id' => null,
+            'transaction_id' => Transaction::factory(),
+            'user_id' => User::factory(),
             'code' => strtoupper(fake()->unique()->bothify('INV-' . '####??')),
             'description' => fake()->optional()->sentence(),
             'base_amount' => $baseAmount,

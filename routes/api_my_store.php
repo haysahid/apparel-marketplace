@@ -13,6 +13,7 @@ use App\Http\Controllers\API\InvoiceController;
 use App\Http\Controllers\API\ReportController;
 use App\Http\Controllers\API\VoucherController;
 use App\Http\Controllers\MyStore\API\MyStoreController;
+use App\Http\Controllers\MyStore\API\ShipmentController;
 use App\Http\Controllers\MyStore\API\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,13 +40,19 @@ Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->gro
 
     Route::get('midtrans-payment-methods', [OrderController::class, 'midtransPaymentMethods'])->name('midtrans.payment-methods');
 
-    Route::put('change-order-status', [OrderController::class, 'changeStatus'])->name('order.change-status');
+    Route::put('change-order-status', [\App\Http\Controllers\MyStore\API\OrderController::class, 'changeStatus'])->name('order.change-status');
 
+    // Invoice
     Route::apiResource('invoice', InvoiceController::class);
 
+    // Shipment
+    Route::apiResource('shipment', ShipmentController::class);
+
+    // Voucher
     Route::apiResource('voucher', VoucherController::class);
     Route::get('voucher-dropdown', [VoucherController::class, 'dropdown'])->name('voucher.dropdown');
 
+    // Report
     Route::post('report/generate', [ReportController::class, 'generateReport'])->name('report.generate');
 
     // Store Logo
