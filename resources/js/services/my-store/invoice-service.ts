@@ -5,6 +5,7 @@ import axios from "axios";
 export default function invoiceService() {
     const dialogStore = useDialogStore();
     const token = `Bearer ${cookieManager.getItem("access_token")}`;
+    const selectedStoreId = cookieManager.getItem("selected_store_id");
 
     async function changeStatus(
         { invoiceId, newStatus },
@@ -13,7 +14,7 @@ export default function invoiceService() {
             onSuccess = (response: any) => {},
             onError = (error: any) => {},
             onChangeStatus = (status: string) => {},
-        }
+        } = {}
     ) {
         onChangeStatus("loading");
 
@@ -54,16 +55,19 @@ export default function invoiceService() {
     }
 
     async function setDelivering(
-        { invoiceId, trackingNumber },
+        {
+            invoiceId,
+            shipments,
+        }: { invoiceId: number; shipments: ShipmentEntity[] },
         {
             autoShowDialog = false,
             onSuccess = (response: any) => {},
             onError = (error: any) => {},
             onChangeStatus = (status: string) => {},
-        }
+        } = {}
     ) {
-        if (!trackingNumber) {
-            dialogStore.openErrorDialog("Nomor resi harus diisi.");
+        if (!shipments || shipments.length === 0) {
+            dialogStore.openErrorDialog("Data pengiriman harus diisi.");
             return;
         }
 
@@ -73,11 +77,12 @@ export default function invoiceService() {
                 `/api/my-store/set-invoice-delivering`,
                 {
                     invoice_id: invoiceId,
-                    tracking_number: trackingNumber,
+                    shipments: shipments,
                 },
                 {
                     headers: {
                         Authorization: token,
+                        Accept: "application/json",
                     },
                 }
             )
@@ -104,8 +109,47 @@ export default function invoiceService() {
             });
     }
 
+    async function getShipments(
+        invoiceId: number,
+        {
+            autoShowDialog = false,
+            onSuccess = (response: any) => {},
+            onError = (error: any) => {},
+            onChangeStatus = (status: string) => {},
+        } = {}
+    ) {
+        onChangeStatus("loading");
+
+        await axios
+            .get(`/api/my-store/shipment-dropdown`, {
+                params: {
+                    invoice_id: invoiceId,
+                },
+                headers: {
+                    Authorization: token,
+                    "X-Selected-Store-ID": selectedStoreId,
+                },
+            })
+            .then((response) => {
+                onChangeStatus("success");
+                onSuccess(response);
+            })
+            .catch((error) => {
+                console.error("Error fetching invoice shipments:", error);
+                onChangeStatus("error");
+                onError(error);
+                if (autoShowDialog) {
+                    dialogStore.openErrorDialog(
+                        error.response?.data?.meta?.message ||
+                            "Terjadi kesalahan saat mengambil data pengiriman invoice."
+                    );
+                }
+            });
+    }
+
     return {
         changeStatus,
         setDelivering,
+        getShipments,
     };
 }

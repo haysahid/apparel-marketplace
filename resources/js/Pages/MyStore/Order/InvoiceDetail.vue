@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
 import LandingSection from "@/Components/LandingSection.vue";
-import formatDate from "@/plugins/date-formatter";
 import OrderGroup from "@/Pages/Order/OrderGroup.vue";
 import InvoiceSummaryCard from "./InvoiceSummaryCard.vue";
 import DetailRow from "@/Components/DetailRow.vue";
 import InfoHint from "@/Components/InfoHint.vue";
 import InvoiceTracking from "./InvoiceTracking.vue";
+import StatusChip from "@/Components/StatusChip.vue";
+import CopyButton from "@/Components/CopyButton.vue";
+import DefaultCard from "@/Components/DefaultCard.vue";
+import WhatsAppButton from "@/Components/WhatsAppButton.vue";
+import { openWhatsAppChat } from "@/plugins/helpers";
 
 const props = defineProps({
     invoice: {
@@ -25,16 +28,17 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    shipments: {
+        type: Array as () => ShipmentEntity[],
+        default: () => [],
+    },
 });
 
 const emit = defineEmits(["continuePayment"]);
 </script>
 
 <template>
-    <div class="flex flex-col gap-4">
-        <!-- Tracking -->
-        <InvoiceTracking v-if="props.showTracking" :invoice="props.invoice" />
-
+    <div class="flex flex-col gap-y-3 gap-x-4">
         <!-- Warning -->
         <InfoHint
             v-if="
@@ -48,15 +52,27 @@ const emit = defineEmits(["continuePayment"]);
             }"
         >
             <template #content>
-                <p
+                <div
                     v-if="
                         props.invoice.transaction.user_id !=
                             $page.props.auth.user.id &&
                         $page.props.selected_store != null
                     "
+                    class="flex items-center justify-between w-full gap-4"
                 >
-                    Pelanggan belum melakukan pembayaran.
-                </p>
+                    <p>Pelanggan belum melakukan pembayaran.</p>
+                    <WhatsAppButton
+                        class="whitespace-nowrap"
+                        @click="
+                            openWhatsAppChat(
+                                props.invoice.transaction.user.phone,
+                                `Halo, saya ingin mengkonfirmasi pesanan dengan kode transaksi ${props.invoice.transaction.code}.`
+                            )
+                        "
+                    >
+                        Hubungi Pelanggan
+                    </WhatsAppButton>
+                </div>
                 <p v-else>
                     Segera
                     <span
@@ -69,30 +85,24 @@ const emit = defineEmits(["continuePayment"]);
             </template>
         </InfoHint>
 
+        <!-- Tracking -->
+        <InvoiceTracking
+            v-if="props.showTracking"
+            :invoice="props.invoice"
+            class="xl:hidden"
+        />
+
         <!-- Details -->
         <LandingSection class="!flex-col !justify-start !min-h-[56vh]">
             <div
-                class="flex flex-col-reverse items-center justify-center w-full gap-5 mx-auto xl:flex-row xl:items-start max-w-7xl"
+                class="flex flex-col items-center justify-center w-full mx-auto gap-y-3 gap-x-4 xl:flex-row xl:items-start max-w-7xl"
                 :class="{
                     'max-w-none': props.isShowingFromMyStore,
                 }"
             >
-                <!-- Items -->
-                <OrderGroup
-                    :orderGroup="{
-                        store_id: props.invoice.store_id,
-                        store: props.invoice.store,
-                        invoice: props.invoice,
-                        items: props.items,
-                    }"
-                    :showSummary="false"
-                />
-
-                <div class="flex flex-col w-full gap-5 xl:max-w-sm">
-                    <!-- Summary -->
-                    <div
-                        class="flex flex-col w-full p-4 outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl gap-y-3"
-                    >
+                <div class="flex flex-col w-full gap-y-3 gap-x-4 xl:max-w-sm">
+                    <!-- Customer -->
+                    <DefaultCard isMain class="flex flex-col w-full gap-y-2">
                         <div class="flex items-center justify-between">
                             <h3 class="font-semibold text-gray-800">
                                 Data Pemesan
@@ -103,6 +113,10 @@ const emit = defineEmits(["continuePayment"]);
                             :value="props.invoice.transaction.user.name"
                         />
                         <DetailRow
+                            name="Username"
+                            :value="props.invoice.transaction.user.username"
+                        />
+                        <DetailRow
                             name="Email"
                             :value="props.invoice.transaction.user.email"
                         />
@@ -110,7 +124,9 @@ const emit = defineEmits(["continuePayment"]);
                             name="No. HP"
                             :value="props.invoice.transaction.user.phone"
                         />
-                    </div>
+                    </DefaultCard>
+
+                    <!-- Invoice Summary -->
                     <InvoiceSummaryCard
                         :invoice="props.invoice"
                         :items="props.items"
@@ -122,6 +138,107 @@ const emit = defineEmits(["continuePayment"]);
                             <slot name="actions" />
                         </template>
                     </InvoiceSummaryCard>
+
+                    <!-- Shipments -->
+                    <DefaultCard
+                        v-if="props.shipments.length > 0"
+                        isMain
+                        class="flex flex-col w-full gap-y-2"
+                    >
+                        <h3 class="font-semibold text-gray-800">
+                            Informasi Pengiriman
+                        </h3>
+
+                        <div class="flex flex-col gap-2">
+                            <div
+                                v-for="(shipment, index) in props.shipments"
+                                :key="shipment.id"
+                                class="flex flex-col gap-2"
+                            >
+                                <DetailRow
+                                    name="Nomor Resi"
+                                    :value="shipment.tracking_number"
+                                >
+                                    <template #value>
+                                        <div class="flex items-center gap-0.5">
+                                            <p
+                                                class="text-sm font-semibold text-right text-gray-700"
+                                            >
+                                                {{ shipment.tracking_number }}
+                                            </p>
+                                            <CopyButton
+                                                :id="`copy-code-tooltip-shipment-${shipment.id}`"
+                                                :text="shipment.tracking_number"
+                                            />
+                                        </div>
+                                    </template>
+                                </DetailRow>
+                                <DetailRow
+                                    name="Kurir"
+                                    :value="shipment.courier_name"
+                                />
+                                <DetailRow
+                                    name="Biaya Pengiriman"
+                                    :value="`Rp ${shipment.shipping_cost.toLocaleString(
+                                        'id-ID'
+                                    )}`"
+                                />
+                                <DetailRow name="Status">
+                                    <template #value>
+                                        <StatusChip
+                                            :label="
+                                                shipment.status.toUpperCase()
+                                            "
+                                            :class="{
+                                                'text-gray-500 bg-gray-100':
+                                                    shipment.status ===
+                                                    'pending',
+                                                'text-orange-500 bg-orange-100':
+                                                    shipment.status ===
+                                                    'in_transit',
+                                                'text-indigo-500 bg-indigo-100':
+                                                    shipment.status ===
+                                                    'out_of_delivery',
+                                                'text-green-500 bg-green-100':
+                                                    shipment.status ===
+                                                    'delivered',
+                                                'text-red-500 bg-red-100':
+                                                    shipment.status ===
+                                                        'lost' ||
+                                                    shipment.status ===
+                                                        'returned',
+                                            }"
+                                        />
+                                    </template>
+                                </DetailRow>
+
+                                <div
+                                    v-if="index !== props.shipments.length - 1"
+                                    class="my-2 border-b border-gray-300"
+                                ></div>
+                            </div>
+                        </div>
+                    </DefaultCard>
+                </div>
+
+                <div class="flex flex-col w-full gap-y-3 gap-x-4 xl:flex-1">
+                    <!-- Tracking -->
+                    <InvoiceTracking
+                        v-if="props.showTracking"
+                        :invoice="props.invoice"
+                        class="hidden xl:block"
+                    />
+
+                    <!-- Items -->
+                    <OrderGroup
+                        :orderGroup="{
+                            store_id: props.invoice.store_id,
+                            store: props.invoice.store,
+                            invoice: props.invoice,
+                            items: props.items,
+                        }"
+                        :showSummary="false"
+                    />
                 </div>
             </div>
         </LandingSection>

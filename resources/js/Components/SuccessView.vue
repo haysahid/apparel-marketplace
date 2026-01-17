@@ -51,7 +51,7 @@ const props = defineProps({
 .success-card {
     transform: translateY(20px);
     opacity: 0;
-    animation: slideUp 0.8s ease-out 0.2s forwards;
+    animation: slideUp 0.8s ease-out 0s forwards;
 }
 
 @keyframes slideUp {

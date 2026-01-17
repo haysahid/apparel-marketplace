@@ -24,4 +24,5 @@ interface InvoiceEntity {
     store: StoreEntity | null;
     transaction: TransactionEntity | null;
     voucher: VoucherEntity | null;
+    shipments: ShipmentEntity[];
 }

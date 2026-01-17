@@ -45,6 +45,11 @@ function checkPayment() {
 }
 
 function showSnap() {
+    if (!payment.value.midtrans_snap_token) {
+        changePaymentType();
+        return;
+    }
+
     midtransPayment.showSnap(
         {
             snapToken: payment.value.midtrans_snap_token,
@@ -157,8 +162,11 @@ const showSuccessView = route().params.success == "true";
             { text: props.transaction.code, active: true },
         ]"
     >
-        <DefaultCard :isMain="true">
-            <SuccessView v-if="showSuccessView" title="Transaksi Berhasil!" />
+        <div class="flex flex-col gap-6">
+            <DefaultCard v-if="showSuccessView" isMain>
+                <SuccessView title="Transaksi Berhasil!" />
+            </DefaultCard>
+
             <OrderTransactionDetail
                 :data-aos="showSuccessView ? 'fade-up' : 'none'"
                 data-aos-delay="1600"
@@ -173,8 +181,11 @@ const showSuccessView = route().params.success == "true";
             >
                 <template #additionalInfo>
                     <!-- Payment -->
-                    <template v-if="true">
-                        <div class="my-2 border-b border-gray-300"></div>
+                    <template v-if="payment">
+                        <div class="my-2 border-b border-gray-200"></div>
+                        <h3 class="font-semibold text-gray-800">
+                            Informasi Pembayaran
+                        </h3>
                         <OrderContentRow
                             label="Status Pembayaran"
                             :value="payment?.status"
@@ -221,7 +232,10 @@ const showSuccessView = route().params.success == "true";
                             props.transaction.shipping_method.slug === 'courier'
                         "
                     >
-                        <div class="my-2 border-b border-gray-300"></div>
+                        <div class="my-2 border-b border-gray-200"></div>
+                        <h3 class="font-semibold text-gray-800">
+                            Alamat Pengiriman
+                        </h3>
                         <OrderContentRow
                             label="Provinsi"
                             :value="props.transaction.province_name"
@@ -233,6 +247,10 @@ const showSuccessView = route().params.success == "true";
                         <OrderContentRow
                             label="Alamat"
                             :value="props.transaction.address"
+                        />
+                        <OrderContentRow
+                            label="Kode Pos"
+                            :value="props.transaction.zip_code"
                         />
                     </template>
                 </template>
@@ -258,14 +276,14 @@ const showSuccessView = route().params.success == "true";
                     </div>
 
                     <!-- <PrimaryButton
-                        @click="showChangeStatusDialog = true"
-                        class="w-full"
-                    >
-                        Ubah Status
-                    </PrimaryButton> -->
+                            @click="showChangeStatusDialog = true"
+                            class="w-full"
+                        >
+                            Ubah Status
+                        </PrimaryButton> -->
                 </template>
             </OrderTransactionDetail>
-        </DefaultCard>
+        </div>
 
         <ChangeTransactionStatusDialog
             :show="showChangeStatusDialog"

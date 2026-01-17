@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DefaultCard from "@/Components/DefaultCard.vue";
 import formatDate from "@/plugins/date-formatter";
 import { computed, onMounted, ref } from "vue";
 
@@ -304,50 +305,57 @@ onMounted(() => {
 </script>
 
 <template>
-    <div
-        class="flex flex-col items-center gap-4 py-2 mx-auto sm:py-4 w-fit sm:gap-6"
+    <DefaultCard
+        :isMain="true"
+        class="max-sm:pr-6 max-sm:pl-6 max-sm:pb-6 max-sm:pt-7"
     >
-        <div class="flex items-start justify-center gap-4 md:gap-8 lg:gap-12">
+        <div
+            class="flex flex-col items-center w-full gap-4 sm:mx-auto sm:w-full"
+        >
             <div
-                v-for="(history, index) in histories"
-                :key="index"
-                class="flex flex-col items-center gap-2.5 sm:gap-4"
+                class="flex items-start justify-around w-full gap-4 md:gap-8 lg:gap-12"
             >
                 <div
-                    v-if="history.icon"
-                    v-html="history.icon"
-                    class="[&>svg]:size-6 sm:[&>svg]:size-8"
-                    :class="{
-                        'fill-primary': history.done,
-                        'fill-gray-400': !history.done,
-                    }"
-                ></div>
+                    v-for="(history, index) in histories"
+                    :key="index"
+                    class="flex flex-col items-center gap-2.5 sm:gap-3"
+                >
+                    <div
+                        v-if="history.icon"
+                        v-html="history.icon"
+                        class="[&>svg]:size-6 sm:[&>svg]:size-8"
+                        :class="{
+                            'fill-primary': history.done,
+                            'fill-gray-400': !history.done,
+                        }"
+                    ></div>
 
-                <div class="flex flex-col items-center gap-0 text-center">
-                    <p
-                        class="text-sm font-semibold text-gray-800 sm:text-base"
-                        :class="{ 'text-primary': history.done }"
-                    >
-                        {{ history.title }}
-                    </p>
-                    <p
-                        class="text-xs text-gray-600 sm:text-sm"
-                        :class="{ 'text-primary': history.done }"
-                    >
-                        {{ history.date }}
-                    </p>
+                    <div class="flex flex-col items-center gap-0 text-center">
+                        <p
+                            class="text-sm font-semibold text-gray-800 sm:text-base"
+                            :class="{ 'text-primary': history.done }"
+                        >
+                            {{ history.title }}
+                        </p>
+                        <p
+                            class="text-xs font-medium text-gray-600"
+                            :class="{ 'text-primary': history.done }"
+                        >
+                            {{ history.date }}
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Line -->
-        <div class="relative w-full h-1.5 bg-gray-200 rounded-full">
-            <div
-                class="absolute top-0 left-0 h-full transition-all ease-out rounded-full bg-primary duration-[1s]"
-                :style="{
-                    width: `${progress > 100 ? 100 : progress}%`,
-                }"
-            ></div>
+            <!-- Line -->
+            <div class="relative w-full h-1.5 bg-gray-200 rounded-full">
+                <div
+                    class="absolute top-0 left-0 h-full transition-all ease-out rounded-full bg-gradient-to-r from-primary-light to-primary duration-[1s]"
+                    :style="{
+                        width: `${progress > 100 ? 100 : progress}%`,
+                    }"
+                ></div>
+            </div>
         </div>
-    </div>
+    </DefaultCard>
 </template>

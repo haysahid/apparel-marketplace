@@ -4,9 +4,9 @@ import OrderGroup from "./OrderGroup.vue";
 import OrderSummaryCard from "./OrderSummaryCard.vue";
 import DetailRow from "@/Components/DetailRow.vue";
 import InfoHint from "@/Components/InfoHint.vue";
-import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { openWhatsAppChat } from "@/plugins/helpers";
 import WhatsAppButton from "@/Components/WhatsAppButton.vue";
+import DefaultCard from "@/Components/DefaultCard.vue";
 
 const props = defineProps({
     transaction: {
@@ -37,7 +37,7 @@ const emit = defineEmits(["continuePayment"]);
 </script>
 
 <template>
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-y-3 gap-x-4">
         <!-- Warning -->
         <InfoHint
             v-if="
@@ -51,7 +51,27 @@ const emit = defineEmits(["continuePayment"]);
             }"
         >
             <template #content>
-                <p>
+                <div
+                    v-if="
+                        props.transaction.user_id != $page.props.auth.user.id &&
+                        $page.props.selected_store != null
+                    "
+                    class="flex items-center justify-between w-full gap-4"
+                >
+                    <p>Pelanggan belum melakukan pembayaran.</p>
+                    <WhatsAppButton
+                        class="whitespace-nowrap"
+                        @click="
+                            openWhatsAppChat(
+                                props.transaction.user.phone,
+                                `Halo, saya ingin mengkonfirmasi pesanan dengan kode transaksi ${props.transaction.code}.`
+                            )
+                        "
+                    >
+                        Hubungi Pelanggan
+                    </WhatsAppButton>
+                </div>
+                <p v-else>
                     Segera
                     <span
                         class="font-semibold cursor-pointer hover:underline"
@@ -97,28 +117,21 @@ const emit = defineEmits(["continuePayment"]);
                     'max-w-none': props.isShowingFromMyStore,
                 }"
             >
-                <!-- Items -->
-                <div class="flex flex-col w-full gap-4">
-                    <OrderGroup
-                        v-for="(item, index) in props.groups"
-                        :key="index"
-                        :orderGroup="item"
-                        :showDivider="index !== props.groups.length - 1"
-                    />
-                </div>
-                <div class="flex flex-col w-full gap-5 xl:max-w-sm">
-                    <!-- Summary -->
-                    <div
-                        class="flex flex-col w-full p-4 outline outline-1 -outline-offset-1 outline-gray-300 rounded-2xl gap-y-3"
-                    >
+                <div class="flex flex-col w-full gap-y-3 gap-x-4 xl:max-w-sm">
+                    <!-- Customer -->
+                    <DefaultCard isMain class="flex flex-col w-full gap-y-2">
                         <div class="flex items-center justify-between">
                             <h3 class="font-semibold text-gray-800">
-                                Data Pengguna
+                                Data Pemesan
                             </h3>
                         </div>
                         <DetailRow
                             name="Nama"
                             :value="props.transaction.user.name"
+                        />
+                        <DetailRow
+                            name="Username"
+                            :value="props.transaction.user.username"
                         />
                         <DetailRow
                             name="Email"
@@ -128,7 +141,9 @@ const emit = defineEmits(["continuePayment"]);
                             name="No. HP"
                             :value="props.transaction.user.phone"
                         />
-                    </div>
+                    </DefaultCard>
+
+                    <!-- Order Summary -->
                     <OrderSummaryCard
                         :transaction="props.transaction"
                         :groups="props.groups"
@@ -141,6 +156,16 @@ const emit = defineEmits(["continuePayment"]);
                             <slot name="actions" />
                         </template>
                     </OrderSummaryCard>
+                </div>
+
+                <!-- Items -->
+                <div class="flex flex-col w-full gap-y-3 gap-x-4 xl:flex-1">
+                    <OrderGroup
+                        v-for="(item, index) in props.groups"
+                        :key="index"
+                        :orderGroup="item"
+                        :showDivider="index !== props.groups.length - 1"
+                    />
                 </div>
             </div>
         </LandingSection>

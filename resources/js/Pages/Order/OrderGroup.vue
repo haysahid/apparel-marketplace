@@ -6,6 +6,7 @@ import { Link, usePage } from "@inertiajs/vue3";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import CustomPageProps from "@/types/model/CustomPageProps";
+import DefaultCard from "@/Components/DefaultCard.vue";
 
 const props = defineProps({
     orderGroup: {
@@ -46,8 +47,9 @@ const detailLink = route().current("my-store.transaction.edit")
 </script>
 
 <template>
-    <div
-        class="flex flex-col items-start justify-between gap-2 p-4 !pb-2 transition-all duration-200 ease-in-out rounded-2xl sm:p-6 sm:!pb-4 outline outline-1 -outline-offset-1 outline-gray-300 w-full"
+    <DefaultCard
+        isMain
+        class="flex flex-col items-start justify-between gap-2 p-4 !pb-2 transition-all duration-200 ease-in-out sm:p-6 sm:!pb-4 w-full"
     >
         <!-- Store Info -->
         <div class="flex items-center justify-between w-full gap-4">
@@ -288,5 +290,5 @@ const detailLink = route().current("my-store.transaction.edit")
                 </table>
             </div>
         </template>
-    </div>
+    </DefaultCard>
 </template>

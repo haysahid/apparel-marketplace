@@ -54,6 +54,10 @@ class ValidateTransactionPaymentUseCase
                     } else {
                         $paymentStatusAfter = 'pending';
                     }
+
+                    // Save midtrans response
+                    $payment->midtrans_response = json_encode($response);
+                    $payment->save();
                 } catch (Exception $e) {
                     if ($e->getCode() == 404) {
                         $paymentStatusAfter = 'pending';

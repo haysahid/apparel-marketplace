@@ -12,6 +12,7 @@ import StatusChip from "@/Components/StatusChip.vue";
 import cookieManager from "@/plugins/cookie-manager";
 import midtransPayment from "@/plugins/midtrans-payment";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import invoiceService from "@/services/my-store/invoice-service";
 
 const props = defineProps({
     invoice: {
@@ -50,6 +51,11 @@ function checkPayment() {
 }
 
 function showSnap() {
+    if (!payment.value.midtrans_snap_token) {
+        changePaymentType();
+        return;
+    }
+
     midtransPayment.showSnap(
         {
             snapToken: payment.value.midtrans_snap_token,
@@ -97,6 +103,7 @@ const resumePaymentStatus = ref(null);
 
 const showPaymentActions = computed(() => {
     return (
+        payment.value &&
         transaction.value.status === "pending" &&
         transaction.value.payment_method.slug === "transfer"
     );
@@ -150,6 +157,17 @@ const showCompletedActions = computed(() => {
     );
 });
 
+// Shipments
+const shipments = ref<ShipmentEntity[]>([]);
+
+const getShipments = async () => {
+    invoiceService().getShipments(props.invoice.id, {
+        onSuccess: (response) => {
+            shipments.value = response.data.result;
+        },
+    });
+};
+
 onMounted(() => {
     if (props.payments.length) {
         payment.value = props.payments[0];
@@ -164,6 +182,8 @@ onMounted(() => {
             checkPayment();
         }
     }
+
+    getShipments();
 });
 
 window.onpopstate = function () {
@@ -180,136 +200,144 @@ window.onpopstate = function () {
             { text: props.invoice.code, active: true },
         ]"
     >
-        <DefaultCard :isMain="true">
-            <InvoiceDetail
-                :invoice="props.invoice"
-                :items="props.items"
-                class="!px-0 !pt-0 md:!px-0"
-                :showTracking="props.invoice.status !== 'cancelled'"
-                :isShowingFromMyStore="true"
-            >
-                <template #additionalInfo>
-                    <!-- Payment -->
-                    <template v-if="showPaymentActions">
-                        <div class="my-2 border-b border-gray-300"></div>
-                        <OrderContentRow
-                            label="Status Pembayaran"
-                            :value="payment?.status"
-                        >
-                            <template #value>
-                                <StatusChip
-                                    :status="payment.status"
-                                    :label="payment.status?.toUpperCase()"
-                                />
-                            </template>
-                        </OrderContentRow>
-                        <OrderContentRow
-                            v-if="payment?.midtrans_response"
-                            label="Tipe Pembayaran"
-                            :value="
-                                payment?.midtrans_response?.payment_type
-                                    ?.split('_')
-                                    .map(
-                                        (word) =>
-                                            word.charAt(0).toUpperCase() +
-                                            word.slice(1)
-                                    )
-                                    .join(' ')
-                            "
-                        />
-                        <OrderContentRow
-                            v-if="payment?.midtrans_response?.va_numbers"
-                            label="Tujuan Pembayaran"
-                            :value="
-                                payment?.midtrans_response?.va_numbers[0]?.bank?.toUpperCase()
-                            "
-                        />
-                        <OrderContentRow
-                            v-if="payment?.midtrans_response"
-                            label="Batas Akhir Pembayaran"
-                            :value="payment?.midtrans_response?.expiry_time"
-                        />
-                    </template>
-
-                    <!-- Shipping Address -->
-                    <template
-                        v-if="
-                            props.invoice.transaction.shipping_method.slug ===
-                            'courier'
-                        "
+        <InvoiceDetail
+            :invoice="props.invoice"
+            :items="props.items"
+            :shipments="shipments"
+            :showTracking="props.invoice.status !== 'cancelled'"
+            :isShowingFromMyStore="true"
+        >
+            <template #additionalInfo>
+                <!-- Payment -->
+                <template v-if="showPaymentActions">
+                    <div class="my-2 border-b border-gray-200"></div>
+                    <h3 class="font-semibold text-gray-800">
+                        Informasi Pembayaran
+                    </h3>
+                    <OrderContentRow
+                        label="Status Pembayaran"
+                        :value="payment?.status"
                     >
-                        <div class="my-2 border-b border-gray-300"></div>
-                        <OrderContentRow
-                            label="Provinsi"
-                            :value="props.invoice.transaction.province_name"
-                        />
-                        <OrderContentRow
-                            label="Kota"
-                            :value="props.invoice.transaction.city_name"
-                        />
-                        <OrderContentRow
-                            label="Alamat"
-                            :value="props.invoice.transaction.address"
-                        />
-                    </template>
+                        <template #value>
+                            <StatusChip
+                                :status="payment.status"
+                                :label="payment.status?.toUpperCase()"
+                            />
+                        </template>
+                    </OrderContentRow>
+                    <OrderContentRow
+                        v-if="payment?.midtrans_response"
+                        label="Tipe Pembayaran"
+                        :value="
+                            payment?.midtrans_response?.payment_type
+                                ?.split('_')
+                                .map(
+                                    (word) =>
+                                        word.charAt(0).toUpperCase() +
+                                        word.slice(1)
+                                )
+                                .join(' ')
+                        "
+                    />
+                    <OrderContentRow
+                        v-if="payment?.midtrans_response?.va_numbers"
+                        label="Tujuan Pembayaran"
+                        :value="
+                            payment?.midtrans_response?.va_numbers[0]?.bank?.toUpperCase()
+                        "
+                    />
+                    <OrderContentRow
+                        v-if="payment?.midtrans_response"
+                        label="Batas Akhir Pembayaran"
+                        :value="payment?.midtrans_response?.expiry_time"
+                    />
                 </template>
 
-                <template #actions>
-                    <!-- Payment Buttons -->
-                    <div
-                        v-if="
-                            showPaymentActions ||
-                            showShippingActions ||
-                            showCompletedActions
-                        "
-                        class="flex flex-col gap-2 mt-2"
-                    >
-                        <template v-if="showPaymentActions">
-                            <PrimaryButton
-                                class="w-full py-3"
-                                :disabled="resumePaymentStatus === 'loading'"
-                                @click="showSnap()"
-                            >
-                                Lanjutkan Pembayaran
-                            </PrimaryButton>
-                            <SecondaryButton
-                                v-if="payment?.midtrans_response"
-                                class="w-full py-3"
-                                :disabled="resumePaymentStatus === 'loading'"
-                                @click="changePaymentType()"
-                            >
-                                Ubah Tipe Pembayaran
-                            </SecondaryButton>
-                        </template>
-                        <template v-if="showShippingActions">
-                            <PrimaryButton
-                                class="w-full py-3"
-                                :disabled="changeStatusStatus === 'loading'"
-                                @click="changeStatus('processing')"
-                            >
-                                Lanjutkan Pengiriman
-                            </PrimaryButton>
-                        </template>
-                        <template v-if="showCompletedActions">
-                            <PrimaryButton
-                                class="w-full py-3"
-                                :disabled="changeStatusStatus === 'loading'"
-                                @click="changeStatus('completed')"
-                            >
-                                Selesai
-                            </PrimaryButton>
-                        </template>
-                    </div>
+                <!-- Shipping Address -->
+                <template
+                    v-if="
+                        props.invoice.transaction.shipping_method.slug ===
+                        'courier'
+                    "
+                >
+                    <div class="my-2 border-b border-gray-200"></div>
+                    <h3 class="font-semibold text-gray-800">
+                        Alamat Pengiriman
+                    </h3>
+                    <OrderContentRow
+                        label="Provinsi"
+                        :value="props.invoice.transaction.province_name"
+                    />
+                    <OrderContentRow
+                        label="Kota"
+                        :value="props.invoice.transaction.city_name"
+                    />
+                    <OrderContentRow
+                        label="Alamat"
+                        :value="props.invoice.transaction.address"
+                    />
+                    <OrderContentRow
+                        label="Kode Pos"
+                        :value="props.invoice.transaction.zip_code"
+                    />
+                </template>
+            </template>
 
-                    <!-- <PrimaryButton
+            <template #actions>
+                <!-- Payment Buttons -->
+                <div
+                    v-if="
+                        showPaymentActions ||
+                        showShippingActions ||
+                        showCompletedActions
+                    "
+                    class="flex flex-col gap-2 mt-2"
+                >
+                    <template v-if="showPaymentActions">
+                        <PrimaryButton
+                            class="w-full py-3"
+                            :disabled="resumePaymentStatus === 'loading'"
+                            @click="showSnap()"
+                        >
+                            Lanjutkan Pembayaran
+                        </PrimaryButton>
+                        <SecondaryButton
+                            v-if="payment?.midtrans_response"
+                            class="w-full py-3"
+                            :disabled="resumePaymentStatus === 'loading'"
+                            @click="changePaymentType()"
+                        >
+                            Ubah Tipe Pembayaran
+                        </SecondaryButton>
+                    </template>
+                    <template v-if="showShippingActions">
+                        <PrimaryButton
+                            class="w-full py-3"
+                            :disabled="changeStatusStatus === 'loading'"
+                            @click="changeStatus('processing')"
+                        >
+                            Lanjutkan Pengiriman
+                        </PrimaryButton>
+                    </template>
+                    <template v-if="showCompletedActions">
+                        <PrimaryButton
+                            class="w-full py-3"
+                            :disabled="changeStatusStatus === 'loading'"
+                            @click="changeStatus('completed')"
+                        >
+                            Selesai
+                        </PrimaryButton>
+                    </template>
+                </div>
+
+                <!-- <PrimaryButton
                         @click="showChangeStatusDialog = true"
                         class="w-full py-3"
                     >
                         Ubah Status
                     </PrimaryButton> -->
-                </template>
-            </InvoiceDetail>
-        </DefaultCard>
+            </template>
+        </InvoiceDetail>
 
         <ChangeTransactionStatusDialog
             :show="showChangeStatusDialog"

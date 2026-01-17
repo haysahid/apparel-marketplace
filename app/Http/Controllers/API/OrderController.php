@@ -549,7 +549,13 @@ class OrderController extends Controller
         ]);
 
         return $this->validateTransactionPaymentUseCase->validate($validated['transaction_code'])->fold(
-            onSuccess: fn($data, $code) => ResponseFormatter::success($data, 'Status pembayaran berhasil diperiksa', $code),
+            onSuccess: function ($data, $code) {
+                return ResponseFormatter::success(
+                    $data,
+                    'Status pembayaran berhasil diperiksa',
+                    $code
+                );
+            },
             onError: fn($error, $code) => ResponseFormatter::error($error, $code)
         );
     }

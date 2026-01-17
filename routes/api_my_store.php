@@ -47,6 +47,7 @@ Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->gro
 
     // Shipment
     Route::apiResource('shipment', ShipmentController::class);
+    Route::get('shipment-dropdown', [ShipmentController::class, 'dropdown'])->name('shipment.dropdown');
 
     // Voucher
     Route::apiResource('voucher', VoucherController::class);

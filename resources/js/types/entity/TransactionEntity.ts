@@ -11,6 +11,7 @@ interface TransactionEntity {
     city_id: number | null;
     city_name: string | null;
     address: string | null;
+    zip_code: string | null;
     voucher_id: number | null;
     voucher_amount: number;
     shipping_cost: number;

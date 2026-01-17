@@ -29,9 +29,10 @@ class Payment extends Model
         'status',
     ];
 
-    protected $casts = [
-        'midtrans_response' => 'array',
-    ];
+    public function getMidtransResponseAttribute($value)
+    {
+        return $value ? json_decode($value, true) : null;
+    }
 
     // Relationships
     public function transaction()

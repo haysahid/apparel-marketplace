@@ -38,6 +38,22 @@ class ShipmentRepository
         return $query->paginate($limit);
     }
 
+    public static function getShipmentDropdown($storeId = null, $invoiceId = null)
+    {
+        $query = Shipment::query();
+        $query->with(['items']);
+
+        if ($storeId) {
+            $query->where('store_id', $storeId);
+        }
+
+        if ($invoiceId) {
+            $query->where('invoice_id', $invoiceId);
+        }
+
+        return $query->get();
+    }
+
     public static function getShipmentById($id)
     {
         return Shipment::with(['invoice', 'items.transaction_item'])->findOrFail($id);
