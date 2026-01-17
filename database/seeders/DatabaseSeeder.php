@@ -23,13 +23,13 @@ class DatabaseSeeder extends Seeder
             MembershipSeeder::class,
             UserSeeder::class,
             StoreRoleSeeder::class,
-            StoreMembershipSeeder::class,
+            // StoreMembershipSeeder::class,
 
-            ProductSeeder::class,
+            // ProductSeeder::class,
             TransactionSeeder::class,
             PointRuleSeeder::class,
 
-            TransactionFactorySeeder::class,
+            // TransactionFactorySeeder::class,
         ]);
     }
 }
