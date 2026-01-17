@@ -73,8 +73,8 @@ export default function invoiceService() {
 
         onChangeStatus("loading");
         await axios
-            .post(
-                `/api/my-store/set-invoice-delivering`,
+            .put(
+                `/api/my-store/set-order-delivering`,
                 {
                     invoice_id: invoiceId,
                     shipments: shipments,
@@ -83,6 +83,7 @@ export default function invoiceService() {
                     headers: {
                         Authorization: token,
                         Accept: "application/json",
+                        "X-Selected-Store-ID": selectedStoreId,
                     },
                 }
             )
@@ -92,7 +93,7 @@ export default function invoiceService() {
                 if (autoShowDialog) {
                     dialogStore.openSuccessDialog(
                         response.data.meta.message ||
-                            "Invoice berhasil diubah menjadi diproses."
+                            "Invoice berhasil diubah menjadi dalam pengiriman."
                     );
                 }
             })

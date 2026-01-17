@@ -13,6 +13,9 @@ import cookieManager from "@/plugins/cookie-manager";
 import midtransPayment from "@/plugins/midtrans-payment";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import invoiceService from "@/services/my-store/invoice-service";
+import ShipmentForm from "../Invoice/ShipmentForm.vue";
+import DialogModal from "@/Components/DialogModal.vue";
+import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 
 const props = defineProps({
     invoice: {
@@ -141,13 +144,24 @@ function changeStatus(newStatus: string) {
         });
 }
 
+// Set Completed
+const showSetCompletedConfirmationDialog = ref(false);
+
 // Shipping
 const showShippingActions = computed(() => {
+    if (transaction.value.payment_method.slug === "cod") {
+        return (
+            props.invoice.status === "pending" &&
+            transaction.value.shipping_method.slug === "courier"
+        );
+    }
+
     return (
         props.invoice.status === "paid" &&
         transaction.value.shipping_method.slug === "courier"
     );
 });
+const showShipmentFormDialog = ref(false);
 
 // Completed
 const showCompletedActions = computed(() => {
@@ -314,7 +328,7 @@ window.onpopstate = function () {
                         <PrimaryButton
                             class="w-full py-3"
                             :disabled="changeStatusStatus === 'loading'"
-                            @click="changeStatus('processing')"
+                            @click="showShipmentFormDialog = true"
                         >
                             Lanjutkan Pengiriman
                         </PrimaryButton>
@@ -323,7 +337,7 @@ window.onpopstate = function () {
                         <PrimaryButton
                             class="w-full py-3"
                             :disabled="changeStatusStatus === 'loading'"
-                            @click="changeStatus('completed')"
+                            @click="showSetCompletedConfirmationDialog = true"
                         >
                             Selesai
                         </PrimaryButton>
@@ -338,6 +352,71 @@ window.onpopstate = function () {
                     </PrimaryButton> -->
             </template>
         </InvoiceDetail>
+
+        <!-- Shipment Form Dialog -->
+        <DialogModal
+            :show="showShipmentFormDialog"
+            @close="showShipmentFormDialog = false"
+            maxWidth="md"
+        >
+            <template #title> Tambah Informasi Pengiriman </template>
+            <template #content>
+                <ShipmentForm
+                    :invoice="props.invoice"
+                    :items="props.items"
+                    :isDialog="true"
+                    class="w-full"
+                    @close="showShipmentFormDialog = false"
+                    @submitted="
+                        showShipmentFormDialog = false;
+                        router.reload();
+                        getShipments();
+                    "
+                />
+            </template>
+        </DialogModal>
+
+        <!-- Set Complete Confirmation -->
+        <DialogModal
+            :show="showSetCompletedConfirmationDialog"
+            @close="showSetCompletedConfirmationDialog = false"
+            maxWidth="sm"
+        >
+            <template #title>
+                <h3
+                    class="text-lg font-medium leading-6 text-gray-900 text-wrap"
+                >
+                    Tandai Pesanan Sebagai Selesai?
+                </h3>
+            </template>
+            <template #content>
+                <p class="mt-0.5 mb-1.5 text-center text-wrap">
+                    Apakah Anda yakin ingin menandai pesanan ini sebagai
+                    selesai? Tindakan ini tidak dapat dibatalkan.
+                </p>
+            </template>
+            <slot />
+            <template #footer>
+                <div class="flex gap-4 text-base">
+                    <SecondaryButton
+                        type="button"
+                        class=""
+                        @click="showSetCompletedConfirmationDialog = false"
+                    >
+                        Batalkan
+                    </SecondaryButton>
+                    <PrimaryButton
+                        type="button"
+                        @click="
+                            showSetCompletedConfirmationDialog = false;
+                            changeStatus('completed');
+                        "
+                    >
+                        Ya, Selesaikan
+                    </PrimaryButton>
+                </div>
+            </template>
+        </DialogModal>
 
         <ChangeTransactionStatusDialog
             :show="showChangeStatusDialog"

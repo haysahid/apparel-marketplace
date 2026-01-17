@@ -9,6 +9,7 @@ import OrderContentRow from "@/Components/OrderContentRow.vue";
 import StatusChip from "@/Components/StatusChip.vue";
 import InvoiceDetail from "./MyStore/Order/InvoiceDetail.vue";
 import cookieManager from "@/plugins/cookie-manager";
+import invoiceService from "@/services/my-store/invoice-service";
 
 async function initScript() {
     const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
@@ -169,6 +170,17 @@ async function changePaymentType() {
         });
 }
 
+// Shipments
+const shipments = ref<ShipmentEntity[]>([]);
+
+const getShipments = async () => {
+    invoiceService().getShipments(props.invoice.id, {
+        onSuccess: (response) => {
+            shipments.value = response.data.result;
+        },
+    });
+};
+
 onMounted(() => {
     if (route().params?.transaction_status == "settlement") {
         // Reload the page
@@ -183,6 +195,8 @@ onMounted(() => {
     ) {
         showSnap();
     }
+
+    getShipments();
 });
 </script>
 
@@ -210,6 +224,7 @@ onMounted(() => {
                 data-aos-once="true"
                 :invoice="props.invoice"
                 :items="props.items"
+                :shipments="shipments"
                 :showTracking="
                     props.invoice.status !== 'cancelled' &&
                     (!showPaymentActions ||

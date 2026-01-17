@@ -87,7 +87,8 @@ const emit = defineEmits(["continuePayment"]);
         <InfoHint
             v-if="
                 props.transaction.payment_method.slug === 'transfer' &&
-                props.transaction.status === 'paid'
+                props.transaction.status === 'paid' &&
+                props.transaction.user_id === $page.props.auth.user.id
             "
             type="success"
             class="mx-auto mb-2 max-w-7xl"

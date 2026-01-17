@@ -214,7 +214,7 @@ const emit = defineEmits(["continuePayment"]);
 
                                 <div
                                     v-if="index !== props.shipments.length - 1"
-                                    class="my-2 border-b border-gray-300"
+                                    class="my-2 border-b border-gray-200"
                                 ></div>
                             </div>
                         </div>

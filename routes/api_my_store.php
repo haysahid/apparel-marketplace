@@ -41,6 +41,7 @@ Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->gro
     Route::get('midtrans-payment-methods', [OrderController::class, 'midtransPaymentMethods'])->name('midtrans.payment-methods');
 
     Route::put('change-order-status', [\App\Http\Controllers\MyStore\API\OrderController::class, 'changeStatus'])->name('order.change-status');
+    Route::put('set-order-delivering', [\App\Http\Controllers\MyStore\API\OrderController::class, 'setDelivering'])->name('order.set-delivering');
 
     // Invoice
     Route::apiResource('invoice', InvoiceController::class);
