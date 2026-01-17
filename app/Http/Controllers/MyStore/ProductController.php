@@ -114,7 +114,7 @@ class ProductController extends Controller
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id',
             'images' => 'required|array',
-            'images.*' => 'file|mimes:jpg,jpeg,png,webp|max:2048',
+            'images.*' => 'file|image|max:2048',
             'links' => 'nullable|array',
             'variants' => 'required|array',
             'variants.*.motif' => 'required|string|max:100',
@@ -126,7 +126,7 @@ class ProductController extends Controller
             'variants.*.current_stock_level' => 'required|integer',
             'variants.*.unit_id' => 'required|exists:units,id',
             'variants.*.images' => 'required|array',
-            'variants.*.images.*' => 'file|mimes:jpg,jpeg,png,webp|max:2048',
+            'variants.*.images.*' => 'file|image|max:2048',
         ], [
             'brand_id.required' => 'Merek produk harus dipilih.',
             'brand_id.exists' => 'Merek yang dipilih tidak valid.',
