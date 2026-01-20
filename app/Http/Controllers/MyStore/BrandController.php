@@ -28,7 +28,7 @@ class BrandController extends Controller
     {
         $limit = $request->input('limit', 10);
         $search = $request->input('search');
-        $orderBy = $request->input('order_by', 'created_at');
+        $orderBy = $request->input('order_by', 'id');
         $orderDirection = $request->input('order_direction', 'desc');
 
         $brands = BrandRepository::getBrands(

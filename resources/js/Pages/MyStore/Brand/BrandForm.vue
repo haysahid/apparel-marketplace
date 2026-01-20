@@ -32,7 +32,7 @@ const form = useForm(
         name: null,
         description: null,
         logo: null,
-    }
+    },
 );
 
 const submit = () => {
@@ -59,7 +59,7 @@ const submit = () => {
                 onError: (errors) => {
                     openErrorDialog(errors.error);
                 },
-            }
+            },
         );
     } else {
         form.transform((data) => {
@@ -101,7 +101,7 @@ onMounted(() => {
     <form @submit.prevent="submit" class="max-w-3xl">
         <div class="flex flex-col items-start gap-4">
             <!-- Name -->
-            <InputGroup for="brand-name" label="Nama Brand">
+            <InputGroup for="brand-name" label="Nama Brand" required>
                 <TextInput
                     id="brand-name"
                     v-model="form.name"

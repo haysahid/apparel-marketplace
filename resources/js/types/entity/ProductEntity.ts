@@ -1,6 +1,7 @@
 interface ProductEntity {
     id: number;
     store_id: number;
+    brand_id: number | null;
     name: string;
     slug: string;
     sku_prefix: string;

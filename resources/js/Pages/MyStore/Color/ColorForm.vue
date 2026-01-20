@@ -97,7 +97,7 @@ onMounted(() => {
     <form @submit.prevent="submit" class="max-w-3xl">
         <div class="flex flex-col items-start gap-4">
             <!-- Name -->
-            <InputGroup for="color-name" label="Nama Warna">
+            <InputGroup for="color-name" label="Nama Warna" required>
                 <TextInput
                     id="color-name"
                     v-model="form.name"

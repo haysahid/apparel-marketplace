@@ -26,7 +26,7 @@ const form = useForm(
         ? props.size
         : {
               name: null,
-          }
+          },
 );
 
 const submit = () => {
@@ -52,7 +52,7 @@ const submit = () => {
                 onFinish: () => {
                     form.reset();
                 },
-            }
+            },
         );
     } else {
         form.transform((data) => {
@@ -94,7 +94,7 @@ onMounted(() => {
     <form @submit.prevent="submit" class="max-w-3xl">
         <div class="flex flex-col items-start gap-4">
             <!-- Name -->
-            <InputGroup for="size-name" label="Nama Ukuran">
+            <InputGroup for="size-name" label="Nama Ukuran" required>
                 <TextInput
                     id="size-name"
                     v-model="form.name"

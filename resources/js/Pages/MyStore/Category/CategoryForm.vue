@@ -100,7 +100,7 @@ onMounted(() => {
     <form @submit.prevent="submit" class="max-w-3xl">
         <div class="flex flex-col items-start gap-4">
             <!-- Name -->
-            <InputGroup for="category-name" label="Nama Kategori">
+            <InputGroup for="category-name" label="Nama Kategori" required>
                 <TextInput
                     id="category-name"
                     v-model="form.name"
@@ -125,7 +125,6 @@ onMounted(() => {
                     class="block w-full mt-1 h-"
                     width="max-w-[180px]"
                     height="h-[120px]"
-                    required
                     :error="form.errors.image"
                     @update:modelValue="form.errors.image = null"
                 />
