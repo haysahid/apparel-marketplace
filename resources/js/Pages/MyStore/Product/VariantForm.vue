@@ -81,7 +81,7 @@ const form = useForm(
               unit_id: null,
               unit: null,
               images: [{ id: "new-var-1", image: null }],
-          }
+          },
 );
 
 const countNewImages = computed(() => {
@@ -96,7 +96,7 @@ const colors = ref((page.props.colors as ColorEntity[]) || []);
 const colorSearch = ref("");
 const filteredColors = computed(() => {
     return colors.value.filter((color) =>
-        color.name.toLowerCase().includes(colorSearch.value.toLowerCase())
+        color.name.toLowerCase().includes(colorSearch.value.toLowerCase()),
     );
 });
 
@@ -104,7 +104,7 @@ const sizes = ref((page.props.sizes as SizeEntity[]) || []);
 const sizeSearch = ref("");
 const filteredSizes = computed(() => {
     return sizes.value.filter((size) =>
-        size.name.toLowerCase().includes(sizeSearch.value.toLowerCase())
+        size.name.toLowerCase().includes(sizeSearch.value.toLowerCase()),
     );
 });
 
@@ -112,7 +112,7 @@ const units = ref((page.props.units as UnitEntity[]) || []);
 const unitSearch = ref("");
 const filteredUnits = computed(() => {
     return units.value.filter((unit) =>
-        unit.name.toLowerCase().includes(unitSearch.value.toLowerCase())
+        unit.name.toLowerCase().includes(unitSearch.value.toLowerCase()),
     );
 });
 
@@ -237,7 +237,7 @@ function deleteImages() {
             })
             .then(() => {
                 imagesToDelete.value = imagesToDelete.value.filter(
-                    (id) => id !== imageId
+                    (id) => id !== imageId,
                 );
             })
             .catch((error) => {
@@ -353,7 +353,8 @@ const submit = () => {
                     ? (form.base_selling_price * form.discount) / 100
                     : form.discount),
             images: form.images.filter(
-                (image) => image.image instanceof File || isExistingImage(image)
+                (image) =>
+                    image.image instanceof File || isExistingImage(image),
             ),
         });
 
@@ -421,28 +422,28 @@ onMounted(() => {
             </h2>
 
             <!-- Motif -->
-            <InputGroup for="motif" label="Motif">
+            <InputGroup for="motif" label="Motif" required>
                 <TextInput
                     id="motif"
                     v-model="form.motif"
                     type="text"
                     placeholder="Masukkan Nama Motif"
                     required
-                    autocomplete="motif"
+                    autocomplete="on"
                     :error="form.errors.motif"
                     @update:modelValue="form.errors.motif = null"
                 />
             </InputGroup>
 
             <!-- Material -->
-            <InputGroup for="material" label="Jenis Bahan">
+            <InputGroup for="material" label="Jenis Bahan" required>
                 <TextInput
                     id="material"
                     v-model="form.material"
                     type="text"
                     placeholder="Masukkan Nama Jenis Bahan"
                     required
-                    autocomplete="material"
+                    autocomplete="on"
                     :error="form.errors.material"
                     @update:modelValue="form.errors.material = null"
                 />
@@ -450,7 +451,7 @@ onMounted(() => {
 
             <div class="flex items-center w-full gap-4">
                 <!-- Color -->
-                <InputGroup for="color_id" label="Warna">
+                <InputGroup for="color_id" label="Warna" required>
                     <DropdownSearchInput
                         id="color_id"
                         :modelValue="
@@ -469,6 +470,7 @@ onMounted(() => {
                                 hexCode: color.hex_code,
                             }))
                         "
+                        required
                         placeholder="Pilih Warna"
                         :error="form.errors.color_id"
                         @update:modelValue="
@@ -476,7 +478,7 @@ onMounted(() => {
                                 form.color_id = option?.value;
                                 form.color = option
                                     ? filteredColors.find(
-                                          (color) => color.id === option.value
+                                          (color) => color.id === option.value,
                                       )
                                     : null;
                             }
@@ -506,7 +508,7 @@ onMounted(() => {
                 </InputGroup>
 
                 <!-- Size -->
-                <InputGroup for="size_id" label="Ukuran">
+                <InputGroup for="size_id" label="Ukuran" required>
                     <DropdownSearchInput
                         id="size_id"
                         :modelValue="
@@ -523,6 +525,7 @@ onMounted(() => {
                                 value: size.id,
                             }))
                         "
+                        required
                         placeholder="Pilih Ukuran"
                         :error="form.errors.size_id"
                         @update:modelValue="
@@ -530,7 +533,7 @@ onMounted(() => {
                                 form.size_id = option?.value;
                                 form.size = option
                                     ? filteredSizes.find(
-                                          (size) => size.id === option.value
+                                          (size) => size.id === option.value,
                                       )
                                     : null;
                             }
@@ -564,14 +567,13 @@ onMounted(() => {
 
             <div class="flex items-center w-full gap-4">
                 <!-- Stock -->
-                <InputGroup for="current_stock_level" label="Stok">
+                <InputGroup for="current_stock_level" label="Stok" required>
                     <TextInput
                         id="current_stock_level"
                         v-model.number="form.current_stock_level"
                         type="number"
                         placeholder="Masukkan Stok"
                         required
-                        autocomplete="current_stock_level"
                         :error="form.errors.current_stock_level"
                         @update:modelValue="
                             form.errors.current_stock_level = null
@@ -580,7 +582,7 @@ onMounted(() => {
                 </InputGroup>
 
                 <!-- Unit -->
-                <InputGroup for="unit_id" label="Satuan">
+                <InputGroup for="unit_id" label="Satuan" required>
                     <DropdownSearchInput
                         id="unit_id"
                         :modelValue="
@@ -597,6 +599,7 @@ onMounted(() => {
                                 value: unit.id,
                             }))
                         "
+                        required
                         placeholder="Pilih Satuan"
                         :error="form.errors.unit_id"
                         @update:modelValue="
@@ -604,7 +607,7 @@ onMounted(() => {
                                 form.unit_id = option?.value;
                                 form.unit = option
                                     ? filteredUnits.find(
-                                          (unit) => unit.id === option.value
+                                          (unit) => unit.id === option.value,
                                       )
                                     : null;
                             }
@@ -638,14 +641,17 @@ onMounted(() => {
 
             <div class="flex items-center w-full gap-4">
                 <!-- Base Selling Price -->
-                <InputGroup for="base_selling_price" label="Harga Dasar">
+                <InputGroup
+                    for="base_selling_price"
+                    label="Harga Dasar"
+                    required
+                >
                     <TextInput
                         id="base_selling_price"
                         v-model.number="form.base_selling_price"
                         type="number"
                         placeholder="Masukkan Harga"
                         required
-                        autocomplete="base_selling_price"
                         :error="form.errors.base_selling_price"
                         @update:modelValue="
                             form.errors.base_selling_price = null
@@ -654,14 +660,13 @@ onMounted(() => {
                 </InputGroup>
 
                 <!-- Discount -->
-                <InputGroup for="discount" label="Diskon (%)">
+                <InputGroup for="discount" label="Diskon (%)" required>
                     <TextInput
                         id="discount"
                         v-model.number="form.discount"
                         type="number"
                         placeholder="Masukkan Diskon"
                         required
-                        autocomplete="discount"
                         :error="form.errors.discount"
                         @update:modelValue="form.errors.discount = null"
                     />
@@ -740,15 +745,15 @@ onMounted(() => {
                                 colorSearch = '';
 
                                 colors = $page.props.colors as ColorEntity[];
-                                
+
                                 const newColor = colors.find(
-                                    (color) => color.name === colorName
+                                    (color) => color.name === colorName,
                                 );
                                 form.color_id = newColor.id;
                                 form.color = newColor;
 
                                 openSuccessDialog(
-                                    'Warna berhasil ditambahkan.'
+                                    'Warna berhasil ditambahkan.',
                                 );
                             }
                         "
@@ -782,13 +787,13 @@ onMounted(() => {
                                 sizes = $page.props.sizes as SizeEntity[];
 
                                 const newSize = sizes.find(
-                                    (size) => size.name === sizeName
+                                    (size) => size.name === sizeName,
                                 );
                                 form.size_id = newSize.id;
                                 form.size = newSize;
 
                                 openSuccessDialog(
-                                    'Ukuran berhasil ditambahkan.'
+                                    'Ukuran berhasil ditambahkan.',
                                 );
                             }
                         "
@@ -822,13 +827,13 @@ onMounted(() => {
                                 units = $page.props.units as UnitEntity[];
 
                                 const newUnit = units.find(
-                                    (unit) => unit.name === unitName
+                                    (unit) => unit.name === unitName,
                                 );
                                 form.unit_id = newUnit.id;
                                 form.unit = newUnit;
 
                                 openSuccessDialog(
-                                    'Satuan berhasil ditambahkan.'
+                                    'Satuan berhasil ditambahkan.',
                                 );
                             }
                         "

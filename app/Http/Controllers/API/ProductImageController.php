@@ -27,14 +27,14 @@ class ProductImageController extends Controller
     {
         $validatedData = $request->validate([
             'product_id' => 'required|exists:products,id',
-            'image' => 'required|file|mimes:jpg,jpeg,png,webp|max:2048',
+            'image' => 'required|file|image|max:2048',
             'order' => 'nullable|integer|min:0',
         ], [
             'product_id.required' => 'ID produk harus diisi.',
             'product_id.exists' => 'Produk tidak ditemukan.',
             'image.required' => 'Gambar produk harus diunggah.',
             'image.file' => 'Gambar harus berupa file.',
-            'image.mimes' => 'Gambar harus berformat jpg, jpeg, png, atau webp.',
+            'image.image' => 'Gambar harus berupa gambar.',
             'image.max' => 'Ukuran gambar maksimal 2MB.',
             'order.integer' => 'Urutan harus berupa angka.',
             'order.min' => 'Urutan tidak boleh kurang dari 0.',

@@ -29,14 +29,14 @@ class ProductVariantImageController extends Controller
     {
         $validatedData = $request->validate([
             'product_variant_id' => 'required|exists:product_variants,id',
-            'image' => 'required|file|mimes:jpg,jpeg,png,webp|max:2048',
+            'image' => 'required|file|image|max:2048',
             'order' => 'nullable|integer|min:0',
         ], [
             'product_variant_id.required' => 'ID varian produk harus diisi.',
             'product_variant_id.exists' => 'Varian produk tidak ditemukan.',
             'image.required' => 'Gambar varian produk harus diunggah.',
             'image.file' => 'Gambar harus berupa file.',
-            'image.mimes' => 'Gambar harus berformat jpg, jpeg, png, atau webp.',
+            'image.image' => 'Gambar harus berupa gambar.',
             'image.max' => 'Ukuran gambar maksimal 2MB.',
             'order.integer' => 'Urutan harus berupa angka.',
             'order.min' => 'Urutan tidak boleh kurang dari 0.',
@@ -77,11 +77,11 @@ class ProductVariantImageController extends Controller
     public function update(Request $request, string $id)
     {
         $validatedData = $request->validate([
-            'image' => 'nullable|file|mimes:jpg,jpeg,png,webp|max:2048',
+            'image' => 'nullable|file|image|max:2048',
             'order' => 'nullable|integer|min:0',
         ], [
             'image.file' => 'Gambar harus berupa file.',
-            'image.mimes' => 'Gambar harus berformat jpg, jpeg, png, atau webp.',
+            'image.image' => 'Gambar harus berupa gambar.',
             'image.max' => 'Ukuran gambar maksimal 2MB.',
             'order.integer' => 'Urutan harus berupa angka.',
             'order.min' => 'Urutan tidak boleh kurang dari 0.',

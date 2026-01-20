@@ -106,14 +106,14 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'brand_id' => 'required|exists:brands,id',
+            'brand_id' => 'nullable|exists:brands,id',
             'name' => 'required|string|max:255',
             'sku_prefix' => 'required|string|max:100',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'discount' => 'nullable|numeric',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id',
-            'images' => 'required|array',
+            'images' => 'nullable|array',
             'images.*' => 'file|image|max:2048',
             'links' => 'nullable|array',
             'variants' => 'required|array',
@@ -128,20 +128,17 @@ class ProductController extends Controller
             'variants.*.images' => 'required|array',
             'variants.*.images.*' => 'file|image|max:2048',
         ], [
-            'brand_id.required' => 'Merek produk harus dipilih.',
             'brand_id.exists' => 'Merek yang dipilih tidak valid.',
             'name.required' => 'Nama produk harus diisi.',
             'sku_prefix.required' => 'Prefix SKU harus diisi.',
             'sku_prefix.string' => 'Prefix SKU harus berupa string.',
             'sku_prefix.max' => 'Prefix SKU tidak boleh lebih dari 100 karakter.',
-            'description.required' => 'Deskripsi produk harus diisi.',
             'discount.numeric' => 'Diskon harus berupa angka.',
             'categories.array' => 'Kategori harus berupa array.',
             'categories.*.exists' => 'Kategori yang dipilih tidak valid.',
-            'images.required' => 'Gambar produk harus diunggah.',
             'images.array' => 'Gambar harus berupa array.',
             'images.*.file' => 'Setiap gambar harus berupa file.',
-            'images.*.mimes' => 'Gambar harus berupa file dengan format jpg, jpeg, png, atau webp.',
+            'images.*.image' => 'Setiap gambar harus berupa gambar.',
             'images.*.max' => 'Setiap gambar tidak boleh lebih dari 2MB.',
             'links.array' => 'Tautan harus berupa array.',
             'variants.required' => 'Varian produk harus diisi.',
@@ -161,7 +158,7 @@ class ProductController extends Controller
             'variants.*.images.required' => 'Gambar varian harus diunggah.',
             'variants.*.images.array' => 'Gambar varian harus berupa array.',
             'variants.*.images.*.file' => 'Setiap gambar varian harus berupa file.',
-            'variants.*.images.*.mimes' => 'Gambar varian harus berupa file dengan format jpg, jpeg, png, atau webp.',
+            'variants.*.images.*.image' => 'Setiap gambar varian harus berupa gambar.',
             'variants.*.images.*.max' => 'Setiap gambar varian tidak boleh lebih dari 2MB.',
         ]);
 
@@ -243,22 +240,20 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
-            'brand_id' => 'required|exists:brands,id',
+            'brand_id' => 'nullable|exists:brands,id',
             'name' => 'required|string|max:255',
             'sku_prefix' => 'required|string|max:100',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'discount' => 'nullable|numeric',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id',
             'links' => 'nullable|array',
         ], [
-            'brand_id.required' => 'Merek produk harus dipilih.',
             'brand_id.exists' => 'Merek yang dipilih tidak valid.',
             'name.required' => 'Nama produk harus diisi.',
             'sku_prefix.required' => 'Prefix SKU harus diisi.',
             'sku_prefix.string' => 'Prefix SKU harus berupa string.',
             'sku_prefix.max' => 'Prefix SKU tidak boleh lebih dari 100 karakter.',
-            'description.required' => 'Deskripsi produk harus diisi.',
             'discount.numeric' => 'Diskon harus berupa angka.',
             'categories.array' => 'Kategori harus berupa array.',
             'categories.*.exists' => 'Kategori yang dipilih tidak valid.',

@@ -24,8 +24,6 @@ export const useProductFormStore = defineStore("product_form", () => {
         },
     );
 
-    const drag = ref(false);
-
     const page = usePage<CustomPageProps>();
 
     const brands = ref<BrandEntity[]>(page.props.brands || []);
@@ -334,22 +332,6 @@ export const useProductFormStore = defineStore("product_form", () => {
         }
     };
 
-    const imagesContainer = ref(null);
-
-    const draggable = useDraggable(imagesContainer, form.images, {
-        animation: 150,
-        onStart: (event) => {
-            drag.value = true;
-            const item = event.item;
-            item.style.opacity = "0.2";
-        },
-        onEnd: (event) => {
-            drag.value = false;
-            const item = event.item;
-            item.style.opacity = "1";
-        },
-    });
-
     const countNewImages = computed(() => {
         return form.images.filter((image) => isNewImage(image)).length;
     });
@@ -369,20 +351,6 @@ export const useProductFormStore = defineStore("product_form", () => {
     const openAddLinkForm = () => {
         showAddLinkForm.value = true;
     };
-    const linksContainer = ref(null);
-    const draggableLinks = useDraggable(linksContainer, form.links, {
-        animation: 150,
-        onStart: (event) => {
-            drag.value = true;
-            const item = event.item;
-            item.style.opacity = "0.2";
-        },
-        onEnd: (event) => {
-            drag.value = false;
-            const item = event.item;
-            item.style.opacity = "1";
-        },
-    });
 
     const showAddBrandForm = ref(false);
     const showAddCategoryForm = ref(false);
@@ -469,7 +437,6 @@ export const useProductFormStore = defineStore("product_form", () => {
     return {
         product,
         form,
-        drag,
         filteredBrands,
         brandSearch,
         filteredCategories,
@@ -481,8 +448,6 @@ export const useProductFormStore = defineStore("product_form", () => {
         deleteVariant,
         getVariants,
         submit,
-        imagesContainer,
-        draggable,
         countNewImages,
         isNewImage,
         isExistingImage,
@@ -490,8 +455,6 @@ export const useProductFormStore = defineStore("product_form", () => {
         variantsToDelete,
         showAddLinkForm,
         openAddLinkForm,
-        linksContainer,
-        draggableLinks,
         showAddBrandForm,
         showAddCategoryForm,
         showSuccessDialog,

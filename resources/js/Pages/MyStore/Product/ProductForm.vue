@@ -34,6 +34,40 @@ const props = defineProps({
 });
 
 const formStore = useProductFormStore();
+
+const isDragging = ref(false);
+
+const imagesContainer = ref(null);
+const imagesRef = computed(() => formStore.form.images);
+const draggable = useDraggable(imagesContainer, imagesRef, {
+    animation: 150,
+    onStart: (event) => {
+        isDragging.value = true;
+        const item = event.item;
+        item.style.opacity = "0.2";
+    },
+    onEnd: (event) => {
+        isDragging.value = false;
+        const item = event.item;
+        item.style.opacity = "1";
+    },
+});
+
+// const linksContainer = ref(null);
+// const linksRef = computed(() => formStore.form.links);
+// const draggableLinks = useDraggable(linksContainer, linksRef, {
+//     animation: 150,
+//     onStart: (event) => {
+//         isDragging.value = true;
+//         const item = event.item;
+//         item.style.opacity = "0.2";
+//     },
+//     onEnd: (event) => {
+//         isDragging.value = false;
+//         const item = event.item;
+//         item.style.opacity = "1";
+//     },
+// });
 </script>
 
 <template>
@@ -70,6 +104,11 @@ const formStore = useProductFormStore();
                             :title="tab.title"
                             :subtitle="tab.subtitle"
                             :isActive="index == formStore.tabIndex"
+                            :error="
+                                index === 1 && formStore.form.errors.variants
+                                    ? formStore.form.errors.variants
+                                    : null
+                            "
                             @click="formStore.tabIndex = index"
                         >
                             <template v-if="tab.icon" #leading>
@@ -282,7 +321,6 @@ const formStore = useProductFormStore();
                                     type="number"
                                     placeholder="Masukkan Diskon"
                                     required
-                                    autocomplete="discount"
                                     :error="formStore.form.errors.discount"
                                     @update:modelValue="
                                         formStore.form.errors.discount = null
@@ -292,7 +330,7 @@ const formStore = useProductFormStore();
 
                             <!-- Description -->
                             <InputGroup
-                                id="description"
+                                for="description"
                                 label="Deskripsi Produk"
                             >
                                 <TextAreaInput
@@ -302,7 +340,6 @@ const formStore = useProductFormStore();
                                     placeholder="Masukkan Deskripsi"
                                     class="block w-full mt-1"
                                     required
-                                    autocomplete="description"
                                     :error="formStore.form.errors.description"
                                     @update:modelValue="
                                         formStore.form.errors.description = null
@@ -334,7 +371,7 @@ const formStore = useProductFormStore();
                                                 index
                                             ]
                                         "
-                                        :isDragging="formStore.drag"
+                                        :isDragging="isDragging"
                                         @update:modelValue="
                                             if (formStore.isNewImage(image)) {
                                                 if (image.image == null) {
@@ -373,7 +410,7 @@ const formStore = useProductFormStore();
                             </InputGroup>
 
                             <!-- Links -->
-                            <div
+                            <!-- <div
                                 class="flex flex-col items-start w-full gap-2 mt-2"
                             >
                                 <div
@@ -412,7 +449,7 @@ const formStore = useProductFormStore();
                                             :url="link.url"
                                             :icon="link.platform?.icon"
                                             :index="index"
-                                            :drag="formStore.drag"
+                                            :drag="isDragging"
                                             :showDeleteButton="true"
                                             @click="link.showEditForm = true"
                                             @delete="
@@ -444,12 +481,12 @@ const formStore = useProductFormStore();
                                         </DialogModal>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <!-- Navigate -->
                             <PrimaryButton
                                 type="button"
-                                class="w-fit"
+                                class="mt-4 w-fit"
                                 @click="
                                     if (formStore.validateProductForm()) {
                                         formStore.tabIndex = 1;
