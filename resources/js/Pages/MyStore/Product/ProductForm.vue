@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useForm, usePage } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
@@ -27,6 +27,7 @@ import { goBack } from "@/plugins/helpers";
 import { useProductFormStore } from "@/stores/product-form-store";
 import mediaService from "@/services/my-store/media-service";
 import MediaForm from "@/Components/MediaForm.vue";
+import Modal from "@/Components/Modal.vue";
 
 const props = defineProps({
     product: {
@@ -70,11 +71,15 @@ const draggable = useDraggable(imagesContainer, imagesRef, {
 //         item.style.opacity = "1";
 //     },
 // });
+
+const showMediaFormModal = ref(false);
+
+onMounted(() => {
+    showMediaFormModal.value = true;
+});
 </script>
 
 <template>
-    <MediaForm class="mb-4" />
-
     <form @submit.prevent="formStore.submit">
         <div class="flex flex-col items-start sm:gap-4">
             <DefaultCard :isMain="true" class="w-full !p-0">
@@ -703,5 +708,9 @@ const draggable = useDraggable(imagesContainer, imagesRef, {
                 </div>
             </template>
         </ErrorDialog>
+
+        <Modal :show="showMediaFormModal" @close="showMediaFormModal = false">
+            <MediaForm />
+        </Modal>
     </form>
 </template>

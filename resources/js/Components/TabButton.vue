@@ -46,6 +46,6 @@ const props = defineProps({
                 </p>
             </div>
         </div>
-        <InputError :message="props.error" class="mt-1" />
+        <InputError v-if="props.error" :message="props.error" class="mt-1" />
     </button>
 </template>

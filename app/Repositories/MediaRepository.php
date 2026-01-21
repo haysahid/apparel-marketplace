@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\TemporaryMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class MediaRepository

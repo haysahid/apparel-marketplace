@@ -13,17 +13,19 @@ export default function mediaService() {
             modelId = null,
             collectionName = "default",
             page = 1,
-            perPage = 10,
+            limit = 10,
             orderBy = "created_at",
             orderDirection = "desc",
+            search = null,
         }: {
             modelType: string;
             modelId?: number;
             collectionName?: string;
             page?: number;
-            perPage?: number;
+            limit?: number;
             orderBy?: string;
             orderDirection?: "asc" | "desc";
+            search?: string | null;
         },
         {
             autoShowDialog = false,
@@ -45,9 +47,10 @@ export default function mediaService() {
                     model_id: modelId,
                     collection_name: collectionName,
                     page: page,
-                    per_page: perPage,
+                    limit: limit,
                     order_by: orderBy,
                     order_direction: orderDirection,
+                    search: search,
                 },
             })
             .then((response) => {
@@ -185,9 +188,216 @@ export default function mediaService() {
         );
     }
 
+    async function deleteMedia(
+        mediaId: number,
+        {
+            autoShowDialog = false,
+            onSuccess = (response: any) => {},
+            onError = (error: any) => {},
+            onChangeStatus = (status: string) => {},
+        } = {},
+    ) {
+        onChangeStatus("loading");
+
+        await axios
+            .delete(`/api/my-store/media/${mediaId}`, {
+                headers: {
+                    Authorization: token,
+                    "X-Selected-Store-ID": selectedStoreId,
+                },
+            })
+            .then((response) => {
+                onChangeStatus("success");
+                onSuccess(response);
+                if (autoShowDialog) {
+                    dialogStore.openSuccessDialog(
+                        response.data.meta.message || "Media berhasil dihapus.",
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error deleting media:", error);
+                onChangeStatus("error");
+                onError(error);
+                if (autoShowDialog) {
+                    dialogStore.openErrorDialog(
+                        error.response?.data?.meta?.message ||
+                            "Terjadi kesalahan saat menghapus media.",
+                    );
+                }
+            });
+    }
+
+    async function deleteMediaBulk(
+        mediaIds: number[],
+        {
+            autoShowDialog = false,
+            onSuccess = (response: any) => {},
+            onError = (error: any) => {},
+            onChangeStatus = (status: string) => {},
+        } = {},
+    ) {
+        onChangeStatus("loading");
+
+        await Promise.all(
+            mediaIds.map((mediaId) =>
+                deleteMedia(mediaId, {
+                    autoShowDialog: false,
+                }),
+            ),
+        )
+            .then((responses) => {
+                onChangeStatus("success");
+                onSuccess(responses);
+                if (autoShowDialog) {
+                    dialogStore.openSuccessDialog("Media berhasil dihapus.");
+                }
+            })
+            .catch((error) => {
+                console.error("Error deleting media bulk:", error);
+                onChangeStatus("error");
+                onError(error);
+                if (autoShowDialog) {
+                    dialogStore.openErrorDialog(
+                        "Terjadi kesalahan saat menghapus media.",
+                    );
+                }
+            });
+    }
+
+    async function uploadTemporaryMedia(
+        file: File,
+        {
+            autoShowDialog = true,
+            onSuccess = (response: any) => {},
+            onError = (error: any) => {},
+            onChangeStatus = (status: string) => {},
+            onProgress = (progressEvent: AxiosProgressEvent) => {},
+        } = {},
+    ) {
+        onChangeStatus("loading");
+        const formData = new FormData();
+        formData.append("file", file);
+
+        await axios
+            .post(`/api/my-store/temporary-media/upload`, formData, {
+                headers: {
+                    Authorization: token,
+                    "X-Selected-Store-ID": selectedStoreId,
+                    "Content-Type": "multipart/form-data",
+                },
+                onUploadProgress: (progressEvent) => {
+                    onProgress(progressEvent);
+                },
+            })
+            .then((response) => {
+                onChangeStatus("success");
+                onSuccess(response);
+                if (autoShowDialog) {
+                    dialogStore.openSuccessDialog(
+                        response.data.meta.message ||
+                            "Media sementara berhasil diunggah.",
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error uploading temporary media:", error);
+                onChangeStatus("error");
+                onError(error);
+                if (autoShowDialog) {
+                    dialogStore.openErrorDialog(
+                        error.response?.data?.meta?.message ||
+                            "Terjadi kesalahan saat mengunggah media sementara.",
+                    );
+                }
+            });
+    }
+
+    async function uploadTemporaryMediaBulk(
+        files: File[],
+        {
+            onProgress = (
+                progressEvent: AxiosProgressEvent,
+                index: number,
+            ) => {},
+            onSuccess = (
+                uploadedTemporaryMediaList: TemporaryMediaEntity[],
+            ) => {},
+            onError = (error: any) => {},
+            onChangeStatus = (status: string) => {},
+        } = {},
+    ): Promise<void> {
+        onChangeStatus("loading");
+
+        let uploadedTemporaryMediaList: TemporaryMediaEntity[] = [];
+
+        await Promise.all(
+            files.map((file, index) =>
+                uploadTemporaryMedia(file, {
+                    autoShowDialog: false,
+                    onProgress: (progressEvent) => {
+                        onProgress(progressEvent, index);
+                    },
+                    onSuccess: (response) => {
+                        uploadedTemporaryMediaList.push(response.data.result);
+                    },
+                }),
+            ),
+        );
+
+        onChangeStatus("success");
+        onSuccess(uploadedTemporaryMediaList);
+    }
+
+    async function getTemporaryMediaList(
+        {} = {},
+        {
+            autoShowDialog = false,
+            onSuccess = (response: any) => {},
+            onError = (error: any) => {},
+            onChangeStatus = (status: string) => {},
+        } = {},
+    ) {
+        onChangeStatus("loading");
+
+        await axios
+            .get(`/api/my-store/temporary-media`, {
+                headers: {
+                    Authorization: token,
+                    "X-Selected-Store-ID": selectedStoreId,
+                },
+            })
+            .then((response) => {
+                onChangeStatus("success");
+                onSuccess(response);
+                if (autoShowDialog) {
+                    dialogStore.openSuccessDialog(
+                        response.data.meta.message ||
+                            "Daftar media sementara berhasil diambil.",
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching temporary media list:", error);
+                onChangeStatus("error");
+                onError(error);
+                if (autoShowDialog) {
+                    dialogStore.openErrorDialog(
+                        error.response?.data?.meta?.message ||
+                            "Terjadi kesalahan saat mengambil daftar media sementara.",
+                    );
+                }
+            });
+    }
+
     return {
         getMediaList,
         uploadMedia,
         uploadMediaBulk,
+        deleteMedia,
+        deleteMediaBulk,
+        getTemporaryMediaList,
+        uploadTemporaryMedia,
+        uploadTemporaryMediaBulk,
     };
 }

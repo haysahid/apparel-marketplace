@@ -136,12 +136,12 @@ const images = computed(() => {
                 ?.flatMap((variant) => variant.images)
                 .filter(
                     (img, idx, arr) =>
-                        arr.findIndex((i) => i.image === img.image) === idx
+                        arr.findIndex((i) => i.image === img.image) === idx,
                 ) || []),
             ...props.product.images,
         ].filter(
             (img, idx, arr) =>
-                arr.findIndex((i) => i.image === img.image) === idx
+                arr.findIndex((i) => i.image === img.image) === idx,
         );
     }
 
@@ -151,10 +151,10 @@ const images = computed(() => {
             ?.flatMap((variant) => variant.images)
             .filter(
                 (img, idx, arr) =>
-                    arr.findIndex((i) => i.image === img.image) === idx
+                    arr.findIndex((i) => i.image === img.image) === idx,
             ) || []),
     ].filter(
-        (img, idx, arr) => arr.findIndex((i) => i.image === img.image) === idx
+        (img, idx, arr) => arr.findIndex((i) => i.image === img.image) === idx,
     );
 });
 
@@ -377,7 +377,10 @@ const breadcrumbs = [
                                     :finalPrice="
                                         product.lowest_final_selling_price
                                     "
-                                    :image="product.images[0]?.image as string || null"
+                                    :image="
+                                        (product.images[0]?.image as string) ||
+                                        null
+                                    "
                                     :description="product.brand?.name"
                                     :slug="product.slug"
                                 />

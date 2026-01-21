@@ -84,4 +84,8 @@ Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->gro
         Route::get('/{id}', [MediaController::class, 'show'])->name('show');
         Route::delete('/{id}', [MediaController::class, 'destroy'])->name('destroy');
     });
+
+    // Temporary Media
+    Route::get('temporary-media', [MediaController::class, 'getAllTemporaryMedia'])->name('temporary-media.index');
+    Route::post('temporary-media/upload', [MediaController::class, 'uploadTemporaryMedia'])->name('temporary-media.upload');
 });

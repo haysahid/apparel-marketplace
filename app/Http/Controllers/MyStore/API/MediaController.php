@@ -6,7 +6,9 @@ use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\TemporaryMedia;
 use App\Repositories\MediaRepository;
+use App\Repositories\TemporaryMediaRepository;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -133,6 +135,60 @@ class MediaController extends Controller
             return ResponseFormatter::success(
                 null,
                 'Media berhasil dihapus.'
+            );
+        } catch (Exception $e) {
+            return ResponseFormatter::error(
+                $e->getMessage(),
+                500
+            );
+        }
+    }
+
+    public function getAllTemporaryMedia(Request $request)
+    {
+        $tempMedia = TemporaryMediaRepository::getAllTemporaryMedia(
+            storeId: $this->storeId,
+        );
+
+        return ResponseFormatter::success(
+            $tempMedia,
+            'Daftar media sementara berhasil diambil.'
+        );
+    }
+
+    public function uploadTemporaryMedia(Request $request)
+    {
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+
+            $temp = TemporaryMediaRepository::createTemporaryMedia(
+                file: $file,
+                storeId: $this->storeId,
+            );
+
+            return ResponseFormatter::success(
+                $temp,
+                'Media sementara berhasil diunggah.',
+                201
+            );
+        }
+    }
+
+    public function getTemporaryMedia(string $id)
+    {
+        try {
+            $tempMedia = TemporaryMediaRepository::getTemporaryMedia($id);
+
+            if (!$tempMedia) {
+                return ResponseFormatter::error(
+                    'Media sementara tidak ditemukan.',
+                    404
+                );
+            }
+
+            return ResponseFormatter::success(
+                $tempMedia,
+                'Detail media sementara berhasil diambil.'
             );
         } catch (Exception $e) {
             return ResponseFormatter::error(
