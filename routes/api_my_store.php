@@ -12,6 +12,7 @@ use App\Http\Controllers\API\ShippingMethodController;
 use App\Http\Controllers\API\InvoiceController;
 use App\Http\Controllers\API\ReportController;
 use App\Http\Controllers\API\VoucherController;
+use App\Http\Controllers\MyStore\API\MediaController;
 use App\Http\Controllers\MyStore\API\MyStoreController;
 use App\Http\Controllers\MyStore\API\ShipmentController;
 use App\Http\Controllers\MyStore\API\UserController;
@@ -75,4 +76,12 @@ Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->gro
     // User
     Route::get('user', [UserController::class, 'index'])->name('user.index');
     Route::get('user-dropdown', [UserController::class, 'dropdown'])->name('user.dropdown');
+
+    // Media
+    Route::prefix('media')->name('media.')->group(function () {
+        Route::get('/', [MediaController::class, 'index'])->name('index');
+        Route::post('/', [MediaController::class, 'store'])->name('store');
+        Route::get('/{id}', [MediaController::class, 'show'])->name('show');
+        Route::delete('/{id}', [MediaController::class, 'destroy'])->name('destroy');
+    });
 });

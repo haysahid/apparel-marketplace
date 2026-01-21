@@ -25,6 +25,8 @@ import InfoTooltip from "@/Components/InfoTooltip.vue";
 import cookieManager from "@/plugins/cookie-manager";
 import { goBack } from "@/plugins/helpers";
 import { useProductFormStore } from "@/stores/product-form-store";
+import mediaService from "@/services/my-store/media-service";
+import MediaForm from "@/Components/MediaForm.vue";
 
 const props = defineProps({
     product: {
@@ -71,6 +73,8 @@ const draggable = useDraggable(imagesContainer, imagesRef, {
 </script>
 
 <template>
+    <MediaForm class="mb-4" />
+
     <form @submit.prevent="formStore.submit">
         <div class="flex flex-col items-start sm:gap-4">
             <DefaultCard :isMain="true" class="w-full !p-0">
