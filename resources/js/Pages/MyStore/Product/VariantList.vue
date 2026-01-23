@@ -7,9 +7,7 @@ import DeleteConfirmationDialog from "@/Components/DeleteConfirmationDialog.vue"
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import Dropdown from "@/Components/Dropdown.vue";
-import InputLabel from "@/Components/InputLabel.vue";
 import Chip from "@/Components/Chip.vue";
-import InputGroup from "@/Components/InputGroup.vue";
 import ColorChip from "@/Components/ColorChip.vue";
 import VariantFilter from "@/Components/VariantFilter.vue";
 
@@ -32,13 +30,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits([
-    "onAdd",
-    "onAdded",
-    "onEdit",
-    "onEditted",
-    "onDelete",
-]);
+const emit = defineEmits(["onCreated", "onUpdated", "onDelete"]);
 
 const motifs = computed(() => {
     return [...new Set(props.variants.map((variant) => variant.motif))];
@@ -314,14 +306,12 @@ const openAddVariantForm = () => {
                 >
                     <template #content>
                         <VariantForm
-                            :isEdit="props.isEdit"
                             :product="props.product"
                             :variant="variant"
-                            @submit="emit('onEdit', $event)"
                             @close="variant.showEditForm = false"
                             @submitted="
                                 variant.showEditForm = false;
-                                emit('onEditted', $event);
+                                emit('onUpdated', $event);
                             "
                         />
                     </template>
@@ -349,14 +339,12 @@ const openAddVariantForm = () => {
         >
             <template #content>
                 <VariantForm
-                    :isEdit="props.product != null"
                     :product="props.product"
                     :variant="null"
-                    @submit="emit('onAdd', $event)"
                     @close="showAddVariantForm = false"
                     @submitted="
                         showAddVariantForm = false;
-                        emit('onAdded', $event);
+                        emit('onCreated', $event);
                     "
                 />
             </template>

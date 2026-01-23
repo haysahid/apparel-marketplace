@@ -54,10 +54,18 @@ const proxyChecked = computed({
         @click="proxyChecked = !proxyChecked"
     >
         <img
+            v-if="props.media.original_url"
             :src="props.media.original_url"
             alt="media"
             class="object-cover w-full h-32 transition-transform duration-200 group-hover:scale-105"
         />
+        <div
+            v-else
+            class="flex items-center justify-center w-full h-32 bg-gray-100"
+        >
+            <span class="text-sm text-gray-500">No Image</span>
+        </div>
+
         <div v-if="props.showName || props.showSize" class="p-2">
             <p v-if="props.showName" class="text-sm font-medium">
                 {{ props.media.file_name }}

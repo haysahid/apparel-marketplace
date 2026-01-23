@@ -4,6 +4,7 @@ import { useDialogStore } from "@/stores/dialog-store";
 import axios, { AxiosProgressEvent, CancelToken } from "axios";
 import { computed, ref } from "vue";
 import PrimaryButton from "./PrimaryButton.vue";
+import temporaryMediaService from "@/services/my-store/temporary-media-service";
 
 const props = defineProps({
     modelType: {
@@ -12,6 +13,10 @@ const props = defineProps({
     },
     modelId: {
         type: Number,
+        default: null,
+    },
+    collectionName: {
+        type: String,
         default: null,
     },
     fileType: {
@@ -24,7 +29,10 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["uploadCompleted"]);
+const emit = defineEmits([
+    "uploadMediaCompleted",
+    "uploadTemporaryMediaCompleted",
+]);
 
 const selectedFiles = ref<FileList | null>(null);
 const uploadListProgress = ref<AxiosProgressEvent[]>([]);
@@ -111,26 +119,38 @@ const uploadFiles = async () => {
             await mediaService().uploadMediaBulk(
                 {
                     modelType: props.modelType,
-                    modelId: 0,
+                    modelId: props.modelId,
+                    collectionName: props.collectionName,
                     files: Array.from(selectedFiles.value),
                     abortControllers: abortControllers.value,
                 },
-                (progressEvent: AxiosProgressEvent, index: number) => {
-                    uploadListProgress.value[index] = progressEvent;
-                    const totalLoaded = uploadListProgress.value.reduce(
-                        (acc, curr) => acc + (curr.loaded || 0),
-                        0,
-                    );
-                    const totalTotal = uploadListProgress.value.reduce(
-                        (acc, curr) => acc + (curr.total || 0),
-                        0,
-                    );
-                    totalUploadProgress.value =
-                        totalTotal > 0 ? (totalLoaded / totalTotal) * 100 : 0;
+                {
+                    onProgress: (
+                        progressEvent: AxiosProgressEvent,
+                        index: number,
+                    ) => {
+                        uploadListProgress.value[index] = progressEvent;
+                        const totalLoaded = uploadListProgress.value.reduce(
+                            (acc, curr) => acc + (curr.loaded || 0),
+                            0,
+                        );
+                        const totalTotal = uploadListProgress.value.reduce(
+                            (acc, curr) => acc + (curr.total || 0),
+                            0,
+                        );
+                        totalUploadProgress.value =
+                            totalTotal > 0
+                                ? (totalLoaded / totalTotal) * 100
+                                : 0;
+                    },
+                    onSuccess: (uploadedMediaList: MediaEntity[]) => {
+                        uploadStatus.value = "completed";
+                        emit("uploadMediaCompleted", uploadedMediaList);
+                    },
                 },
             );
         } else {
-            await mediaService().uploadTemporaryMediaBulk(
+            await temporaryMediaService().uploadTemporaryMediaBulk(
                 {
                     files: Array.from(selectedFiles.value),
                     abortControllers: abortControllers.value,
@@ -159,7 +179,10 @@ const uploadFiles = async () => {
                         uploadedTemporaryMediaList: TemporaryMediaEntity[],
                     ) => {
                         uploadStatus.value = "completed";
-                        emit("uploadCompleted", uploadedTemporaryMediaList);
+                        emit(
+                            "uploadTemporaryMediaCompleted",
+                            uploadedTemporaryMediaList,
+                        );
 
                         // // Delay to allow user to see completed status
                         // setTimeout(() => {
@@ -189,6 +212,7 @@ const uploadFile = async (file: File, index: number) => {
             {
                 modelType: props.modelType,
                 modelId: props.modelId,
+                collectionName: props.collectionName,
                 file: file,
             },
             {
@@ -198,12 +222,12 @@ const uploadFile = async (file: File, index: number) => {
                 },
                 onSuccess: (uploadedMedia: MediaEntity) => {
                     uploadStatus.value = "completed";
-                    emit("uploadCompleted", [uploadedMedia]);
+                    emit("uploadMediaCompleted", [uploadedMedia]);
                 },
             },
         );
     } else {
-        await mediaService().uploadTemporaryMedia(
+        await temporaryMediaService().uploadTemporaryMedia(
             {
                 file,
             },
@@ -214,17 +238,22 @@ const uploadFile = async (file: File, index: number) => {
                 },
                 onSuccess: (uploadedTemporaryMedia: TemporaryMediaEntity) => {
                     uploadStatus.value = "completed";
-                    emit("uploadCompleted", [uploadedTemporaryMedia]);
+                    emit("uploadTemporaryMediaCompleted", [
+                        uploadedTemporaryMedia,
+                    ]);
                 },
             },
         );
     }
 };
 
+const selectedMediaList = ref<Array<MediaEntity>>([]);
+
 defineExpose({
     selectedFiles,
     uploadFiles,
     uploadStatus,
+    selectedMediaList,
 });
 </script>
 

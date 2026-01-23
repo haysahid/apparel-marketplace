@@ -42,12 +42,12 @@ class ProductVariantRepository
                 'unit_id' => $unit->id,
             ]);
 
-            if ($data['images']) {
-                foreach ($data['images'] as $key => $image) {
+            if (isset($data['images'])) {
+                foreach ($data['images'] as $key => $mediaId) {
                     ProductVariantImage::create([
                         'product_variant_id' => $variant->id,
                         'product_id' => $variant->product_id,
-                        'image' => $image->store('product'),
+                        'media_id' => $mediaId,
                         'order' => $key,
                     ]);
                 }
@@ -106,6 +106,20 @@ class ProductVariantRepository
 
             $variant->save();
 
+            if (isset($data['images'])) {
+                foreach ($data['images'] as $key => $mediaId) {
+                    if (!ProductVariantImage::where('product_variant_id', $variant->id)->where('media_id', $mediaId)->exists()) {
+                        ProductVariantImage::create([
+                            'product_variant_id' => $variant->id,
+                            'product_id' => $variant->product_id,
+                            'media_id' => $mediaId,
+                            'order' => $key,
+                        ]);
+                        continue;
+                    }
+                }
+            }
+
             DB::commit();
 
             return $variant;
@@ -125,16 +139,6 @@ class ProductVariantRepository
 
             // Delete associated images
             ProductVariantImage::where('product_variant_id', $id)->each(function ($image) {
-                // Check if the file used by another product
-                $otherImages = ProductVariantImage::where('image', $image->image)
-                    ->where('id', '!=', $image->id)
-                    ->count();
-
-                if ($otherImages === 0) {
-                    // Delete the image file
-                    Storage::delete($image->image);
-                }
-
                 $image->delete();
             });
 

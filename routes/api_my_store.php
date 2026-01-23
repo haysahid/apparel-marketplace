@@ -5,7 +5,6 @@ use App\Http\Controllers\API\CustomerController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\PaymentMethodController;
 use App\Http\Controllers\MyStore\API\ProductController;
-use App\Http\Controllers\API\ProductImageController;
 use App\Http\Controllers\API\ProductVariantController;
 use App\Http\Controllers\API\ProductVariantImageController;
 use App\Http\Controllers\API\ShippingMethodController;
@@ -30,9 +29,9 @@ Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->gro
 
     // Product
     Route::apiResource('product', ProductController::class);
-    Route::apiResource('product-image', ProductImageController::class);
     Route::apiResource('product-variant', ProductVariantController::class);
     Route::apiResource('product-variant-image', ProductVariantImageController::class);
+    Route::post('product-sku-prefix-check', [ProductController::class, 'checkSkuPrefixAvailability'])->name('product.sku-prefix-check');
 
     // Order
     Route::post('checkout', [OrderController::class, 'checkoutStore'])->name('checkout');

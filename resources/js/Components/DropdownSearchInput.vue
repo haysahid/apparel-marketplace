@@ -80,7 +80,7 @@ watch(
     () => search.value,
     (newValue) => {
         emit("search", newValue);
-    }
+    },
 );
 
 const dropdown = ref(null);
@@ -100,7 +100,7 @@ const filteredOptions = computed(() => {
         return props.options.filter((option) =>
             option.label
                 .toLowerCase()
-                .includes(search.value.toLowerCase().trim())
+                .includes(search.value.toLowerCase().trim()),
         );
     } else {
         return props.options;
@@ -142,6 +142,7 @@ const filteredOptions = computed(() => {
                 :placeholder="props.placeholder"
                 :error="props.error"
                 :disabled="props.disabled"
+                autocomplete="off"
                 @focus="dropdown.open = true"
                 @focusout="onFocusout"
             >

@@ -43,7 +43,7 @@ class ProductVariantController extends Controller
             'current_stock_level' => 'required|integer',
             'unit_id' => 'required|exists:units,id',
             'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'images.*' => 'integer|exists:media,id',
         ], [
             'store_id.required' => 'ID toko harus diisi.',
             'store_id.exists' => 'Toko tidak ditemukan.',
@@ -62,10 +62,9 @@ class ProductVariantController extends Controller
             'base_selling_price.min' => 'Harga jual tidak boleh kurang dari 0.',
             'unit_id.required' => 'Unit harus dipilih.',
             'unit_id.exists' => 'Unit yang dipilih tidak valid.',
-            'images.*.required' => 'Gambar harus diunggah.',
-            'images.*.image' => 'File yang diunggah harus berupa gambar.',
-            'images.*.mimes' => 'Gambar harus berformat: jpeg, png, jpg, gif, svg, webp.',
-            'images.*.max' => 'Ukuran gambar maksimal 2MB.',
+            'images.array' => 'Gambar harus berupa array.',
+            'images.*.integer' => 'Setiap gambar harus berupa ID yang valid.',
+            'images.*.exists' => 'Gambar yang dipilih tidak ditemukan.',
         ]);
 
         try {
@@ -119,6 +118,8 @@ class ProductVariantController extends Controller
             'discount' => 'nullable|numeric|min:0',
             'current_stock_level' => 'required|integer',
             'unit_id' => 'required|exists:units,id',
+            'images' => 'nullable|array',
+            'images.*' => 'integer|exists:media,id',
         ], [
             'motif.required' => 'Motif harus diisi.',
             'color_id.required' => 'Warna harus dipilih.',
@@ -137,6 +138,9 @@ class ProductVariantController extends Controller
             'current_stock_level.integer' => 'Stok saat ini harus berupa angka.',
             'unit_id.required' => 'Unit harus dipilih.',
             'unit_id.exists' => 'Unit yang dipilih tidak valid.',
+            'images.array' => 'Gambar harus berupa array.',
+            'images.*.integer' => 'Setiap gambar harus berupa ID yang valid.',
+            'images.*.exists' => 'Gambar yang dipilih tidak ditemukan.',
         ]);
 
         try {

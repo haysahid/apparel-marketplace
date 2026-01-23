@@ -241,4 +241,19 @@ class ProductRepository
             throw new Exception('Gagal menghapus produk: ' . $e);
         }
     }
+
+    public static function isSkuPrefixAvailable(
+        string $skuPrefix,
+        $storeId,
+        ?string $excludeProductId = null,
+    ): bool {
+        $query = Product::where('sku_prefix', strtoupper(str_replace(' ', '', $skuPrefix)))
+            ->where('store_id', $storeId);
+
+        if ($excludeProductId) {
+            $query->where('id', '!=', $excludeProductId);
+        }
+
+        return !$query->exists();
+    }
 }

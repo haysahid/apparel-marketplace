@@ -12,7 +12,7 @@ class MediaRepository
 {
     public static function getAllMedia(
         $storeId = null,
-        $model = null,
+        $models = null,
         $collectionName = null,
         $limit = 10,
         $search = null,
@@ -31,8 +31,8 @@ class MediaRepository
             );
         }
 
-        if ($model) {
-            $query->where('model_type', $model);
+        if ($models) {
+            $query->whereIn('model_type', $models);
         }
 
         if ($collectionName) {
@@ -77,6 +77,15 @@ class MediaRepository
     ) {
         $mediaItems = Media::whereIn('id', $mediaIds)->get();
         foreach ($mediaItems as $media) {
+            // If media is already attached to this model and collection, skip
+            if (
+                $media->model_type === get_class($model) &&
+                $media->model_id === $model->id &&
+                $media->collection_name === $collectionName
+            ) {
+                continue;
+            }
+
             // Determine new file name based on model's slug or name
             if (isset($model->slug)) {
                 // Use slug if available

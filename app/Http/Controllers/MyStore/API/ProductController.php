@@ -163,4 +163,21 @@ class ProductController extends Controller
             );
         }
     }
+
+    public function checkSkuPrefixAvailability(Request $request)
+    {
+        $skuPrefix = $request->input('sku_prefix');
+        $productId = $request->input('product_id');
+
+        $isAvailable = ProductRepository::isSkuPrefixAvailable(
+            skuPrefix: $skuPrefix,
+            storeId: $this->storeId,
+            excludeProductId: $productId,
+        );
+
+        return ResponseFormatter::success(
+            ['is_available' => $isAvailable],
+            'Pemeriksaan ketersediaan SKU prefix berhasil.'
+        );
+    }
 }

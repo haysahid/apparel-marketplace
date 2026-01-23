@@ -3,19 +3,21 @@ import { ref, computed, onMounted, nextTick } from "vue";
 import { useForm, usePage } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import ImageInput from "@/Components/ImageInput.vue";
-import ErrorDialog from "@/Components/ErrorDialog.vue";
 import { useDraggable } from "vue-draggable-plus";
 import axios from "axios";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import InputGroup from "@/Components/InputGroup.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
-import SuccessDialog from "@/Components/SuccessDialog.vue";
 import DialogModal from "@/Components/DialogModal.vue";
 import ColorForm from "../Color/ColorForm.vue";
 import UnitForm from "../Unit/UnitForm.vue";
 import SizeForm from "../Size/SizeForm.vue";
 import cookieManager from "@/plugins/cookie-manager";
+import MediaCard from "@/Components/MediaCard.vue";
+import { useProductFormStore } from "@/stores/product-form-store";
+import Modal from "@/Components/Modal.vue";
+import MediaForm from "@/Components/MediaForm.vue";
+import { useDialogStore } from "@/stores/dialog-store";
 
 const props = defineProps({
     product: {
@@ -26,41 +28,16 @@ const props = defineProps({
         type: Object as () => ProductVariantEntity,
         default: null,
     },
-    isEdit: {
-        type: Boolean,
-        default: false,
-    },
 });
 
-const emit = defineEmits(["submit", "close", "submitted"]);
+const emit = defineEmits(["close", "submitted"]);
 
-const isFile = (image) => {
-    return image instanceof File;
-};
-
-const loadFile = (file) => {
-    return URL.createObjectURL(file);
-};
-
-const isNewImage = (image) => {
-    return typeof image.id == "string" && image.id.startsWith("new-var-");
-};
-
-const isExistingImage = (image) => {
-    return typeof image.id == "number";
-};
-
-const initialNewImagesCount =
-    props.variant?.images?.filter((image) => isNewImage(image)).length || 0;
+const dialogStore = useDialogStore();
 
 const form = useForm(
     props.variant
         ? {
               ...JSON.parse(JSON.stringify(props.variant)),
-              images: [
-                  ...(props.variant?.images || []),
-                  { id: `new-var-${initialNewImagesCount + 1}`, image: null },
-              ],
           }
         : {
               product_id: props.product?.id,
@@ -80,13 +57,9 @@ const form = useForm(
               current_stock_level: null,
               unit_id: null,
               unit: null,
-              images: [{ id: "new-var-1", image: null }],
+              images: [],
           },
 );
-
-const countNewImages = computed(() => {
-    return form.images.filter((image) => isNewImage(image)).length;
-});
 
 const drag = ref(false);
 
@@ -146,106 +119,9 @@ function validate() {
         form.errors.current_stock_level = "Stok tidak boleh kosong.";
     }
 
-    if (!form.unit) {
-        form.errors.unit = "Satuan tidak boleh kosong.";
+    if (!form.unit_id) {
+        form.errors.unit_id = "Satuan tidak boleh kosong.";
     }
-
-    if (!form.images || form.images.length === 0) {
-        form.errors.images = "Minimal harus ada satu gambar produk.";
-    }
-}
-
-function uploadNewImage(image, index) {
-    const token = `Bearer ${cookieManager.getItem("access_token")}`;
-
-    const formData = new FormData();
-    formData.append("product_variant_id", props.variant?.id?.toString());
-    formData.append("product_id", props.product?.id?.toString());
-    formData.append("image", image.image);
-    formData.append("order", index);
-
-    axios
-        .post("/api/my-store/product-variant-image", formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-                Authorization: token,
-            },
-        })
-        .then((response) => {
-            form.images[index] = response.data.result;
-        })
-        .catch((error) => {
-            if (error.response?.data?.error) {
-                openErrorDialog(error.response.data.error);
-            }
-        });
-}
-
-function updateImage(index, image) {
-    if (typeof image.image === "string" && image.order == index) {
-        return;
-    }
-
-    const token = `Bearer ${cookieManager.getItem("access_token")}`;
-
-    const formData = new FormData();
-    formData.append("_method", "PUT");
-    if (image.image instanceof File) {
-        formData.append("image", image.image);
-    }
-    formData.append("order", index);
-
-    axios
-        .post(`/api/my-store/product-variant-image/${image.id}`, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-                Authorization: token,
-            },
-        })
-        .then((response) => {
-            form.images[index] = response.data.result;
-        })
-        .catch((error) => {
-            if (error.response?.data?.error) {
-                openErrorDialog(error.response.data.error);
-            }
-        });
-}
-
-function updateImages() {
-    const images = form.images || [];
-
-    images.forEach((image, index) => {
-        if (isNewImage(image) && image.image instanceof File) {
-            uploadNewImage(image, index);
-        } else if (isExistingImage(image)) {
-            updateImage(index, image);
-        }
-    });
-}
-
-function deleteImages() {
-    const token = `Bearer ${cookieManager.getItem("access_token")}`;
-    const images = imagesToDelete.value || [];
-
-    images.forEach((imageId) => {
-        axios
-            .delete(`/api/my-store/product-variant-image/${imageId}`, {
-                headers: {
-                    Authorization: token,
-                },
-            })
-            .then(() => {
-                imagesToDelete.value = imagesToDelete.value.filter(
-                    (id) => id !== imageId,
-                );
-            })
-            .catch((error) => {
-                if (error.response?.data?.error) {
-                    openErrorDialog(error.response.data.error);
-                }
-            });
-    });
 }
 
 function updateVariant() {
@@ -255,9 +131,11 @@ function updateVariant() {
     formData.append("_method", "PUT");
 
     Object.keys(data).forEach((key) => {
-        if (key === "images") return;
-
-        if (data[key] !== null && data[key] !== undefined) {
+        if (key === "images") {
+            data.images.forEach((image: ProductVariantImageEntity, index) => {
+                formData.append(`images[${index}]`, image.media_id.toString());
+            });
+        } else if (data[key] !== null && data[key] !== undefined) {
             formData.append(key, data[key]);
         }
     });
@@ -283,7 +161,7 @@ function updateVariant() {
                     form.errors[key] = error.response.data.errors[key][0];
                 });
             } else if (error.response?.data?.error) {
-                openErrorDialog(error.response.data.error);
+                dialogStore.openErrorDialog(error.response.data.error);
             }
         });
 }
@@ -296,10 +174,8 @@ function createVariant() {
 
     Object.keys(data).forEach((key) => {
         if (key === "images") {
-            data.images.forEach((image, index) => {
-                if (isNewImage(image) && image.image instanceof File) {
-                    formData.append(`images[${index}]`, image.image);
-                }
+            data.images.forEach((image: ProductVariantImageEntity, index) => {
+                formData.append(`images[${index}]`, image.media_id.toString());
             });
         } else if (data[key] !== null && data[key] !== undefined) {
             formData.append(key, data[key]);
@@ -327,38 +203,19 @@ function createVariant() {
                     form.errors[key] = error.response.data.errors[key][0];
                 });
             } else if (error.response?.data?.error) {
-                openErrorDialog(error.response.data.error);
+                dialogStore.openErrorDialog(error.response.data.error);
             }
         });
 }
 
 const submit = () => {
     validate();
-    if (form.errors.url) return;
+    if (Object.keys(form.errors).length > 0) return;
 
-    if (props.isEdit) {
-        if (props.variant) {
-            updateImages();
-            deleteImages();
-            updateVariant();
-        } else {
-            createVariant();
-        }
+    if (props.variant) {
+        updateVariant();
     } else {
-        emit("submit", {
-            ...form.data(),
-            final_selling_price:
-                form.base_selling_price -
-                (form.discount_type === "percentage"
-                    ? (form.base_selling_price * form.discount) / 100
-                    : form.discount),
-            images: form.images.filter(
-                (image) =>
-                    image.image instanceof File || isExistingImage(image),
-            ),
-        });
-
-        emit("close");
+        createVariant();
     }
 };
 
@@ -387,29 +244,15 @@ const showAddColorForm = ref(false);
 const showAddSizeForm = ref(false);
 const showAddUnitForm = ref(false);
 
-const openSuccessDialog = (message) => {
-    successMessage.value = message;
-    showSuccessDialog.value = true;
-};
-
-const closeSuccessDialog = () => {
-    showSuccessDialog.value = false;
-};
-
-const showErrorDialog = ref(false);
-const errorMessage = ref(null);
-
-const openErrorDialog = (message) => {
-    errorMessage.value = message;
-    showErrorDialog.value = true;
-};
-
 onMounted(() => {
     nextTick(() => {
         const input = document.getElementById("motif") as HTMLInputElement;
         input?.focus();
     });
 });
+
+const productFormStore = useProductFormStore();
+const showMediaFormModal = ref(false);
 </script>
 
 <template>
@@ -676,43 +519,51 @@ onMounted(() => {
             <!-- Images -->
             <InputGroup for="images" label="Gambar Variasi Produk">
                 <div ref="imagesContainer" class="flex flex-wrap w-full gap-2">
-                    <ImageInput
-                        v-for="(image, index) in form.images"
-                        :key="index"
-                        :id="`image-${image.id}`"
-                        :modelValue="image.image"
-                        type="file"
-                        accept="image/*"
-                        placeholder="Upload gambar"
-                        class="!w-auto mt-1"
-                        width="!w-[100px]"
-                        height="h-[100px]"
-                        :showDeleteButton="true"
-                        :error="form.errors.images?.[index]"
-                        :isDragging="drag"
-                        @update:modelValue="
-                            if (isNewImage(image)) {
-                                if (image.image == null) {
-                                    form.images.push({
-                                        id: `new-${countNewImages + 1}`,
-                                        image: null,
-                                    });
-                                }
+                    <div
+                        ref="imagesContainer"
+                        class="flex flex-wrap w-full gap-2"
+                    >
+                        <template
+                            v-for="(image, index) in form.images"
+                            :key="image.id"
+                        >
+                            <MediaCard
+                                :media="image.media"
+                                :isSelected="false"
+                                :showCheckbox="false"
+                                :showRemoveButton="true"
+                                :showName="false"
+                                :showSize="false"
+                                @remove="form.images.splice(index, 1)"
+                            />
+                        </template>
 
-                                image.image = $event;
-                            } else {
-                                image.image = $event;
-                            }
-                        "
-                        @delete="
-                            if (isNewImage(image)) {
-                                form.images.splice(index, 1);
-                            } else {
-                                imagesToDelete.push(image.id);
-                                form.images.splice(index, 1);
-                            }
-                        "
-                    />
+                        <button
+                            type="button"
+                            class="relative overflow-hidden transition-all ease-in-out border rounded-lg cursor-pointer group hover:border-primary-light hover:ring-1 hover:ring-primary-light"
+                            @click.prevent="showMediaFormModal = true"
+                        >
+                            <div
+                                class="flex flex-col items-center justify-center w-full h-32 gap-2 p-4 text-gray-500 transition-all duration-300 ease-in-out rounded-lg bg-gray-50 group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    class="size-8"
+                                >
+                                    <path
+                                        d="M5 21C4.45 21 3.97933 20.8043 3.588 20.413C3.19667 20.0217 3.00067 19.5507 3 19V5C3 4.45 3.196 3.97934 3.588 3.588C3.98 3.19667 4.45067 3.00067 5 3H12C12.2833 3 12.521 3.096 12.713 3.288C12.905 3.48 13.0007 3.71734 13 4C12.9993 4.28267 12.9033 4.52034 12.712 4.713C12.5207 4.90567 12.2833 5.00134 12 5H5V19H19V12C19 11.7167 19.096 11.4793 19.288 11.288C19.48 11.0967 19.7173 11.0007 20 11C20.2827 10.9993 20.5203 11.0953 20.713 11.288C20.9057 11.4807 21.0013 11.718 21 12V19C21 19.55 20.8043 20.021 20.413 20.413C20.0217 20.805 19.5507 21.0007 19 21H5ZM6 17H18L14.25 12L11.25 16L9 13L6 17ZM17 7H16C15.7167 7 15.4793 6.904 15.288 6.712C15.0967 6.52 15.0007 6.28267 15 6C14.9993 5.71734 15.0953 5.48 15.288 5.288C15.4807 5.096 15.718 5 16 5H17V4C17 3.71667 17.096 3.47934 17.288 3.288C17.48 3.09667 17.7173 3.00067 18 3C18.2827 2.99934 18.5203 3.09534 18.713 3.288C18.9057 3.48067 19.0013 3.718 19 4V5H20C20.2833 5 20.521 5.096 20.713 5.288C20.905 5.48 21.0007 5.71734 21 6C20.9993 6.28267 20.9033 6.52034 20.712 6.713C20.5207 6.90567 20.2833 7.00134 20 7H19V8C19 8.28334 18.904 8.521 18.712 8.713C18.52 8.905 18.2827 9.00067 18 9C17.7173 8.99934 17.48 8.90334 17.288 8.712C17.096 8.52067 17 8.28334 17 8V7Z"
+                                        fill="currentColor"
+                                    />
+                                </svg>
+
+                                <p class="text-sm text-center">Tambah Gambar</p>
+                            </div>
+                        </button>
+                    </div>
                 </div>
             </InputGroup>
 
@@ -723,144 +574,148 @@ onMounted(() => {
                 </SecondaryButton>
             </div>
         </div>
-
-        <!-- Add Color Modal -->
-        <DialogModal
-            :show="showAddColorForm"
-            @close="showAddColorForm = false"
-            maxWidth="sm"
-        >
-            <template #content>
-                <div class="w-full">
-                    <h2
-                        class="w-full mb-3 text-lg font-medium text-center text-gray-900"
-                    >
-                        Tambah Warna
-                    </h2>
-                    <ColorForm
-                        :isDialog="true"
-                        @onSubmitted="
-                            (colorName) => {
-                                showAddColorForm = false;
-                                colorSearch = '';
-
-                                colors = $page.props.colors as ColorEntity[];
-
-                                const newColor = colors.find(
-                                    (color) => color.name === colorName,
-                                );
-                                form.color_id = newColor.id;
-                                form.color = newColor;
-
-                                openSuccessDialog(
-                                    'Warna berhasil ditambahkan.',
-                                );
-                            }
-                        "
-                        @close="showAddColorForm = false"
-                        class="w-full"
-                    />
-                </div>
-            </template>
-        </DialogModal>
-
-        <!-- Add Size Modal -->
-        <DialogModal
-            :show="showAddSizeForm"
-            @close="showAddSizeForm = false"
-            maxWidth="sm"
-        >
-            <template #content>
-                <div class="w-full">
-                    <h2
-                        class="w-full mb-3 text-lg font-medium text-center text-gray-900"
-                    >
-                        Tambah Ukuran
-                    </h2>
-                    <SizeForm
-                        :isDialog="true"
-                        @onSubmitted="
-                            (sizeName) => {
-                                showAddSizeForm = false;
-                                sizeSearch = '';
-
-                                sizes = $page.props.sizes as SizeEntity[];
-
-                                const newSize = sizes.find(
-                                    (size) => size.name === sizeName,
-                                );
-                                form.size_id = newSize.id;
-                                form.size = newSize;
-
-                                openSuccessDialog(
-                                    'Ukuran berhasil ditambahkan.',
-                                );
-                            }
-                        "
-                        @close="showAddSizeForm = false"
-                        class="w-full"
-                    />
-                </div>
-            </template>
-        </DialogModal>
-
-        <!-- Add Unit Modal -->
-        <DialogModal
-            :show="showAddUnitForm"
-            @close="showAddUnitForm = false"
-            maxWidth="sm"
-        >
-            <template #content>
-                <div class="w-full">
-                    <h2
-                        class="w-full mb-3 text-lg font-medium text-center text-gray-900"
-                    >
-                        Tambah Satuan
-                    </h2>
-                    <UnitForm
-                        :isDialog="true"
-                        @onSubmitted="
-                            (unitName) => {
-                                showAddUnitForm = false;
-                                unitSearch = '';
-
-                                units = $page.props.units as UnitEntity[];
-
-                                const newUnit = units.find(
-                                    (unit) => unit.name === unitName,
-                                );
-                                form.unit_id = newUnit.id;
-                                form.unit = newUnit;
-
-                                openSuccessDialog(
-                                    'Satuan berhasil ditambahkan.',
-                                );
-                            }
-                        "
-                        @close="showAddUnitForm = false"
-                        class="w-full"
-                    />
-                </div>
-            </template>
-        </DialogModal>
-
-        <SuccessDialog
-            :show="showSuccessDialog"
-            :title="successMessage"
-            @close="closeSuccessDialog"
-        />
-
-        <ErrorDialog :show="showErrorDialog" @close="showErrorDialog = false">
-            <template #content>
-                <div>
-                    <div
-                        class="mb-1 text-lg font-medium text-center text-gray-900"
-                    >
-                        Terjadi Kesalahan
-                    </div>
-                    <p class="text-center text-gray-700">{{ errorMessage }}</p>
-                </div>
-            </template>
-        </ErrorDialog>
     </form>
+
+    <!-- Add Color Modal -->
+    <DialogModal
+        :show="showAddColorForm"
+        @close="showAddColorForm = false"
+        maxWidth="sm"
+    >
+        <template #content>
+            <div class="w-full">
+                <h2
+                    class="w-full mb-3 text-lg font-medium text-center text-gray-900"
+                >
+                    Tambah Warna
+                </h2>
+                <ColorForm
+                    :isDialog="true"
+                    @onSubmitted="
+                        (colorName) => {
+                            showAddColorForm = false;
+                            colorSearch = '';
+
+                            colors = $page.props.colors as ColorEntity[];
+
+                            const newColor = colors.find(
+                                (color) => color.name === colorName,
+                            );
+                            form.color_id = newColor.id;
+                            form.color = newColor;
+
+                            dialogStore.openSuccessDialog(
+                                'Warna berhasil ditambahkan.',
+                            );
+                        }
+                    "
+                    @close="showAddColorForm = false"
+                    class="w-full"
+                />
+            </div>
+        </template>
+    </DialogModal>
+
+    <!-- Add Size Modal -->
+    <DialogModal
+        :show="showAddSizeForm"
+        @close="showAddSizeForm = false"
+        maxWidth="sm"
+    >
+        <template #content>
+            <div class="w-full">
+                <h2
+                    class="w-full mb-3 text-lg font-medium text-center text-gray-900"
+                >
+                    Tambah Ukuran
+                </h2>
+                <SizeForm
+                    :isDialog="true"
+                    @onSubmitted="
+                        (sizeName) => {
+                            showAddSizeForm = false;
+                            sizeSearch = '';
+
+                            sizes = $page.props.sizes as SizeEntity[];
+
+                            const newSize = sizes.find(
+                                (size) => size.name === sizeName,
+                            );
+                            form.size_id = newSize.id;
+                            form.size = newSize;
+
+                            dialogStore.openSuccessDialog(
+                                'Ukuran berhasil ditambahkan.',
+                            );
+                        }
+                    "
+                    @close="showAddSizeForm = false"
+                    class="w-full"
+                />
+            </div>
+        </template>
+    </DialogModal>
+
+    <!-- Add Unit Modal -->
+    <DialogModal
+        :show="showAddUnitForm"
+        @close="showAddUnitForm = false"
+        maxWidth="sm"
+    >
+        <template #content>
+            <div class="w-full">
+                <h2
+                    class="w-full mb-3 text-lg font-medium text-center text-gray-900"
+                >
+                    Tambah Satuan
+                </h2>
+                <UnitForm
+                    :isDialog="true"
+                    @onSubmitted="
+                        (unitName) => {
+                            showAddUnitForm = false;
+                            unitSearch = '';
+
+                            units = $page.props.units as UnitEntity[];
+
+                            const newUnit = units.find(
+                                (unit) => unit.name === unitName,
+                            );
+                            form.unit_id = newUnit.id;
+                            form.unit = newUnit;
+
+                            dialogStore.openSuccessDialog(
+                                'Satuan berhasil ditambahkan.',
+                            );
+                        }
+                    "
+                    @close="showAddUnitForm = false"
+                    class="w-full"
+                />
+            </div>
+        </template>
+    </DialogModal>
+
+    <Modal :show="showMediaFormModal" @close="showMediaFormModal = false">
+        <MediaForm
+            modelType="product"
+            :modelId="props.product?.id"
+            collectionName="product"
+            :relatedModelOnly="true"
+            @close="showMediaFormModal = false"
+            @selectedMediaList="
+                (selectedMediaList) => {
+                    form.images = [
+                        ...form.images,
+                        ...(selectedMediaList.map((media: MediaEntity) => ({
+                            media_id: media.id,
+                            original_url: media.original_url,
+                            media: media,
+                        })) as ProductVariantImageEntity[]),
+                    ];
+                    showMediaFormModal = false;
+                }
+            "
+        />
+    </Modal>
 </template>

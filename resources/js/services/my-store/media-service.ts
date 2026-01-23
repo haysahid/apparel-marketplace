@@ -158,21 +158,36 @@ export default function mediaService() {
             files,
             collectionName = "default",
             abortControllers,
+            ignoreIndexes = [],
         }: {
             modelType: string;
             modelId: number;
             files: File[];
             collectionName?: string;
             abortControllers?: AbortController[];
+            ignoreIndexes?: number[];
         },
-        progressCallbacks = (
-            progressEvent: AxiosProgressEvent,
-            index: number,
-        ) => {},
+        {
+            onProgress = (
+                progressEvent: AxiosProgressEvent,
+                index: number,
+            ) => {},
+            onSuccess = (uploadedMediaList: MediaEntity[]) => {},
+            onError = (error: any) => {},
+            onChangeStatus = (status: string) => {},
+        },
     ): Promise<void> {
+        onChangeStatus("loading");
+
+        const uploadedMediaList: MediaEntity[] = [];
+
         await Promise.all(
-            files.map((file, index) =>
-                uploadMedia(
+            files.map((file, index) => {
+                if (ignoreIndexes.includes(index)) {
+                    return Promise.resolve();
+                }
+
+                return uploadMedia(
                     {
                         modelType,
                         modelId,
@@ -185,12 +200,18 @@ export default function mediaService() {
                     {
                         autoShowDialog: false,
                         onProgress: (progressEvent) => {
-                            progressCallbacks(progressEvent, index);
+                            onProgress(progressEvent, index);
+                        },
+                        onSuccess: (response) => {
+                            uploadedMediaList.push(response.data.result);
                         },
                     },
-                ),
-            ),
+                );
+            }),
         );
+
+        onChangeStatus("success");
+        onSuccess(uploadedMediaList);
     }
 
     async function deleteMedia(

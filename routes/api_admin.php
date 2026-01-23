@@ -1,13 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\API\StoreController;
-use App\Http\Controllers\API\ProductImageController;
 use App\Http\Controllers\Admin\API\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::name('api.admin.')->prefix('admin')->middleware('auth:sanctum')->group(function () {
-    Route::apiResource('product-image', ProductImageController::class);
-
     // User Routes
     Route::prefix('user')->name('user.')->group(function () {
         Route::get('dropdown', [UserController::class, 'dropdown'])->name('dropdown');

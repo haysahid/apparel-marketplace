@@ -7,9 +7,13 @@ import { computed, ref, watch } from "vue";
 import { useDialogStore } from "./dialog-store";
 
 export const useProductFormStore = defineStore("product_form", () => {
+    const token = `Bearer ${cookieManager.getItem("access_token")}`;
+    const selectedStoreId = cookieManager.getItem("selected_store_id");
+
     const selectedProductKey = "selected_product";
     const productFormKey = "product_form";
     const newProductFormKey = "new_product_form";
+    const productFormTabKey = "product_form_tab";
 
     const dialogStore = useDialogStore();
 
@@ -115,7 +119,6 @@ export const useProductFormStore = defineStore("product_form", () => {
             }
         }
 
-        tabIndex.value = 0;
         product.value = selectedProduct;
 
         if (!selectedProduct) {
@@ -317,8 +320,39 @@ export const useProductFormStore = defineStore("product_form", () => {
                 }
             });
 
-            router.post(route("my-store.product.store"), formData, {
-                onSuccess: (response) => {
+            // router.post(route("my-store.product.store"), formData, {
+            //     onSuccess: (response) => {
+            //         console.log(response);
+            //         onChangeStatus("success");
+            //         onSuccess(response);
+
+            //         if (autoShowDialog) {
+            //             const page = usePage<CustomPageProps>();
+            //             dialogStore.openSuccessDialog(page.props.flash.success);
+            //         }
+            //     },
+            //     onError: (error) => {
+            //         onChangeStatus("error");
+            //         onError(error);
+            //         form.value.errors = error;
+
+            //         if (autoShowDialog && error.error) {
+            //             dialogStore.openErrorDialog(error.error);
+            //         }
+            //     },
+            // });
+
+            await axios
+                .post("/api/my-store/product", formData, {
+                    headers: {
+                        Authorization: `Bearer ${cookieManager.getItem(
+                            "access_token",
+                        )}`,
+                        "X-Selected-Store-ID":
+                            cookieManager.getItem("selected_store_id"),
+                    },
+                })
+                .then((response) => {
                     onChangeStatus("success");
                     onSuccess(response);
 
@@ -326,17 +360,18 @@ export const useProductFormStore = defineStore("product_form", () => {
                         const page = usePage<CustomPageProps>();
                         dialogStore.openSuccessDialog(page.props.flash.success);
                     }
-                },
-                onError: (error) => {
+                })
+                .catch((error) => {
                     onChangeStatus("error");
                     onError(error);
-                    form.value.errors = error;
-
-                    if (autoShowDialog && error.error) {
-                        dialogStore.openErrorDialog(error.error);
+                    if (error.response?.data?.errors) {
+                        form.value.errors = error.response.data.errors;
                     }
-                },
-            });
+
+                    if (autoShowDialog && error.response?.data?.error) {
+                        dialogStore.openErrorDialog(error.response.data.error);
+                    }
+                });
         }
     };
 
@@ -393,7 +428,6 @@ export const useProductFormStore = defineStore("product_form", () => {
 
         return visibleTabs;
     });
-    const tabIndex = ref(0);
 
     const validateProductForm = () => {
         let isValid = true;
@@ -411,8 +445,50 @@ export const useProductFormStore = defineStore("product_form", () => {
         return isValid;
     };
 
-    const addProductImage = async (image: MediaEntity) => {
-        form.value.images.push(image);
+    const checkSkuPrefixAvailability = async (
+        skuPrefix: string,
+        {
+            onSuccess = (isAvailable: any) => {},
+            onError = (error: any) => {},
+            onChangeStatus = (status: string) => {},
+        } = {},
+    ) => {
+        onChangeStatus("loading");
+
+        await axios
+            .post(
+                `${page.props.ziggy.url}/api/my-store/product-sku-prefix-check`,
+                {
+                    sku_prefix: skuPrefix,
+                    product_id: product.value ? product.value.id : null,
+                },
+                {
+                    headers: {
+                        Authorization: token,
+                        "X-Selected-Store-ID": selectedStoreId,
+                    },
+                },
+            )
+            .then((response) => {
+                onChangeStatus("success");
+                const isAvailable = response.data.result.is_available;
+
+                onSuccess(isAvailable);
+
+                if (!isAvailable) {
+                    form.value.errors.sku_prefix =
+                        "Sudah digunakan oleh produk lain.";
+                } else {
+                    form.value.errors.sku_prefix = null;
+                }
+            })
+            .catch((error) => {
+                onChangeStatus("error");
+                onError(error);
+                if (error.response?.data?.error) {
+                    form.value.errors.sku_prefix = error.response.data.error;
+                }
+            });
     };
 
     return {
@@ -432,10 +508,10 @@ export const useProductFormStore = defineStore("product_form", () => {
         showAddBrandForm,
         showAddCategoryForm,
         tabs,
-        tabIndex,
         validateProductForm,
         categories,
         brands,
         clearNewProductForm,
+        checkSkuPrefixAvailability,
     };
 });

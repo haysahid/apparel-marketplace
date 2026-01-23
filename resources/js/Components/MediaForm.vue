@@ -29,6 +29,11 @@ const props = defineProps({
         required: false,
         default: "image",
     },
+    relatedModelOnly: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
 });
 
 const emit = defineEmits(["close", "selectedMediaList"]);
@@ -40,18 +45,21 @@ const mediaList = computed(() => {
 });
 const temporaryMediaList = ref<TemporaryMediaEntity[]>([]);
 
-mediaService().getMediaList(
-    {
-        modelType: props.modelType,
-        modelId: null,
-        collectionName: props.collectionName,
-    },
-    {
-        onSuccess: (response) => {
-            mediaListPagination.value = response.data.result;
+const getMediaList = async () => {
+    mediaService().getMediaList(
+        {
+            modelType: props.modelType,
+            modelId: props.relatedModelOnly ? props.modelId : null,
+            collectionName: props.collectionName,
         },
-    },
-);
+        {
+            onSuccess: (response) => {
+                mediaListPagination.value = response.data.result;
+            },
+        },
+    );
+};
+getMediaList();
 
 const getTemporaryMediaList = async () => {
     temporaryMediaService().getTemporaryMediaList(
@@ -107,7 +115,19 @@ const selectedMediaList = computed<Array<TemporaryMediaEntity | MediaEntity>>(
     },
 );
 
-const onUploadCompleted = (uploadedTemporaryMediaList) => {
+const onUploadMediaCompleted = (uploadedMediaList: MediaEntity[]) => {
+    mediaTab.value.selectedMediaList = [
+        ...uploadedMediaList,
+        ...mediaTab.value.selectedMediaList,
+    ];
+    getMediaList();
+
+    emit("selectedMediaList", selectedMediaList.value);
+};
+
+const onUploadTemporaryMediaCompleted = (
+    uploadedTemporaryMediaList: TemporaryMediaEntity[],
+) => {
     temporaryMediaTab.value.selectedMediaList = [
         ...uploadedTemporaryMediaList,
         ...temporaryMediaTab.value.selectedMediaList,
@@ -120,51 +140,53 @@ const onUploadCompleted = (uploadedTemporaryMediaList) => {
 const attachStatus = ref<"idle" | "loading" | "success" | "error">("idle");
 
 const selectMediaList = () => {
-    attachStatus.value = "loading";
+    if (props.modelId) {
+        attachStatus.value = "loading";
 
-    // Attach selected media to the model
-    const mediaIds = selectedMediaList.value
-        .filter((media) => !media.is_temporary)
-        .map((media) => media.id);
+        // Attach selected media to the model
+        const mediaIds = selectedMediaList.value
+            .filter((media) => !media.is_temporary)
+            .map((media) => media.id);
 
-    if (mediaIds.length > 0) {
-        mediaService().attachMediaToModel(
-            {
-                modelType: props.modelType,
-                modelId: props.modelId,
-                mediaIds: mediaIds,
-                collectionName: props.collectionName,
-            },
-            {
-                onSuccess: () => {
-                    // Do something if needed
+        if (mediaIds.length > 0) {
+            mediaService().attachMediaToModel(
+                {
+                    modelType: props.modelType,
+                    modelId: props.modelId,
+                    mediaIds: mediaIds,
+                    collectionName: props.collectionName,
                 },
-            },
-        );
-    }
-
-    // Attach selected temporary media to the model
-    const temporaryMediaIds = selectedMediaList.value
-        .filter((media) => media.is_temporary)
-        .map((media) => media.id);
-
-    if (temporaryMediaIds.length > 0) {
-        temporaryMediaService().attachTemporaryMediaToModel(
-            {
-                modelType: props.modelType,
-                modelId: props.modelId,
-                temporaryMediaIds: temporaryMediaIds,
-                collectionName: props.collectionName,
-            },
-            {
-                onSuccess: () => {
-                    // Do something if needed
+                {
+                    onSuccess: () => {
+                        // Do something if needed
+                    },
                 },
-            },
-        );
-    }
+            );
+        }
 
-    attachStatus.value = "success";
+        // Attach selected temporary media to the model
+        const temporaryMediaIds = selectedMediaList.value
+            .filter((media) => media.is_temporary)
+            .map((media) => media.id);
+
+        if (temporaryMediaIds.length > 0) {
+            temporaryMediaService().attachTemporaryMediaToModel(
+                {
+                    modelType: props.modelType,
+                    modelId: props.modelId,
+                    temporaryMediaIds: temporaryMediaIds,
+                    collectionName: props.collectionName,
+                },
+                {
+                    onSuccess: () => {
+                        // Do something if needed
+                    },
+                },
+            );
+        }
+
+        attachStatus.value = "success";
+    }
 
     emit("selectedMediaList", selectedMediaList.value);
 };
@@ -194,9 +216,11 @@ const selectMediaList = () => {
                 ref="uploadMediaTab"
                 :modelType="props.modelType"
                 :modelId="props.modelId"
+                :collectionName="props.collectionName"
                 :fileType="props.fileType"
                 :autoUpload="true"
-                @uploadCompleted="onUploadCompleted"
+                @uploadMediaCompleted="onUploadMediaCompleted"
+                @uploadTemporaryMediaCompleted="onUploadTemporaryMediaCompleted"
             />
 
             <!-- Recent Temporary Media -->
@@ -236,6 +260,17 @@ const selectMediaList = () => {
                 <SecondaryButton @click="emit('close')">
                     Batal
                 </SecondaryButton>
+
+                <PrimaryButton
+                    v-if="
+                        selectedTabIndex === 0 &&
+                        uploadMediaTab?.selectedFiles?.length > 0
+                    "
+                    :disabled="attachStatus === 'loading'"
+                    @click="emit('close')"
+                >
+                    Selesai
+                </PrimaryButton>
 
                 <PrimaryButton
                     v-if="selectedTabIndex !== 0"

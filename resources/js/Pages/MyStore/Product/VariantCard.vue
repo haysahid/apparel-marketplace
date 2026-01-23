@@ -73,11 +73,11 @@ const loadFile = (file) => {
             <img
                 v-if="props.variant.images.length > 0"
                 :src="
-                    isFile(props.variant.images[0].image)
-                        ? loadFile(props.variant.images[0].image)
-                        : getImageUrl(props.variant.images[0].image)
+                    isFile(props.variant.images[0].original_url)
+                        ? loadFile(props.variant.images[0].original_url)
+                        : getImageUrl(props.variant.images[0].original_url)
                 "
-                alt="Product Image"
+                :alt="props.name"
                 class="object-cover size-[60px] sm:size-[80px]"
             />
             <div

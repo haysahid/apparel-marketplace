@@ -146,7 +146,10 @@ class ProductController extends Controller
                 data: $data,
             );
 
-            return redirect()->route('my-store.product.edit', $product->id)
+            return redirect()->route('my-store.product.edit', [
+                'id' => $product->id,
+                'tab' => 1,
+            ])
                 ->with('success', 'Produk berhasil dibuat.');
         } catch (Exception $e) {
             return redirect()->back()

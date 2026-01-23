@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from "vue";
 import TextInput from "@/Components/TextInput.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -22,6 +22,8 @@ import MediaForm from "@/Components/MediaForm.vue";
 import Modal from "@/Components/Modal.vue";
 import MediaCard from "@/Components/MediaCard.vue";
 import { useDialogStore } from "@/stores/dialog-store";
+import { router } from "@inertiajs/vue3";
+import useDebounce from "@/plugins/debounce";
 
 const props = defineProps({
     product: {
@@ -77,22 +79,52 @@ const submitProduct = () => {
 
         formStore.submitProduct({
             autoShowDialog: false,
-            onSuccess: () => {
+            onSuccess: (response) => {
                 formStore.clearNewProductForm();
-                formStore.tabIndex = 1;
 
-                if (showSuccessDialogWithAddVariantAlert) {
-                    dialogStore.openSuccessDialog(
-                        "Informasi produk berhasil disimpan. Silakan tambahkan variasi produk.",
-                    );
-                } else {
-                    dialogStore.openSuccessDialog(
-                        "Informasi produk berhasil diperbarui.",
-                    );
-                }
+                const newProduct = response.data.result;
+
+                router.visit(
+                    route("my-store.product.edit", { id: newProduct.id }) +
+                        `?tab=1`,
+                    {
+                        preserveState: true,
+                        preserveScroll: false,
+                        onFinish: () => {
+                            nextTick(() => {
+                                dialogStore.openSuccessDialog(
+                                    showSuccessDialogWithAddVariantAlert
+                                        ? "Informasi produk berhasil disimpan. Silakan tambahkan variasi produk."
+                                        : "Informasi produk berhasil disimpan.",
+                                );
+                            });
+                        },
+                    },
+                );
             },
         });
     }
+};
+
+const tabIndex = computed(() => {
+    if (route().current() !== "my-store.product.edit") {
+        return 0;
+    }
+
+    return route().params.tab ? parseInt(route().params.tab as string) : 0;
+});
+
+const skuPrefixDebounce = useDebounce();
+const checkSkuPrefixStatus = ref(null);
+
+const checkSkuPrefix = (skuPrefix: string) => {
+    skuPrefixDebounce(() => {
+        formStore.checkSkuPrefixAvailability(skuPrefix, {
+            onChangeStatus: (status) => {
+                checkSkuPrefixStatus.value = status;
+            },
+        });
+    }, 500);
 };
 
 onMounted(() => {
@@ -100,6 +132,10 @@ onMounted(() => {
         formStore.initializeForm(props.product);
     } else {
         formStore.initializeForm();
+    }
+
+    if (formStore.form.sku_prefix) {
+        checkSkuPrefix(formStore.form.sku_prefix);
     }
 });
 </script>
@@ -144,13 +180,17 @@ onMounted(() => {
                         :key="index"
                         :title="tab.title"
                         :subtitle="tab.subtitle"
-                        :isActive="index == formStore.tabIndex"
+                        :isActive="index == tabIndex"
                         :error="
                             index === 1 && formStore.form.errors.variants
                                 ? formStore.form.errors.variants
                                 : null
                         "
-                        @click="formStore.tabIndex = index"
+                        @click="
+                            router.replace({
+                                url: `/my-store/product/${props.product?.id}?tab=${index}`,
+                            })
+                        "
                     >
                         <template v-if="tab.icon" #leading>
                             <span
@@ -158,8 +198,7 @@ onMounted(() => {
                                 v-html="tab.icon"
                                 class="[&>svg]:fill-gray-500 group-hover:[&>svg]:fill-gray-600 [&>svg]:transition-all [&>svg]:duration-300 [&>svg]:ease-in-out [&>svg]:size-5"
                                 :class="{
-                                    '[&>svg]:!fill-primary':
-                                        index == formStore.tabIndex,
+                                    '[&>svg]:!fill-primary': index == tabIndex,
                                 }"
                             ></span>
                         </template>
@@ -172,7 +211,7 @@ onMounted(() => {
                 >
                     <!-- Tab 0 -->
                     <form
-                        v-show="formStore.tabIndex == 0"
+                        v-show="tabIndex == 0"
                         @submit.prevent="submitProduct"
                         class="w-full"
                     >
@@ -280,9 +319,23 @@ onMounted(() => {
                                         "
                                         @update:modelValue="
                                             formStore.form.errors.sku_prefix =
-                                                null
+                                                null;
+
+                                            checkSkuPrefix($event);
                                         "
-                                    />
+                                    >
+                                        <template
+                                            #suffix
+                                            v-if="
+                                                checkSkuPrefixStatus ===
+                                                'loading'
+                                            "
+                                        >
+                                            <div
+                                                class="absolute circular-loading-xs right-2"
+                                            />
+                                        </template>
+                                    </TextInput>
                                     <template #suffix>
                                         <InfoTooltip
                                             id="sku-prefix-info"
@@ -532,7 +585,7 @@ onMounted(() => {
 
                     <!-- Tab 1 -->
                     <div
-                        v-if="formStore.tabIndex == 1"
+                        v-if="tabIndex == 1"
                         class="flex flex-col w-full gap-4"
                     >
                         <!-- Variants -->
@@ -547,39 +600,28 @@ onMounted(() => {
                                     : null
                             "
                             :variants="formStore.form.variants"
-                            @onAdd="
-                                (variant) => {
-                                    formStore.form.variants.push(variant);
-                                }
-                            "
-                            @onAdded="
+                            @onCreated="
                                 (message) => {
-                                    dialogStore.openSuccessDialog(message);
-                                    formStore.getVariants();
+                                    router.reload({
+                                        onFinish: () => {
+                                            dialogStore.openSuccessDialog(
+                                                message,
+                                            );
+                                            formStore.getVariants();
+                                        },
+                                    });
                                 }
                             "
-                            @onEdit="
-                                (variant) => {
-                                    const index =
-                                        formStore.form.variants.findIndex(
-                                            (v) =>
-                                                v.motif === variant.motif &&
-                                                v.color_id ===
-                                                    variant.color_id &&
-                                                v.size_id === variant.size_id,
-                                        );
-                                    if (index !== -1) {
-                                        formStore.form.variants[index] = {
-                                            ...variant,
-                                            showEditForm: false,
-                                        };
-                                    }
-                                }
-                            "
-                            @onEditted="
+                            @onUpdated="
                                 (message) => {
-                                    dialogStore.openSuccessDialog(message);
-                                    formStore.getVariants();
+                                    router.reload({
+                                        onFinish: () => {
+                                            dialogStore.openSuccessDialog(
+                                                message,
+                                            );
+                                            formStore.getVariants();
+                                        },
+                                    });
                                 }
                             "
                             @onDelete="
@@ -709,7 +751,7 @@ onMounted(() => {
     <Modal :show="showMediaFormModal" @close="showMediaFormModal = false">
         <MediaForm
             modelType="product"
-            :modelId="props.product.id"
+            :modelId="props.product?.id"
             collectionName="product"
             @close="showMediaFormModal = false"
             @selectedMediaList="

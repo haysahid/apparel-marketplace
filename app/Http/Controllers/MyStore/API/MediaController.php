@@ -28,12 +28,12 @@ class MediaController extends Controller
         $orderDirection = $request->input('order_direction', 'desc');
         $search = $request->input('search');
 
-        $model = $request->input('model');
+        $models = $request->input('models');
         $collectionName = $request->input('collection_name');
 
         $media = MediaRepository::getAllMedia(
             storeId: $this->storeId,
-            model: $model,
+            models: $models,
             collectionName: $collectionName,
             limit: $limit,
             search: $search,
