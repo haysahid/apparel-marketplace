@@ -114,7 +114,7 @@ class ProductRepository
                 foreach ($data['temporary_images'] as $tempMediaId) {
                     $tempMedia = TemporaryMedia::find($tempMediaId);
                     if ($tempMedia) {
-                        $tempMedia->copy($product, 'product');
+                        $tempMedia->copyToMedia($product, 'product');
                         $tempMedia->delete();
                     }
                 }

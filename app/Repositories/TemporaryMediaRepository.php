@@ -3,6 +3,9 @@
 namespace App\Repositories;
 
 use App\Models\TemporaryMedia;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class TemporaryMediaRepository
 {
@@ -73,7 +76,43 @@ class TemporaryMediaRepository
     ) {
         $temporaryMediaItems = TemporaryMedia::whereIn('id', $temporaryMediaIds)->get();
         foreach ($temporaryMediaItems as $tempMedia) {
-            $tempMedia->copy($model, $collectionName);
+            // Determine new file name based on model's slug or name
+            if (isset($model->slug)) {
+                // Use slug if available
+                $baseName = $model->slug;
+            } elseif (isset($model->name)) {
+                // Use name as slug
+                $baseName = Str::slug($model->name);
+            } else {
+                // Use original
+                $baseName = pathinfo($tempMedia->file_name, PATHINFO_FILENAME);
+            }
+
+            // Ensure unique file name
+            $baseName .= '-' . uniqid();
+
+            $extension = pathinfo($tempMedia->file_name, PATHINFO_EXTENSION);
+            $newFileName = $baseName . '.' . $extension;
+
+            // Copy media to new model and collection
+            $newTempMedia = $tempMedia->copyToMedia($model, $collectionName);
+
+            // Rename file_name in database
+            $newTempMedia->file_name = $newFileName;
+
+            // Rename file on disk
+            $disk = $newTempMedia->disk;
+            $oldPath = $newTempMedia->getPath();
+            $newPath = dirname($oldPath) . '/' . $newFileName;
+
+            if (Storage::disk($disk)->exists($oldPath)) {
+                Storage::disk($disk)->move($oldPath, $newPath);
+            }
+
+            // Update the path in the database if necessary
+            $newTempMedia->save();
+
+            // Delete temporary media record and file
             $tempMedia->delete();
         }
     }

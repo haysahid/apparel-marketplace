@@ -4,6 +4,8 @@ namespace App\Repositories;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class MediaRepository
@@ -75,7 +77,41 @@ class MediaRepository
     ) {
         $mediaItems = Media::whereIn('id', $mediaIds)->get();
         foreach ($mediaItems as $media) {
-            $media->copy($model, $collectionName);
+            // Determine new file name based on model's slug or name
+            if (isset($model->slug)) {
+                // Use slug if available
+                $baseName = $model->slug;
+            } elseif (isset($model->name)) {
+                // Use name as slug
+                $baseName = Str::slug($model->name);
+            } else {
+                // Use original
+                $baseName = pathinfo($media->file_name, PATHINFO_FILENAME);
+            }
+
+            // Ensure unique file name
+            $baseName .= '-' . uniqid();
+
+            $extension = pathinfo($media->file_name, PATHINFO_EXTENSION);
+            $newFileName = $baseName . '.' . $extension;
+
+            // Copy media to new model and collection
+            $newMedia = $media->copy($model, $collectionName);
+
+            // Rename file_name in database
+            $newMedia->file_name = $newFileName;
+
+            // Rename file on disk
+            $disk = $newMedia->disk;
+            $oldPath = $newMedia->getPath();
+            $newPath = dirname($oldPath) . '/' . $newFileName;
+
+            if (Storage::disk($disk)->exists($oldPath)) {
+                Storage::disk($disk)->move($oldPath, $newPath);
+            }
+
+            // Update the path in the database if necessary
+            $newMedia->save();
         }
     }
 }

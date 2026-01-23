@@ -54,26 +54,23 @@ class TemporaryMedia extends Model
     }
 
     // Actions
-    public function copy($model, $collectionName = 'default')
+    public function copyToMedia($model, $collectionName = 'default')
     {
         $sourcePath = storage_path(self::TMP_STORAGE_PATH . $this->folder . '/' . $this->file_name);
-
-        Log::info('TemporaryMedia copy', [
-            'sourcePath' => $sourcePath,
-            'exists' => file_exists($sourcePath),
-            'is_readable' => is_readable($sourcePath),
-        ]);
 
         if (!file_exists($sourcePath)) {
             throw new Exception("Temporary file does not exist at: {$sourcePath}");
         }
 
-        $model
+        return $model
             ->addMedia($sourcePath)
             ->usingFileName($this->file_name)
             ->toMediaCollection($collectionName);
+    }
 
-        return $this;
+    public function getPath()
+    {
+        return storage_path(self::TMP_STORAGE_PATH . $this->folder . '/' . $this->file_name);
     }
 
     // Relationships
