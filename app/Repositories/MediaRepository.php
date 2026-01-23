@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\TemporaryMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class MediaRepository
@@ -67,5 +66,16 @@ class MediaRepository
             return true;
         }
         return false;
+    }
+
+    public static function attachMediaToModel(
+        $mediaIds,
+        $model,
+        $collectionName = 'default'
+    ) {
+        $mediaItems = Media::whereIn('id', $mediaIds)->get();
+        foreach ($mediaItems as $media) {
+            $media->copy($model, $collectionName);
+        }
     }
 }

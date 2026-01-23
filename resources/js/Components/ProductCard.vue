@@ -28,14 +28,6 @@ const props = defineProps({
     image: String,
     description: String,
 });
-
-function formatPrice(price) {
-    return price.toLocaleString("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    });
-}
 </script>
 
 <template>
@@ -87,14 +79,14 @@ function formatPrice(price) {
                         <p
                             class="text-sm font-semibold sm:text-base text-primary"
                         >
-                            {{ formatPrice(props.finalPrice) }}
+                            {{ $formatCurrency(props.finalPrice) }}
                         </p>
 
                         <p
                             v-if="props.discount"
                             class="text-xs text-gray-500 line-through sm:text-sm"
                         >
-                            {{ formatPrice(props.basePrice) }}
+                            {{ $formatCurrency(props.basePrice) }}
                         </p>
                     </div>
 

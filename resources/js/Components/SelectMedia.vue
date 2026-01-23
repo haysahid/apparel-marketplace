@@ -24,7 +24,7 @@ defineExpose({
 </script>
 
 <template>
-    <div class="flex flex-col items-start">
+    <div class="flex flex-col items-start h-full">
         <h2 class="mb-4 text-base font-semibold">
             {{ props.title }}
             <span>({{ props.mediaList.length }})</span>
@@ -89,7 +89,7 @@ defineExpose({
         </div>
         <div
             v-else
-            class="flex flex-col items-center justify-center w-full pt-1 pb-6"
+            class="flex flex-col items-center justify-center w-full h-full pt-1 pb-6"
         >
             <p class="text-sm text-center text-gray-500">
                 Tidak ada media yang ditemukan.

@@ -20,7 +20,7 @@ class PublicController extends Controller
     {
         $brands = Brand::take(5)->get();
         $categories = Category::whereNotNull('image')->orderBy('name', 'asc')->get();
-        $popularProducts = Product::with(['brand', 'categories', 'images'])->take(8)->get();
+        $popularProducts = Product::with(['brand', 'categories', 'images'])->whereHas('variants')->take(8)->get();
 
         return Inertia::render('Home', [
             'brands' => $brands,
@@ -43,6 +43,7 @@ class PublicController extends Controller
 
         $products = Product::query();
         $products->with(['brand', 'categories', 'images']);
+        $products->whereHas('variants');
 
         if ($brands) {
             if (is_string($brands)) {

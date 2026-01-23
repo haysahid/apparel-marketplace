@@ -47,7 +47,7 @@ const motifs = computed(() => {
 const colors = computed(() => {
     return [
         ...new Set(
-            props.variants.map((variant) => JSON.stringify(variant.color))
+            props.variants.map((variant) => JSON.stringify(variant.color)),
         ),
     ].map((color) => JSON.parse(color));
 });
@@ -93,6 +93,7 @@ const openAddVariantForm = () => {
                 </div>
                 <div class="flex items-center gap-2">
                     <PrimaryButton
+                        v-if="props.variants.length"
                         type="button"
                         class="text-nowrap"
                         :disabled="props.isLoading"
@@ -238,6 +239,24 @@ const openAddVariantForm = () => {
             class="flex items-center justify-center w-full h-[40vh]"
         >
             <div class="circular-loading"></div>
+        </div>
+        <div v-else-if="props.variants.length == 0" class="w-full">
+            <div
+                class="flex flex-col gap-4 items-center justify-center h-[40vh] w-full"
+            >
+                <p class="text-sm text-center text-gray-500">
+                    Belum ada variasi produk. <br />
+                    Silakan tambahkan variasi produk terlebih dahulu.
+                </p>
+                <PrimaryButton
+                    type="button"
+                    class="text-nowrap"
+                    :disabled="props.isLoading"
+                    @click="openAddVariantForm"
+                >
+                    Tambah Variasi
+                </PrimaryButton>
+            </div>
         </div>
         <div
             v-else-if="filteredVariants.length > 0"

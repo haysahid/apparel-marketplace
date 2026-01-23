@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import mediaService from "@/services/my-store/media-service";
 import { computed, ref } from "vue";
-import DefaultCard from "./DefaultCard.vue";
 import TabButton from "./TabButton.vue";
 import UploadMedia from "./UploadMedia.vue";
 import SelectMedia from "./SelectMedia.vue";
 import PrimaryButton from "./PrimaryButton.vue";
 import SecondaryButton from "./SecondaryButton.vue";
+import temporaryMediaService from "@/services/my-store/temporary-media-service";
 
 const props = defineProps({
     modelType: {
@@ -16,6 +16,11 @@ const props = defineProps({
     },
     modelId: {
         type: Number,
+        required: false,
+        default: null,
+    },
+    collectionName: {
+        type: String,
         required: false,
         default: null,
     },
@@ -35,12 +40,21 @@ const mediaList = computed(() => {
 });
 const temporaryMediaList = ref<TemporaryMediaEntity[]>([]);
 
-mediaService().getMediaList({
-    modelType: props.modelType,
-});
+mediaService().getMediaList(
+    {
+        modelType: props.modelType,
+        modelId: null,
+        collectionName: props.collectionName,
+    },
+    {
+        onSuccess: (response) => {
+            mediaListPagination.value = response.data.result;
+        },
+    },
+);
 
 const getTemporaryMediaList = async () => {
-    mediaService().getTemporaryMediaList(
+    temporaryMediaService().getTemporaryMediaList(
         {},
         {
             onSuccess: (response) => {
@@ -92,6 +106,68 @@ const selectedMediaList = computed<Array<TemporaryMediaEntity | MediaEntity>>(
         return [...selectedTemporaryMedia, ...selectedMedia];
     },
 );
+
+const onUploadCompleted = (uploadedTemporaryMediaList) => {
+    temporaryMediaTab.value.selectedMediaList = [
+        ...uploadedTemporaryMediaList,
+        ...temporaryMediaTab.value.selectedMediaList,
+    ];
+    getTemporaryMediaList();
+
+    selectedTabIndex.value = 1;
+};
+
+const attachStatus = ref<"idle" | "loading" | "success" | "error">("idle");
+
+const selectMediaList = () => {
+    attachStatus.value = "loading";
+
+    // Attach selected media to the model
+    const mediaIds = selectedMediaList.value
+        .filter((media) => !media.is_temporary)
+        .map((media) => media.id);
+
+    if (mediaIds.length > 0) {
+        mediaService().attachMediaToModel(
+            {
+                modelType: props.modelType,
+                modelId: props.modelId,
+                mediaIds: mediaIds,
+                collectionName: props.collectionName,
+            },
+            {
+                onSuccess: () => {
+                    // Do something if needed
+                },
+            },
+        );
+    }
+
+    // Attach selected temporary media to the model
+    const temporaryMediaIds = selectedMediaList.value
+        .filter((media) => media.is_temporary)
+        .map((media) => media.id);
+
+    if (temporaryMediaIds.length > 0) {
+        temporaryMediaService().attachTemporaryMediaToModel(
+            {
+                modelType: props.modelType,
+                modelId: props.modelId,
+                temporaryMediaIds: temporaryMediaIds,
+                collectionName: props.collectionName,
+            },
+            {
+                onSuccess: () => {
+                    // Do something if needed
+                },
+            },
+        );
+    }
+
+    attachStatus.value = "success";
+
+    emit("selectedMediaList", selectedMediaList.value);
+};
 </script>
 
 <template>
@@ -111,7 +187,7 @@ const selectedMediaList = computed<Array<TemporaryMediaEntity | MediaEntity>>(
             </TabButton>
         </div>
 
-        <div class="gap-y-6 overflow-y-auto max-h-[70vh] px-4 sm:px-6">
+        <div class="gap-y-6 overflow-y-auto h-[60vh] px-4 sm:px-6">
             <!-- Upload Section -->
             <UploadMedia
                 v-show="selectedTabIndex === 0"
@@ -119,14 +195,8 @@ const selectedMediaList = computed<Array<TemporaryMediaEntity | MediaEntity>>(
                 :modelType="props.modelType"
                 :modelId="props.modelId"
                 :fileType="props.fileType"
-                @uploadCompleted="
-                    (uploadedTemporaryMediaList) => {
-                        selectedTabIndex = 1;
-                        temporaryMediaTab.selectedMediaList =
-                            uploadedTemporaryMediaList;
-                        getTemporaryMediaList();
-                    }
-                "
+                :autoUpload="true"
+                @uploadCompleted="onUploadCompleted"
             />
 
             <!-- Recent Temporary Media -->
@@ -150,14 +220,14 @@ const selectedMediaList = computed<Array<TemporaryMediaEntity | MediaEntity>>(
 
         <!-- Actions -->
         <div
-            class="flex items-center justify-between gap-4 px-4 py-4 sm:px-6 sm:py-6"
+            class="flex items-center gap-4 px-4 py-4 sm:px-6 sm:py-6"
+            :class="selectedTabIndex === 0 ? 'justify-end' : 'justify-between'"
         >
-            <p class="text-sm text-gray-600">
+            <p v-if="selectedTabIndex !== 0" class="text-sm text-gray-600">
                 {{
-                    selectedTabIndex == 0
-                        ? uploadMediaTab?.selectedFiles?.length || 0
-                        : (temporaryMediaTab?.selectedMediaList.length || 0) +
-                          (mediaTab?.selectedMediaList.length || 0)
+                    selectedTabIndex === 1
+                        ? temporaryMediaTab?.selectedMediaList.length || 0
+                        : mediaTab?.selectedMediaList.length || 0
                 }}
                 media dipilih.
             </p>
@@ -168,31 +238,12 @@ const selectedMediaList = computed<Array<TemporaryMediaEntity | MediaEntity>>(
                 </SecondaryButton>
 
                 <PrimaryButton
-                    v-if="selectedTabIndex === 0"
-                    @click="uploadMediaTab?.uploadFiles"
-                >
-                    Unggah Media
-                    <template #prefix>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            class="size-5"
-                        >
-                            <path
-                                d="M11 20H6.5C4.98333 20 3.68767 19.475 2.613 18.425C1.53833 17.375 1.00067 16.0917 1 14.575C1 13.275 1.39167 12.1167 2.175 11.1C2.95833 10.0833 3.98333 9.43333 5.25 9.15C5.66667 7.61667 6.5 6.375 7.75 5.425C9 4.475 10.4167 4 12 4C13.95 4 15.6043 4.67933 16.963 6.038C18.3217 7.39667 19.0007 9.05067 19 11C20.15 11.1333 21.1043 11.6293 21.863 12.488C22.6217 13.3467 23.0007 14.3507 23 15.5C23 16.75 22.5627 17.8127 21.688 18.688C20.8133 19.5633 19.7507 20.0007 18.5 20H13V12.85L14.6 14.4L16 13L12 9L8 13L9.4 14.4L11 12.85V20Z"
-                                fill="currentColor"
-                            />
-                        </svg>
-                    </template>
-                </PrimaryButton>
-
-                <PrimaryButton
-                    v-else
-                    :disabled="selectedMediaList.length === 0"
-                    @click="emit('selectedMediaList', selectedMediaList)"
+                    v-if="selectedTabIndex !== 0"
+                    :disabled="
+                        selectedMediaList.length === 0 ||
+                        attachStatus === 'loading'
+                    "
+                    @click="selectMediaList()"
                 >
                     Pilih Media ({{ selectedMediaList.length }})
                 </PrimaryButton>

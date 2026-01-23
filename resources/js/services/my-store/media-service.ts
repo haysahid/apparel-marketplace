@@ -79,14 +79,16 @@ export default function mediaService() {
     async function uploadMedia(
         {
             modelType,
+            modelId,
             file,
             collectionName = "default",
-            cancelToken,
+            abortController,
         }: {
             modelType: string;
+            modelId: number;
             file: File;
             collectionName?: string;
-            cancelToken?: CancelToken;
+            abortController?: AbortController;
         },
         {
             autoShowDialog = true,
@@ -105,6 +107,7 @@ export default function mediaService() {
         onChangeStatus("loading");
         const formData = new FormData();
         formData.append("model_type", modelType);
+        formData.append("model_id", modelId.toString());
         formData.append("file", file);
         formData.append("collection_name", collectionName);
 
@@ -118,7 +121,7 @@ export default function mediaService() {
                 onUploadProgress: (progressEvent) => {
                     onProgress(progressEvent);
                 },
-                cancelToken: cancelToken,
+                signal: abortController ? abortController.signal : undefined,
             })
             .then((response) => {
                 onChangeStatus("success");
@@ -151,15 +154,16 @@ export default function mediaService() {
     async function uploadMediaBulk(
         {
             modelType,
+            modelId,
             files,
             collectionName = "default",
-            cancelTokens,
+            abortControllers,
         }: {
             modelType: string;
             modelId: number;
             files: File[];
             collectionName?: string;
-            cancelTokens?: CancelToken[];
+            abortControllers?: AbortController[];
         },
         progressCallbacks = (
             progressEvent: AxiosProgressEvent,
@@ -171,10 +175,11 @@ export default function mediaService() {
                 uploadMedia(
                     {
                         modelType,
+                        modelId,
                         file,
                         collectionName,
-                        cancelToken: cancelTokens
-                            ? cancelTokens[index]
+                        abortController: abortControllers
+                            ? abortControllers[index]
                             : undefined,
                     },
                     {
@@ -265,92 +270,18 @@ export default function mediaService() {
             });
     }
 
-    async function uploadTemporaryMedia(
-        file: File,
+    async function attachMediaToModel(
         {
-            autoShowDialog = true,
-            onSuccess = (response: any) => {},
-            onError = (error: any) => {},
-            onChangeStatus = (status: string) => {},
-            onProgress = (progressEvent: AxiosProgressEvent) => {},
-        } = {},
-    ) {
-        onChangeStatus("loading");
-        const formData = new FormData();
-        formData.append("file", file);
-
-        await axios
-            .post(`/api/my-store/temporary-media/upload`, formData, {
-                headers: {
-                    Authorization: token,
-                    "X-Selected-Store-ID": selectedStoreId,
-                    "Content-Type": "multipart/form-data",
-                },
-                onUploadProgress: (progressEvent) => {
-                    onProgress(progressEvent);
-                },
-            })
-            .then((response) => {
-                onChangeStatus("success");
-                onSuccess(response);
-                if (autoShowDialog) {
-                    dialogStore.openSuccessDialog(
-                        response.data.meta.message ||
-                            "Media sementara berhasil diunggah.",
-                    );
-                }
-            })
-            .catch((error) => {
-                console.error("Error uploading temporary media:", error);
-                onChangeStatus("error");
-                onError(error);
-                if (autoShowDialog) {
-                    dialogStore.openErrorDialog(
-                        error.response?.data?.meta?.message ||
-                            "Terjadi kesalahan saat mengunggah media sementara.",
-                    );
-                }
-            });
-    }
-
-    async function uploadTemporaryMediaBulk(
-        files: File[],
-        {
-            onProgress = (
-                progressEvent: AxiosProgressEvent,
-                index: number,
-            ) => {},
-            onSuccess = (
-                uploadedTemporaryMediaList: TemporaryMediaEntity[],
-            ) => {},
-            onError = (error: any) => {},
-            onChangeStatus = (status: string) => {},
-        } = {},
-    ): Promise<void> {
-        onChangeStatus("loading");
-
-        let uploadedTemporaryMediaList: TemporaryMediaEntity[] = [];
-
-        await Promise.all(
-            files.map((file, index) =>
-                uploadTemporaryMedia(file, {
-                    autoShowDialog: false,
-                    onProgress: (progressEvent) => {
-                        onProgress(progressEvent, index);
-                    },
-                    onSuccess: (response) => {
-                        uploadedTemporaryMediaList.push(response.data.result);
-                    },
-                }),
-            ),
-        );
-
-        onChangeStatus("success");
-        onSuccess(uploadedTemporaryMediaList);
-    }
-
-    async function getTemporaryMediaList(
-        {} = {},
+            mediaIds,
+            modelType,
+            modelId,
+            collectionName = "default",
+        }: {
+            mediaIds: number[];
+            modelType: string;
+            modelId: number;
+            collectionName: string;
+        },
         {
             autoShowDialog = false,
             onSuccess = (response: any) => {},
@@ -361,30 +292,39 @@ export default function mediaService() {
         onChangeStatus("loading");
 
         await axios
-            .get(`/api/my-store/temporary-media`, {
-                headers: {
-                    Authorization: token,
-                    "X-Selected-Store-ID": selectedStoreId,
+            .post(
+                `/api/my-store/media/attach`,
+                {
+                    media_ids: mediaIds,
+                    model_type: modelType,
+                    model_id: modelId,
+                    collection_name: collectionName,
                 },
-            })
+                {
+                    headers: {
+                        Authorization: token,
+                        "X-Selected-Store-ID": selectedStoreId,
+                    },
+                },
+            )
             .then((response) => {
                 onChangeStatus("success");
                 onSuccess(response);
                 if (autoShowDialog) {
                     dialogStore.openSuccessDialog(
                         response.data.meta.message ||
-                            "Daftar media sementara berhasil diambil.",
+                            `Media berhasil dilampirkan ke ${modelType} dengan ID ${modelId}.`,
                     );
                 }
             })
             .catch((error) => {
-                console.error("Error fetching temporary media list:", error);
+                console.error("Error attaching media to model:", error);
                 onChangeStatus("error");
                 onError(error);
                 if (autoShowDialog) {
                     dialogStore.openErrorDialog(
                         error.response?.data?.meta?.message ||
-                            "Terjadi kesalahan saat mengambil daftar media sementara.",
+                            `Terjadi kesalahan saat melampirkan media ke ${modelType} dengan ID ${modelId}.`,
                     );
                 }
             });
@@ -396,8 +336,6 @@ export default function mediaService() {
         uploadMediaBulk,
         deleteMedia,
         deleteMediaBulk,
-        getTemporaryMediaList,
-        uploadTemporaryMedia,
-        uploadTemporaryMediaBulk,
+        attachMediaToModel,
     };
 }

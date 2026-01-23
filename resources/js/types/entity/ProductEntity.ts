@@ -20,7 +20,7 @@ interface ProductEntity {
     store: StoreEntity | null;
     brand: BrandEntity | null;
     categories: CategoryEntity[];
-    images: ProductVariantImageEntity[];
+    images: (TemporaryMediaEntity | MediaEntity)[];
     links: ProductLinkEntity[];
     variants: ProductVariantEntity[];
 }

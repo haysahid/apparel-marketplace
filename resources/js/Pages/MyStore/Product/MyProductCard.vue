@@ -24,7 +24,7 @@ const basePrice = computed(() => {
     }
 
     return `${formatCurrency(
-        props.product.lowest_base_selling_price
+        props.product.lowest_base_selling_price,
     )} - ${formatCurrency(props.product.highest_base_selling_price)}`;
 });
 
@@ -37,7 +37,7 @@ const finalPrice = computed(() => {
     }
 
     return `${formatCurrency(
-        props.product.lowest_final_selling_price
+        props.product.lowest_final_selling_price,
     )} - ${formatCurrency(props.product.highest_final_selling_price)}`;
 });
 </script>
@@ -49,7 +49,7 @@ const finalPrice = computed(() => {
         <div class="flex items-start w-full gap-2.5 sm:gap-3">
             <img
                 v-if="props.product.images.length > 0"
-                :src="getImageUrl(props.product.images[0].image)"
+                :src="getImageUrl(props.product.images[0]?.original_url)"
                 :alt="props.product.name"
                 class="object-cover h-[80px] sm:h-[100px] aspect-square rounded border border-gray-200 self-start"
             />
@@ -80,7 +80,7 @@ const finalPrice = computed(() => {
                         {{ props.product.name }}
                     </p>
                     <p class="text-xs text-gray-500 pe-12">
-                        {{ props.product.brand.name }}
+                        {{ props.product.brand?.name }}
                     </p>
                     <div class="flex items-end w-full gap-4 mt-1">
                         <div class="flex flex-col items-start w-full">

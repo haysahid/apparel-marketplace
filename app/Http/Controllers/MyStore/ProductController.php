@@ -113,20 +113,11 @@ class ProductController extends Controller
             'discount' => 'nullable|numeric',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id',
+            'temporary_images' => 'nullable|array',
+            'temporary_images.*' => 'integer|exists:temporary_media,id',
             'images' => 'nullable|array',
-            'images.*' => 'file|image|max:2048',
+            'images.*' => 'integer|exists:media,id',
             'links' => 'nullable|array',
-            'variants' => 'required|array',
-            'variants.*.motif' => 'required|string|max:100',
-            'variants.*.color_id' => 'required|exists:colors,id',
-            'variants.*.size_id' => 'required|exists:sizes,id',
-            'variants.*.material' => 'required|string|max:100',
-            'variants.*.base_selling_price' => 'required|numeric',
-            'variants.*.discount' => 'nullable|numeric',
-            'variants.*.current_stock_level' => 'required|integer',
-            'variants.*.unit_id' => 'required|exists:units,id',
-            'variants.*.images' => 'required|array',
-            'variants.*.images.*' => 'file|image|max:2048',
         ], [
             'brand_id.exists' => 'Merek yang dipilih tidak valid.',
             'name.required' => 'Nama produk harus diisi.',
@@ -136,30 +127,13 @@ class ProductController extends Controller
             'discount.numeric' => 'Diskon harus berupa angka.',
             'categories.array' => 'Kategori harus berupa array.',
             'categories.*.exists' => 'Kategori yang dipilih tidak valid.',
+            'temporary_images.array' => 'Gambar sementara harus berupa array.',
+            'temporary_images.*.integer' => 'Setiap gambar sementara harus berupa ID yang valid.',
+            'temporary_images.*.exists' => 'Gambar sementara yang dipilih tidak ditemukan.',
             'images.array' => 'Gambar harus berupa array.',
-            'images.*.file' => 'Setiap gambar harus berupa file.',
-            'images.*.image' => 'Setiap gambar harus berupa gambar.',
-            'images.*.max' => 'Setiap gambar tidak boleh lebih dari 2MB.',
+            'images.*.integer' => 'Setiap gambar harus berupa ID yang valid.',
+            'images.*.exists' => 'Gambar yang dipilih tidak ditemukan.',
             'links.array' => 'Tautan harus berupa array.',
-            'variants.required' => 'Varian produk harus diisi.',
-            'variants.*.motif.required' => 'Motif varian harus diisi.',
-            'variants.*.color_id.required' => 'Warna varian harus dipilih.',
-            'variants.*.color_id.exists' => 'Warna yang dipilih tidak valid.',
-            'variants.*.size_id.required' => 'Ukuran varian harus dipilih.',
-            'variants.*.size_id.exists' => 'Ukuran yang dipilih tidak valid.',
-            'variants.*.material.required' => 'Material varian harus diisi.',
-            'variants.*.base_selling_price.required' => 'Harga jual dasar varian harus diisi.',
-            'variants.*.base_selling_price.numeric' => 'Harga jual dasar varian harus berupa angka.',
-            'variants.*.discount.numeric' => 'Diskon varian harus berupa angka.',
-            'variants.*.current_stock_level.required' => 'Stok saat ini varian harus diisi.',
-            'variants.*.current_stock_level.integer' => 'Stok saat ini varian harus berupa bilangan bulat.',
-            'variants.*.unit_id.required' => 'Unit varian harus dipilih.',
-            'variants.*.unit_id.exists' => 'Unit yang dipilih tidak valid.',
-            'variants.*.images.required' => 'Gambar varian harus diunggah.',
-            'variants.*.images.array' => 'Gambar varian harus berupa array.',
-            'variants.*.images.*.file' => 'Setiap gambar varian harus berupa file.',
-            'variants.*.images.*.image' => 'Setiap gambar varian harus berupa gambar.',
-            'variants.*.images.*.max' => 'Setiap gambar varian tidak boleh lebih dari 2MB.',
         ]);
 
         try {
@@ -168,11 +142,11 @@ class ProductController extends Controller
                 'store_id' => $this->storeId,
             ];
 
-            ProductRepository::createProduct(
+            $product = ProductRepository::createProduct(
                 data: $data,
             );
 
-            return redirect()->route('my-store.product.index')
+            return redirect()->route('my-store.product.edit', $product->id)
                 ->with('success', 'Produk berhasil dibuat.');
         } catch (Exception $e) {
             return redirect()->back()
@@ -263,7 +237,7 @@ class ProductController extends Controller
         try {
             ProductRepository::updateProduct($product, $validated);
 
-            return redirect()->route('my-store.product.index')
+            return redirect()->back()
                 ->with('success', 'Produk berhasil diperbarui.');
         } catch (Exception $e) {
             return redirect()->back()

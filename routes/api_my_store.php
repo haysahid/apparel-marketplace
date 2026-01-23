@@ -4,7 +4,7 @@ use App\Http\Controllers\API\BrandController;
 use App\Http\Controllers\API\CustomerController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\PaymentMethodController;
-use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\MyStore\API\ProductController;
 use App\Http\Controllers\API\ProductImageController;
 use App\Http\Controllers\API\ProductVariantController;
 use App\Http\Controllers\API\ProductVariantImageController;
@@ -15,6 +15,7 @@ use App\Http\Controllers\API\VoucherController;
 use App\Http\Controllers\MyStore\API\MediaController;
 use App\Http\Controllers\MyStore\API\MyStoreController;
 use App\Http\Controllers\MyStore\API\ShipmentController;
+use App\Http\Controllers\MyStore\API\TemporaryMediaController;
 use App\Http\Controllers\MyStore\API\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -83,9 +84,13 @@ Route::name('api.my-store')->prefix('my-store')->middleware('auth:sanctum')->gro
         Route::post('/', [MediaController::class, 'store'])->name('store');
         Route::get('/{id}', [MediaController::class, 'show'])->name('show');
         Route::delete('/{id}', [MediaController::class, 'destroy'])->name('destroy');
+        Route::post('/attach', [MediaController::class, 'attach'])->name('attach');
     });
 
     // Temporary Media
-    Route::get('temporary-media', [MediaController::class, 'getAllTemporaryMedia'])->name('temporary-media.index');
-    Route::post('temporary-media/upload', [MediaController::class, 'uploadTemporaryMedia'])->name('temporary-media.upload');
+    Route::prefix('temporary-media')->name('temporary-media.')->group(function () {
+        Route::get('/', [TemporaryMediaController::class, 'index'])->name('index');
+        Route::post('/', [TemporaryMediaController::class, 'store'])->name('store');
+        Route::post('/attach', [TemporaryMediaController::class, 'attach'])->name('attach');
+    });
 });

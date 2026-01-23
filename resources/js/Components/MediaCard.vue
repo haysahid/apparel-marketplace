@@ -18,10 +18,19 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    showCheckbox: {
+        type: Boolean,
+        default: true,
+    },
+    showRemoveButton: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits<{
     (e: "update:isSelected", value: boolean): void;
+    (e: "remove", id: number | string): void;
 }>();
 
 const proxyChecked = computed({
@@ -45,9 +54,9 @@ const proxyChecked = computed({
         @click="proxyChecked = !proxyChecked"
     >
         <img
-            :src="props.media.url"
+            :src="props.media.original_url"
             alt="media"
-            class="object-cover w-full h-32 transition-transform duration-200 rounded-t-lg group-hover:scale-105"
+            class="object-cover w-full h-32 transition-transform duration-200 group-hover:scale-105"
         />
         <div v-if="props.showName || props.showSize" class="p-2">
             <p v-if="props.showName" class="text-sm font-medium">
@@ -59,7 +68,7 @@ const proxyChecked = computed({
         </div>
 
         <!-- Checkbox -->
-        <div class="absolute top-2 left-2">
+        <div v-if="props.showCheckbox" class="absolute top-1 left-2">
             <input
                 type="checkbox"
                 :value="props.media.id"
@@ -67,5 +76,28 @@ const proxyChecked = computed({
                 class="w-4 h-4 text-blue-600 transition-all ease-in-out border-gray-300 rounded focus:ring-blue-500"
             />
         </div>
+
+        <!-- Remove Button -->
+        <button
+            v-if="props.showRemoveButton"
+            type="button"
+            class="absolute p-0.5 text-white transition-all duration-300 ease-in-out rounded bg-black/10 top-1 right-1 hover:bg-red-500"
+            @click.stop="emit('remove', props.media.id)"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                class="size-5"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                />
+            </svg>
+        </button>
     </button>
 </template>

@@ -50,7 +50,7 @@ const basePrice = (product) => {
         return formatCurrency(product.lowest_base_selling_price);
     }
     return `${formatCurrency(
-        product.lowest_base_selling_price
+        product.lowest_base_selling_price,
     )} - ${formatCurrency(product.highest_base_selling_price)}`;
 };
 
@@ -62,7 +62,7 @@ const finalPrice = (product) => {
         return formatCurrency(product.lowest_final_selling_price);
     }
     return `${formatCurrency(
-        product.lowest_final_selling_price
+        product.lowest_final_selling_price,
     )} - ${formatCurrency(product.highest_final_selling_price)}`;
 };
 
@@ -99,7 +99,7 @@ const deleteProduct = () => {
                     closeDeleteProductDialog(true);
                     getProducts();
                 },
-            }
+            },
         );
     }
 };
@@ -129,7 +129,7 @@ const filteredBrands = computed(() => {
     return brands.filter((brand) =>
         brand.name
             .toLowerCase()
-            .includes(brandSearch.value?.toLowerCase() || "")
+            .includes(brandSearch.value?.toLowerCase() || ""),
     );
 });
 
@@ -179,7 +179,7 @@ function getProducts() {
 function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
-            "search-product"
+            "search-product",
         ) as HTMLInputElement;
         input?.focus({ preventScroll: true });
     });
@@ -230,7 +230,7 @@ onMounted(() => {
                                 filters.brand_id = option?.value;
                                 filters.brand = option
                                     ? filteredBrands.find(
-                                          (brand) => brand.id === option.value
+                                          (brand) => brand.id === option.value,
                                       )
                                     : null;
                                 filters.page = 1;
@@ -292,7 +292,12 @@ onMounted(() => {
                         <td>
                             <img
                                 v-if="product.images.length > 0"
-                                :src="getImageUrl(product.images[0].image as string)"
+                                :src="
+                                    getImageUrl(
+                                        product.images[0]
+                                            .original_url as string,
+                                    )
+                                "
                                 :alt="product.name"
                                 class="object-cover h-[60px] sm:h-[80px] aspect-square rounded border border-gray-200"
                             />
@@ -336,10 +341,10 @@ onMounted(() => {
                             </div>
                         </td>
                         <td>
-                            {{ product.brand.name }}
+                            {{ product.brand?.name || "-" }}
                         </td>
                         <td class="text-center">
-                            {{ product.stock_count }}
+                            {{ $formatNumber(product.stock_count) }}
                         </td>
                         <td>
                             <AdminItemAction
@@ -347,7 +352,7 @@ onMounted(() => {
                                     $inertia.visit(
                                         route('my-store.product.edit', {
                                             product: product,
-                                        })
+                                        }),
                                     )
                                 "
                                 @delete="openDeleteProductDialog(product)"
@@ -370,7 +375,7 @@ onMounted(() => {
                                 $inertia.visit(
                                     route('my-store.product.edit', {
                                         product: product,
-                                    })
+                                    }),
                                 )
                             "
                             @delete="openDeleteProductDialog(product)"

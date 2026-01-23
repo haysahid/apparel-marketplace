@@ -5,10 +5,12 @@ namespace App\Repositories;
 use App\Models\Product;
 use App\Models\ProductLink;
 use App\Models\ProductVariant;
+use App\Models\TemporaryMedia;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ProductRepository
 {
@@ -108,13 +110,20 @@ class ProductRepository
                 $product->categories()->attach($data['categories']);
             }
 
+            if (isset($data['temporary_images'])) {
+                foreach ($data['temporary_images'] as $tempMediaId) {
+                    $tempMedia = TemporaryMedia::find($tempMediaId);
+                    if ($tempMedia) {
+                        $tempMedia->copy($product, 'product');
+                        $tempMedia->delete();
+                    }
+                }
+            }
+
             if (isset($data['images'])) {
-                foreach ($data['images'] as $key => $image) {
-                    $imagePath = $image->store('product');
-                    $product->images()->create([
-                        'image' => $imagePath,
-                        'order' => $key,
-                    ]);
+                foreach ($data['images'] as $mediaId) {
+                    $media = Media::find($mediaId);
+                    $media->copy($product, 'product');
                 }
             }
 
@@ -124,39 +133,6 @@ class ProductRepository
                         'platform_id' => $link['platform_id'] ?? null,
                         'url' => $link['url'],
                     ]);
-                }
-            }
-
-            if (isset($data['variants'])) {
-                foreach ($data['variants'] as $variant) {
-                    $newVariant = ProductVariant::create([
-                        'store_id' => $data['store_id'],
-                        'product_id' => $product->id,
-                        'sku' => strtoupper(str_replace(' ', '', $product->sku_prefix . '_' . $variant['motif'] . '_' . $variant['color_id'] . '_' . $variant['size_id'])),
-                        'slug' => str($product->name . '-' . $variant['motif'] . '-' . $variant['color_id'] . '-' . $variant['size_id'])->slug(),
-                        'motif' => $variant['motif'],
-                        'color_id' => $variant['color_id'],
-                        'size_id' => $variant['size_id'],
-                        'material' => $variant['material'],
-                        'purchase_price' => $variant['purchase_price'] ?? $variant['base_selling_price'],
-                        'base_selling_price' => $variant['base_selling_price'],
-                        'discount_type' => 'percentage',
-                        'discount' => $variant['discount'] ?? 0,
-                        'final_selling_price' => $variant['base_selling_price'] - ($variant['base_selling_price'] * ($variant['discount'] ?? 0) / 100),
-                        'current_stock_level' => $variant['current_stock_level'],
-                        'unit_id' => $variant['unit_id'],
-                    ]);
-
-                    if (isset($variant['images'])) {
-                        foreach ($variant['images'] as $key => $image) {
-                            $imagePath = $image->store('product');
-                            $newVariant->images()->create([
-                                'product_id' => $product->id,
-                                'image' => $imagePath,
-                                'order' => $key,
-                            ]);
-                        }
-                    }
                 }
             }
 

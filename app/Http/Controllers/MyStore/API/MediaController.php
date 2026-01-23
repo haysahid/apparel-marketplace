@@ -144,51 +144,39 @@ class MediaController extends Controller
         }
     }
 
-    public function getAllTemporaryMedia(Request $request)
+    public function attach(Request $request)
     {
-        $tempMedia = TemporaryMediaRepository::getAllTemporaryMedia(
-            storeId: $this->storeId,
-        );
+        $validatedData = $request->validate([
+            'media_ids' => 'required|array',
+            'model_type' => 'required|string|in:product,variant',
+            'model_id' => 'required|integer',
+            'collection_name' => 'nullable|string',
+        ]);
 
-        return ResponseFormatter::success(
-            $tempMedia,
-            'Daftar media sementara berhasil diambil.'
-        );
-    }
+        $mediaIds = $validatedData['media_ids'];
+        $modelType = $validatedData['model_type'];
+        $modelId = $validatedData['model_id'];
+        $collectionName = $validatedData['collection_name'] ?? 'default';
 
-    public function uploadTemporaryMedia(Request $request)
-    {
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-
-            $temp = TemporaryMediaRepository::createTemporaryMedia(
-                file: $file,
-                storeId: $this->storeId,
-            );
-
-            return ResponseFormatter::success(
-                $temp,
-                'Media sementara berhasil diunggah.',
-                201
-            );
+        if ($modelType === 'product') {
+            $modelType = Product::class;
+        } elseif ($modelType === 'variant') {
+            $modelType = ProductVariant::class;
         }
-    }
 
-    public function getTemporaryMedia(string $id)
-    {
         try {
-            $tempMedia = TemporaryMediaRepository::getTemporaryMedia($id);
+            $modelClass = app($modelType);
+            $model = $modelClass::findOrFail($modelId);
 
-            if (!$tempMedia) {
-                return ResponseFormatter::error(
-                    'Media sementara tidak ditemukan.',
-                    404
-                );
-            }
+            MediaRepository::attachMediaToModel(
+                mediaIds: $mediaIds,
+                model: $model,
+                collectionName: $collectionName,
+            );
 
             return ResponseFormatter::success(
-                $tempMedia,
-                'Detail media sementara berhasil diambil.'
+                null,
+                'Media berhasil dilampirkan ke model.'
             );
         } catch (Exception $e) {
             return ResponseFormatter::error(

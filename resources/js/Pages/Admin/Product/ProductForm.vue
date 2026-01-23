@@ -44,7 +44,7 @@ const form = useForm(
               images: [{ id: "new-1", image: null }],
               links: [],
               variants: [],
-          }
+          },
 );
 
 const drag = ref(false);
@@ -57,7 +57,7 @@ const isBrandDropdownOpen = ref(false);
 
 const filteredBrands = computed(() => {
     return brands.filter((brand) =>
-        brand.name.toLowerCase().includes(brandSearch.value.toLowerCase())
+        brand.name.toLowerCase().includes(brandSearch.value.toLowerCase()),
     );
 });
 
@@ -111,7 +111,7 @@ function updateImage(index, image) {
                     "Content-Type": "multipart/form-data",
                     Authorization: token,
                 },
-            }
+            },
         )
         .then((response) => {
             form.images[index] = response.data.result;
@@ -147,11 +147,11 @@ function deleteImages() {
                     headers: {
                         Authorization: token,
                     },
-                }
+                },
             )
             .then(() => {
                 imagesToDelete.value = imagesToDelete.value.filter(
-                    (id) => id !== imageId
+                    (id) => id !== imageId,
                 );
             })
             .catch((error) => {
@@ -181,7 +181,7 @@ const submit = () => {
                         if (link.platform_id) {
                             formData.append(
                                 `links[${index}][platform_id]`,
-                                link.platform_id
+                                link.platform_id,
                             );
                         }
 
@@ -223,7 +223,7 @@ const submit = () => {
                     data.links.forEach((link, index) => {
                         formData.append(
                             `links[${index}][platform_id]`,
-                            link.platform_id
+                            link.platform_id,
                         );
                         formData.append(`links[${index}][url]`, link.url);
                     });
@@ -565,7 +565,7 @@ const openErrorDialog = (message) => {
                                             ? (form.categories =
                                                   form.categories.filter(
                                                       (c) =>
-                                                          c.id !== category.id
+                                                          c.id !== category.id,
                                                   ))
                                             : form.categories.push(category)
                                     "

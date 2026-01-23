@@ -100,7 +100,7 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth'])->group(functi
             Route::get('/create', [ProductController::class, 'create'])->name('create');
             Route::post('/', [ProductController::class, 'store'])->name('store');
             Route::get('/{product}', [ProductController::class, 'edit'])->name('edit');
-            Route::post('/{product}', [ProductController::class, 'update'])->name('update');
+            Route::put('/{product}', [ProductController::class, 'update'])->name('update');
             Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy');
         });
 

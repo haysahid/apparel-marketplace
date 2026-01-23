@@ -8,11 +8,20 @@ class TemporaryMediaRepository
 {
     public static function getAllTemporaryMedia(
         $storeId = null,
+        $limit = null,
+        $orderBy = 'created_at',
+        $orderDirection = 'desc',
     ) {
         $query = TemporaryMedia::query();
 
         if ($storeId) {
             $query->where('store_id', $storeId);
+        }
+
+        $query->orderBy($orderBy, $orderDirection);
+
+        if ($limit) {
+            return $query->limit($limit)->get();
         }
 
         return $query->get();
@@ -51,8 +60,21 @@ class TemporaryMediaRepository
         $tempMedia = TemporaryMedia::find($id);
         if ($tempMedia) {
             $tempMedia->delete();
+
             return true;
         }
         return false;
+    }
+
+    public static function attachTemporaryMediaToModel(
+        $temporaryMediaIds,
+        $model,
+        $collectionName = 'default'
+    ) {
+        $temporaryMediaItems = TemporaryMedia::whereIn('id', $temporaryMediaIds)->get();
+        foreach ($temporaryMediaItems as $tempMedia) {
+            $tempMedia->copy($model, $collectionName);
+            $tempMedia->delete();
+        }
     }
 }

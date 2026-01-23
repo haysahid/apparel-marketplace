@@ -1,16 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import { useForm, usePage } from "@inertiajs/vue3";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import TextInput from "@/Components/TextInput.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import ImageInput from "@/Components/ImageInput.vue";
-import ErrorDialog from "@/Components/ErrorDialog.vue";
 import { useDraggable } from "vue-draggable-plus";
 import ProductLinkForm from "./ProductLinkForm.vue";
 import DialogModal from "@/Components/DialogModal.vue";
-import LinkItem from "@/Components/LinkItem.vue";
-import SuccessDialog from "@/Components/SuccessDialog.vue";
 import InputGroup from "@/Components/InputGroup.vue";
 import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import DropdownSearchInputMultiple from "@/Components/DropdownSearchInputMultiple.vue";
@@ -20,18 +15,17 @@ import CategoryForm from "../Category/CategoryForm.vue";
 import DefaultCard from "@/Components/DefaultCard.vue";
 import VariantList from "./VariantList.vue";
 import TabButton from "@/Components/TabButton.vue";
-import axios from "axios";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
-import cookieManager from "@/plugins/cookie-manager";
 import { goBack } from "@/plugins/helpers";
 import { useProductFormStore } from "@/stores/product-form-store";
-import mediaService from "@/services/my-store/media-service";
 import MediaForm from "@/Components/MediaForm.vue";
 import Modal from "@/Components/Modal.vue";
+import MediaCard from "@/Components/MediaCard.vue";
+import { useDialogStore } from "@/stores/dialog-store";
 
 const props = defineProps({
     product: {
-        type: Object,
+        type: Object as () => ProductEntity | null,
         default: null,
     },
 });
@@ -74,75 +68,115 @@ const draggable = useDraggable(imagesContainer, imagesRef, {
 
 const showMediaFormModal = ref(false);
 
+const dialogStore = useDialogStore();
+
+const submitProduct = () => {
+    if (formStore.validateProductForm()) {
+        const showSuccessDialogWithAddVariantAlert =
+            !props.product?.variants?.length;
+
+        formStore.submitProduct({
+            autoShowDialog: false,
+            onSuccess: () => {
+                formStore.clearNewProductForm();
+                formStore.tabIndex = 1;
+
+                if (showSuccessDialogWithAddVariantAlert) {
+                    dialogStore.openSuccessDialog(
+                        "Informasi produk berhasil disimpan. Silakan tambahkan variasi produk.",
+                    );
+                } else {
+                    dialogStore.openSuccessDialog(
+                        "Informasi produk berhasil diperbarui.",
+                    );
+                }
+            },
+        });
+    }
+};
+
 onMounted(() => {
-    showMediaFormModal.value = true;
+    if (props.product) {
+        formStore.initializeForm(props.product);
+    } else {
+        formStore.initializeForm();
+    }
 });
 </script>
 
 <template>
-    <form @submit.prevent="formStore.submit">
-        <div class="flex flex-col items-start sm:gap-4">
-            <DefaultCard :isMain="true" class="w-full !p-0">
+    <div class="flex flex-col items-start sm:gap-4">
+        <DefaultCard :isMain="true" class="w-full !p-0">
+            <div class="flex w-full gap-4 p-4 border-b border-gray-100 sm:p-6">
+                <div class="w-full">
+                    <h2 class="text-lg font-semibold">Produk & Variasi</h2>
+                    <p class="text-sm text-gray-500">
+                        Isi informasi produk dan variasi.
+                    </p>
+                </div>
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <PrimaryButton
+                        v-if="props.product"
+                        type="button"
+                        @click="$inertia.visit(route('my-store.product.index'))"
+                    >
+                        Selesai
+                    </PrimaryButton>
+                    <SecondaryButton
+                        v-else
+                        type="button"
+                        @click="$inertia.visit(route('my-store.product.index'))"
+                    >
+                        Kembali
+                    </SecondaryButton>
+                </div>
+            </div>
+
+            <div
+                class="w-full min-h-[60vh] flex flex-col sm:flex-row items-start"
+            >
+                <!-- Tab Navigation -->
                 <div
-                    class="flex w-full gap-4 p-4 border-b border-gray-100 sm:p-6"
+                    class="flex sm:flex-col items-start w-full sm:w-[300px] divide-x sm:divide-y divide-gray-100 border-b border-gray-100"
                 >
-                    <div class="w-full">
-                        <h2 class="text-lg font-semibold">Produk & Variasi</h2>
-                        <p class="text-sm text-gray-500">
-                            Isi informasi produk dan variasi.
-                        </p>
-                    </div>
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <SecondaryButton type="button" @click="goBack()">
-                            Kembali
-                        </SecondaryButton>
-                        <PrimaryButton type="submit"> Simpan </PrimaryButton>
-                    </div>
+                    <TabButton
+                        v-for="(tab, index) in formStore.tabs"
+                        :key="index"
+                        :title="tab.title"
+                        :subtitle="tab.subtitle"
+                        :isActive="index == formStore.tabIndex"
+                        :error="
+                            index === 1 && formStore.form.errors.variants
+                                ? formStore.form.errors.variants
+                                : null
+                        "
+                        @click="formStore.tabIndex = index"
+                    >
+                        <template v-if="tab.icon" #leading>
+                            <span
+                                v-if="tab.icon"
+                                v-html="tab.icon"
+                                class="[&>svg]:fill-gray-500 group-hover:[&>svg]:fill-gray-600 [&>svg]:transition-all [&>svg]:duration-300 [&>svg]:ease-in-out [&>svg]:size-5"
+                                :class="{
+                                    '[&>svg]:!fill-primary':
+                                        index == formStore.tabIndex,
+                                }"
+                            ></span>
+                        </template>
+                    </TabButton>
                 </div>
 
+                <!-- Tab Content -->
                 <div
-                    class="w-full min-h-[60vh] flex flex-col sm:flex-row items-start"
+                    class="flex items-center justify-center w-full h-full p-4 border-l border-gray-100 sm:p-6"
                 >
-                    <!-- Tab Navigation -->
-                    <div
-                        class="flex sm:flex-col items-start w-full sm:w-[300px] divide-x sm:divide-y divide-gray-100 border-b border-gray-100"
+                    <!-- Tab 0 -->
+                    <form
+                        v-show="formStore.tabIndex == 0"
+                        @submit.prevent="submitProduct"
+                        class="w-full"
                     >
-                        <TabButton
-                            v-for="(tab, index) in formStore.tabs"
-                            :key="index"
-                            :title="tab.title"
-                            :subtitle="tab.subtitle"
-                            :isActive="index == formStore.tabIndex"
-                            :error="
-                                index === 1 && formStore.form.errors.variants
-                                    ? formStore.form.errors.variants
-                                    : null
-                            "
-                            @click="formStore.tabIndex = index"
-                        >
-                            <template v-if="tab.icon" #leading>
-                                <span
-                                    v-if="tab.icon"
-                                    v-html="tab.icon"
-                                    class="[&>svg]:fill-gray-500 group-hover:[&>svg]:fill-gray-600 [&>svg]:transition-all [&>svg]:duration-300 [&>svg]:ease-in-out [&>svg]:size-5"
-                                    :class="{
-                                        '[&>svg]:!fill-primary':
-                                            index == formStore.tabIndex,
-                                    }"
-                                ></span>
-                            </template>
-                        </TabButton>
-                    </div>
-
-                    <!-- Tab Content -->
-                    <div
-                        class="flex items-center justify-center w-full h-full p-4 border-l border-gray-100 sm:p-6"
-                    >
-                        <!-- Tab 0 -->
-                        <div
-                            v-if="formStore.tabIndex == 0"
-                            class="flex flex-col w-full gap-4"
-                        >
+                        <div class="flex flex-col w-full gap-4">
                             <h2 class="font-semibold">Informasi Produk</h2>
 
                             <!-- Name -->
@@ -362,59 +396,56 @@ onMounted(() => {
                                     ref="imagesContainer"
                                     class="flex flex-wrap w-full gap-2"
                                 >
-                                    <ImageInput
+                                    <template
                                         v-for="(image, index) in formStore.form
                                             .images"
                                         :key="image.id"
-                                        :id="`image-${image.id}`"
-                                        :modelValue="image.image"
-                                        type="file"
-                                        accept="image/*"
-                                        placeholder="Upload gambar"
-                                        class="!w-auto"
-                                        width="!w-[100px]"
-                                        height="h-[100px]"
-                                        :showDeleteButton="true"
-                                        :error="
-                                            formStore.form.errors.images?.[
-                                                index
-                                            ]
-                                        "
-                                        :isDragging="isDragging"
-                                        @update:modelValue="
-                                            if (formStore.isNewImage(image)) {
-                                                if (image.image == null) {
-                                                    formStore.form.images.push({
-                                                        id: `new-${
-                                                            formStore.countNewImages +
-                                                            1
-                                                        }`,
-                                                        image: null,
-                                                    });
-                                                }
+                                    >
+                                        <MediaCard
+                                            :media="image"
+                                            :isSelected="false"
+                                            :showCheckbox="false"
+                                            :showRemoveButton="true"
+                                            :showName="false"
+                                            :showSize="false"
+                                            @remove="
+                                                formStore.form.images.splice(
+                                                    index,
+                                                    1,
+                                                )
+                                            "
+                                        />
+                                    </template>
 
-                                                image.image = $event;
-                                            } else {
-                                                image.image = $event;
-                                            }
+                                    <button
+                                        type="button"
+                                        class="relative overflow-hidden transition-all ease-in-out border rounded-lg cursor-pointer group hover:border-primary-light hover:ring-1 hover:ring-primary-light"
+                                        @click.prevent="
+                                            showMediaFormModal = true
                                         "
-                                        @delete="
-                                            if (formStore.isNewImage(image)) {
-                                                formStore.form.images.splice(
-                                                    index,
-                                                    1,
-                                                );
-                                            } else {
-                                                formStore.imagesToDelete.push(
-                                                    image.id,
-                                                );
-                                                formStore.form.images.splice(
-                                                    index,
-                                                    1,
-                                                );
-                                            }
-                                        "
-                                    />
+                                    >
+                                        <div
+                                            class="flex flex-col items-center justify-center w-full h-32 gap-2 p-4 text-gray-500 transition-all duration-300 ease-in-out rounded-lg bg-gray-50 group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="24"
+                                                height="24"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                class="size-8"
+                                            >
+                                                <path
+                                                    d="M5 21C4.45 21 3.97933 20.8043 3.588 20.413C3.19667 20.0217 3.00067 19.5507 3 19V5C3 4.45 3.196 3.97934 3.588 3.588C3.98 3.19667 4.45067 3.00067 5 3H12C12.2833 3 12.521 3.096 12.713 3.288C12.905 3.48 13.0007 3.71734 13 4C12.9993 4.28267 12.9033 4.52034 12.712 4.713C12.5207 4.90567 12.2833 5.00134 12 5H5V19H19V12C19 11.7167 19.096 11.4793 19.288 11.288C19.48 11.0967 19.7173 11.0007 20 11C20.2827 10.9993 20.5203 11.0953 20.713 11.288C20.9057 11.4807 21.0013 11.718 21 12V19C21 19.55 20.8043 20.021 20.413 20.413C20.0217 20.805 19.5507 21.0007 19 21H5ZM6 17H18L14.25 12L11.25 16L9 13L6 17ZM17 7H16C15.7167 7 15.4793 6.904 15.288 6.712C15.0967 6.52 15.0007 6.28267 15 6C14.9993 5.71734 15.0953 5.48 15.288 5.288C15.4807 5.096 15.718 5 16 5H17V4C17 3.71667 17.096 3.47934 17.288 3.288C17.48 3.09667 17.7173 3.00067 18 3C18.2827 2.99934 18.5203 3.09534 18.713 3.288C18.9057 3.48067 19.0013 3.718 19 4V5H20C20.2833 5 20.521 5.096 20.713 5.288C20.905 5.48 21.0007 5.71734 21 6C20.9993 6.28267 20.9033 6.52034 20.712 6.713C20.5207 6.90567 20.2833 7.00134 20 7H19V8C19 8.28334 18.904 8.521 18.712 8.713C18.52 8.905 18.2827 9.00067 18 9C17.7173 8.99934 17.48 8.90334 17.288 8.712C17.096 8.52067 17 8.28334 17 8V7Z"
+                                                    fill="currentColor"
+                                                />
+                                            </svg>
+
+                                            <p class="text-sm text-center">
+                                                Tambah Gambar
+                                            </p>
+                                        </div>
+                                    </button>
                                 </div>
                             </InputGroup>
 
@@ -493,49 +524,72 @@ onMounted(() => {
                             </div> -->
 
                             <!-- Navigate -->
-                            <PrimaryButton
-                                type="button"
-                                class="mt-4 w-fit"
-                                @click="
-                                    if (formStore.validateProductForm()) {
-                                        formStore.tabIndex = 1;
-                                    }
-                                "
-                            >
-                                Selanjutnya
+                            <PrimaryButton type="submit" class="mt-4 w-fit">
+                                Simpan
                             </PrimaryButton>
                         </div>
+                    </form>
 
-                        <!-- Tab 1 -->
-                        <div
-                            v-if="formStore.tabIndex == 1"
-                            class="flex flex-col w-full gap-4"
-                        >
-                            <!-- Variants -->
-                            <VariantList
-                                :isEdit="props.product != null"
-                                :product="
-                                    props.product
-                                        ? {
-                                              ...props.product,
-                                              variants: undefined,
-                                          }
-                                        : null
-                                "
-                                :variants="formStore.form.variants"
-                                @onAdd="
-                                    (variant) => {
-                                        formStore.form.variants.push(variant);
+                    <!-- Tab 1 -->
+                    <div
+                        v-if="formStore.tabIndex == 1"
+                        class="flex flex-col w-full gap-4"
+                    >
+                        <!-- Variants -->
+                        <VariantList
+                            :isEdit="props.product != null"
+                            :product="
+                                props.product
+                                    ? {
+                                          ...props.product,
+                                          variants: undefined,
+                                      }
+                                    : null
+                            "
+                            :variants="formStore.form.variants"
+                            @onAdd="
+                                (variant) => {
+                                    formStore.form.variants.push(variant);
+                                }
+                            "
+                            @onAdded="
+                                (message) => {
+                                    dialogStore.openSuccessDialog(message);
+                                    formStore.getVariants();
+                                }
+                            "
+                            @onEdit="
+                                (variant) => {
+                                    const index =
+                                        formStore.form.variants.findIndex(
+                                            (v) =>
+                                                v.motif === variant.motif &&
+                                                v.color_id ===
+                                                    variant.color_id &&
+                                                v.size_id === variant.size_id,
+                                        );
+                                    if (index !== -1) {
+                                        formStore.form.variants[index] = {
+                                            ...variant,
+                                            showEditForm: false,
+                                        };
                                     }
-                                "
-                                @onAdded="
-                                    (message) => {
-                                        formStore.openSuccessDialog(message);
-                                        formStore.getVariants();
-                                    }
-                                "
-                                @onEdit="
-                                    (variant) => {
+                                }
+                            "
+                            @onEditted="
+                                (message) => {
+                                    dialogStore.openSuccessDialog(message);
+                                    formStore.getVariants();
+                                }
+                            "
+                            @onDelete="
+                                (variant) => {
+                                    if (
+                                        props.product != null &&
+                                        variant.id != null
+                                    ) {
+                                        formStore.deleteVariant(variant);
+                                    } else {
                                         const index =
                                             formStore.form.variants.findIndex(
                                                 (v) =>
@@ -545,172 +599,128 @@ onMounted(() => {
                                                     v.size_id ===
                                                         variant.size_id,
                                             );
-                                        if (index !== -1) {
-                                            formStore.form.variants[index] = {
-                                                ...variant,
-                                                showEditForm: false,
-                                            };
-                                        }
+                                        formStore.form.variants.splice(
+                                            index,
+                                            1,
+                                        );
+                                        dialogStore.openSuccessDialog(
+                                            'Varian produk berhasil dihapus.',
+                                        );
                                     }
-                                "
-                                @onEditted="
-                                    (message) => {
-                                        formStore.openSuccessDialog(message);
-                                        formStore.getVariants();
-                                    }
-                                "
-                                @onDelete="
-                                    (variant) => {
-                                        if (
-                                            props.product != null &&
-                                            variant.id != null
-                                        ) {
-                                            formStore.deleteVariant(variant);
-                                        } else {
-                                            const index =
-                                                formStore.form.variants.findIndex(
-                                                    (v) =>
-                                                        v.motif ===
-                                                            variant.motif &&
-                                                        v.color_id ===
-                                                            variant.color_id &&
-                                                        v.size_id ===
-                                                            variant.size_id,
-                                                );
-                                            formStore.form.variants.splice(
-                                                index,
-                                                1,
-                                            );
-                                            formStore.openSuccessDialog(
-                                                'Varian produk berhasil dihapus.',
-                                            );
-                                        }
-                                    }
-                                "
-                            />
-                        </div>
+                                }
+                            "
+                        />
                     </div>
                 </div>
-            </DefaultCard>
-        </div>
+            </div>
+        </DefaultCard>
+    </div>
 
-        <DialogModal
-            :show="formStore.showAddLinkForm"
-            title="Tambah Tautan Produk"
-            @close="formStore.showAddLinkForm = false"
-            maxWidth="sm"
-        >
-            <template #content>
-                <ProductLinkForm
-                    :link="null"
-                    @submit="formStore.form.links.push($event)"
-                    @close="formStore.showAddLinkForm = false"
+    <DialogModal
+        :show="formStore.showAddLinkForm"
+        title="Tambah Tautan Produk"
+        @close="formStore.showAddLinkForm = false"
+        maxWidth="sm"
+    >
+        <template #content>
+            <ProductLinkForm
+                :link="null"
+                @submit="formStore.form.links.push($event)"
+                @close="formStore.showAddLinkForm = false"
+            />
+        </template>
+    </DialogModal>
+
+    <!-- Add Brand Modal -->
+    <DialogModal
+        :show="formStore.showAddBrandForm"
+        @close="formStore.showAddBrandForm = false"
+        maxWidth="sm"
+    >
+        <template #content>
+            <div class="w-full">
+                <h2
+                    class="w-full mb-3 text-lg font-medium text-center text-gray-900"
+                >
+                    Tambah Brand
+                </h2>
+                <BrandForm
+                    :isDialog="true"
+                    @onSubmitted="
+                        (brandName) => {
+                            formStore.showAddBrandForm = false;
+                            formStore.brands = $page.props.brands;
+
+                            const newBrand = formStore.brands.find(
+                                (brand) => brand.name === brandName,
+                            );
+                            formStore.form.brand_id = newBrand.id;
+                            formStore.form.brand = newBrand;
+
+                            dialogStore.openSuccessDialog(
+                                'Brand berhasil ditambahkan.',
+                            );
+                        }
+                    "
+                    @close="formStore.showAddBrandForm = false"
+                    class="w-full"
                 />
-            </template>
-        </DialogModal>
+            </div>
+        </template>
+    </DialogModal>
 
-        <!-- Add Brand Modal -->
-        <DialogModal
-            :show="formStore.showAddBrandForm"
-            @close="formStore.showAddBrandForm = false"
-            maxWidth="sm"
-        >
-            <template #content>
-                <div class="w-full">
-                    <h2
-                        class="w-full mb-3 text-lg font-medium text-center text-gray-900"
-                    >
-                        Tambah Brand
-                    </h2>
-                    <BrandForm
-                        :isDialog="true"
-                        @onSubmitted="
-                            (brandName) => {
-                                formStore.showAddBrandForm = false;
-                                formStore.brands = $page.props.brands;
+    <!-- Add Category Modal -->
+    <DialogModal
+        :show="formStore.showAddCategoryForm"
+        @close="formStore.showAddCategoryForm = false"
+        maxWidth="sm"
+    >
+        <template #content>
+            <div class="w-full">
+                <h2
+                    class="w-full mb-3 text-lg font-medium text-center text-gray-900"
+                >
+                    Tambah Kategori
+                </h2>
+                <CategoryForm
+                    :isDialog="true"
+                    @onSubmitted="
+                        (categoryName) => {
+                            formStore.showAddCategoryForm = false;
+                            formStore.categories = $page.props.categories;
 
-                                const newBrand = formStore.brands.find(
-                                    (brand) => brand.name === brandName,
-                                );
-                                formStore.form.brand_id = newBrand.id;
-                                formStore.form.brand = newBrand;
+                            const newCategory = formStore.categories.find(
+                                (category) => category.name === categoryName,
+                            );
+                            formStore.form.categories.push(newCategory);
 
-                                formStore.openSuccessDialog(
-                                    'Brand berhasil ditambahkan.',
-                                );
-                            }
-                        "
-                        @close="formStore.showAddBrandForm = false"
-                        class="w-full"
-                    />
-                </div>
-            </template>
-        </DialogModal>
+                            dialogStore.openSuccessDialog(
+                                'Kategori berhasil ditambahkan.',
+                            );
+                        }
+                    "
+                    @close="formStore.showAddCategoryForm = false"
+                    class="w-full"
+                />
+            </div>
+        </template>
+    </DialogModal>
 
-        <!-- Add Category Modal -->
-        <DialogModal
-            :show="formStore.showAddCategoryForm"
-            @close="formStore.showAddCategoryForm = false"
-            maxWidth="sm"
-        >
-            <template #content>
-                <div class="w-full">
-                    <h2
-                        class="w-full mb-3 text-lg font-medium text-center text-gray-900"
-                    >
-                        Tambah Kategori
-                    </h2>
-                    <CategoryForm
-                        :isDialog="true"
-                        @onSubmitted="
-                            (categoryName) => {
-                                formStore.showAddCategoryForm = false;
-                                formStore.categories = $page.props.categories;
-
-                                const newCategory = formStore.categories.find(
-                                    (category) =>
-                                        category.name === categoryName,
-                                );
-                                formStore.form.categories.push(newCategory);
-
-                                formStore.openSuccessDialog(
-                                    'Kategori berhasil ditambahkan.',
-                                );
-                            }
-                        "
-                        @close="formStore.showAddCategoryForm = false"
-                        class="w-full"
-                    />
-                </div>
-            </template>
-        </DialogModal>
-
-        <SuccessDialog
-            :show="formStore.showSuccessDialog"
-            :title="formStore.successMessage"
-            @close="formStore.closeSuccessDialog"
+    <Modal :show="showMediaFormModal" @close="showMediaFormModal = false">
+        <MediaForm
+            modelType="product"
+            :modelId="props.product.id"
+            collectionName="product"
+            @close="showMediaFormModal = false"
+            @selectedMediaList="
+                (selectedMediaList) => {
+                    formStore.form.images = [
+                        ...formStore.form.images,
+                        ...selectedMediaList,
+                    ];
+                    showMediaFormModal = false;
+                }
+            "
         />
-
-        <ErrorDialog
-            :show="formStore.showErrorDialog"
-            @close="formStore.closeErrorDialog"
-        >
-            <template #content>
-                <div>
-                    <div
-                        class="mb-1 text-lg font-medium text-center text-gray-900"
-                    >
-                        Terjadi Kesalahan
-                    </div>
-                    <p class="text-center text-gray-700">
-                        {{ formStore.errorMessage }}
-                    </p>
-                </div>
-            </template>
-        </ErrorDialog>
-
-        <Modal :show="showMediaFormModal" @close="showMediaFormModal = false">
-            <MediaForm />
-        </Modal>
-    </form>
+    </Modal>
 </template>

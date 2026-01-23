@@ -3,17 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
+use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Product extends Model
+class Product extends Model implements HasMedia
 {
     use SoftDeletes, InteractsWithMedia;
 
     // Optional: Define automatic image conversions (Optimization)
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions($media = null): void
     {
         $this->addMediaConversion('thumb')
             ->width(200)
@@ -43,6 +45,7 @@ class Product extends Model
         'highest_base_selling_price',
         'highest_final_selling_price',
         'stock_count',
+        'thumbnail_url',
     ];
 
     // Methods
@@ -79,6 +82,12 @@ class Product extends Model
         return $this->getVariants()->sum('current_stock_level');
     }
 
+    public function getThumbnailUrlAttribute()
+    {
+        $media = $this->getFirstMedia('product');
+        return $media ? $media->getUrl('thumb') : null;
+    }
+
     // Relationships
     public function store()
     {
@@ -95,9 +104,17 @@ class Product extends Model
         return $this->belongsToMany(Category::class, 'product_category');
     }
 
-    public function images()
+    // public function images()
+    // {
+    //     return $this->morphMany(Media::class, 'model')->where('collection_name', 'images');
+    // }
+
+    public function images(): MorphMany
     {
-        return $this->hasMany(ProductImage::class)->orderBy('order', 'asc');
+        // Mengarahkan relasi morph ke tabel media milik Spatie
+        return $this->morphMany(Media::class, 'model')
+            ->where('collection_name', 'product') // Opsional: Filter koleksi tertentu
+            ->orderBy('order_column', 'asc');
     }
 
     public function links()
