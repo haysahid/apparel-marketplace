@@ -34,16 +34,20 @@ const close = () => {
 </script>
 <template>
     <DialogModal :show="props.show" @close="close" maxWidth="sm">
+        <template #icon v-if="$slots.icon">
+            <slot name="icon" />
+        </template>
         <template #title>
             <h3
                 v-html="props.title"
                 class="text-lg font-medium leading-6 text-gray-900 text-wrap"
             ></h3>
         </template>
-        <template v-if="props.description" #content>
+        <template v-if="props.description || $slots.content" #content>
             <p class="mt-0.5 mb-1.5 text-center text-wrap">
                 {{ props.description }}
             </p>
+            <slot name="content" />
         </template>
         <slot />
         <template #footer>

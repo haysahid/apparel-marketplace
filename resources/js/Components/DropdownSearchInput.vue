@@ -142,6 +142,7 @@ const filteredOptions = computed(() => {
                 :placeholder="props.placeholder"
                 :error="props.error"
                 :disabled="props.disabled"
+                :required="props.required"
                 autocomplete="off"
                 @focus="dropdown.open = true"
                 @focusout="onFocusout"
@@ -283,6 +284,8 @@ const filteredOptions = computed(() => {
                         :placeholder="props.placeholder"
                         :error="props.error"
                         :disabled="props.disabled"
+                        :required="props.required"
+                        autocomplete="off"
                     >
                         <template #prefix v-if="props.modelValue?.hexCode">
                             <span

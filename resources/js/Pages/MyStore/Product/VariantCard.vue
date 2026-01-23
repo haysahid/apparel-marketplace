@@ -78,11 +78,11 @@ const loadFile = (file) => {
                         : getImageUrl(props.variant.images[0].original_url)
                 "
                 :alt="props.name"
-                class="object-cover size-[60px] sm:size-[80px]"
+                class="object-cover size-[80px] sm:size-[100px]"
             />
             <div
                 v-else
-                class="flex items-center justify-center size-[60px] sm:size-[80px] bg-gray-100 rounded-lg aspect-square"
+                class="flex items-center justify-center size-[80px] sm:size-[100px] bg-gray-100 rounded-lg aspect-square"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -125,31 +125,32 @@ const loadFile = (file) => {
             </div>
         </div>
 
-        <div class="flex flex-col items-end gap-2 shrink-0">
+        <div class="flex flex-col items-end h-full gap-2 shrink-0">
             <button
                 v-if="showDeleteButton"
                 type="button"
-                class="p-[7px] text-gray-400 bg-white rounded-full hover:bg-gray-100 transition-all duration-300 ease-in-out"
+                class="p-[7px] text-gray-400 bg-white rounded-md hover:bg-gray-100 transition-all duration-300 ease-in-out"
                 @click.stop="emit('delete')"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="size-5"
-                    fill="none"
+                    width="24"
+                    height="24"
                     viewBox="0 0 24 24"
-                    stroke="currentColor"
+                    fill="none"
+                    class="stroke-red-500 group-hover:stroke-red-600 size-5"
                 >
                     <path
+                        d="M3 6H21M19 6V20C19 21 18 22 17 22H7C6 22 5 21 5 20V6M8 6V4C8 3 9 2 10 2H14C15 2 16 3 16 4V6M10 11V17M14 11V17"
+                        stroke-width="2"
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M6 18L18 6M6 6l12 12"
                     />
                 </svg>
             </button>
 
             <div
-                class="flex items-center gap-2 py-1.5 px-2 bg-gray-100 rounded-md"
+                class="flex items-center gap-2 py-1.5 px-2 bg-gray-100 rounded-md whitespace-nowrap"
             >
                 <p class="text-sm font-medium text-gray-600">
                     {{

@@ -343,7 +343,7 @@ onMounted(() => {
                         <td>
                             {{ product.brand?.name || "-" }}
                         </td>
-                        <td class="text-center">
+                        <td>
                             {{ $formatNumber(product.stock_count) }}
                         </td>
                         <td>

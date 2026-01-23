@@ -118,6 +118,13 @@ class ProductVariantRepository
                         continue;
                     }
                 }
+
+                // Remove images that are not in the new list
+                ProductVariantImage::where('product_variant_id', $variant->id)
+                    ->whereNotIn('media_id', $data['images'])
+                    ->each(function ($image) {
+                        $image->delete();
+                    });
             }
 
             DB::commit();

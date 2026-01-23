@@ -12,4 +12,7 @@ interface MediaEntity {
 
     // Additional attributes
     is_temporary?: boolean;
+
+    // Utilities
+    showDeleteDialog?: boolean | false;
 }

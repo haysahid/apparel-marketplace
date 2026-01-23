@@ -3,12 +3,7 @@
 namespace App\Http\Controllers\MyStore;
 
 use App\Http\Controllers\Controller;
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Color;
-use App\Models\Platform;
 use App\Models\Product;
-use App\Models\Size;
 use App\Repositories\BrandRepository;
 use App\Repositories\CategoryRepository;
 use App\Repositories\ColorRepository;
@@ -224,6 +219,8 @@ class ProductController extends Controller
             'discount' => 'nullable|numeric',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id',
+            'images' => 'nullable|array',
+            'images.*' => 'integer|exists:media,id',
             'links' => 'nullable|array',
         ], [
             'brand_id.exists' => 'Merek yang dipilih tidak valid.',
@@ -234,6 +231,9 @@ class ProductController extends Controller
             'discount.numeric' => 'Diskon harus berupa angka.',
             'categories.array' => 'Kategori harus berupa array.',
             'categories.*.exists' => 'Kategori yang dipilih tidak valid.',
+            'images.array' => 'Gambar harus berupa array.',
+            'images.*.integer' => 'Setiap gambar harus berupa ID yang valid.',
+            'images.*.exists' => 'Gambar yang dipilih tidak ditemukan.',
             'links.array' => 'Tautan harus berupa array.',
         ]);
 

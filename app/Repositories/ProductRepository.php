@@ -121,9 +121,11 @@ class ProductRepository
             }
 
             if (isset($data['images'])) {
-                foreach ($data['images'] as $mediaId) {
+                foreach ($data['images'] as $key => $mediaId) {
                     $media = Media::find($mediaId);
                     $media->copy($product, 'product');
+                    $media->order_column = $key;
+                    $media->save();
                 }
             }
 
@@ -168,6 +170,17 @@ class ProductRepository
                 $product->categories()->sync($data['categories']);
             } else {
                 $product->categories()->detach();
+            }
+
+            if (isset($data['images'])) {
+                // Reorder images based on the provided array
+                foreach ($data['images'] as $index => $mediaId) {
+                    $media = Media::find($mediaId);
+                    if ($media) {
+                        $media->order_column = $index;
+                        $media->save();
+                    }
+                }
             }
 
             if (isset($data['links'])) {

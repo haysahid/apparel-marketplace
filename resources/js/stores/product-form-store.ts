@@ -253,28 +253,59 @@ export const useProductFormStore = defineStore("product_form", () => {
                 }
             });
 
-            router.post(
-                route("my-store.product.update", product.value.id),
-                formData,
-                {
-                    onSuccess: (response) => {
-                        onChangeStatus("success");
-                        onSuccess(response);
+            // router.post(
+            //     route("my-store.product.update", product.value.id),
+            //     formData,
+            //     {
+            //         onSuccess: (response) => {
+            //             onChangeStatus("success");
+            //             onSuccess(response);
 
-                        if (autoShowDialog) {
-                            const page = usePage<CustomPageProps>();
-                            dialogStore.openSuccessDialog(
-                                page.props.flash.success,
-                            );
-                        }
+            //             if (autoShowDialog) {
+            //                 const page = usePage<CustomPageProps>();
+            //                 dialogStore.openSuccessDialog(
+            //                     page.props.flash.success,
+            //                 );
+            //             }
+            //         },
+            //         onError: (error) => {
+            //             onChangeStatus("error");
+            //             onError(error);
+            //             form.value.errors = error;
+            //         },
+            //     },
+            // );
+
+            await axios
+                .post(`/api/my-store/product/${product.value.id}`, formData, {
+                    headers: {
+                        Authorization: `Bearer ${cookieManager.getItem(
+                            "access_token",
+                        )}`,
+                        "X-Selected-Store-ID":
+                            cookieManager.getItem("selected_store_id"),
                     },
-                    onError: (error) => {
-                        onChangeStatus("error");
-                        onError(error);
-                        form.value.errors = error;
-                    },
-                },
-            );
+                })
+                .then((response) => {
+                    onChangeStatus("success");
+                    onSuccess(response);
+
+                    if (autoShowDialog) {
+                        const page = usePage<CustomPageProps>();
+                        dialogStore.openSuccessDialog(page.props.flash.success);
+                    }
+                })
+                .catch((error) => {
+                    onChangeStatus("error");
+                    onError(error);
+                    if (error.response?.data?.errors) {
+                        form.value.errors = error.response.data.errors;
+                    }
+
+                    if (autoShowDialog && error.response?.data?.error) {
+                        dialogStore.openErrorDialog(error.response.data.error);
+                    }
+                });
         } else {
             onChangeStatus("loading");
 

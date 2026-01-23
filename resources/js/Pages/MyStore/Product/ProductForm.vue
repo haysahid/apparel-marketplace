@@ -24,6 +24,7 @@ import MediaCard from "@/Components/MediaCard.vue";
 import { useDialogStore } from "@/stores/dialog-store";
 import { router } from "@inertiajs/vue3";
 import useDebounce from "@/plugins/debounce";
+import DeleteConfirmationDialog from "@/Components/DeleteConfirmationDialog.vue";
 
 const props = defineProps({
     product: {
@@ -37,9 +38,17 @@ const formStore = useProductFormStore();
 const isDragging = ref(false);
 
 const imagesContainer = ref(null);
-const imagesRef = computed(() => formStore.form.images);
+const imagesRef = computed({
+    get: () => formStore.form.images,
+    set: (value) => {
+        formStore.form.images = value;
+    },
+});
 const draggable = useDraggable(imagesContainer, imagesRef, {
     animation: 150,
+    filter(event, target, sortable) {
+        return target.classList.contains("no-drag");
+    },
     onStart: (event) => {
         isDragging.value = true;
         const item = event.item;
@@ -74,9 +83,6 @@ const dialogStore = useDialogStore();
 
 const submitProduct = () => {
     if (formStore.validateProductForm()) {
-        const showSuccessDialogWithAddVariantAlert =
-            !props.product?.variants?.length;
-
         formStore.submitProduct({
             autoShowDialog: false,
             onSuccess: (response) => {
@@ -84,23 +90,35 @@ const submitProduct = () => {
 
                 const newProduct = response.data.result;
 
-                router.visit(
-                    route("my-store.product.edit", { id: newProduct.id }) +
-                        `?tab=1`,
-                    {
-                        preserveState: true,
-                        preserveScroll: false,
+                if (route().current() === "my-store.product.create") {
+                    router.visit(
+                        route("my-store.product.edit", { id: newProduct.id }) +
+                            `?tab=1`,
+                        {
+                            preserveState: true,
+                            preserveScroll: false,
+                            onFinish: () => {
+                                nextTick(() => {
+                                    dialogStore.openSuccessDialog(
+                                        "Informasi produk berhasil disimpan. Silakan tambahkan variasi produk.",
+                                    );
+                                });
+                            },
+                        },
+                    );
+                }
+
+                if (route().current() === "my-store.product.edit") {
+                    router.reload({
                         onFinish: () => {
                             nextTick(() => {
                                 dialogStore.openSuccessDialog(
-                                    showSuccessDialogWithAddVariantAlert
-                                        ? "Informasi produk berhasil disimpan. Silakan tambahkan variasi produk."
-                                        : "Informasi produk berhasil disimpan.",
+                                    "Informasi produk berhasil disimpan.",
                                 );
                             });
                         },
-                    },
-                );
+                    });
+                }
             },
         });
     }
@@ -138,6 +156,20 @@ onMounted(() => {
         checkSkuPrefix(formStore.form.sku_prefix);
     }
 });
+
+const countImageUsedInVariants = (imageId: number | string) => {
+    let count = 0;
+
+    formStore.form.variants.forEach((variant) => {
+        variant.images.forEach((image) => {
+            if (image.media_id === imageId) {
+                count++;
+            }
+        });
+    });
+
+    return count;
+};
 </script>
 
 <template>
@@ -151,15 +183,14 @@ onMounted(() => {
                     </p>
                 </div>
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <PrimaryButton
+                    <!-- <SecondaryButton
                         v-if="props.product"
                         type="button"
                         @click="$inertia.visit(route('my-store.product.index'))"
                     >
                         Selesai
-                    </PrimaryButton>
+                    </SecondaryButton> -->
                     <SecondaryButton
-                        v-else
                         type="button"
                         @click="$inertia.visit(route('my-store.product.index'))"
                     >
@@ -447,12 +478,12 @@ onMounted(() => {
                             <InputGroup label="Gambar Produk">
                                 <div
                                     ref="imagesContainer"
-                                    class="flex flex-wrap w-full gap-2"
+                                    class="grid w-full grid-cols-2 gap-2 lg:grid-cols-3 xl:grid-cols-4"
                                 >
                                     <template
                                         v-for="(image, index) in formStore.form
                                             .images"
-                                        :key="image.id"
+                                        :key="index"
                                     >
                                         <MediaCard
                                             :media="image"
@@ -462,17 +493,81 @@ onMounted(() => {
                                             :showName="false"
                                             :showSize="false"
                                             @remove="
-                                                formStore.form.images.splice(
-                                                    index,
-                                                    1,
-                                                )
+                                                image.showDeleteDialog = true
                                             "
-                                        />
+                                        >
+                                            <template #default>
+                                                <DeleteConfirmationDialog
+                                                    :show="
+                                                        image.showDeleteDialog
+                                                    "
+                                                    title="Hapus Gambar Produk"
+                                                    description="Apakah Anda yakin ingin menghapus gambar ini dari produk?"
+                                                    @confirm="
+                                                        formStore.form.images.splice(
+                                                            index,
+                                                            1,
+                                                        );
+                                                        image.showDeleteDialog = false;
+                                                    "
+                                                    @close="
+                                                        image.showDeleteDialog = false
+                                                    "
+                                                >
+                                                    <template #icon>
+                                                        <img
+                                                            v-if="
+                                                                image.original_url
+                                                            "
+                                                            :src="
+                                                                image.original_url
+                                                            "
+                                                            alt="media"
+                                                            class="object-contain w-full h-32 my-2 rounded-lg"
+                                                        />
+                                                    </template>
+                                                    <template
+                                                        #content
+                                                        v-if="
+                                                            image.showDeleteDialog
+                                                        "
+                                                    >
+                                                        <div
+                                                            v-if="
+                                                                countImageUsedInVariants(
+                                                                    image.id,
+                                                                ) > 0
+                                                            "
+                                                            class="flex flex-col items-center w-full gap-0.5 px-4 py-2 my-4 text-sm rounded-lg bg-red-50"
+                                                        >
+                                                            <p
+                                                                class="text-xs text-red-600"
+                                                            >
+                                                                Perhatian!
+                                                            </p>
+                                                            <p
+                                                                class="text-gray-700"
+                                                            >
+                                                                {{
+                                                                    countImageUsedInVariants(
+                                                                        image.id,
+                                                                    )
+                                                                }}
+                                                                variasi yang
+                                                                menggunakan
+                                                                gambar ini akan
+                                                                terpengaruh.
+                                                            </p>
+                                                        </div>
+                                                    </template>
+                                                </DeleteConfirmationDialog>
+                                            </template>
+                                        </MediaCard>
                                     </template>
 
                                     <button
                                         type="button"
-                                        class="relative overflow-hidden transition-all ease-in-out border rounded-lg cursor-pointer group hover:border-primary-light hover:ring-1 hover:ring-primary-light"
+                                        class="relative overflow-hidden transition-all ease-in-out border rounded-lg cursor-pointer group hover:border-primary-light hover:ring-1 hover:ring-primary-light no-drag"
                                         @click.prevent="
                                             showMediaFormModal = true
                                         "

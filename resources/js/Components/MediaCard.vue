@@ -89,23 +89,26 @@ const proxyChecked = computed({
         <button
             v-if="props.showRemoveButton"
             type="button"
-            class="absolute p-0.5 text-white transition-all duration-300 ease-in-out rounded bg-black/10 top-1 right-1 hover:bg-red-500"
+            class="absolute p-1 transition-all duration-300 ease-in-out rounded stroke-red-500 bg-white/80 top-1 right-1 hover:bg-red-500 hover:stroke-white backdrop-blur-sm"
             @click.stop="emit('remove', props.media.id)"
         >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
-                fill="none"
+                width="24"
+                height="24"
                 viewBox="0 0 24 24"
-                stroke="currentColor"
+                fill="none"
                 class="size-5"
             >
                 <path
+                    d="M3 6H21M19 6V20C19 21 18 22 17 22H7C6 22 5 21 5 20V6M8 6V4C8 3 9 2 10 2H14C15 2 16 3 16 4V6M10 11V17M14 11V17"
+                    stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
                 />
             </svg>
         </button>
+
+        <slot />
     </button>
 </template>

@@ -46,7 +46,7 @@ const finalPrice = computed(() => {
     <div
         class="flex flex-col items-center justify-between gap-2 p-2.5 sm:gap-3 sm:p-4 transition-all duration-300 ease-in-out border border-gray-200 rounded-lg hover:border-primary-light hover:ring-1 hover:ring-primary-light relative"
     >
-        <div class="flex items-start w-full gap-2.5 sm:gap-3">
+        <div class="flex items-center w-full gap-2.5 sm:gap-3">
             <img
                 v-if="props.product.images.length > 0"
                 :src="getImageUrl(props.product.images[0]?.original_url)"
@@ -79,10 +79,13 @@ const finalPrice = computed(() => {
                     >
                         {{ props.product.name }}
                     </p>
-                    <p class="text-xs text-gray-500 pe-12">
+                    <p
+                        v-if="props.product.brand"
+                        class="text-xs text-gray-500 pe-12"
+                    >
                         {{ props.product.brand?.name }}
                     </p>
-                    <div class="flex items-end w-full gap-4 mt-1">
+                    <div class="flex items-center w-full gap-4">
                         <div class="flex flex-col items-start w-full">
                             <p class="text-sm font-medium text-gray-600">
                                 {{ finalPrice }}
@@ -103,10 +106,13 @@ const finalPrice = computed(() => {
                             </div>
                         </div>
                         <div
-                            class="flex items-center gap-2 py-1.5 px-2 bg-gray-100 rounded-md"
+                            class="flex items-center gap-2 px-2 py-1 sm:py-1.5 sm:px-2 bg-gray-100 rounded-md whitespace-nowrap"
                         >
-                            <p class="text-sm font-medium text-gray-600">
+                            <p
+                                class="text-xs font-medium text-gray-600 sm:text-sm"
+                            >
                                 {{ formatNumber(props.product?.stock_count) }}
+                                Stok
                             </p>
                         </div>
                     </div>

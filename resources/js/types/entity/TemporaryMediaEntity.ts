@@ -11,4 +11,7 @@ interface TemporaryMediaEntity {
 
     // Additional attributes
     is_temporary: boolean | null;
+
+    // Utilities
+    showDeleteDialog?: boolean | false;
 }
