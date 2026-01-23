@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('type_id')->constrained('transaction_types')->onDelete('cascade');
-            $table->string('code')->unique()->index();
+            $table->string('code')->index();
             $table->string('note')->nullable();
             $table->foreignId('payment_method_id')->nullable()->constrained('payment_methods')->onDelete('set null');
             $table->foreignId('shipping_method_id')->nullable()->constrained('shipping_methods')->onDelete('set null');

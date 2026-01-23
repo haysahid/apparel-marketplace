@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('voucher_id')->constrained('vouchers')->onDelete('cascade');
-            $table->string('unique_code')->unique();
+            $table->string('unique_code')->index();
             $table->integer('usage_count')->default(0);
             $table->timestamp('redeemed_at')->nullable();
             $table->timestamp('last_used_at')->nullable();

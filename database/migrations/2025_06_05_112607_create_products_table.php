@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('store_id')->constrained('stores')->onDelete('cascade');
             $table->foreignId('brand_id')->nullable()->constrained('brands')->onDelete('set null');
             $table->string('name');
-            $table->string('slug')->unique()->index();
-            $table->string('sku_prefix')->unique()->index();
+            $table->string('slug')->index();
+            $table->string('sku_prefix')->index();
             $table->text('description')->nullable();
             $table->enum('discount_type', ['percentage', 'fixed'])->nullable();
             $table->integer('discount')->unsigned()->nullable();

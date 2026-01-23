@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('store_id')->constrained('stores')->onDelete('cascade');
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
-            $table->string('sku', 100)->unique()->index();
-            $table->string('barcode', 100)->unique()->nullable()->index();
-            $table->string('slug')->unique()->index();
+            $table->string('sku', 100)->index();
+            $table->string('barcode', 100)->nullable()->index();
+            $table->string('slug')->index();
             $table->string('motif', 100)->nullable();
             $table->foreignId('color_id')->nullable()->constrained('colors')->onDelete('set null');
             $table->foreignId('size_id')->nullable()->constrained('sizes')->onDelete('set null');

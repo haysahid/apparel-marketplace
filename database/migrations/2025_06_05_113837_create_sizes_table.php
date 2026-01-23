@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('sizes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('store_id')->nullable()->constrained('stores')->onDelete('cascade')->default(null);
-            $table->string('name')->unique();
+            $table->string('name')->index();
             $table->timestamps();
             $table->softDeletes();
         });

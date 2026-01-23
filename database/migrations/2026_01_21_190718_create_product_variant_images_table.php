@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_variant_id')->constrained('product_variants')->onDelete('cascade');
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
-            $table->string('image');
+            $table->foreignId('media_id')->constrained('media')->onDelete('cascade');
             $table->integer('order')->default(0);
             $table->timestamps();
             $table->softDeletes();
