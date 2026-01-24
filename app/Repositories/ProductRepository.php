@@ -15,7 +15,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ProductRepository
 {
-    private static function temporaryMediaGenerateNewFileName(
+    public static function temporaryMediaGenerateNewFileName(
         TemporaryMedia $tempMedia,
         Product $product
     ) {
@@ -38,7 +38,7 @@ class ProductRepository
         return $baseName . '.' . $extension;
     }
 
-    private static function mediaGenerateNewFileName(
+    public static function mediaGenerateNewFileName(
         Media $media,
         Product $product
     ) {

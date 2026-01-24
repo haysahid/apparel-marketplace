@@ -291,12 +291,9 @@ onMounted(() => {
                         </td>
                         <td>
                             <img
-                                v-if="product.images.length > 0"
+                                v-if="product.thumbnail_url"
                                 :src="
-                                    getImageUrl(
-                                        product.images[0]
-                                            .original_url as string,
-                                    )
+                                    getImageUrl(product.thumbnail_url as string)
                                 "
                                 :alt="product.name"
                                 class="object-cover h-[60px] sm:h-[80px] aspect-square rounded border border-gray-200"

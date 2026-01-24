@@ -36,22 +36,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["click", "delete"]);
-
-function formatPrice(price = 0) {
-    return price.toLocaleString("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    });
-}
-
-const isFile = (image) => {
-    return image instanceof File;
-};
-
-const loadFile = (file) => {
-    return URL.createObjectURL(file);
-};
 </script>
 
 <template>
@@ -71,12 +55,8 @@ const loadFile = (file) => {
         >
             <!-- Image -->
             <img
-                v-if="props.variant.images.length > 0"
-                :src="
-                    isFile(props.variant.images[0].original_url)
-                        ? loadFile(props.variant.images[0].original_url)
-                        : getImageUrl(props.variant.images[0].original_url)
-                "
+                v-if="props.variant.thumbnail_url"
+                :src="getImageUrl(props.variant.thumbnail_url)"
                 :alt="props.name"
                 class="object-cover size-[80px] sm:size-[100px] rounded-lg"
             />
@@ -107,7 +87,7 @@ const loadFile = (file) => {
             </p>
 
             <p class="text-xs text-gray-800 sm:text-sm">
-                {{ formatPrice(props.variant.final_selling_price) }}
+                {{ $formatCurrency(props.variant.final_selling_price) }}
             </p>
             <div class="flex items-center gap-x-1 mt-0.5">
                 <DiscountTag
@@ -120,7 +100,7 @@ const loadFile = (file) => {
                     v-if="props.variant.discount > 0"
                     class="text-xs text-gray-500 line-through"
                 >
-                    {{ formatPrice(props.variant.base_selling_price) }}
+                    {{ $formatCurrency(props.variant.base_selling_price) }}
                 </p>
             </div>
         </div>

@@ -2,7 +2,10 @@
 
 namespace App\Jobs;
 
-use App\Models\ProductImage;
+use App\Models\Product;
+use App\Repositories\MediaRepository;
+use App\Repositories\ProductRepository;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -30,23 +33,30 @@ class DownloadProductImage implements ShouldQueue
         if (!preg_match('/\.[a-zA-Z0-9]+$/', $basename)) {
             $basename .= '.jpg';
         }
-        $imagePath = 'product/' . $basename;
+        $imagePath = 'tmp/' . $basename;
 
         Log::info('----------------------------------');
         Log::info('Processing image: ' . $imagePath);
 
-        // Check if the image already exists in folder
         $existingImage = Storage::exists($imagePath);
 
         if ($existingImage) {
             Log::info('Image already exists: ' . $imagePath);
 
             // Save image path to database
-            ProductImage::create([
-                'product_id' => $this->productId,
-                'image' => $imagePath,
-                'order' => $this->order,
-            ]);
+            $product = Product::find($this->productId);
+            $file = Storage::path($imagePath);
+            $newMedia = MediaRepository::createMedia(
+                model: $product,
+                file: $file,
+                collectionName: 'product',
+            );
+            $newMedia->file_name = ProductRepository::mediaGenerateNewFileName(
+                $newMedia,
+                $product
+            );
+            $newMedia->order_column = $this->order;
+            $newMedia->save();
 
             Log::info('Image path saved to database: ' . $imagePath);
 
@@ -55,21 +65,30 @@ class DownloadProductImage implements ShouldQueue
 
         Log::info('Downloading image async: ' . $this->imageUrl);
 
-        $imageContents = @file_get_contents($this->imageUrl);
-        if ($imageContents !== false) {
-            $basename = basename(parse_url($this->imageUrl, PHP_URL_PATH));
-            if (!preg_match('/\.[a-zA-Z0-9]+$/', $basename)) {
-                $basename .= '.jpg';
-            }
-            $imagePath = 'product/' . $basename;
-            Storage::put($imagePath, $imageContents);
+        try {
+            $imageContents = @file_get_contents($this->imageUrl);
+            if ($imageContents !== false) {
+                $product = Product::find($this->productId);
 
-            // Simpan ke database
-            ProductImage::create([
-                'product_id' => $this->productId,
-                'image' => $imagePath,
-                'order' => $this->order,
-            ]);
+                Log::info('Saving image to path: ' . $imagePath);
+                Storage::put($imagePath, $imageContents);
+
+                $file = Storage::path($imagePath);
+                $newMedia = MediaRepository::createMedia(
+                    model: $product,
+                    file: $file,
+                    collectionName: 'product',
+                );
+                $newMedia->file_name = ProductRepository::mediaGenerateNewFileName(
+                    $newMedia,
+                    $product
+                );
+                $newMedia->order_column = $this->order;
+                $newMedia->save();
+            }
+        } catch (Exception $e) {
+            Log::error('Error downloading image: ' . $this->imageUrl);
+            Log::error('Exception message: ' . $e->getMessage());
         }
     }
 }

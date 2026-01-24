@@ -65,6 +65,7 @@ class TemporaryMedia extends Model
 
         return $model
             ->addMedia($sourcePath)
+            ->preservingOriginal()
             ->usingFileName($this->file_name)
             ->toMediaCollection($collectionName);
     }

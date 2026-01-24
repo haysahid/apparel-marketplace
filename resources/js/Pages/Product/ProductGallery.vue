@@ -121,7 +121,7 @@ const goToNextImage = () => {
             <img
                 v-for="(img, index) in props.images"
                 :key="index"
-                :src="getImageUrl(img.thumbnail_url)"
+                :src="getImageUrl(img.preview_url)"
                 :alt="props.altText"
                 class="h-[50px] aspect-[3/2] object-cover rounded cursor-pointer transition duration-200 hover:scale-105 m-0.5"
                 :class="{

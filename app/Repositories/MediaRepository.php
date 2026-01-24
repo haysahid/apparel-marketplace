@@ -58,6 +58,7 @@ class MediaRepository
     {
         return $model
             ->addMedia($file)
+            ->preservingOriginal()
             ->toMediaCollection($collectionName);
     }
 

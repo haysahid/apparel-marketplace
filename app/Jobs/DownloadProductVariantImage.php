@@ -2,7 +2,11 @@
 
 namespace App\Jobs;
 
+use App\Models\Product;
 use App\Models\ProductVariantImage;
+use App\Repositories\MediaRepository;
+use App\Repositories\ProductRepository;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -32,47 +36,78 @@ class DownloadProductVariantImage implements ShouldQueue
         if (!preg_match('/\.[a-zA-Z0-9]+$/', $basename)) {
             $basename .= '.jpg';
         }
-        $imagePath = 'product/' . $basename;
+        $imagePath = 'tmp/' . $basename;
 
         Log::info('----------------------------------');
         Log::info('Processing image: ' . $imagePath);
 
-        // Check if the image already exists in folder
         $existingImage = Storage::exists($imagePath);
 
         if ($existingImage) {
             Log::info('Image already exists: ' . $imagePath);
 
             // Save image path to database
+            $product = Product::find($this->productId);
+            $file = Storage::path($imagePath);
+            $newMedia = MediaRepository::createMedia(
+                model: $product,
+                file: $file,
+                collectionName: 'product',
+            );
+            $newMedia->file_name = ProductRepository::mediaGenerateNewFileName(
+                $newMedia,
+                $product
+            );
+            $newMedia->order_column = $this->order;
+            $newMedia->save();
+
+            Log::info('Image path saved to database: ' . $imagePath);
+
+            // Associate image with product variant
             ProductVariantImage::create([
                 'product_variant_id' => $this->productVariantId,
                 'product_id' => $this->productId,
-                'image' => $imagePath,
+                'media_id' => $newMedia->id,
                 'order' => $this->order,
             ]);
-
-            Log::info('Image path saved to database: ' . $imagePath);
 
             return;
         }
 
         Log::info('Downloading image async: ' . $this->imageUrl);
 
-        $imageContents = @file_get_contents($this->imageUrl);
-        if ($imageContents !== false) {
-            Storage::put($imagePath, $imageContents);
+        try {
+            $imageContents = @file_get_contents($this->imageUrl);
+            if ($imageContents !== false) {
+                $product = Product::find($this->productId);
 
-            Log::info('Image downloaded and saved: ' . $imagePath);
+                Log::info('Saving image to path: ' . $imagePath);
+                Storage::put($imagePath, $imageContents);
 
-            // Save to database
-            ProductVariantImage::create([
-                'product_variant_id' => $this->productVariantId,
-                'product_id' => $this->productId,
-                'image' => $imagePath,
-                'order' => $this->order,
-            ]);
-        } else {
-            Log::error('Failed to download image: ' . $this->imageUrl);
+                $file = Storage::path($imagePath);
+                $newMedia = MediaRepository::createMedia(
+                    model: $product,
+                    file: $file,
+                    collectionName: 'product',
+                );
+                $newMedia->file_name = ProductRepository::mediaGenerateNewFileName(
+                    $newMedia,
+                    $product
+                );
+                $newMedia->order_column = $this->order;
+                $newMedia->save();
+
+                // Associate image with product variant
+                ProductVariantImage::create([
+                    'product_variant_id' => $this->productVariantId,
+                    'product_id' => $this->productId,
+                    'media_id' => $newMedia->id,
+                    'order' => $this->order,
+                ]);
+            }
+        } catch (Exception $e) {
+            Log::error('Error downloading image: ' . $this->imageUrl);
+            Log::error('Exception message: ' . $e->getMessage());
         }
     }
 }

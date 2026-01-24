@@ -33,7 +33,7 @@ class TransactionItem extends Model
 
     protected function getImageAttribute()
     {
-        return $this->variant->images[0]->image ?? $this->variant->product->images[0]->image ?? null;
+        return $this->variant->thumbnail_url ?? null;
     }
 
     // Relationships

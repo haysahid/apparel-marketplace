@@ -131,31 +131,14 @@ const images = computed(() => {
         orderForm.value?.filter.color != null ||
         orderForm.value?.filter.size != null
     ) {
-        return [
-            ...(orderForm.value?.filteredVariants
-                ?.flatMap((variant) => variant.images)
-                .filter(
-                    (img, idx, arr) =>
-                        arr.findIndex((i) => i.image === img.image) === idx,
-                ) || []),
-            ...props.product.images,
-        ].filter(
+        return props.product.images.filter(
             (img, idx, arr) =>
-                arr.findIndex((i) => i.image === img.image) === idx,
+                arr.findIndex((i) => i.original_url === img.original_url) ===
+                idx,
         );
     }
 
-    return [
-        ...props.product.images,
-        ...(props.product.variants
-            ?.flatMap((variant) => variant.images)
-            .filter(
-                (img, idx, arr) =>
-                    arr.findIndex(
-                        (i) => i.original_url === img.original_url,
-                    ) === idx,
-            ) || []),
-    ].filter(
+    return props.product.images.filter(
         (img, idx, arr) =>
             arr.findIndex((i) => i.original_url === img.original_url) === idx,
     );

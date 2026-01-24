@@ -13,7 +13,6 @@ export const useProductFormStore = defineStore("product_form", () => {
     const selectedProductKey = "selected_product";
     const productFormKey = "product_form";
     const newProductFormKey = "new_product_form";
-    const productFormTabKey = "product_form_tab";
 
     const dialogStore = useDialogStore();
 
