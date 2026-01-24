@@ -25,6 +25,7 @@ import { useDialogStore } from "@/stores/dialog-store";
 import { router } from "@inertiajs/vue3";
 import useDebounce from "@/plugins/debounce";
 import DeleteConfirmationDialog from "@/Components/DeleteConfirmationDialog.vue";
+import mediaService from "@/services/my-store/media-service";
 
 const props = defineProps({
     product: {
@@ -503,12 +504,23 @@ const countImageUsedInVariants = (imageId: number | string) => {
                                                     "
                                                     title="Hapus Gambar Produk"
                                                     description="Apakah Anda yakin ingin menghapus gambar ini dari produk?"
-                                                    @confirm="
+                                                    @delete="
                                                         formStore.form.images.splice(
                                                             index,
                                                             1,
                                                         );
                                                         image.showDeleteDialog = false;
+
+                                                        mediaService().deleteMedia(
+                                                            image.id,
+                                                            {
+                                                                autoShowDialog: true,
+                                                                onSuccess:
+                                                                    () => {
+                                                                        formStore.getVariants();
+                                                                    },
+                                                            },
+                                                        );
                                                     "
                                                     @close="
                                                         image.showDeleteDialog = false
@@ -680,7 +692,7 @@ const countImageUsedInVariants = (imageId: number | string) => {
 
                     <!-- Tab 1 -->
                     <div
-                        v-if="tabIndex == 1"
+                        v-show="tabIndex == 1"
                         class="flex flex-col w-full gap-4"
                     >
                         <!-- Variants -->

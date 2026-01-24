@@ -156,6 +156,7 @@ export const useProductFormStore = defineStore("product_form", () => {
                 {
                     headers: {
                         Authorization: token,
+                        "X-Selected-Store-ID": selectedStoreId,
                     },
                 },
             )
@@ -171,23 +172,19 @@ export const useProductFormStore = defineStore("product_form", () => {
     }
 
     function getVariants() {
-        const token = `Bearer ${cookieManager.getItem("access_token")}`;
-
         axios
             .get(
                 `${page.props.ziggy.url}/api/my-store/product/${product.value.id}`,
                 {
                     headers: {
                         Authorization: token,
+                        "X-Selected-Store-ID": selectedStoreId,
                     },
                 },
             )
             .then((response) => {
                 const product = response.data.result;
-                form.value.variants = product.variants.map((variant) => ({
-                    ...variant,
-                    images: variant.images || [],
-                }));
+                form.value.variants = product.variants;
             })
             .catch((error) => {
                 if (error.response?.data?.error) {

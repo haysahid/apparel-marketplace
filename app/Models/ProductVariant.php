@@ -47,6 +47,8 @@ class ProductVariant extends Model
 
     protected $appends = [
         'name',
+        'thumbnail_url',
+        'preview_url',
     ];
 
     // Additional attributes
@@ -63,6 +65,24 @@ class ProductVariant extends Model
             $name .= ' - ' . $this->size->name;
         }
         return $name;
+    }
+
+    protected function getThumbnailUrlAttribute()
+    {
+        $firstImage = $this->images->first();
+        if ($firstImage) {
+            return $firstImage->thumbnail_url;
+        }
+        return null;
+    }
+
+    protected function getPreviewUrlAttribute()
+    {
+        $firstImage = $this->images->first();
+        if ($firstImage) {
+            return $firstImage->preview_url;
+        }
+        return null;
     }
 
     protected function url()

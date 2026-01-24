@@ -148,7 +148,7 @@ class ProductVariantController extends Controller
 
             return ResponseFormatter::success(
                 $variant,
-                'Product variant updated successfully.'
+                'Varian produk berhasil diperbarui.'
             );
         } catch (Exception $e) {
             return ResponseFormatter::error(

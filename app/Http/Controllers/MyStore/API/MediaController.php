@@ -29,11 +29,13 @@ class MediaController extends Controller
         $search = $request->input('search');
 
         $models = $request->input('models');
+        $model_id = $request->input('model_id');
         $collectionName = $request->input('collection_name');
 
         $media = MediaRepository::getAllMedia(
             storeId: $this->storeId,
             models: $models,
+            modelId: $model_id,
             collectionName: $collectionName,
             limit: $limit,
             search: $search,

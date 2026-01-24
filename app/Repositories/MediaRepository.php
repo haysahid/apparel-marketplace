@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\ProductVariantImage;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -13,6 +14,7 @@ class MediaRepository
     public static function getAllMedia(
         $storeId = null,
         $models = null,
+        $modelId = null,
         $collectionName = null,
         $limit = 10,
         $search = null,
@@ -33,6 +35,10 @@ class MediaRepository
 
         if ($models) {
             $query->whereIn('model_type', $models);
+        }
+
+        if ($modelId) {
+            $query->where('model_id', $modelId);
         }
 
         if ($collectionName) {
@@ -65,6 +71,14 @@ class MediaRepository
         $media = Media::find($id);
         if ($media) {
             $media->delete();
+
+            if (get_class($media->model) == Product::class) {
+                // Delete associated product variants' media
+                ProductVariantImage::where('product_id', $media->model_id)
+                    ->where('media_id', $id)
+                    ->delete();
+            }
+
             return true;
         }
         return false;
@@ -86,23 +100,7 @@ class MediaRepository
                 continue;
             }
 
-            // Determine new file name based on model's slug or name
-            if (isset($model->slug)) {
-                // Use slug if available
-                $baseName = $model->slug;
-            } elseif (isset($model->name)) {
-                // Use name as slug
-                $baseName = Str::slug($model->name);
-            } else {
-                // Use original
-                $baseName = pathinfo($media->file_name, PATHINFO_FILENAME);
-            }
-
-            // Ensure unique file name
-            $baseName .= '-' . uniqid();
-
-            $extension = pathinfo($media->file_name, PATHINFO_EXTENSION);
-            $newFileName = $baseName . '.' . $extension;
+            $newFileName = self::generateNewFileName($media, $model);
 
             // Copy media to new model and collection
             $newMedia = $media->copy($model, $collectionName);
@@ -122,5 +120,26 @@ class MediaRepository
             // Update the path in the database if necessary
             $newMedia->save();
         }
+    }
+
+    public static function generateNewFileName($media, $model)
+    {
+        // Determine new file name based on model's slug or name
+        if (isset($model->slug)) {
+            // Use slug if available
+            $baseName = $model->slug;
+        } elseif (isset($model->name)) {
+            // Use name as slug
+            $baseName = Str::slug($model->name);
+        } else {
+            // Use original
+            $baseName = pathinfo($media->file_name, PATHINFO_FILENAME);
+        }
+
+        // Ensure unique file name
+        $baseName .= '-' . uniqid();
+        $extension = pathinfo($media->file_name, PATHINFO_EXTENSION);
+
+        return $baseName . '.' . $extension;
     }
 }

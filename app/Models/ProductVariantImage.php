@@ -19,11 +19,23 @@ class ProductVariantImage extends Model
 
     protected $appends = [
         'original_url',
+        'thumbnail_url',
+        'preview_url',
     ];
 
     public function getOriginalUrlAttribute()
     {
         return $this->media ? $this->media->original_url : null;
+    }
+
+    public function getThumbnailUrlAttribute()
+    {
+        return $this->media ? $this->media->getUrl('thumb') : null;
+    }
+
+    public function getPreviewUrlAttribute()
+    {
+        return $this->media ? $this->media->getUrl('preview') : null;
     }
 
     // Relationships

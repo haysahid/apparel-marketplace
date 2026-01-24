@@ -10,6 +10,7 @@ import Dropdown from "@/Components/Dropdown.vue";
 import Chip from "@/Components/Chip.vue";
 import ColorChip from "@/Components/ColorChip.vue";
 import VariantFilter from "@/Components/VariantFilter.vue";
+import Modal from "@/Components/Modal.vue";
 
 const props = defineProps({
     product: {
@@ -299,23 +300,20 @@ const openAddVariantForm = () => {
                     @click="variant.showEditForm = true"
                     @delete="variant.showDeleteConfirmation = true"
                 />
-                <DialogModal
+                <Modal
                     :show="variant.showEditForm"
-                    title="Ubah Variasi Produk"
                     @close="variant.showEditForm = false"
                 >
-                    <template #content>
-                        <VariantForm
-                            :product="props.product"
-                            :variant="variant"
-                            @close="variant.showEditForm = false"
-                            @submitted="
-                                variant.showEditForm = false;
-                                emit('onUpdated', $event);
-                            "
-                        />
-                    </template>
-                </DialogModal>
+                    <VariantForm
+                        :product="props.product"
+                        :variant="variant"
+                        @close="variant.showEditForm = false"
+                        @submitted="
+                            variant.showEditForm = false;
+                            emit('onUpdated', $event);
+                        "
+                    />
+                </Modal>
                 <DeleteConfirmationDialog
                     :title="`Hapus Varian Produk <b>${variant.motif} - ${variant.color?.name} - ${variant.size?.name}</b>?`"
                     :show="variant.showDeleteConfirmation"
@@ -333,21 +331,16 @@ const openAddVariantForm = () => {
             </p>
         </div>
 
-        <DialogModal
-            :show="showAddVariantForm"
-            @close="showAddVariantForm = false"
-        >
-            <template #content>
-                <VariantForm
-                    :product="props.product"
-                    :variant="null"
-                    @close="showAddVariantForm = false"
-                    @submitted="
-                        showAddVariantForm = false;
-                        emit('onCreated', $event);
-                    "
-                />
-            </template>
-        </DialogModal>
+        <Modal :show="showAddVariantForm" @close="showAddVariantForm = false">
+            <VariantForm
+                :product="props.product"
+                :variant="null"
+                @close="showAddVariantForm = false"
+                @submitted="
+                    showAddVariantForm = false;
+                    emit('onCreated', $event);
+                "
+            />
+        </Modal>
     </div>
 </template>

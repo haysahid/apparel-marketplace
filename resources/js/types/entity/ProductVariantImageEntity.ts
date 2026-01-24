@@ -10,6 +10,8 @@ interface ProductVariantImageEntity {
 
     // Additional attributes
     original_url?: string | null;
+    preview_url?: string | null;
+    thumbnail_url?: string | null;
 
     // Relationships
     media?: any;

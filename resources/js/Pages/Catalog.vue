@@ -95,7 +95,7 @@ function onChangeBrands(brands) {
                 products.value = page.props.products.data;
                 getQueryParams();
             },
-        }
+        },
     );
 }
 
@@ -118,7 +118,7 @@ function onChangeCategories(categories) {
                 products.value = page.props.products.data;
                 getQueryParams();
             },
-        }
+        },
     );
 }
 
@@ -141,7 +141,7 @@ function onChangeColors(colors) {
                 products.value = page.props.products.data;
                 getQueryParams();
             },
-        }
+        },
     );
 }
 
@@ -166,7 +166,7 @@ function onChangeSearch() {
                 products.value = page.props.products.data;
                 getQueryParams();
             },
-        }
+        },
     );
 }
 </script>
@@ -286,7 +286,8 @@ function onChangeSearch() {
                                             @click="
                                                 brand.selected = false;
                                                 onChangeBrands(
-                                                    catalogFilter.filters.brands
+                                                    catalogFilter.filters
+                                                        .brands,
                                                 );
                                                 $event.stopPropagation();
                                             "
@@ -355,7 +356,7 @@ function onChangeSearch() {
                                                 category.selected = false;
                                                 onChangeCategories(
                                                     catalogFilter.filters
-                                                        .categories
+                                                        .categories,
                                                 );
                                                 $event.stopPropagation();
                                             "
@@ -396,7 +397,8 @@ function onChangeSearch() {
                                             @click="
                                                 color.selected = false;
                                                 onChangeColors(
-                                                    catalogFilter.filters.colors
+                                                    catalogFilter.filters
+                                                        .colors,
                                                 );
                                                 $event.stopPropagation();
                                             "
@@ -426,15 +428,15 @@ function onChangeSearch() {
                                     catalogFilter.filters.categories.forEach(
                                         (category) => {
                                             category.selected = false;
-                                        }
+                                        },
                                     );
                                     onChangeCategories(
                                         catalogFilter.filters.categories.map(
                                             (category) => ({
                                                 ...category,
                                                 selected: false,
-                                            })
-                                        )
+                                            }),
+                                        ),
                                     );
                                 "
                             >
@@ -457,21 +459,21 @@ function onChangeSearch() {
                                         mode="out-in"
                                         appear
                                         @before-enter="
-                                                (el: HTMLElement) => {
-                                                    el.style.transitionDelay =
-                                                        index % 10 * 100 + 'ms';
-                                                }
-                                            "
+                                            (el: HTMLElement) => {
+                                                el.style.transitionDelay =
+                                                    (index % 10) * 100 + 'ms';
+                                            }
+                                        "
                                         @after-enter="
-                                                (el: HTMLElement) => {
-                                                    el.style.transitionDelay = '';
-                                                }
-                                            "
+                                            (el: HTMLElement) => {
+                                                el.style.transitionDelay = '';
+                                            }
+                                        "
                                         @after-leave="
-                                                (el: HTMLElement) => {
-                                                    el.style.transitionDelay = '';
-                                                }
-                                            "
+                                            (el: HTMLElement) => {
+                                                el.style.transitionDelay = '';
+                                            }
+                                        "
                                     >
                                         <ProductCard
                                             :name="product.name"
@@ -482,7 +484,11 @@ function onChangeSearch() {
                                             :finalPrice="
                                                 product.lowest_final_selling_price
                                             "
-                                            :image="(product.images[0]?.image as string | null)"
+                                            :image="
+                                                product.preview_url as
+                                                    | string
+                                                    | null
+                                            "
                                             :description="product.brand?.name"
                                             :slug="product.slug"
                                         />

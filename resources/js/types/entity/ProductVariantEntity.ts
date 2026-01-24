@@ -23,6 +23,8 @@ interface ProductVariantEntity {
 
     // Additional attributes
     name: string;
+    thumbnail_url: string | null;
+    preview_url: string | null;
 
     // Relationships
     product: ProductEntity | null;

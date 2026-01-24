@@ -66,8 +66,8 @@ const hasActions = computed(() => {
                 <!-- Image -->
                 <img
                     v-if="props.item.image"
-                    :src="getImageUrl(props.item.image)"
-                    alt="Product Image"
+                    :src="getImageUrl(props.item.image as string)"
+                    :alt="props.item.variant?.name"
                     class="object-cover size-[60px] sm:size-[80px] lg:size-[120px] rounded-lg outline outline-1 outline-gray-300"
                 />
                 <div
@@ -98,7 +98,7 @@ const hasActions = computed(() => {
                         :href="
                             route(
                                 'product.show',
-                                props.item.variant.product.slug
+                                props.item.variant.product.slug,
                             ) + `?sku=${props.item.variant.sku}`
                         "
                         class="w-full"
@@ -120,7 +120,7 @@ const hasActions = computed(() => {
                         <p class="text-sm text-gray-800">
                             {{
                                 formatPrice(
-                                    props.item.variant.final_selling_price
+                                    props.item.variant.final_selling_price,
                                 )
                             }}
                         </p>
@@ -130,7 +130,7 @@ const hasActions = computed(() => {
                         >
                             {{
                                 formatPrice(
-                                    props.item.variant.base_selling_price
+                                    props.item.variant.base_selling_price,
                                 )
                             }}
                         </p>

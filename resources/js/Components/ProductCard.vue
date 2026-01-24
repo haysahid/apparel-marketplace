@@ -33,13 +33,13 @@ const props = defineProps({
 <template>
     <Link :href="route('product.show', { slug: props.slug })">
         <div
-            class="bg-white rounded-lg outline outline-1 shadow-sm outline-gray-100 hover:outline-primary-light transition-all duration-300 cursor-pointer h-full hover:scale-[1.01] hover:shadow-md"
+            class="bg-white rounded-lg outline outline-1 shadow-sm outline-gray-100 hover:outline-primary-light transition-all duration-300 cursor-pointer h-full hover:scale-[1.01] hover:shadow-md group overflow-hidden"
         >
             <img
                 v-if="props.image"
                 :src="getImageUrl(props.image)"
                 :alt="props.name"
-                class="object-cover w-full rounded-t-lg aspect-square"
+                class="object-cover w-full transition-transform duration-300 ease-in-out rounded-t-lg aspect-square group-hover:scale-105"
             />
             <div
                 v-else

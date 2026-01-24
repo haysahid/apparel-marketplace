@@ -76,33 +76,17 @@ class TemporaryMediaRepository
     ) {
         $temporaryMediaItems = TemporaryMedia::whereIn('id', $temporaryMediaIds)->get();
         foreach ($temporaryMediaItems as $tempMedia) {
-            // Determine new file name based on model's slug or name
-            if (isset($model->slug)) {
-                // Use slug if available
-                $baseName = $model->slug;
-            } elseif (isset($model->name)) {
-                // Use name as slug
-                $baseName = Str::slug($model->name);
-            } else {
-                // Use original
-                $baseName = pathinfo($tempMedia->file_name, PATHINFO_FILENAME);
-            }
-
-            // Ensure unique file name
-            $baseName .= '-' . uniqid();
-
-            $extension = pathinfo($tempMedia->file_name, PATHINFO_EXTENSION);
-            $newFileName = $baseName . '.' . $extension;
+            $newFileName = self::generateNewFileName($tempMedia, $model);
 
             // Copy media to new model and collection
-            $newTempMedia = $tempMedia->copyToMedia($model, $collectionName);
+            $newMedia = $tempMedia->copyToMedia($model, $collectionName);
 
             // Rename file_name in database
-            $newTempMedia->file_name = $newFileName;
+            $newMedia->file_name = $newFileName;
 
             // Rename file on disk
-            $disk = $newTempMedia->disk;
-            $oldPath = $newTempMedia->getPath();
+            $disk = $newMedia->disk;
+            $oldPath = $newMedia->getPath();
             $newPath = dirname($oldPath) . '/' . $newFileName;
 
             if (Storage::disk($disk)->exists($oldPath)) {
@@ -110,10 +94,31 @@ class TemporaryMediaRepository
             }
 
             // Update the path in the database if necessary
-            $newTempMedia->save();
+            $newMedia->save();
 
             // Delete temporary media record and file
             $tempMedia->delete();
         }
+    }
+
+    private static function generateNewFileName(TemporaryMedia $tempMedia, $model)
+    {
+        // Determine new file name based on model's slug or name
+        if (isset($model->slug)) {
+            // Use slug if available
+            $baseName = $model->slug;
+        } elseif (isset($model->name)) {
+            // Use name as slug
+            $baseName = Str::slug($model->name);
+        } else {
+            // Use original
+            $baseName = pathinfo($tempMedia->file_name, PATHINFO_FILENAME);
+        }
+
+        // Ensure unique file name
+        $baseName .= '-' . uniqid();
+        $extension = pathinfo($tempMedia->file_name, PATHINFO_EXTENSION);
+
+        return $baseName . '.' . $extension;
     }
 }

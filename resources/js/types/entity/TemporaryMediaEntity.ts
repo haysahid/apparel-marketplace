@@ -1,4 +1,4 @@
-interface TemporaryMediaEntity {
+interface TemporaryMediaEntity extends MediaEntity {
     id: number;
     store_id: number | null;
     folder: string;

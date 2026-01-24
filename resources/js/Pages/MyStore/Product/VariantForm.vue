@@ -256,318 +256,334 @@ const showMediaFormModal = ref(false);
 </script>
 
 <template>
-    <form @submit.prevent="submit" class="w-full p-2">
-        <div class="flex flex-col items-start w-full gap-4 text-start">
+    <form @submit.prevent="submit" class="w-full">
+        <div class="flex flex-col items-start w-full text-start">
             <h2
-                class="w-full mb-3 text-lg font-medium text-center text-gray-900"
+                class="w-full p-4 text-lg font-medium text-center text-gray-900 sm:p-6"
             >
                 {{ props.variant ? "Ubah" : "Tambah" }} Variasi Produk
             </h2>
 
-            <!-- Motif -->
-            <InputGroup for="motif" label="Motif" required>
-                <TextInput
-                    id="motif"
-                    v-model="form.motif"
-                    type="text"
-                    placeholder="Masukkan Nama Motif"
-                    required
-                    autocomplete="on"
-                    :error="form.errors.motif"
-                    @update:modelValue="form.errors.motif = null"
-                />
-            </InputGroup>
-
-            <!-- Material -->
-            <InputGroup for="material" label="Jenis Bahan" required>
-                <TextInput
-                    id="material"
-                    v-model="form.material"
-                    type="text"
-                    placeholder="Masukkan Nama Jenis Bahan"
-                    required
-                    autocomplete="on"
-                    :error="form.errors.material"
-                    @update:modelValue="form.errors.material = null"
-                />
-            </InputGroup>
-
-            <div class="flex items-center w-full gap-4">
-                <!-- Color -->
-                <InputGroup for="color_id" label="Warna" required>
-                    <DropdownSearchInput
-                        id="color_id"
-                        :modelValue="
-                            form.color_id
-                                ? {
-                                      label: form.color?.name,
-                                      value: form.color_id,
-                                      hexCode: form.color?.hex_code,
-                                  }
-                                : null
-                        "
-                        :options="
-                            filteredColors.map((color) => ({
-                                label: color.name,
-                                value: color.id,
-                                hexCode: color.hex_code,
-                            }))
-                        "
-                        required
-                        placeholder="Pilih Warna"
-                        :error="form.errors.color_id"
-                        @update:modelValue="
-                            (option) => {
-                                form.color_id = option?.value;
-                                form.color = option
-                                    ? filteredColors.find(
-                                          (color) => color.id === option.value,
-                                      )
-                                    : null;
-                            }
-                        "
-                        @search="colorSearch = $event"
-                        @clear="
-                            form.color_id = null;
-                            form.color = null;
-                            colorSearch = '';
-                        "
-                    >
-                        <template #optionHeader>
-                            <div
-                                class="flex items-center justify-between gap-2"
-                            >
-                                <p class="text-sm font-semibold">Pilih Warna</p>
-                                <button
-                                    type="button"
-                                    class="text-sm text-blue-500 hover:underline"
-                                    @click="showAddColorForm = true"
-                                >
-                                    Tambah
-                                </button>
-                            </div>
-                        </template>
-                    </DropdownSearchInput>
-                </InputGroup>
-
-                <!-- Size -->
-                <InputGroup for="size_id" label="Ukuran" required>
-                    <DropdownSearchInput
-                        id="size_id"
-                        :modelValue="
-                            form.size_id
-                                ? {
-                                      label: form.size?.name,
-                                      value: form.size_id,
-                                  }
-                                : null
-                        "
-                        :options="
-                            filteredSizes.map((size) => ({
-                                label: size.name,
-                                value: size.id,
-                            }))
-                        "
-                        required
-                        placeholder="Pilih Ukuran"
-                        :error="form.errors.size_id"
-                        @update:modelValue="
-                            (option) => {
-                                form.size_id = option?.value;
-                                form.size = option
-                                    ? filteredSizes.find(
-                                          (size) => size.id === option.value,
-                                      )
-                                    : null;
-                            }
-                        "
-                        @search="sizeSearch = $event"
-                        @clear="
-                            form.size_id = null;
-                            form.size = null;
-                            sizeSearch = '';
-                        "
-                    >
-                        <template #optionHeader>
-                            <div
-                                class="flex items-center justify-between gap-2"
-                            >
-                                <p class="text-sm font-semibold">
-                                    Pilih Ukuran
-                                </p>
-                                <button
-                                    type="button"
-                                    class="text-sm text-blue-500 hover:underline"
-                                    @click="showAddSizeForm = true"
-                                >
-                                    Tambah
-                                </button>
-                            </div>
-                        </template>
-                    </DropdownSearchInput>
-                </InputGroup>
-            </div>
-
-            <div class="flex items-center w-full gap-4">
-                <!-- Stock -->
-                <InputGroup for="current_stock_level" label="Stok" required>
+            <div
+                class="flex flex-col items-start w-full gap-4 text-start overflow-y-auto h-[60vh] px-4 sm:px-6"
+            >
+                <!-- Motif -->
+                <InputGroup for="motif" label="Motif" required>
                     <TextInput
-                        id="current_stock_level"
-                        v-model.number="form.current_stock_level"
-                        type="number"
-                        placeholder="Masukkan Stok"
+                        id="motif"
+                        v-model="form.motif"
+                        type="text"
+                        placeholder="Masukkan Nama Motif"
                         required
-                        :error="form.errors.current_stock_level"
-                        @update:modelValue="
-                            form.errors.current_stock_level = null
-                        "
+                        autocomplete="on"
+                        :error="form.errors.motif"
+                        @update:modelValue="form.errors.motif = null"
                     />
                 </InputGroup>
 
-                <!-- Unit -->
-                <InputGroup for="unit_id" label="Satuan" required>
-                    <DropdownSearchInput
-                        id="unit_id"
-                        :modelValue="
-                            form.unit_id
-                                ? {
-                                      label: form.unit?.name,
-                                      value: form.unit_id,
-                                  }
-                                : null
-                        "
-                        :options="
-                            filteredUnits.map((unit) => ({
-                                label: unit.name,
-                                value: unit.id,
-                            }))
-                        "
+                <!-- Material -->
+                <InputGroup for="material" label="Jenis Bahan" required>
+                    <TextInput
+                        id="material"
+                        v-model="form.material"
+                        type="text"
+                        placeholder="Masukkan Nama Jenis Bahan"
                         required
-                        placeholder="Pilih Satuan"
-                        :error="form.errors.unit_id"
-                        @update:modelValue="
-                            (option) => {
-                                form.unit_id = option?.value;
-                                form.unit = option
-                                    ? filteredUnits.find(
-                                          (unit) => unit.id === option.value,
-                                      )
-                                    : null;
-                            }
-                        "
-                        @search="unitSearch = $event"
-                        @clear="
-                            form.unit_id = null;
-                            form.unit = null;
-                            unitSearch = '';
-                        "
-                    >
-                        <template #optionHeader>
-                            <div
-                                class="flex items-center justify-between gap-2"
-                            >
-                                <p class="text-sm font-semibold">
-                                    Pilih Satuan
-                                </p>
-                                <button
-                                    type="button"
-                                    class="text-sm text-blue-500 hover:underline"
-                                    @click="showAddUnitForm = true"
+                        autocomplete="on"
+                        :error="form.errors.material"
+                        @update:modelValue="form.errors.material = null"
+                    />
+                </InputGroup>
+
+                <div class="flex items-center w-full gap-4">
+                    <!-- Color -->
+                    <InputGroup for="color_id" label="Warna" required>
+                        <DropdownSearchInput
+                            id="color_id"
+                            :modelValue="
+                                form.color_id
+                                    ? {
+                                          label: form.color?.name,
+                                          value: form.color_id,
+                                          hexCode: form.color?.hex_code,
+                                      }
+                                    : null
+                            "
+                            :options="
+                                filteredColors.map((color) => ({
+                                    label: color.name,
+                                    value: color.id,
+                                    hexCode: color.hex_code,
+                                }))
+                            "
+                            required
+                            placeholder="Pilih Warna"
+                            :error="form.errors.color_id"
+                            @update:modelValue="
+                                (option) => {
+                                    form.color_id = option?.value;
+                                    form.color = option
+                                        ? filteredColors.find(
+                                              (color) =>
+                                                  color.id === option.value,
+                                          )
+                                        : null;
+                                }
+                            "
+                            @search="colorSearch = $event"
+                            @clear="
+                                form.color_id = null;
+                                form.color = null;
+                                colorSearch = '';
+                            "
+                        >
+                            <template #optionHeader>
+                                <div
+                                    class="flex items-center justify-between gap-2"
                                 >
-                                    Tambah
-                                </button>
-                            </div>
-                        </template>
-                    </DropdownSearchInput>
-                </InputGroup>
-            </div>
+                                    <p class="text-sm font-semibold">
+                                        Pilih Warna
+                                    </p>
+                                    <button
+                                        type="button"
+                                        class="text-sm text-blue-500 hover:underline"
+                                        @click="showAddColorForm = true"
+                                    >
+                                        Tambah
+                                    </button>
+                                </div>
+                            </template>
+                        </DropdownSearchInput>
+                    </InputGroup>
 
-            <div class="flex items-center w-full gap-4">
-                <!-- Base Selling Price -->
-                <InputGroup
-                    for="base_selling_price"
-                    label="Harga Dasar"
-                    required
-                >
-                    <TextInput
-                        id="base_selling_price"
-                        v-model.number="form.base_selling_price"
-                        type="number"
-                        placeholder="Masukkan Harga"
+                    <!-- Size -->
+                    <InputGroup for="size_id" label="Ukuran" required>
+                        <DropdownSearchInput
+                            id="size_id"
+                            :modelValue="
+                                form.size_id
+                                    ? {
+                                          label: form.size?.name,
+                                          value: form.size_id,
+                                      }
+                                    : null
+                            "
+                            :options="
+                                filteredSizes.map((size) => ({
+                                    label: size.name,
+                                    value: size.id,
+                                }))
+                            "
+                            required
+                            placeholder="Pilih Ukuran"
+                            :error="form.errors.size_id"
+                            @update:modelValue="
+                                (option) => {
+                                    form.size_id = option?.value;
+                                    form.size = option
+                                        ? filteredSizes.find(
+                                              (size) =>
+                                                  size.id === option.value,
+                                          )
+                                        : null;
+                                }
+                            "
+                            @search="sizeSearch = $event"
+                            @clear="
+                                form.size_id = null;
+                                form.size = null;
+                                sizeSearch = '';
+                            "
+                        >
+                            <template #optionHeader>
+                                <div
+                                    class="flex items-center justify-between gap-2"
+                                >
+                                    <p class="text-sm font-semibold">
+                                        Pilih Ukuran
+                                    </p>
+                                    <button
+                                        type="button"
+                                        class="text-sm text-blue-500 hover:underline"
+                                        @click="showAddSizeForm = true"
+                                    >
+                                        Tambah
+                                    </button>
+                                </div>
+                            </template>
+                        </DropdownSearchInput>
+                    </InputGroup>
+                </div>
+
+                <div class="flex items-center w-full gap-4">
+                    <!-- Stock -->
+                    <InputGroup for="current_stock_level" label="Stok" required>
+                        <TextInput
+                            id="current_stock_level"
+                            v-model.number="form.current_stock_level"
+                            type="number"
+                            placeholder="Masukkan Stok"
+                            required
+                            :error="form.errors.current_stock_level"
+                            @update:modelValue="
+                                form.errors.current_stock_level = null
+                            "
+                        />
+                    </InputGroup>
+
+                    <!-- Unit -->
+                    <InputGroup for="unit_id" label="Satuan" required>
+                        <DropdownSearchInput
+                            id="unit_id"
+                            :modelValue="
+                                form.unit_id
+                                    ? {
+                                          label: form.unit?.name,
+                                          value: form.unit_id,
+                                      }
+                                    : null
+                            "
+                            :options="
+                                filteredUnits.map((unit) => ({
+                                    label: unit.name,
+                                    value: unit.id,
+                                }))
+                            "
+                            required
+                            placeholder="Pilih Satuan"
+                            :error="form.errors.unit_id"
+                            @update:modelValue="
+                                (option) => {
+                                    form.unit_id = option?.value;
+                                    form.unit = option
+                                        ? filteredUnits.find(
+                                              (unit) =>
+                                                  unit.id === option.value,
+                                          )
+                                        : null;
+                                }
+                            "
+                            @search="unitSearch = $event"
+                            @clear="
+                                form.unit_id = null;
+                                form.unit = null;
+                                unitSearch = '';
+                            "
+                        >
+                            <template #optionHeader>
+                                <div
+                                    class="flex items-center justify-between gap-2"
+                                >
+                                    <p class="text-sm font-semibold">
+                                        Pilih Satuan
+                                    </p>
+                                    <button
+                                        type="button"
+                                        class="text-sm text-blue-500 hover:underline"
+                                        @click="showAddUnitForm = true"
+                                    >
+                                        Tambah
+                                    </button>
+                                </div>
+                            </template>
+                        </DropdownSearchInput>
+                    </InputGroup>
+                </div>
+
+                <div class="flex items-center w-full gap-4">
+                    <!-- Base Selling Price -->
+                    <InputGroup
+                        for="base_selling_price"
+                        label="Harga Dasar"
                         required
-                        :error="form.errors.base_selling_price"
-                        @update:modelValue="
-                            form.errors.base_selling_price = null
-                        "
-                    />
-                </InputGroup>
+                    >
+                        <TextInput
+                            id="base_selling_price"
+                            v-model.number="form.base_selling_price"
+                            type="number"
+                            placeholder="Masukkan Harga"
+                            required
+                            :error="form.errors.base_selling_price"
+                            @update:modelValue="
+                                form.errors.base_selling_price = null
+                            "
+                        />
+                    </InputGroup>
 
-                <!-- Discount -->
-                <InputGroup for="discount" label="Diskon (%)" required>
-                    <TextInput
-                        id="discount"
-                        v-model.number="form.discount"
-                        type="number"
-                        placeholder="Masukkan Diskon"
-                        required
-                        :error="form.errors.discount"
-                        @update:modelValue="form.errors.discount = null"
-                    />
-                </InputGroup>
-            </div>
+                    <!-- Discount -->
+                    <InputGroup for="discount" label="Diskon (%)" required>
+                        <TextInput
+                            id="discount"
+                            v-model.number="form.discount"
+                            type="number"
+                            placeholder="Masukkan Diskon"
+                            required
+                            :error="form.errors.discount"
+                            @update:modelValue="form.errors.discount = null"
+                        />
+                    </InputGroup>
+                </div>
 
-            <!-- Images -->
-            <InputGroup for="images" label="Gambar Variasi Produk">
-                <div ref="imagesContainer" class="flex flex-wrap w-full gap-2">
+                <!-- Images -->
+                <InputGroup for="images" label="Gambar Variasi Produk">
                     <div
                         ref="imagesContainer"
                         class="flex flex-wrap w-full gap-2"
                     >
-                        <template
-                            v-for="(image, index) in form.images"
-                            :key="image.id"
+                        <div
+                            ref="imagesContainer"
+                            class="flex flex-wrap w-full gap-2"
                         >
-                            <MediaCard
-                                :media="image.media"
-                                :isSelected="false"
-                                :showCheckbox="false"
-                                :showRemoveButton="true"
-                                :showName="false"
-                                :showSize="false"
-                                @remove="form.images.splice(index, 1)"
-                            />
-                        </template>
-
-                        <button
-                            type="button"
-                            class="relative overflow-hidden transition-all ease-in-out border rounded-lg cursor-pointer group hover:border-primary-light hover:ring-1 hover:ring-primary-light"
-                            @click.prevent="showMediaFormModal = true"
-                        >
-                            <div
-                                class="flex flex-col items-center justify-center w-full h-32 gap-2 p-4 text-gray-500 transition-all duration-300 ease-in-out rounded-lg bg-gray-50 group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary"
+                            <template
+                                v-for="(image, index) in form.images"
+                                :key="image.id"
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    class="size-8"
+                                <MediaCard
+                                    :media="image.media"
+                                    :isSelected="false"
+                                    :showCheckbox="false"
+                                    :showRemoveButton="true"
+                                    :showName="false"
+                                    :showSize="false"
+                                    @remove="form.images.splice(index, 1)"
+                                />
+                            </template>
+
+                            <button
+                                type="button"
+                                class="relative overflow-hidden transition-all ease-in-out border rounded-lg cursor-pointer group hover:border-primary-light hover:ring-1 hover:ring-primary-light"
+                                @click.prevent="showMediaFormModal = true"
+                            >
+                                <div
+                                    class="flex flex-col items-center justify-center w-full h-32 gap-2 p-4 text-gray-500 transition-all duration-300 ease-in-out rounded-lg bg-gray-50 group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary"
                                 >
-                                    <path
-                                        d="M5 21C4.45 21 3.97933 20.8043 3.588 20.413C3.19667 20.0217 3.00067 19.5507 3 19V5C3 4.45 3.196 3.97934 3.588 3.588C3.98 3.19667 4.45067 3.00067 5 3H12C12.2833 3 12.521 3.096 12.713 3.288C12.905 3.48 13.0007 3.71734 13 4C12.9993 4.28267 12.9033 4.52034 12.712 4.713C12.5207 4.90567 12.2833 5.00134 12 5H5V19H19V12C19 11.7167 19.096 11.4793 19.288 11.288C19.48 11.0967 19.7173 11.0007 20 11C20.2827 10.9993 20.5203 11.0953 20.713 11.288C20.9057 11.4807 21.0013 11.718 21 12V19C21 19.55 20.8043 20.021 20.413 20.413C20.0217 20.805 19.5507 21.0007 19 21H5ZM6 17H18L14.25 12L11.25 16L9 13L6 17ZM17 7H16C15.7167 7 15.4793 6.904 15.288 6.712C15.0967 6.52 15.0007 6.28267 15 6C14.9993 5.71734 15.0953 5.48 15.288 5.288C15.4807 5.096 15.718 5 16 5H17V4C17 3.71667 17.096 3.47934 17.288 3.288C17.48 3.09667 17.7173 3.00067 18 3C18.2827 2.99934 18.5203 3.09534 18.713 3.288C18.9057 3.48067 19.0013 3.718 19 4V5H20C20.2833 5 20.521 5.096 20.713 5.288C20.905 5.48 21.0007 5.71734 21 6C20.9993 6.28267 20.9033 6.52034 20.712 6.713C20.5207 6.90567 20.2833 7.00134 20 7H19V8C19 8.28334 18.904 8.521 18.712 8.713C18.52 8.905 18.2827 9.00067 18 9C17.7173 8.99934 17.48 8.90334 17.288 8.712C17.096 8.52067 17 8.28334 17 8V7Z"
-                                        fill="currentColor"
-                                    />
-                                </svg>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        class="size-8"
+                                    >
+                                        <path
+                                            d="M5 21C4.45 21 3.97933 20.8043 3.588 20.413C3.19667 20.0217 3.00067 19.5507 3 19V5C3 4.45 3.196 3.97934 3.588 3.588C3.98 3.19667 4.45067 3.00067 5 3H12C12.2833 3 12.521 3.096 12.713 3.288C12.905 3.48 13.0007 3.71734 13 4C12.9993 4.28267 12.9033 4.52034 12.712 4.713C12.5207 4.90567 12.2833 5.00134 12 5H5V19H19V12C19 11.7167 19.096 11.4793 19.288 11.288C19.48 11.0967 19.7173 11.0007 20 11C20.2827 10.9993 20.5203 11.0953 20.713 11.288C20.9057 11.4807 21.0013 11.718 21 12V19C21 19.55 20.8043 20.021 20.413 20.413C20.0217 20.805 19.5507 21.0007 19 21H5ZM6 17H18L14.25 12L11.25 16L9 13L6 17ZM17 7H16C15.7167 7 15.4793 6.904 15.288 6.712C15.0967 6.52 15.0007 6.28267 15 6C14.9993 5.71734 15.0953 5.48 15.288 5.288C15.4807 5.096 15.718 5 16 5H17V4C17 3.71667 17.096 3.47934 17.288 3.288C17.48 3.09667 17.7173 3.00067 18 3C18.2827 2.99934 18.5203 3.09534 18.713 3.288C18.9057 3.48067 19.0013 3.718 19 4V5H20C20.2833 5 20.521 5.096 20.713 5.288C20.905 5.48 21.0007 5.71734 21 6C20.9993 6.28267 20.9033 6.52034 20.712 6.713C20.5207 6.90567 20.2833 7.00134 20 7H19V8C19 8.28334 18.904 8.521 18.712 8.713C18.52 8.905 18.2827 9.00067 18 9C17.7173 8.99934 17.48 8.90334 17.288 8.712C17.096 8.52067 17 8.28334 17 8V7Z"
+                                            fill="currentColor"
+                                        />
+                                    </svg>
 
-                                <p class="text-sm text-center">Tambah Gambar</p>
-                            </div>
-                        </button>
+                                    <p class="text-sm text-center">
+                                        Tambah Gambar
+                                    </p>
+                                </div>
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </InputGroup>
+                </InputGroup>
+            </div>
 
-            <div class="flex items-center justify-start w-full gap-4 mt-4">
+            <div
+                class="flex items-center justify-start w-full gap-4 p-4 sm:p-6"
+            >
                 <PrimaryButton type="submit"> Simpan Data </PrimaryButton>
                 <SecondaryButton type="button" @click="$emit('close')">
                     Batalkan

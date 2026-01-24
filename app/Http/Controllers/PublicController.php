@@ -147,6 +147,7 @@ class PublicController extends Controller
 
         $relatedProducts = Product::where('id', '!=', $product->id)
             ->with(['brand', 'categories', 'images'])
+            ->whereHas('variants')
             ->take(4)
             ->get();
 

@@ -14,17 +14,19 @@ class Product extends Model implements HasMedia
 {
     use SoftDeletes, InteractsWithMedia;
 
-    // Optional: Define automatic image conversions (Optimization)
-    public function registerMediaConversions($media = null): void
+    // Define automatic image conversions (Optimization)
+    public function registerMediaConversions(Media $media = null): void
     {
         $this->addMediaConversion('thumb')
             ->width(200)
             ->height(200)
-            ->sharpen(10);
+            ->sharpen(10)
+            ->performOnCollections('product');
 
         $this->addMediaConversion('preview')
             ->width(800)
-            ->quality(80); // Automatic compression for server efficiency
+            ->quality(80)
+            ->performOnCollections('product'); // Automatic compression for server efficiency
     }
 
     protected $fillable = [
@@ -46,6 +48,7 @@ class Product extends Model implements HasMedia
         'highest_final_selling_price',
         'stock_count',
         'thumbnail_url',
+        'preview_url',
     ];
 
     // Methods
@@ -86,6 +89,12 @@ class Product extends Model implements HasMedia
     {
         $media = $this->getFirstMedia('product');
         return $media ? $media->getUrl('thumb') : null;
+    }
+
+    public function getPreviewUrlAttribute()
+    {
+        $media = $this->getFirstMedia('product');
+        return $media ? $media->getUrl('preview') : null;
     }
 
     // Relationships

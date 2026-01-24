@@ -24,7 +24,7 @@ watch(
             image.value = newImages[0];
             imageIndex.value = 0;
         }
-    }
+    },
 );
 
 const changeImage = (index) => {
@@ -65,7 +65,7 @@ const goToNextImage = () => {
             class="relative flex items-center justify-center w-full overflow-hidden transition-all duration-300 ease-in-out border border-gray-100 rounded-lg group"
         >
             <img
-                :src="getImageUrl(image.image)"
+                :src="getImageUrl(image.original_url)"
                 :alt="props.altText"
                 class="object-cover w-full transition-all duration-300 ease-in-out rounded-lg aspect-square group-hover:scale-105"
             />
@@ -121,12 +121,12 @@ const goToNextImage = () => {
             <img
                 v-for="(img, index) in props.images"
                 :key="index"
-                :src="getImageUrl(img.image)"
+                :src="getImageUrl(img.thumbnail_url)"
                 :alt="props.altText"
                 class="h-[50px] aspect-[3/2] object-cover rounded cursor-pointer transition duration-200 hover:scale-105 m-0.5"
                 :class="{
                     '!cursor-default hover:!scale-100 outline outline-2 outline-primary':
-                        image.image == img.image,
+                        image.original_url == img.original_url,
                 }"
                 @click="changeImage(index)"
             />

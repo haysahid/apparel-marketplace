@@ -46,14 +46,14 @@ const props = defineProps({
 const tableRows = [
     {
         label: "Brand",
-        value: props.product.brand?.name,
+        value: props.product.brand?.name || "-",
     },
     {
         label: "Kategori",
         value:
             props.product.categories
                 ?.map((category) => category.name)
-                .join(", ") || "Tidak ada kategori",
+                .join(", ") || "-",
     },
     {
         label: "Warna",
@@ -151,10 +151,13 @@ const images = computed(() => {
             ?.flatMap((variant) => variant.images)
             .filter(
                 (img, idx, arr) =>
-                    arr.findIndex((i) => i.image === img.image) === idx,
+                    arr.findIndex(
+                        (i) => i.original_url === img.original_url,
+                    ) === idx,
             ) || []),
     ].filter(
-        (img, idx, arr) => arr.findIndex((i) => i.image === img.image) === idx,
+        (img, idx, arr) =>
+            arr.findIndex((i) => i.original_url === img.original_url) === idx,
     );
 });
 
@@ -172,8 +175,8 @@ onMounted(() => {
 const breadcrumbs = [
     { text: "Katalog", url: route("catalog") },
     {
-        text: props.product.brand.name,
-        url: route("catalog", { brands: props.product.brand.name }),
+        text: props.product.brand?.name,
+        url: route("catalog", { brands: props.product.brand?.name }),
     },
     { text: props.product.name, active: true },
 ];
@@ -293,9 +296,16 @@ const breadcrumbs = [
                                         Deskripsi
                                     </h3>
                                     <p
+                                        v-if="props.product.description"
                                         class="text-sm text-gray-700 whitespace-pre-line"
                                     >
                                         {{ props.product.description }}
+                                    </p>
+                                    <p
+                                        v-else
+                                        class="text-sm italic text-gray-500"
+                                    >
+                                        Belum ada deskripsi .
                                     </p>
                                 </div>
                             </div>
@@ -378,8 +388,7 @@ const breadcrumbs = [
                                         product.lowest_final_selling_price
                                     "
                                     :image="
-                                        (product.images[0]?.image as string) ||
-                                        null
+                                        (product.preview_url as string) || null
                                     "
                                     :description="product.brand?.name"
                                     :slug="product.slug"

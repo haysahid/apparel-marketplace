@@ -10,10 +10,58 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ProductRepository
 {
+    private static function temporaryMediaGenerateNewFileName(
+        TemporaryMedia $tempMedia,
+        Product $product
+    ) {
+        // Determine new file name based on product's slug or name
+        if (isset($product->slug)) {
+            // Use slug if available
+            $baseName = $product->slug;
+        } elseif (isset($product->name)) {
+            // Use name as slug
+            $baseName = Str::slug($product->name);
+        } else {
+            // Use original
+            $baseName = pathinfo($tempMedia->file_name, PATHINFO_FILENAME);
+        }
+
+        // Ensure unique file name
+        $baseName .= '-' . uniqid();
+        $extension = pathinfo($tempMedia->file_name, PATHINFO_EXTENSION);
+
+        return $baseName . '.' . $extension;
+    }
+
+    private static function mediaGenerateNewFileName(
+        Media $media,
+        Product $product
+    ) {
+        // Determine new file name based on model's slug or name
+        if (isset($product->slug)) {
+            // Use slug if available
+            $baseName = $product->slug;
+        } elseif (isset($product->name)) {
+            // Use name as slug
+            $baseName = Str::slug($product->name);
+        } else {
+            // Use original
+            $baseName = pathinfo($media->file_name, PATHINFO_FILENAME);
+        }
+
+        // Ensure unique file name
+        $baseName .= '-' . uniqid();
+
+        $extension = pathinfo($media->file_name, PATHINFO_EXTENSION);
+
+        return $baseName . '.' . $extension;
+    }
+
     public static function getProducts(
         $storeId = null,
         $limit = 5,
@@ -114,7 +162,15 @@ class ProductRepository
                 foreach ($data['temporary_images'] as $tempMediaId) {
                     $tempMedia = TemporaryMedia::find($tempMediaId);
                     if ($tempMedia) {
-                        $tempMedia->copyToMedia($product, 'product');
+                        $newFileName = self::temporaryMediaGenerateNewFileName(
+                            $tempMedia,
+                            $product
+                        );
+                        $newMedia = $tempMedia->copyToMedia($product, 'product');
+                        $newMedia->file_name = $newFileName;
+                        $newMedia->save();
+
+                        // Delete temporary media record and files
                         $tempMedia->delete();
                     }
                 }
@@ -123,9 +179,13 @@ class ProductRepository
             if (isset($data['images'])) {
                 foreach ($data['images'] as $key => $mediaId) {
                     $media = Media::find($mediaId);
-                    $media->copy($product, 'product');
-                    $media->order_column = $key;
-                    $media->save();
+                    if ($media) {
+                        $newFileName = self::mediaGenerateNewFileName($media, $product);
+                        $newMedia = $media->copy($product, 'product');
+                        $newMedia->file_name = $newFileName;
+                        $newMedia->order_column = $key;
+                        $newMedia->save();
+                    }
                 }
             }
 
@@ -236,9 +296,6 @@ class ProductRepository
             // Delete product variants
             foreach ($product->variants as $variant) {
                 foreach ($variant->images as $image) {
-                    if ($image->image) {
-                        Storage::delete($image->image);
-                    }
                     $image->delete();
                 }
                 $variant->delete();

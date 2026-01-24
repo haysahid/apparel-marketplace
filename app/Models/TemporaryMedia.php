@@ -5,6 +5,7 @@ namespace App\Models;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class TemporaryMedia extends Model
 {
@@ -54,7 +55,7 @@ class TemporaryMedia extends Model
     }
 
     // Actions
-    public function copyToMedia($model, $collectionName = 'default')
+    public function copyToMedia($model, $collectionName = 'default'): Media
     {
         $sourcePath = storage_path(self::TMP_STORAGE_PATH . $this->folder . '/' . $this->file_name);
 

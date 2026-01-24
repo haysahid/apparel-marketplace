@@ -47,19 +47,24 @@ onMounted(() => {
 
         <!-- Brands -->
         <div
+            v-if="
+                props.brands.map((brand) => brand.logo).filter((logo) => logo)
+                    .length > 0
+            "
             class="flex flex-row items-center justify-center gap-6 px-6 py-4 bg-secondary-box/30 max-sm:flex-wrap sm:gap-8 md:gap-x-24 sm:py-6 lg:px-40"
         >
-            <img
-                v-for="brand in props.brands || []"
-                :key="brand.id"
-                :src="getImageUrl(brand.logo)"
-                :alt="brand.name"
-                data-aos="zoom-in"
-                data-aos-duration="600"
-                data-aos-delay="100"
-                data-aos-once="true"
-                class="object-contain h-8 max-w-12 sm:max-w-20 lg:max-w-32 sm:h-16 lg:h-20"
-            />
+            <template v-for="brand in props.brands || []" :key="brand.id">
+                <img
+                    v-if="brand.logo"
+                    :src="getImageUrl(brand.logo)"
+                    :alt="brand.name"
+                    data-aos="zoom-in"
+                    data-aos-duration="600"
+                    data-aos-delay="100"
+                    data-aos-once="true"
+                    class="object-contain h-8 max-w-12 sm:max-w-20 lg:max-w-32 sm:h-16 lg:h-20"
+                />
+            </template>
         </div>
 
         <div class="p-6 sm:p-12 md:p-[100px] flex flex-col gap-12 lg:gap-20">
@@ -70,9 +75,11 @@ onMounted(() => {
                     data-aos-duration="600"
                     data-aos-delay="200"
                     data-aos-once="true"
-                    class="flex flex-col items-start justify-center gap-4 mx-auto max-w-7xl"
+                    class="flex flex-col items-start justify-center w-full gap-4 mx-auto max-w-7xl"
                 >
-                    <div class="flex flex-col items-start justify-center gap-4">
+                    <div
+                        class="flex flex-col items-start justify-center w-full gap-4"
+                    >
                         <div
                             class="flex items-center justify-between w-full gap-12 mb-4"
                         >
@@ -139,7 +146,10 @@ onMounted(() => {
                                         :finalPrice="
                                             product.lowest_final_selling_price
                                         "
-                                        :image="product.images[0]?.image as string || null"
+                                        :image="
+                                            (product.preview_url as string) ||
+                                            null
+                                        "
                                         :description="product.brand?.name"
                                         :slug="product.slug"
                                     />
@@ -155,7 +165,10 @@ onMounted(() => {
             </LandingSection>
 
             <!-- Categories -->
-            <LandingSection class="min-h-[30vh]">
+            <LandingSection
+                v-if="props.categories && props.categories.length > 0"
+                class="min-h-[30vh]"
+            >
                 <div
                     data-aos="fade-up"
                     data-aos-duration="600"

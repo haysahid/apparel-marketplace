@@ -57,7 +57,7 @@ const loadFile = (file) => {
 <template>
     <button
         type="button"
-        class="flex items-center justify-start w-full gap-3 pl-3.5 pr-2 py-2.5 bg-white outline outline-gray-200 rounded-xl hover:outline-primary-light transition-all duration-200 ease-in-out cursor-pointer -outline-offset-2"
+        class="flex items-center justify-start w-full gap-3 pl-3.5 pr-2 py-3.5 bg-white outline outline-gray-200 rounded-xl hover:outline-primary-light transition-all duration-200 ease-in-out cursor-pointer -outline-offset-2"
         :class="{
             'hover:outline-gray-300 ': drag,
             'pr-3.5': !showDeleteButton,
@@ -78,7 +78,7 @@ const loadFile = (file) => {
                         : getImageUrl(props.variant.images[0].original_url)
                 "
                 :alt="props.name"
-                class="object-cover size-[80px] sm:size-[100px]"
+                class="object-cover size-[80px] sm:size-[100px] rounded-lg"
             />
             <div
                 v-else

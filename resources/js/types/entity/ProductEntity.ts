@@ -15,6 +15,8 @@ interface ProductEntity {
     highest_base_selling_price: number;
     highest_final_selling_price: number;
     stock_count: number;
+    thumbnail_url: string | null;
+    preview_url: string | null;
 
     // Relationships
     store: StoreEntity | null;
