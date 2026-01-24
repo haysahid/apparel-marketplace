@@ -20,7 +20,7 @@ const emit = defineEmits(["edit", "delete"]);
         <img
             v-if="props.store.logo"
             :src="$getImageUrl(props.store.logo)"
-            alt="Brand Logo"
+            :alt="props.store.name"
             class="object-contain w-[60px] sm:w-[80px] rounded aspect-[3/2]"
         />
         <div

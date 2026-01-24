@@ -103,7 +103,7 @@ const deleteUser = () => {
                     closeDeleteUserDialog(true);
                     getUsers();
                 },
-            }
+            },
         );
     }
 };
@@ -148,7 +148,7 @@ function canDelete(user) {
 function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
-            "search-user"
+            "search-user",
         ) as HTMLInputElement;
         input?.focus({ preventScroll: true });
     });
@@ -231,10 +231,10 @@ onMounted(() => {
                                         :src="
                                             getImageUrl(
                                                 user.avatar ||
-                                                    user.profile_photo_url
+                                                    user.profile_photo_url,
                                             )
                                         "
-                                        alt="Foto Pengguna"
+                                        :alt="user.name"
                                         class="object-cover rounded-full aspect-square size-8"
                                     />
                                     <svg
@@ -310,7 +310,7 @@ onMounted(() => {
                                     $inertia.visit(
                                         route('admin.user.edit', {
                                             user: user,
-                                        })
+                                        }),
                                     )
                                 "
                                 @delete="openDeleteUserDialog(user)"
@@ -341,7 +341,7 @@ onMounted(() => {
                             $inertia.visit(
                                 route('admin.user.edit', {
                                     user: user,
-                                })
+                                }),
                             )
                         "
                         @delete="openDeleteUserDialog(user)"

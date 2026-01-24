@@ -28,7 +28,7 @@ function getUserVouchers() {
         .get("/api/my-store/voucher", {
             headers: {
                 Authorization: `Bearer ${cookieManager.getItem(
-                    "access_token"
+                    "access_token",
                 )}`,
             },
         })
@@ -62,7 +62,7 @@ getUserVouchers();
                     <img
                         v-if="props.partner.logo"
                         :src="$getImageUrl(props.partner.logo)"
-                        alt="Logo Mitra"
+                        :alt="props.partner.name"
                         class="object-contain rounded-lg size-[100px] h-fit shrink-0"
                     />
                     <svg
@@ -189,7 +189,7 @@ getUserVouchers();
                             :href="
                                 getWhatsAppLink(
                                     props.partner.contact_phone,
-                                    'Halo, saya ingin bertanya tentang produk Anda.'
+                                    'Halo, saya ingin bertanya tentang produk Anda.',
                                 )
                             "
                             target="_blank"

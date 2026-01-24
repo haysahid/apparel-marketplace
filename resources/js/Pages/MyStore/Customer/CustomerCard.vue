@@ -30,7 +30,7 @@ const emit = defineEmits(["edit"]);
                         props.customer.avatar ||
                         props.customer.profile_photo_url
                     "
-                    alt="Foto Pelanggan"
+                    :alt="props.customer.name"
                     class="object-contain rounded-full size-10 h-fit shrink-0"
                 />
                 <svg

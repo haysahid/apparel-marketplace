@@ -19,7 +19,7 @@ const emit = defineEmits(["edit", "delete"]);
     >
         <img
             :src="getImageUrl(props.certificate.image)"
-            alt="Sertifikat"
+            :alt="props.certificate.name"
             class="object-cover w-[80px] sm:w-[100px] rounded aspect-[3/2] border border-gray-200"
         />
         <div class="flex flex-col items-start w-full gap-1">

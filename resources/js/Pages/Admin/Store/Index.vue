@@ -95,7 +95,7 @@ const filteredUsers = computed(() => {
             users.value?.filter((user) =>
                 user.name
                     .toLowerCase()
-                    .includes(getUsersSearch.value.toLowerCase())
+                    .includes(getUsersSearch.value.toLowerCase()),
             ) || []
         );
     }
@@ -113,7 +113,7 @@ const getUsers = () => {
             headers: {
                 Accept: "application/json",
                 Authorization: `Bearer ${cookieManager.getItem(
-                    "access_token"
+                    "access_token",
                 )}`,
             },
         })
@@ -156,7 +156,7 @@ const deleteStore = () => {
                     closeDeleteStoreDialog(true);
                     getStores();
                 },
-            }
+            },
         );
     }
 };
@@ -189,7 +189,7 @@ function canEdit(store: StoreEntity) {
 function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
-            "search-store"
+            "search-store",
         ) as HTMLInputElement;
         input?.focus({ preventScroll: true });
     });
@@ -241,7 +241,7 @@ onMounted(() => {
                                 filters.user_id = option?.value;
                                 filters.user = option
                                     ? filteredUsers.find(
-                                          (user) => user.id === option.value
+                                          (user) => user.id === option.value,
                                       )
                                     : null;
                                 filters.page = 1;
@@ -304,7 +304,7 @@ onMounted(() => {
                             <img
                                 v-if="store.logo"
                                 :src="getImageUrl(store.logo)"
-                                alt="Logo Partner"
+                                :alt="store.name"
                                 class="object-contain h-[60px] rounded aspect-[3/2]"
                             />
                             <div
@@ -354,7 +354,7 @@ onMounted(() => {
                                     $inertia.visit(
                                         route('admin.store.edit', {
                                             store: store,
-                                        })
+                                        }),
                                     )
                                 "
                                 @delete="openDeleteStoreDialog(store)"
@@ -383,7 +383,7 @@ onMounted(() => {
                             $inertia.visit(
                                 route('admin.store.edit', {
                                     store: store,
-                                })
+                                }),
                             )
                         "
                         @delete="openDeleteStoreDialog(store)"

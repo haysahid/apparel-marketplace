@@ -79,7 +79,7 @@ const showStoreOptionsDialog = ref(false);
                     <img
                         v-if="$page.props.selected_store.logo && false"
                         :src="getImageUrl($page.props.selected_store.logo)"
-                        alt="Platform Icon"
+                        :alt="$page.props.selected_store.name"
                         class="text-blue-500 !fill-blue-500 object-contain size-8"
                     />
                     <div v-else class="p-0.5">
@@ -177,7 +177,7 @@ const showStoreOptionsDialog = ref(false);
         @close="showStoreOptionsDialog = false"
         @select="
             $inertia.visit(
-                route('my-store.select-store', { storeId: $event.id })
+                route('my-store.select-store', { storeId: $event.id }),
             );
 
             showStoreOptionsDialog = false;

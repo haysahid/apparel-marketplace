@@ -40,7 +40,7 @@ function getInvoices() {
             },
             headers: {
                 Authorization: `Bearer ${cookieManager.getItem(
-                    "access_token"
+                    "access_token",
                 )}`,
             },
         })
@@ -63,7 +63,7 @@ function getUserVouchers() {
         .get(`/api/my-store/customer/${props.customer.id}/voucher`, {
             headers: {
                 Authorization: `Bearer ${cookieManager.getItem(
-                    "access_token"
+                    "access_token",
                 )}`,
             },
         })
@@ -97,7 +97,7 @@ getUserVouchers();
                     <img
                         v-if="props.customer.avatar"
                         :src="$getImageUrl(props.customer.avatar)"
-                        alt="Foto Pelanggan"
+                        :alt="props.customer.name"
                         class="object-contain rounded-full size-[100px] h-fit shrink-0"
                     />
                     <svg
@@ -212,7 +212,7 @@ getUserVouchers();
                         :href="
                             getWhatsAppLink(
                                 props.customer.phone,
-                                'Halo, saya ingin bertanya tentang produk Anda.'
+                                'Halo, saya ingin bertanya tentang produk Anda.',
                             )
                         "
                         target="_blank"

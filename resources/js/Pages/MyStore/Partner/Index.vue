@@ -107,7 +107,7 @@ const deletePartner = () => {
                     closeDeletePartnerDialog(true);
                     getPartners();
                 },
-            }
+            },
         );
     }
 };
@@ -134,7 +134,7 @@ function canEdit(partner) {
     return (
         page.props.auth.is_admin ||
         page.props.auth.user.stores.some(
-            (store) => store.id === partner.store_id
+            (store) => store.id === partner.store_id,
         )
     );
 }
@@ -142,7 +142,7 @@ function canEdit(partner) {
 function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
-            "search-partner"
+            "search-partner",
         ) as HTMLInputElement;
         input?.focus({ preventScroll: true });
     });
@@ -215,7 +215,7 @@ onMounted(() => {
                             <img
                                 v-if="partner.logo"
                                 :src="getImageUrl(partner.logo)"
-                                alt="Logo Partner"
+                                :alt="partner.name"
                                 class="object-contain h-[60px] rounded aspect-[3/2]"
                             />
                             <div
@@ -273,7 +273,7 @@ onMounted(() => {
                                     $inertia.visit(
                                         route('my-store.partner.edit', {
                                             partner: partner,
-                                        })
+                                        }),
                                     )
                                 "
                                 @delete="openDeletePartnerDialog(partner)"
@@ -302,7 +302,7 @@ onMounted(() => {
                             $inertia.visit(
                                 route('my-store.partner.edit', {
                                     partner: partner,
-                                })
+                                }),
                             )
                         "
                         @delete="openDeletePartnerDialog(partner)"

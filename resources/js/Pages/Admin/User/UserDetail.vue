@@ -40,7 +40,7 @@ function getPointTransactions() {
             },
             headers: {
                 Authorization: `Bearer ${cookieManager.getItem(
-                    "access_token"
+                    "access_token",
                 )}`,
             },
         })
@@ -63,7 +63,7 @@ function getUserVouchers() {
         .get(`/api/admin/user/${props.user.id}/voucher`, {
             headers: {
                 Authorization: `Bearer ${cookieManager.getItem(
-                    "access_token"
+                    "access_token",
                 )}`,
             },
         })
@@ -99,10 +99,10 @@ getUserVouchers();
                         :src="
                             $getImageUrl(
                                 props.user.avatar ||
-                                    props.user.profile_photo_url
+                                    props.user.profile_photo_url,
                             )
                         "
-                        alt="Foto Pengguna"
+                        :alt="props.user.name"
                         class="object-cover rounded-full size-[100px] aspect-square shrink-0"
                     />
                     <svg
@@ -221,7 +221,7 @@ getUserVouchers();
                             <div
                                 v-for="storeRole in props.user.store_role_pairs.slice(
                                     0,
-                                    1
+                                    1,
                                 )"
                                 :key="
                                     storeRole.store?.id +
@@ -286,7 +286,7 @@ getUserVouchers();
                                     >
                                         <div
                                             v-for="storeRole in props.user.store_role_pairs.slice(
-                                                1
+                                                1,
                                             )"
                                             :key="
                                                 storeRole.store?.id +
@@ -348,7 +348,7 @@ getUserVouchers();
                             :href="
                                 getWhatsAppLink(
                                     props.user.phone,
-                                    'Halo, saya ingin bertanya tentang produk Anda.'
+                                    'Halo, saya ingin bertanya tentang produk Anda.',
                                 )
                             "
                             target="_blank"
@@ -370,7 +370,7 @@ getUserVouchers();
                     title="Poin Saat Ini"
                     :value="
                         $formatNumber(
-                            props.user.user_points[0]?.current_balance || 0
+                            props.user.user_points[0]?.current_balance || 0,
                         )
                     "
                 />
@@ -378,7 +378,7 @@ getUserVouchers();
                     title="Total Poin Diperoleh"
                     :value="
                         $formatNumber(
-                            props.user.user_points[0]?.lifetime_points || 0
+                            props.user.user_points[0]?.lifetime_points || 0,
                         )
                     "
                 />
@@ -413,7 +413,7 @@ getUserVouchers();
                                     <p class="text-sm text-gray-500">
                                         {{
                                             $formatDate(
-                                                pointTransaction.created_at
+                                                pointTransaction.created_at,
                                             )
                                         }}
                                     </p>
@@ -431,10 +431,10 @@ getUserVouchers();
                                         pointTransaction.points_amount > 0
                                             ? "+" +
                                               $formatNumber(
-                                                  pointTransaction.points_amount
+                                                  pointTransaction.points_amount,
                                               )
                                             : $formatNumber(
-                                                  pointTransaction.points_amount
+                                                  pointTransaction.points_amount,
                                               )
                                     }}
                                 </p>

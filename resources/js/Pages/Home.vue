@@ -41,7 +41,7 @@ onMounted(() => {
         <!-- Banner -->
         <img
             src="/storage/promotion_banner.png"
-            alt="Banner"
+            alt="Banner Promosi"
             class="object-cover w-full"
         />
 

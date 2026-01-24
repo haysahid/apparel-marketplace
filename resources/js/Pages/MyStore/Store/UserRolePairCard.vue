@@ -22,10 +22,10 @@ const emit = defineEmits({
             :src="
                 $getImageUrl(
                     props.userRolePair.user?.avatar ||
-                        props.userRolePair.user?.profile_photo_url
+                        props.userRolePair.user?.profile_photo_url,
                 )
             "
-            alt="Profile Photo"
+            :alt="props.userRolePair.user?.name || ''"
             class="object-cover rounded-full size-10 shrink-0 h-fit"
         />
         <svg

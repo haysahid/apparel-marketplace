@@ -534,7 +534,7 @@ const countImageUsedInVariants = (imageId: number | string) => {
                                                             :src="
                                                                 image.original_url
                                                             "
-                                                            alt="media"
+                                                            :alt="image.name"
                                                             class="object-contain w-full h-32 my-2 rounded-lg"
                                                         />
                                                     </template>

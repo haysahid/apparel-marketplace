@@ -24,7 +24,7 @@ const emit = defineEmits(["edit"]);
                 <img
                     v-if="props.member.avatar || props.member.profile_photo_url"
                     :src="props.member.avatar || props.member.profile_photo_url"
-                    alt="Foto Pelanggan"
+                    :alt="props.member.name"
                     class="object-contain rounded-full size-10 h-fit shrink-0"
                 />
                 <svg

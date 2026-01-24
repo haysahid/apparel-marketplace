@@ -69,7 +69,7 @@ const loadFile = (file) => {
                         ? loadFile(props.variant.images[0].image)
                         : props.variant.images[0].image
                 "
-                alt="Product Image"
+                :alt="props.name"
                 class="object-cover size-[60px] sm:size-[80px]"
             />
             <div

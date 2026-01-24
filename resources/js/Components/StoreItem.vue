@@ -24,7 +24,7 @@ const props = defineProps({
         <img
             v-if="props.icon"
             :src="props.icon"
-            alt="Platform Icon"
+            :alt="props.name"
             class="text-blue-500 size-8 !fill-blue-500 object-contain"
         />
         <div v-else>

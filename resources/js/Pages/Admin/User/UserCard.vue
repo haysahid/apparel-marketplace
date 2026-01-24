@@ -37,10 +37,10 @@ const hasDeleteCallback = computed(() => {
                 v-if="props.user.avatar || props.user.profile_photo_url"
                 :src="
                     $getImageUrl(
-                        props.user.avatar || props.user.profile_photo_url
+                        props.user.avatar || props.user.profile_photo_url,
                     )
                 "
-                alt="Foto Pelanggan"
+                :alt="props.user.name"
                 class="object-cover rounded-full aspect-square size-10 shrink-0"
             />
             <svg

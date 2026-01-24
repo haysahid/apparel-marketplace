@@ -56,7 +56,7 @@ const proxyChecked = computed({
         <img
             v-if="props.media.original_url"
             :src="props.media.original_url"
-            alt="media"
+            :alt="props.media.file_name"
             class="object-cover w-full h-32 transition-transform duration-200 group-hover:scale-105"
         />
         <div

@@ -63,7 +63,7 @@ const deleteCertificate = () => {
                     closeDeleteCertificateDialog(true);
                     getCertificates();
                 },
-            }
+            },
         );
     }
 };
@@ -126,7 +126,7 @@ const page = usePage<CustomPageProps>();
 function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
-            "search-certificate"
+            "search-certificate",
         ) as HTMLInputElement;
         input?.focus({ preventScroll: true });
     });
@@ -196,7 +196,7 @@ onMounted(() => {
                         <td>
                             <img
                                 :src="getImageUrl(certificate.image)"
-                                alt="Sertifikat"
+                                :alt="certificate.name"
                                 class="object-cover w-[80px] sm:w-[120px] rounded aspect-[3/2] border border-gray-200"
                             />
                         </td>
@@ -214,7 +214,7 @@ onMounted(() => {
                                     $inertia.visit(
                                         route('my-store.certificate.edit', {
                                             storeCertificate: certificate,
-                                        })
+                                        }),
                                     )
                                 "
                                 @delete="
@@ -239,7 +239,7 @@ onMounted(() => {
                                 $inertia.visit(
                                     route('my-store.certificate.edit', {
                                         storeCertificate: certificate,
-                                    })
+                                    }),
                                 )
                             "
                             @delete="openDeleteCertificateDialog(certificate)"

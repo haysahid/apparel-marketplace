@@ -104,7 +104,7 @@ const deleteBrand = () => {
                     closeDeleteBrandDialog(true);
                     getBrands();
                 },
-            }
+            },
         );
     }
 };
@@ -137,7 +137,7 @@ function canEdit(brand) {
 function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
-            "search-brand"
+            "search-brand",
         ) as HTMLInputElement;
         input?.focus({ preventScroll: true });
     });
@@ -203,7 +203,7 @@ onMounted(() => {
                             <img
                                 v-if="brand.logo"
                                 :src="getImageUrl(brand.logo)"
-                                alt="Logo Brand"
+                                :alt="brand.name"
                                 class="object-contain h-[60px] rounded aspect-[3/2]"
                             />
                             <div
@@ -238,7 +238,7 @@ onMounted(() => {
                                     $inertia.visit(
                                         route('my-store.brand.edit', {
                                             brand: brand,
-                                        })
+                                        }),
                                     )
                                 "
                                 @delete="openDeleteBrandDialog(brand)"
@@ -272,7 +272,7 @@ onMounted(() => {
                             $inertia.visit(
                                 route('my-store.brand.edit', {
                                     brand: brand,
-                                })
+                                }),
                             )
                         "
                         @delete="openDeleteBrandDialog(brand)"

@@ -102,7 +102,7 @@ const deleteCategory = () => {
                     closeDeleteCategoryDialog(true);
                     getCategories();
                 },
-            }
+            },
         );
     }
 };
@@ -129,7 +129,7 @@ function canEdit(category) {
     return (
         page.props.auth.is_admin ||
         page.props.auth.user.stores.some(
-            (store) => store.id === category.store_id
+            (store) => store.id === category.store_id,
         )
     );
 }
@@ -137,7 +137,7 @@ function canEdit(category) {
 function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
-            "search-category"
+            "search-category",
         ) as HTMLInputElement;
         input?.focus({ preventScroll: true });
     });
@@ -206,7 +206,7 @@ onMounted(() => {
                             <img
                                 v-if="category.image"
                                 :src="getImageUrl(category.image)"
-                                alt="Logo Brand"
+                                :alt="category.name"
                                 class="object-contain h-[40px] rounded aspect-[3/2]"
                             />
                             <div
@@ -240,7 +240,7 @@ onMounted(() => {
                                         $inertia.visit(
                                             route('my-store.category.edit', {
                                                 category: category,
-                                            })
+                                            }),
                                         )
                                     "
                                     @delete="openDeleteCategoryDialog(category)"
@@ -275,7 +275,7 @@ onMounted(() => {
                             $inertia.visit(
                                 route('my-store.category.edit', {
                                     category: category,
-                                })
+                                }),
                             )
                         "
                         @delete="openDeleteCategoryDialog(category)"

@@ -104,7 +104,7 @@ const deleteCustomer = () => {
                     closeDeleteCustomerDialog(true);
                     getCustomers();
                 },
-            }
+            },
         );
     }
 };
@@ -135,7 +135,7 @@ function canEdit(customer) {
 function setSearchFocus() {
     nextTick(() => {
         const input = document.getElementById(
-            "search-customer"
+            "search-customer",
         ) as HTMLInputElement;
         input?.focus({ preventScroll: true });
     });
@@ -223,10 +223,10 @@ onMounted(() => {
                                         :src="
                                             getImageUrl(
                                                 customer.avatar ||
-                                                    customer.profile_photo_url
+                                                    customer.profile_photo_url,
                                             )
                                         "
-                                        alt="Foto Pelanggan"
+                                        :alt="customer.name"
                                         class="object-contain rounded-full size-8"
                                     />
                                     <svg
@@ -345,7 +345,7 @@ onMounted(() => {
                                     $inertia.visit(
                                         route('my-store.customer.edit', {
                                             customer: customer,
-                                        })
+                                        }),
                                     )
                                 "
                                 @delete="openDeleteCustomerDialog(customer)"
@@ -374,7 +374,7 @@ onMounted(() => {
                             $inertia.visit(
                                 route('my-store.customer.edit', {
                                     customer: customer,
-                                })
+                                }),
                             )
                         "
                         @delete="openDeleteCustomerDialog(customer)"

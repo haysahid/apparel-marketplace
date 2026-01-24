@@ -37,7 +37,7 @@ function formatPrice(price = 0) {
                 <img
                     v-if="props.item.image"
                     :src="getImageUrl(props.item.image)"
-                    alt="Product Image"
+                    :alt="props.item.variant.name"
                     class="object-cover size-[60px] sm:size-[80px] rounded-lg outline outline-1 outline-gray-300"
                 />
                 <div

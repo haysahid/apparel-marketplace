@@ -41,7 +41,7 @@ const getPlatformNameFromUrl = (url) => {
         <img
             v-if="props.link.platform?.icon"
             :src="props.link.platform.icon"
-            alt="Platform Icon"
+            :alt="props.link.platform.name"
             class="size-8"
         />
         <div v-else>

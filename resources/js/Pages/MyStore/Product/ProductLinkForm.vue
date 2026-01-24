@@ -35,7 +35,9 @@ const page = usePage();
 const platforms = page.props.platforms as Platform[];
 const filteredPlatforms = computed(() => {
     return platforms.filter((platform) =>
-        platform.name.toLowerCase().includes(platformSearch.value.toLowerCase())
+        platform.name
+            .toLowerCase()
+            .includes(platformSearch.value.toLowerCase()),
     );
 });
 const platformSearch = ref("");
@@ -56,7 +58,7 @@ const form = useForm(
               product_id: null,
               platform_id: null,
               platform: null,
-          }
+          },
 );
 
 function validate() {
@@ -64,7 +66,7 @@ function validate() {
         form.errors.url = "URL tidak boleh kosong.";
     } else if (
         !/^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/[^\s]*)?$/i.test(
-            form.url.trim()
+            form.url.trim(),
         )
     ) {
         form.errors.url = "URL tidak valid.";
@@ -111,7 +113,7 @@ function submit() {
                             :modelValue="
                                 form.platform_id && !isPlatformDropdownOpen
                                     ? platforms.find(
-                                          (p) => p.id === form.platform_id
+                                          (p) => p.id === form.platform_id,
                                       )?.name
                                     : platformSearch
                             "
@@ -132,7 +134,7 @@ function submit() {
                             >
                                 <img
                                     :src="getImageUrl(form.platform.icon)"
-                                    alt="Platform Icon"
+                                    :alt="form.platform.name"
                                     class="absolute w-5 h-5 transform -translate-y-1/2 left-3 top-1/2"
                                 />
                             </template>
@@ -201,7 +203,7 @@ function submit() {
                                 <img
                                     v-if="platform.icon"
                                     :src="getImageUrl(platform.icon)"
-                                    alt="Platform Icon"
+                                    :alt="platform.name"
                                     class="inline-block w-5 h-5 mr-2"
                                 />
                                 <p>{{ platform.name }}</p>

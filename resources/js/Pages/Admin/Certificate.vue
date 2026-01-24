@@ -18,7 +18,7 @@ const certificates = ref(
     props.certificates.data.map((certificate) => ({
         ...certificate,
         showDeleteModal: false,
-    }))
+    })),
 );
 
 const showDeleteCertificateDialog = (certificate) => {
@@ -34,7 +34,7 @@ const closeDeleteCertificateDialog = (certificate, result) => {
         if (result) {
             openSuccessDialog("Data Berhasil Dihapus");
             certificates.value = certificates.value.filter(
-                (cert) => cert.id !== certificate.id
+                (cert) => cert.id !== certificate.id,
             );
         }
     }
@@ -54,7 +54,7 @@ const deleteCertificate = (certificate) => {
                 onSuccess: () => {
                     closeDeleteCertificateDialog(certificate, true);
                 },
-            }
+            },
         );
     }
 };
@@ -140,7 +140,7 @@ onMounted(() => {
                             <td>
                                 <img
                                     :src="getImageUrl(certificate.image)"
-                                    alt="Sertifikat"
+                                    :alt="certificate.name"
                                     class="object-cover w-[100px] sm:w-[160px] rounded aspect-[3/2]"
                                 />
                             </td>
@@ -158,7 +158,7 @@ onMounted(() => {
                                         $inertia.visit(
                                             route('admin.certificate.edit', {
                                                 storeCertificate: certificate,
-                                            })
+                                            }),
                                         )
                                     "
                                     @delete="
@@ -169,7 +169,7 @@ onMounted(() => {
                                     :show="certificate.showDeleteModal"
                                     @close="
                                         closeDeleteCertificateDialog(
-                                            certificate
+                                            certificate,
                                         )
                                     "
                                     @delete="deleteCertificate(certificate)"

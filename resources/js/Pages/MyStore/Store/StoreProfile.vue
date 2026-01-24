@@ -17,7 +17,7 @@ const props = defineProps({
         <img
             v-if="props.store.banner"
             :src="$getImageUrl(props.store.banner)"
-            alt="Banner Toko"
+            :alt="`Banner ${props.store.name}`"
             class="object-cover w-full rounded-t-xl shadow-sm aspect-[4/1] dark:border-gray-600"
         />
 
@@ -30,7 +30,7 @@ const props = defineProps({
                 <img
                     v-if="props.store.logo"
                     :src="$getImageUrl(props.store.logo)"
-                    alt="Logo Toko"
+                    :alt="props.store.name"
                     class="object-contain size-[120px] sm:size-[140px] h-fit shrink-0"
                 />
                 <svg

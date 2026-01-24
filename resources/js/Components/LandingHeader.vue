@@ -68,10 +68,10 @@ onMounted(() => {
                                 :src="
                                     scrolled
                                         ? getImageUrl(
-                                              $page.props.setting.logo_white
+                                              $page.props.setting.logo_white,
                                           )
                                         : getImageUrl(
-                                              $page.props.setting.logo_black
+                                              $page.props.setting.logo_black,
                                           )
                                 "
                                 alt="Logo"
@@ -275,7 +275,7 @@ onMounted(() => {
             @close="showStoreOptionsDialog = false"
             @select="
                 $inertia.visit(
-                    route('my-store.select-store', { storeId: $event.id })
+                    route('my-store.select-store', { storeId: $event.id }),
                 );
 
                 showStoreOptionsDialog = false;

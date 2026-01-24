@@ -55,7 +55,7 @@ const getPlatformNameFromUrl = (url) => {
         <img
             v-else-if="props.icon"
             :src="getImageUrl(props.icon)"
-            alt="Platform Icon"
+            :alt="props.name"
             class="text-blue-500 size-8 !fill-blue-500"
         />
         <div v-else>
