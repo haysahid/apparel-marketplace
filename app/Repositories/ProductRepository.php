@@ -31,10 +31,7 @@ class ProductRepository
             $baseName = pathinfo($tempMedia->file_name, PATHINFO_FILENAME);
         }
 
-        // Ensure unique file name
-        $baseName .= '-' . uniqid();
         $extension = pathinfo($tempMedia->file_name, PATHINFO_EXTENSION);
-
         return $baseName . '.' . $extension;
     }
 
@@ -54,11 +51,7 @@ class ProductRepository
             $baseName = pathinfo($media->file_name, PATHINFO_FILENAME);
         }
 
-        // Ensure unique file name
-        $baseName .= '-' . uniqid();
-
         $extension = pathinfo($media->file_name, PATHINFO_EXTENSION);
-
         return $baseName . '.' . $extension;
     }
 

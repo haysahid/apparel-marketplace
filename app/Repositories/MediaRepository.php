@@ -54,12 +54,25 @@ class MediaRepository
         return $query->paginate($limit);
     }
 
-    public static function createMedia($model, $file, $collectionName = 'default')
-    {
-        return $model
-            ->addMedia($file)
-            ->preservingOriginal()
-            ->toMediaCollection($collectionName);
+    public static function createMedia(
+        $model,
+        $file,
+        $collectionName = 'default',
+        $name = null,
+        $fileName = null,
+        $preserveOriginal = true
+    ) {
+        $mediaAdder = $model->addMedia($file);
+        if ($preserveOriginal) {
+            $mediaAdder->preservingOriginal();
+        }
+        if ($name) {
+            $mediaAdder->usingName($name);
+        }
+        if ($fileName) {
+            $mediaAdder->usingFileName($fileName);
+        }
+        return $mediaAdder->toMediaCollection($collectionName);
     }
 
     public static function getMediaDetail($id)
@@ -105,20 +118,8 @@ class MediaRepository
 
             // Copy media to new model and collection
             $newMedia = $media->copy($model, $collectionName);
-
-            // Rename file_name in database
+            $newMedia->name = pathinfo($newFileName, PATHINFO_FILENAME);
             $newMedia->file_name = $newFileName;
-
-            // Rename file on disk
-            $disk = $newMedia->disk;
-            $oldPath = $newMedia->getPath();
-            $newPath = dirname($oldPath) . '/' . $newFileName;
-
-            if (Storage::disk($disk)->exists($oldPath)) {
-                Storage::disk($disk)->move($oldPath, $newPath);
-            }
-
-            // Update the path in the database if necessary
             $newMedia->save();
         }
     }
@@ -137,10 +138,15 @@ class MediaRepository
             $baseName = pathinfo($media->file_name, PATHINFO_FILENAME);
         }
 
-        // Ensure unique file name
-        $baseName .= '-' . uniqid();
         $extension = pathinfo($media->file_name, PATHINFO_EXTENSION);
-
         return $baseName . '.' . $extension;
+    }
+
+    public static function getMediaByModelAndName($model, $name): ?Media
+    {
+        return Media::where('model_type', get_class($model))
+            ->where('model_id', $model->id)
+            ->where('name', $name)
+            ->first();
     }
 }

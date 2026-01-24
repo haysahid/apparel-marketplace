@@ -49,6 +49,36 @@ class DownloadProductVariantImage implements ShouldQueue
             // Save image path to database
             $product = Product::find($this->productId);
             $file = Storage::path($imagePath);
+
+            // Check if the media already exists for this product and file
+            $existingMedia = MediaRepository::getMediaByModelAndName(
+                model: $product,
+                name: pathinfo($basename, PATHINFO_FILENAME)
+            );
+
+            if ($existingMedia) {
+                Log::info('Media already exists for product ID ' . $this->productId . ' and file ' . $basename);
+
+                // Attach existing media to product variant if not already attached
+                $existingAssociation = ProductVariantImage::where('product_variant_id', $this->productVariantId)
+                    ->where('media_id', $existingMedia->id)
+                    ->first();
+
+                if (!$existingAssociation) {
+                    ProductVariantImage::create([
+                        'product_variant_id' => $this->productVariantId,
+                        'product_id' => $this->productId,
+                        'media_id' => $existingMedia->id,
+                        'order' => $this->order,
+                    ]);
+                    Log::info('Associated existing media with product variant ID ' . $this->productVariantId);
+                } else {
+                    Log::info('Media already associated with product variant ID ' . $this->productVariantId);
+                }
+
+                return;
+            }
+
             $newMedia = MediaRepository::createMedia(
                 model: $product,
                 file: $file,

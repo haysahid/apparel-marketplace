@@ -56,6 +56,8 @@ class MediaController extends Controller
             'model_id' => 'required|integer',
             'file' => 'required|file|max:5120', // Max 5MB
             'collection_name' => 'nullable|string',
+            'name' => 'nullable|string',
+            'file_name' => 'nullable|string',
         ], [
             'model_type.required' => 'Tipe model harus diisi.',
             'model_id.required' => 'ID model harus diisi.',
@@ -68,6 +70,8 @@ class MediaController extends Controller
         $modelId = $validatedData['model_id'];
         $file = $validatedData['file'];
         $collectionName = $validatedData['collection_name'] ?? 'default';
+        $name = $validatedData['name'] ?? null;
+        $fileName = $validatedData['file_name'] ?? null;
 
         if ($modelType === 'product') {
             $modelType = Product::class;
@@ -83,6 +87,8 @@ class MediaController extends Controller
                 model: $model,
                 file: $file,
                 collectionName: $collectionName,
+                name: $name,
+                fileName: $fileName,
             );
 
             return ResponseFormatter::success(

@@ -34,7 +34,7 @@ class TemporaryMediaRepository
         $file,
         $storeId = null,
     ) {
-        $folder = uniqid() . '-' . now()->timestamp;
+        $folder =  now()->timestamp . '-' . uniqid();
 
         $filename = $file->getClientOriginalName();
         $mimeType = $file->getClientMimeType();
@@ -80,20 +80,8 @@ class TemporaryMediaRepository
 
             // Copy media to new model and collection
             $newMedia = $tempMedia->copyToMedia($model, $collectionName);
-
-            // Rename file_name in database
+            $newMedia->name = pathinfo($newFileName, PATHINFO_FILENAME);
             $newMedia->file_name = $newFileName;
-
-            // Rename file on disk
-            $disk = $newMedia->disk;
-            $oldPath = $newMedia->getPath();
-            $newPath = dirname($oldPath) . '/' . $newFileName;
-
-            if (Storage::disk($disk)->exists($oldPath)) {
-                Storage::disk($disk)->move($oldPath, $newPath);
-            }
-
-            // Update the path in the database if necessary
             $newMedia->save();
 
             // Delete temporary media record and file
@@ -115,10 +103,7 @@ class TemporaryMediaRepository
             $baseName = pathinfo($tempMedia->file_name, PATHINFO_FILENAME);
         }
 
-        // Ensure unique file name
-        $baseName .= '-' . uniqid();
         $extension = pathinfo($tempMedia->file_name, PATHINFO_EXTENSION);
-
         return $baseName . '.' . $extension;
     }
 }
