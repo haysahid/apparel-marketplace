@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from "vue";
+import { ref, computed, onMounted, nextTick, watch } from "vue";
 import { useForm, usePage } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -60,6 +60,50 @@ const form = useForm(
               images: [],
           },
 );
+const sellingMarginPercentage = ref(0);
+const sellingMarginPercentageError = ref<string | null>(null);
+
+const computedSku = computed(() => {
+    const skuSeparator = "-";
+    const skuPrefix = props.product.sku_prefix;
+    let metadataList = [];
+
+    if (form.motif) {
+        metadataList.push(form.motif);
+    }
+    if (form.color) {
+        metadataList.push(form.color.name);
+    }
+    if (form.size) {
+        metadataList.push(form.size.name);
+    }
+
+    return (
+        skuPrefix +
+        (metadataList.length > 0
+            ? skuSeparator +
+              metadataList
+                  .map((item) =>
+                      item.toString().toUpperCase().replace(/\s+/g, ""),
+                  )
+                  .join(skuSeparator)
+            : "")
+    );
+});
+
+const computedFinalSellingPrice = computed(() => {
+    let finalPrice = form.base_selling_price || 0;
+
+    if (form.discount && form.discount > 0) {
+        if (form.discount_type === "percentage") {
+            finalPrice = finalPrice - (finalPrice * form.discount) / 100;
+        } else if (form.discount_type === "fixed") {
+            finalPrice = finalPrice - form.discount;
+        }
+    }
+
+    return finalPrice >= 0 ? finalPrice : 0;
+});
 
 const drag = ref(false);
 
@@ -88,6 +132,33 @@ const filteredUnits = computed(() => {
         unit.name.toLowerCase().includes(unitSearch.value.toLowerCase()),
     );
 });
+
+watch(
+    () => form.discount,
+    () => {
+        if (
+            form.discount_type === "percentage" &&
+            (form.discount > 100 || form.discount < 0)
+        ) {
+            form.errors.discount = "Diskon harus antara 0 hingga 100.";
+        } else {
+            form.errors.discount = null;
+        }
+    },
+);
+
+watch(
+    () => sellingMarginPercentage.value,
+    (newValue) => {
+        if (newValue < 0 || newValue > 100) {
+            sellingMarginPercentageError.value =
+                "Persentase margin harus antara 0 hingga 100.";
+            return;
+        } else {
+            sellingMarginPercentageError.value = null;
+        }
+    },
+);
 
 function validate() {
     if (form.errors) {
@@ -235,18 +306,13 @@ const draggable = useDraggable(imagesContainer, form.images, {
     },
 });
 
-const imagesToDelete = ref([]);
-
-const showSuccessDialog = ref(false);
-const successMessage = ref(null);
-
 const showAddColorForm = ref(false);
 const showAddSizeForm = ref(false);
 const showAddUnitForm = ref(false);
 
 onMounted(() => {
     nextTick(() => {
-        const input = document.getElementById("motif") as HTMLInputElement;
+        const input = document.getElementById("barcode") as HTMLInputElement;
         input?.focus();
     });
 });
@@ -267,14 +333,44 @@ const showMediaFormModal = ref(false);
             <div
                 class="flex flex-col items-start w-full gap-4 text-start overflow-y-auto h-[60vh] px-4 sm:px-6"
             >
+                <div class="flex items-center w-full gap-4">
+                    <!-- Barcode -->
+                    <InputGroup for="barcode" label="Barcode">
+                        <TextInput
+                            id="barcode"
+                            v-model="form.barcode"
+                            type="text"
+                            placeholder="Masukkan Barcode"
+                            autocomplete="on"
+                            :error="form.errors.barcode"
+                            @update:modelValue="form.errors.barcode = null"
+                        />
+                    </InputGroup>
+
+                    <!-- SKU -->
+                    <InputGroup for="sku" label="SKU">
+                        <TextInput
+                            id="sku"
+                            :modelValue="computedSku"
+                            type="text"
+                            readonly
+                            bgClass="bg-gray-100"
+                        />
+                        <template #suffix>
+                            <span class="text-sm italic text-gray-500">
+                                - Otomatis
+                            </span>
+                        </template>
+                    </InputGroup>
+                </div>
+
                 <!-- Motif -->
-                <InputGroup for="motif" label="Motif" required>
+                <InputGroup for="motif" label="Motif">
                     <TextInput
                         id="motif"
                         v-model="form.motif"
                         type="text"
                         placeholder="Masukkan Nama Motif"
-                        required
                         autocomplete="on"
                         :error="form.errors.motif"
                         @update:modelValue="form.errors.motif = null"
@@ -282,13 +378,12 @@ const showMediaFormModal = ref(false);
                 </InputGroup>
 
                 <!-- Material -->
-                <InputGroup for="material" label="Jenis Bahan" required>
+                <InputGroup for="material" label="Jenis Bahan">
                     <TextInput
                         id="material"
                         v-model="form.material"
                         type="text"
                         placeholder="Masukkan Nama Jenis Bahan"
-                        required
                         autocomplete="on"
                         :error="form.errors.material"
                         @update:modelValue="form.errors.material = null"
@@ -490,26 +585,101 @@ const showMediaFormModal = ref(false);
                     </InputGroup>
                 </div>
 
-                <div class="flex items-center w-full gap-4">
+                <div class="flex flex-col w-full gap-4 sm:flex-row">
+                    <!-- Purchase Price -->
+                    <InputGroup for="purchase_price" label="Harga Beli">
+                        <TextInput
+                            id="purchase_price"
+                            v-model.number="form.purchase_price"
+                            type="number"
+                            placeholder="Masukkan Harga Beli"
+                            :error="form.errors.purchase_price"
+                            @update:modelValue="
+                                form.errors.purchase_price = null;
+
+                                form.base_selling_price =
+                                    (form.purchase_price || 0) +
+                                    ((form.purchase_price || 0) *
+                                        sellingMarginPercentage) /
+                                        100;
+                            "
+                        />
+                    </InputGroup>
+
+                    <!-- Base Selling Margin -->
+                    <InputGroup
+                        for="base_selling_price"
+                        label="Margin Penjualan Dasar (%)"
+                    >
+                        <TextInput
+                            id="selling_margin_percentage"
+                            v-model.number="sellingMarginPercentage"
+                            type="number"
+                            placeholder="Masukkan Margin Penjualan"
+                            :error="sellingMarginPercentageError"
+                            @update:modelValue="
+                                sellingMarginPercentageError = null;
+
+                                form.base_selling_price =
+                                    (form.purchase_price || 0) +
+                                    ((form.purchase_price || 0) *
+                                        sellingMarginPercentage) /
+                                        100;
+                            "
+                        />
+                    </InputGroup>
+                </div>
+
+                <div class="flex flex-col w-full gap-4 sm:flex-row">
                     <!-- Base Selling Price -->
                     <InputGroup
                         for="base_selling_price"
-                        label="Harga Dasar"
+                        label="Harga Jual Dasar"
                         required
                     >
                         <TextInput
                             id="base_selling_price"
                             v-model.number="form.base_selling_price"
                             type="number"
-                            placeholder="Masukkan Harga"
+                            placeholder="Masukkan Harga Jual Dasar"
                             required
                             :error="form.errors.base_selling_price"
                             @update:modelValue="
-                                form.errors.base_selling_price = null
+                                form.errors.base_selling_price = null;
+
+                                sellingMarginPercentage = form.purchase_price
+                                    ? ((form.base_selling_price -
+                                          form.purchase_price) /
+                                          form.purchase_price) *
+                                      100
+                                    : 0;
                             "
                         />
                     </InputGroup>
 
+                    <!-- Final Selling Price -->
+                    <InputGroup
+                        for="final_selling_price"
+                        label="Harga Jual Akhir"
+                    >
+                        <TextInput
+                            id="final_selling_price"
+                            :modelValue="
+                                $formatCurrency(computedFinalSellingPrice)
+                            "
+                            type="text"
+                            readonly
+                            bgClass="bg-gray-100"
+                        />
+                        <template #suffix>
+                            <span class="text-sm italic text-gray-500">
+                                - Otomatis
+                            </span>
+                        </template>
+                    </InputGroup>
+                </div>
+
+                <div class="flex flex-col w-full gap-4 sm:flex-row">
                     <!-- Discount -->
                     <InputGroup for="discount" label="Diskon (%)" required>
                         <TextInput
@@ -521,6 +691,36 @@ const showMediaFormModal = ref(false);
                             :error="form.errors.discount"
                             @update:modelValue="form.errors.discount = null"
                         />
+                    </InputGroup>
+
+                    <!-- Final Selling Margin -->
+                    <InputGroup
+                        for="final_selling_margin"
+                        label="Margin Penjualan Akhir"
+                    >
+                        <TextInput
+                            id="final_selling_margin"
+                            :modelValue="`${$formatCurrency(
+                                computedFinalSellingPrice -
+                                    (form.purchase_price || 0),
+                            )} (${
+                                form.purchase_price
+                                    ? ((computedFinalSellingPrice -
+                                          form.purchase_price) /
+                                          form.purchase_price) *
+                                      100
+                                    : 0
+                            }%)`"
+                            type="text"
+                            readonly
+                            bgClass="bg-gray-100"
+                        />
+
+                        <template #suffix>
+                            <span class="text-sm italic text-gray-500">
+                                - Otomatis
+                            </span>
+                        </template>
                     </InputGroup>
                 </div>
 
