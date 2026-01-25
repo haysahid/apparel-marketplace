@@ -7,8 +7,9 @@ import BaseDialog from "@/Components/BaseDialog.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import DialogModal from "@/Components/DialogModal.vue";
 import GuestForm from "./GuestForm.vue";
+import CustomPageProps from "@/types/model/CustomPageProps";
 
-const page = usePage();
+const page = usePage<CustomPageProps>();
 const cartStore = useCartStore();
 
 const showErrorDialog = ref(false);
@@ -86,7 +87,7 @@ const submit = () => {
                 $inertia.visit(
                     route('login', {
                         redirect: route('my-cart'),
-                    })
+                    }),
                 );
             "
             @negativeClicked="showGuestForm = true"

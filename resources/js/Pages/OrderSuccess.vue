@@ -46,7 +46,7 @@ function checkPayment() {
             onError: (error) => {
                 console.error("Error checking payment:", error);
             },
-        }
+        },
     );
 }
 
@@ -71,7 +71,7 @@ function showSnap() {
             onChangeStatus: (status) => {
                 resumePaymentStatus.value = status;
             },
-        }
+        },
     );
 }
 
@@ -91,7 +91,7 @@ function changePaymentType() {
             onError: (error) => {
                 console.error("Error changing payment type:", error);
             },
-        }
+        },
     );
 }
 
@@ -118,7 +118,7 @@ onMounted(() => {
             router.visit(
                 route("my-order.detail", {
                     transaction_code: props.transaction.code,
-                })
+                }),
             );
         }
     } else if (props.transaction.status == "pending") {
@@ -161,7 +161,7 @@ onMounted(() => {
                 <template #additionalInfo>
                     <!-- Payment -->
                     <template v-if="showPaymentActions">
-                        <div class="my-2 border-b border-gray-300"></div>
+                        <div class="my-2 border-b border-gray-200"></div>
                         <OrderContentRow
                             label="Status Pembayaran"
                             :value="payment?.status"
@@ -182,7 +182,7 @@ onMounted(() => {
                                     .map(
                                         (word) =>
                                             word.charAt(0).toUpperCase() +
-                                            word.slice(1)
+                                            word.slice(1),
                                     )
                                     .join(' ')
                             "
@@ -207,7 +207,7 @@ onMounted(() => {
                             props.transaction.shipping_method.slug === 'courier'
                         "
                     >
-                        <div class="my-2 border-b border-gray-300"></div>
+                        <div class="my-2 border-b border-gray-200"></div>
                         <OrderContentRow
                             label="Provinsi"
                             :value="props.transaction.province_name"

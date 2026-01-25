@@ -9,7 +9,7 @@ import OrderContentRow from "@/Components/OrderContentRow.vue";
 import StatusChip from "@/Components/StatusChip.vue";
 import InvoiceDetail from "./MyStore/Order/InvoiceDetail.vue";
 import cookieManager from "@/plugins/cookie-manager";
-import invoiceService from "@/services/my-store/invoice-service";
+import invoiceService from "@/services/invoice-service";
 
 async function initScript() {
     const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
@@ -52,10 +52,10 @@ async function checkPayment() {
             {
                 headers: {
                     authorization: `Bearer ${cookieManager.getItem(
-                        "access_token"
+                        "access_token",
                     )}`,
                 },
-            }
+            },
         )
         .then((response) => {
             payment.value = response.data.result;
@@ -111,10 +111,10 @@ async function showSnap() {
                         {
                             headers: {
                                 authorization: `Bearer ${cookieManager.getItem(
-                                    "access_token"
+                                    "access_token",
                                 )}`,
                             },
-                        }
+                        },
                     )
                     .then((response) => {
                         resumePaymentStatus.value = "success";
@@ -122,7 +122,7 @@ async function showSnap() {
                             route("my-order.detail", {
                                 transaction_code:
                                     props.invoice.transaction.code,
-                            })
+                            }),
                         );
                     })
                     .catch((error) => {
@@ -156,10 +156,10 @@ async function changePaymentType() {
             {
                 headers: {
                     authorization: `Bearer ${cookieManager.getItem(
-                        "access_token"
+                        "access_token",
                     )}`,
                 },
-            }
+            },
         )
         .then(async (response) => {
             payment.value = response.data.result;
@@ -187,7 +187,7 @@ onMounted(() => {
         router.visit(
             route("my-order.detail", {
                 transaction_code: props.invoice.transaction.code,
-            })
+            }),
         );
     } else if (
         route().params?.show_snap == "1" &&
@@ -236,7 +236,7 @@ onMounted(() => {
                 <template #additionalInfo>
                     <!-- Payment -->
                     <template v-if="showPaymentActions">
-                        <div class="my-2 border-b border-gray-300"></div>
+                        <div class="my-2 border-b border-gray-200"></div>
                         <OrderContentRow
                             label="Status Pembayaran"
                             :value="payment?.status"
@@ -257,7 +257,7 @@ onMounted(() => {
                                     .map(
                                         (word) =>
                                             word.charAt(0).toUpperCase() +
-                                            word.slice(1)
+                                            word.slice(1),
                                     )
                                     .join(' ')
                             "
@@ -283,7 +283,7 @@ onMounted(() => {
                             'courier'
                         "
                     >
-                        <div class="my-2 border-b border-gray-300"></div>
+                        <div class="my-2 border-b border-gray-200"></div>
                         <OrderContentRow
                             label="Provinsi"
                             :value="props.invoice.transaction.province_name"

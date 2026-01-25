@@ -142,6 +142,7 @@ class PublicController extends Controller
         $minOrder = $product->variants->min('min_order');
         $variants = $product->variants;
         $motifs = $variants->pluck('motif')->unique()->filter()->sort()->values()->all();
+        $materials = $variants->pluck('material')->unique()->filter()->sort()->values()->all();
         $colors = $variants->pluck('color')->unique('id')->values()->all();
         $sizes = $variants->pluck('size')->filter()->unique('id')->sortBy('id')->values()->all();
 
@@ -156,6 +157,7 @@ class PublicController extends Controller
             'accumulatedStock' => $accumulatedStock,
             'minOrder' => $minOrder,
             'motifs' => $motifs,
+            'materials' => $materials,
             'colors' => $colors,
             'sizes' => $sizes,
             'relatedProducts' => $relatedProducts,

@@ -11,12 +11,17 @@ use App\Models\Unit;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ProductVariantRepository
 {
-    public function generateSku(string $skuPrefix, array $metadata): string
+    public static function generateSku(string $skuPrefix, array $metadata): string
     {
         $skuSeparator = config('product.sku_separator');
+
+        $metadata = array_filter($metadata, function ($item) {
+            return !is_null($item) && $item !== '';
+        });
 
         $sku = $skuPrefix;
         if (!empty($metadata)) {
@@ -27,13 +32,17 @@ class ProductVariantRepository
         return $sku;
     }
 
-    public function generateSlug(string $productName, array $metadata): string
+    public static function generateSlug(string $productName, array $metadata): string
     {
+        $metadata = array_filter($metadata, function ($item) {
+            return !is_null($item) && $item !== '';
+        });
+
         $slug = str($productName);
         if (!empty($metadata)) {
             $slug .= '-' . implode('-', $metadata);
         }
-        return $slug->slug();
+        return Str::slug($slug);
     }
 
     public static function createVariant(array $data)
@@ -52,7 +61,7 @@ class ProductVariantRepository
                 'sku' => self::generateSku(
                     $product->sku_prefix,
                     [
-                        $data['motif'],
+                        $data['motif'] ?? null,
                         $color->name,
                         $size->name,
                     ]
@@ -60,16 +69,16 @@ class ProductVariantRepository
                 'slug' => self::generateSlug(
                     $product->name,
                     [
-                        $data['motif'],
+                        $data['motif'] ?? null,
                         $color->name,
                         $size->name,
                     ]
                 ),
-                'barcode' => $data['barcode'],
-                'motif' => $data['motif'],
+                'barcode' => $data['barcode'] ?? null,
+                'motif' => $data['motif'] ?? null,
                 'color_id' => $color->id,
                 'size_id' => $size->id,
-                'material' => $data['material'],
+                'material' => $data['material'] ?? null,
                 'purchase_price' => $data['purchase_price'] ?? $data['base_selling_price'],
                 'base_selling_price' => $data['base_selling_price'],
                 'discount_type' => 'percentage',
@@ -127,7 +136,7 @@ class ProductVariantRepository
             $variant->sku = self::generateSku(
                 $variant->product->sku_prefix,
                 [
-                    $data['motif'],
+                    $data['motif'] ?? null,
                     $color->name,
                     $size->name,
                 ]
@@ -135,16 +144,16 @@ class ProductVariantRepository
             $variant->slug = self::generateSlug(
                 $variant->product->name,
                 [
-                    $data['motif'],
+                    $data['motif'] ?? null,
                     $color->name,
                     $size->name,
                 ]
             );
-            $variant->barcode = $data['barcode'];
-            $variant->motif = $data['motif'];
+            $variant->barcode = $data['barcode'] ?? null;
+            $variant->motif = $data['motif'] ?? null;
             $variant->color_id = $data['color_id'];
             $variant->size_id = $data['size_id'];
-            $variant->material = $data['material'];
+            $variant->material = $data['material'] ?? null;
 
             if ($data['purchase_price'] !== null) {
                 $variant->purchase_price = $data['purchase_price'] ?: $data['base_selling_price'];

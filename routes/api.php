@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\OrderController;
+use App\Http\Controllers\API\ShipmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,7 @@ Route::name('api.')->group(function () {
     Route::get('/shipping-cost', [OrderController::class, 'shippingCost'])->name('shipping-cost');
     Route::post('/checkout-guest', [OrderController::class, 'checkoutGuest'])->name('checkout-guest');
     Route::get('/check-payment-guest', [OrderController::class, 'checkPayment'])->name('check-payment-guest');
+    Route::get('/shipment-dropdown-guest', [ShipmentController::class, 'dropdown'])->name('shipment.dropdown');
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/voucher', [OrderController::class, 'getVouchers'])->name('voucher');

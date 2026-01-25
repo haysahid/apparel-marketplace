@@ -33,17 +33,31 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
-            $invoice = Invoice::findOrFail($validated['invoice_id']);
+            $invoice = Invoice::with(['shipments', 'transaction.transaction_items'])
+                ->findOrFail($validated['invoice_id']);
             $invoice->status = $validated['status'];
             $invoice->save();
 
-            // If the status is set to 'completed', update all related shipments to 'delivered'
             if ($validated['status'] === 'completed') {
+                // Update all related shipments to 'delivered'
                 $shipments = $invoice->shipments;
                 foreach ($shipments as $shipment) {
                     $shipment->status = 'delivered';
                     $shipment->save();
                 }
+
+                $transaction = $invoice->transaction;
+
+                // Update all transaction items to 'completed'
+                $transactionItems = $transaction->transaction_items;
+                foreach ($transactionItems as $item) {
+                    $item->fullfillment_status = 'completed';
+                    $item->save();
+                }
+
+                // Finally, update the transaction status to 'completed'
+                $transaction->status = 'completed';
+                $transaction->save();
             }
 
             DB::commit();

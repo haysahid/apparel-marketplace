@@ -7,6 +7,8 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import CustomPageProps from "@/types/model/CustomPageProps";
 import DefaultCard from "@/Components/DefaultCard.vue";
+import WhatsAppButton from "@/Components/WhatsAppButton.vue";
+import { getWhatsAppLink, openWhatsAppChat } from "@/plugins/helpers";
 
 const props = defineProps({
     orderGroup: {
@@ -36,13 +38,16 @@ const showDetailButton =
     route().current("order.success.guest") ||
     route().current("my-store.transaction.edit");
 
+const showContactSellerButton =
+    !showDetailButton && !route().current("my-store.order.edit");
+
 const detailLink = route().current("my-store.transaction.edit")
     ? route("my-store.order.edit", {
           invoice: props.orderGroup.invoice,
       })
     : route(
           page.props.auth.user ? "my-order.detail" : "my-order.detail.guest",
-          props.orderGroup.invoice?.code
+          props.orderGroup.invoice?.code,
       );
 </script>
 
@@ -105,6 +110,30 @@ const detailLink = route().current("my-store.transaction.edit")
                     Detail
                 </PrimaryButton>
             </Link>
+
+            <!-- Contact Seller -->
+            <a
+                v-if="showContactSellerButton"
+                :href="
+                    getWhatsAppLink(
+                        props.orderGroup.store?.phone,
+                        'Halo, saya ingin menanyakan tentang pesanan saya dengan nomor invoice ' +
+                            props.orderGroup.invoice?.code,
+                    )
+                "
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                <WhatsAppButton
+                    @click="$event.stopPropagation()"
+                    class="whitespace-nowrap"
+                >
+                    <span>
+                        Hubungi
+                        <span class="hidden sm:inline-block">Penjual</span>
+                    </span>
+                </WhatsAppButton>
+            </a>
         </div>
 
         <!-- Items -->
@@ -154,7 +183,7 @@ const detailLink = route().current("my-store.transaction.edit")
                                     type="button"
                                     @click="
                                         copyToClipboard(
-                                            props.orderGroup.invoice?.code
+                                            props.orderGroup.invoice?.code,
                                         )
                                     "
                                     class="p-1"
@@ -214,7 +243,7 @@ const detailLink = route().current("my-store.transaction.edit")
                                             @click="
                                                 copyToClipboard(
                                                     props.orderGroup.invoice
-                                                        ?.code
+                                                        ?.code,
                                                 )
                                             "
                                             class="p-1"
@@ -246,7 +275,7 @@ const detailLink = route().current("my-store.transaction.edit")
                                 {{
                                     $formatCurrency(
                                         props.orderGroup.invoice?.base_amount ??
-                                            0
+                                            0,
                                     )
                                 }}
                             </td>
@@ -258,7 +287,7 @@ const detailLink = route().current("my-store.transaction.edit")
                                 {{
                                     $formatCurrency(
                                         props.orderGroup.invoice
-                                            ?.voucher_amount ?? 0
+                                            ?.voucher_amount ?? 0,
                                     )
                                 }}
                             </td>
@@ -269,7 +298,7 @@ const detailLink = route().current("my-store.transaction.edit")
                                 {{
                                     $formatCurrency(
                                         props.orderGroup.invoice
-                                            ?.shipping_cost ?? 0
+                                            ?.shipping_cost ?? 0,
                                     )
                                 }}
                             </td>
@@ -281,7 +310,7 @@ const detailLink = route().current("my-store.transaction.edit")
                             <td class="font-semibold text-end ps-8">
                                 {{
                                     $formatCurrency(
-                                        props.orderGroup.invoice?.amount ?? 0
+                                        props.orderGroup.invoice?.amount ?? 0,
                                     )
                                 }}
                             </td>

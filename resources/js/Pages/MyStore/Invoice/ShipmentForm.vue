@@ -59,7 +59,7 @@ const submit = () => {
             onSuccess: () => {
                 emit("submitted");
             },
-        }
+        },
     );
 };
 </script>
@@ -105,7 +105,7 @@ const submit = () => {
 
                 <div class="flex flex-col gap-4">
                     <!-- Weight -->
-                    <InputGroup for="weight" label="Berat" required>
+                    <InputGroup for="weight" label="Berat (gram)" required>
                         <TextInput
                             id="weight"
                             v-model="form.weight"

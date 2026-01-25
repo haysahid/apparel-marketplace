@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue";
 import VariantForm from "./VariantForm.vue";
 import VariantCard from "./VariantCard.vue";
@@ -14,11 +14,11 @@ import Modal from "@/Components/Modal.vue";
 
 const props = defineProps({
     product: {
-        type: Object,
+        type: Object as () => ProductEntity,
         default: null,
     },
     variants: {
-        type: Array,
+        type: Array as () => ProductVariantEntity[],
         required: true,
     },
     isEdit: {
@@ -34,7 +34,13 @@ const props = defineProps({
 const emit = defineEmits(["onCreated", "onUpdated", "onDelete"]);
 
 const motifs = computed(() => {
-    return [...new Set(props.variants.map((variant) => variant.motif))];
+    return [
+        ...new Set(
+            props.variants
+                .map((variant) => variant.motif)
+                .filter((motif) => motif != null),
+        ),
+    ];
 });
 
 const colors = computed(() => {
@@ -63,6 +69,22 @@ const filteredVariants = computed(() => {
 const showAddVariantForm = ref(false);
 const openAddVariantForm = () => {
     showAddVariantForm.value = true;
+};
+
+const getVariantName = (variant: ProductVariantEntity) => {
+    const metadata = [];
+
+    if (variant.motif) {
+        metadata.push(variant.motif);
+    }
+    if (variant.color) {
+        metadata.push(variant.color.name);
+    }
+    if (variant.size) {
+        metadata.push(variant.size.name);
+    }
+
+    return metadata.join(" - ");
 };
 </script>
 
@@ -103,7 +125,6 @@ const openAddVariantForm = () => {
                         <template #trigger>
                             <SecondaryButton
                                 type="button"
-                                :disabled="props.disabled"
                                 class="!p-2 group"
                                 :class="{
                                     'border-primary hover:bg-primary/10':
@@ -294,7 +315,7 @@ const openAddVariantForm = () => {
                     </p>
                 </div>
                 <VariantCard
-                    :name="`${variant.motif} - ${variant.color?.name} - ${variant.size?.name}`"
+                    :name="getVariantName(variant)"
                     :variant="variant"
                     :index="index"
                     @click="variant.showEditForm = true"

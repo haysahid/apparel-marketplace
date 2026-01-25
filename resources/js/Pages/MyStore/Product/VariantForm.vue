@@ -166,20 +166,12 @@ function validate() {
         form.errors = {};
     }
 
-    if (!form.motif) {
-        form.errors.motif = "Motif tidak boleh kosong.";
-    }
-
     if (!form.color_id) {
         form.errors.color_id = "Warna tidak boleh kosong.";
     }
 
     if (!form.size_id) {
         form.errors.size_id = "Ukuran tidak boleh kosong.";
-    }
-
-    if (!form.material) {
-        form.errors.material = "Jenis bahan tidak boleh kosong.";
     }
 
     if (!form.base_selling_price) {

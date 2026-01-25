@@ -10,7 +10,6 @@ import ProductDetailTable from "./Product/ProductDetailTable.vue";
 import DiscountTag from "@/Components/DiscountTag.vue";
 import TextInput from "@/Components/TextInput.vue";
 import StoreCard from "@/Components/StoreCard.vue";
-import { getImageUrl } from "@/plugins/helpers";
 
 const props = defineProps({
     product: {
@@ -29,6 +28,10 @@ const props = defineProps({
         type: Array as () => string[],
         default: () => [],
     },
+    materials: {
+        type: Array as () => string[],
+        default: () => [],
+    },
     colors: {
         type: Array as () => ColorEntity[],
         default: () => [],
@@ -43,39 +46,94 @@ const props = defineProps({
     },
 });
 
-const tableRows = [
-    {
-        label: "Brand",
-        value: props.product.brand?.name || "-",
-    },
-    {
-        label: "Kategori",
-        value:
-            props.product.categories
-                ?.map((category) => category.name)
-                .join(", ") || "-",
-    },
-    {
-        label: "Warna",
-        value:
-            props.colors?.map((color) => color.name).join(", ") ||
-            "Tidak ada warna",
-    },
-    {
-        label: "Ukuran",
-        value:
-            props.sizes?.map((size) => size.name).join(", ") ||
-            "Tidak ada ukuran",
-    },
-    {
-        label: "Stok",
-        value: props.accumulatedStock > 0 ? props.accumulatedStock : "Habis",
-    },
-    {
-        label: "Min. Pemesanan",
-        value: props.minOrder,
-    },
-];
+const tableRows = computed(() => {
+    if (orderForm.value?.selectedVariant) {
+        return [
+            {
+                label: "Brand",
+                value: props.product.brand?.name || "-",
+            },
+            {
+                label: "Kategori",
+                value:
+                    props.product.categories
+                        ?.map((category) => category.name)
+                        .join(", ") || "-",
+            },
+            {
+                label: "Motif",
+                value: orderForm.value.selectedVariant.motif || "-",
+            },
+            {
+                label: "Bahan",
+                value: orderForm.value.selectedVariant.material || "-",
+            },
+            {
+                label: "Warna",
+                value: orderForm.value.selectedVariant.color?.name || "-",
+            },
+            {
+                label: "Ukuran",
+                value: orderForm.value.selectedVariant.size?.name || "-",
+            },
+            {
+                label: "Stok",
+                value:
+                    orderForm.value.selectedVariant.current_stock_level > 0
+                        ? orderForm.value.selectedVariant.current_stock_level
+                        : "Habis",
+            },
+            {
+                label: "Min. Pemesanan",
+                value: props.minOrder,
+            },
+        ];
+    }
+
+    return [
+        {
+            label: "Brand",
+            value: props.product.brand?.name || "-",
+        },
+        {
+            label: "Kategori",
+            value:
+                props.product.categories
+                    ?.map((category) => category.name)
+                    .join(", ") || "-",
+        },
+        {
+            label: "Motif",
+            value:
+                props.motifs?.filter((motif) => motif != null).join(", ") ||
+                "-",
+        },
+        {
+            label: "Bahan",
+            value:
+                props.materials
+                    ?.filter((material) => material != null)
+                    .join(", ") || "-",
+        },
+        {
+            label: "Warna",
+            value: props.colors?.map((color) => color.name).join(", ") || "-",
+        },
+        {
+            label: "Ukuran",
+            value: props.sizes?.map((size) => size.name).join(", ") || "-",
+        },
+        {
+            label: "Stok",
+            value:
+                props.accumulatedStock > 0 ? props.accumulatedStock : "Habis",
+        },
+        {
+            label: "Min. Pemesanan",
+            value: props.minOrder,
+        },
+    ];
+});
 
 const orderForm = ref(null);
 
@@ -218,7 +276,10 @@ const breadcrumbs = [
 
                     <div class="flex flex-col justify-start py-2">
                         <h1 class="mb-3 text-xl font-bold">
-                            {{ props.product.name }}
+                            {{
+                                orderForm?.selectedVariant?.name ||
+                                props.product.name
+                            }}
                         </h1>
                         <div class="flex flex-col items-start gap-2.5 mb-6">
                             <p class="text-2xl font-bold text-primary">
@@ -263,6 +324,12 @@ const breadcrumbs = [
                                         class="mb-2 font-semibold text-gray-700"
                                     >
                                         Rincian
+                                        <span
+                                            v-if="orderForm?.selectedVariant"
+                                            class="italic font-normal text-gray-500"
+                                        >
+                                            (variasi yang dipilih)
+                                        </span>
                                     </h3>
                                     <div
                                         class="relative overflow-x-auto rounded-lg w-full max-w-[600px] border border-gray-300"

@@ -68,7 +68,7 @@ watch(
         } else {
             destinations.value = [];
         }
-    }
+    },
 );
 
 const form = useForm({
@@ -86,7 +86,7 @@ function getShippingCost() {
             cartStore.groups.map((group) => {
                 group.shipping = null;
                 return group;
-            })
+            }),
         );
         return;
     }
@@ -112,7 +112,7 @@ function getShippingCost() {
 
             groupHasSelectedItems.forEach((group) => {
                 const foundShipping = shippings.find(
-                    (item) => item.store_id === group.store_id
+                    (item) => item.store_id === group.store_id,
                 );
                 if (foundShipping) {
                     group.shipping = foundShipping.shipping;
@@ -146,7 +146,7 @@ watch(
     () => form.data(),
     (newForm) => {
         updateLocalForm();
-    }
+    },
 );
 
 const total = computed(() => {
@@ -231,7 +231,7 @@ const submit = () => {
         .post(isGuest ? "/api/checkout-guest" : "/api/checkout", data, {
             headers: {
                 authorization: `Bearer ${cookieManager.getItem(
-                    "access_token"
+                    "access_token",
                 )}`,
             },
         })
@@ -247,7 +247,7 @@ const submit = () => {
                     show_snap: result.payment.midtrans_snap_token
                         ? true
                         : false,
-                })
+                }),
             );
         })
         .catch((error) => {
@@ -256,7 +256,7 @@ const submit = () => {
                 form.errors = error.response.data.errors || {};
             } else {
                 openErrorDialog(
-                    error.response.data.meta.message || "Terjadi kesalahan"
+                    error.response.data.meta.message || "Terjadi kesalahan",
                 );
             }
         });
@@ -328,7 +328,7 @@ const submit = () => {
                             (option) => {
                                 form.destination_id = option.value;
                                 form.destination = destinations.find(
-                                    (d) => d.id === option.value
+                                    (d) => d.id === option.value,
                                 );
                                 form.errors.destination_id = null;
 
@@ -364,7 +364,7 @@ const submit = () => {
             </template>
 
             <!-- Divider -->
-            <div class="my-2 border-b border-gray-300"></div>
+            <div class="my-2 border-b border-gray-200"></div>
 
             <!-- Summary -->
             <div class="flex flex-col gap-y-2">
@@ -389,7 +389,7 @@ const submit = () => {
                             style: 'currency',
                             currency: 'IDR',
                             minimumFractionDigits: 0,
-                        }
+                        },
                     )}`"
                 />
 
@@ -441,7 +441,7 @@ const submit = () => {
             </div>
 
             <!-- Divider -->
-            <!-- <div class="my-2 border-b border-gray-300"></div> -->
+            <!-- <div class="my-2 border-b border-gray-200"></div> -->
 
             <!-- Note -->
             <!-- <p class="text-sm text-gray-500">Catatan:</p>
@@ -468,7 +468,7 @@ const submit = () => {
                 $inertia.visit(
                     route('login', {
                         redirect: route('my-cart'),
-                    })
+                    }),
                 );
             "
             @negativeClicked="
@@ -476,7 +476,7 @@ const submit = () => {
                 $inertia.visit(
                     route('register', {
                         redirect: route('my-cart'),
-                    })
+                    }),
                 );
             "
         />

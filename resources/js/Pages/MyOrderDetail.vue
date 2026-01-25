@@ -140,7 +140,7 @@ onMounted(() => {
             <template #additionalInfo>
                 <!-- Payment -->
                 <template v-if="showPaymentActions">
-                    <div class="my-2 border-b border-gray-300"></div>
+                    <div class="my-2 border-b border-gray-200"></div>
                     <OrderContentRow
                         label="Status Pembayaran"
                         :value="payment?.status"
@@ -184,7 +184,7 @@ onMounted(() => {
                 <template
                     v-if="props.transaction.shipping_method.slug === 'courier'"
                 >
-                    <div class="my-2 border-b border-gray-300"></div>
+                    <div class="my-2 border-b border-gray-200"></div>
                     <OrderContentRow
                         label="Provinsi"
                         :value="props.transaction.province_name"

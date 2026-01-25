@@ -5,7 +5,6 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import ChangeTransactionStatusDialog from "./ChangeTransactionStatusDialog.vue";
 import axios from "axios";
 import MyStoreLayout from "@/Layouts/MyStoreLayout.vue";
-import DefaultCard from "@/Components/DefaultCard.vue";
 import InvoiceDetail from "./InvoiceDetail.vue";
 import OrderContentRow from "@/Components/OrderContentRow.vue";
 import StatusChip from "@/Components/StatusChip.vue";
@@ -15,7 +14,6 @@ import SecondaryButton from "@/Components/SecondaryButton.vue";
 import invoiceService from "@/services/my-store/invoice-service";
 import ShipmentForm from "../Invoice/ShipmentForm.vue";
 import DialogModal from "@/Components/DialogModal.vue";
-import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 
 const props = defineProps({
     invoice: {
@@ -49,7 +47,7 @@ function checkPayment() {
             onChangeStatus: (status) => {
                 checkPaymentStatus.value = status;
             },
-        }
+        },
     );
 }
 
@@ -79,7 +77,7 @@ function showSnap() {
             onChangeStatus: (status) => {
                 resumePaymentStatus.value = status;
             },
-        }
+        },
     );
 }
 
@@ -96,7 +94,7 @@ function changePaymentType() {
                     showSnap();
                 }
             },
-        }
+        },
     );
 }
 
@@ -132,7 +130,7 @@ function changeStatus(newStatus: string) {
                 headers: {
                     Authorization: token,
                 },
-            }
+            },
         )
         .then(() => {
             changeStatusStatus.value = "success";
@@ -248,7 +246,7 @@ window.onpopstate = function () {
                                 .map(
                                     (word) =>
                                         word.charAt(0).toUpperCase() +
-                                        word.slice(1)
+                                        word.slice(1),
                                 )
                                 .join(' ')
                         "
@@ -339,7 +337,7 @@ window.onpopstate = function () {
                             :disabled="changeStatusStatus === 'loading'"
                             @click="showSetCompletedConfirmationDialog = true"
                         >
-                            Selesai
+                            Selesaikan
                         </PrimaryButton>
                     </template>
                 </div>

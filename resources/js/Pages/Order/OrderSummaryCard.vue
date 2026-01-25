@@ -23,17 +23,17 @@ const props = defineProps({
 
 const subTotal = props.groups.reduce(
     (total, group) => total + group.invoice.base_amount,
-    0
+    0,
 );
 
 const discount = props.groups.reduce(
     (total, group) => total + group.invoice.voucher_amount,
-    0
+    0,
 );
 
 const total = props.groups.reduce(
     (total, group) => total + group.invoice.amount,
-    0
+    0,
 );
 
 function copyToClipboard(text: string) {
@@ -117,7 +117,7 @@ const isCopied = ref(false);
                 </template>
 
                 <!-- Divider -->
-                <div class="my-2 border-b border-gray-300"></div>
+                <div class="my-2 border-b border-gray-200"></div>
 
                 <OrderContentRow
                     label="Sub Total"

@@ -33,4 +33,8 @@ interface ProductVariantEntity {
     unit: UnitEntity | null;
     images: ProductVariantImageEntity[];
     transaction_items: TransactionItemEntity[];
+
+    // Utilities
+    showEditForm?: boolean;
+    showDeleteConfirmation?: boolean;
 }

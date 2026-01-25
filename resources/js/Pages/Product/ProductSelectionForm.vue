@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, defineExpose, watch } from "vue";
+import { ref, computed } from "vue";
 import { useForm, usePage } from "@inertiajs/vue3";
 import ColorChip from "@/Components/ColorChip.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import Chip from "@/Components/Chip.vue";
 import ProductLinkDialog from "@/Components/ProductLinkDialog.vue";
-import TextInput from "@/Components/TextInput.vue";
 import SuccessDialog from "@/Components/SuccessDialog.vue";
 import ErrorDialog from "@/Components/ErrorDialog.vue";
 import { useCartStore } from "@/stores/cart-store";
@@ -15,7 +14,6 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 const cartStore = useCartStore();
 
 const page = usePage();
-const store = page.props.store as StoreEntity;
 
 const props = defineProps({
     product: {
@@ -49,7 +47,7 @@ const filter = useForm(
               motif: null,
               color: null,
               size: null,
-          }
+          },
 );
 
 // Set initial filter based on URL parameters
@@ -73,29 +71,31 @@ const filteredVariants = computed(() => {
 
 const availableMotifs = computed(() => {
     return props.motifs.filter((motif) =>
-        filteredVariants.value.some((variant) => variant.motif === motif)
+        filteredVariants.value.some((variant) => variant.motif === motif),
     );
 });
 
 const availableColors = computed(() => {
     return props.colors.filter((color) =>
-        filteredVariants.value.some((variant) => variant.color?.id === color.id)
+        filteredVariants.value.some(
+            (variant) => variant.color?.id === color.id,
+        ),
     );
 });
 
 const availableSizes = computed(() => {
     return props.sizes.filter((size) =>
-        filteredVariants.value.some((variant) => variant.size?.id === size.id)
+        filteredVariants.value.some((variant) => variant.size?.id === size.id),
     );
 });
 
-const selectedVariant = computed(() => {
+const selectedVariant = computed<ProductVariantEntity | null>(() => {
     return (
         variants.find(
             (variant) =>
                 variant.motif === filter.motif &&
                 variant.color?.id === filter.color?.id &&
-                variant.size?.id === filter.size?.id
+                variant.size?.id === filter.size?.id,
         ) || null
     );
 });
@@ -115,7 +115,7 @@ const isVariantInCart = computed(() => {
 function addToCart() {
     if (!selectedVariant.value) {
         openErrorDialog(
-            "Silakan pilih motif, warna, dan ukuran produk terlebih dahulu."
+            "Silakan pilih motif, warna, dan ukuran produk terlebih dahulu.",
         );
         return;
     }
@@ -144,8 +144,7 @@ function addToCart() {
         variant_id: selectedVariant.value.id,
         quantity: quantity.value,
         image:
-            selectedVariant.value.images[0]?.image ||
-            props.product.images[0]?.image,
+            selectedVariant.value.thumbnail_url || props.product.thumbnail_url,
         variant: selectedVariant.value,
         created_at: new Date().toISOString(),
         selected: true,
@@ -239,7 +238,7 @@ defineExpose({
                                 filter.size &&
                                 !filteredVariants.some(
                                     (variant) =>
-                                        variant.size?.id === filter.size.id
+                                        variant.size?.id === filter.size.id,
                                 )
                             ) {
                                 filter.size = null;
@@ -249,7 +248,7 @@ defineExpose({
                                 filter.color &&
                                 !filteredVariants.some(
                                     (variant) =>
-                                        variant.color?.id === filter.color.id
+                                        variant.color?.id === filter.color.id,
                                 )
                             ) {
                                 filter.color = null;
@@ -283,7 +282,7 @@ defineExpose({
                                 filter.size &&
                                 !filteredVariants.some(
                                     (variant) =>
-                                        variant.size?.id === filter.size.id
+                                        variant.size?.id === filter.size.id,
                                 )
                             ) {
                                 filter.size = null;
@@ -292,7 +291,7 @@ defineExpose({
                             if (
                                 filter.motif &&
                                 !filteredVariants.some(
-                                    (variant) => variant.motif === filter.motif
+                                    (variant) => variant.motif === filter.motif,
                                 )
                             ) {
                                 filter.motif = null;
@@ -325,7 +324,7 @@ defineExpose({
                                 filter.color &&
                                 !filteredVariants.some(
                                     (variant) =>
-                                        variant.color?.id === filter.color.id
+                                        variant.color?.id === filter.color.id,
                                 )
                             ) {
                                 filter.color = null;
@@ -334,7 +333,7 @@ defineExpose({
                             if (
                                 filter.motif &&
                                 !filteredVariants.some(
-                                    (variant) => variant.motif === filter.motif
+                                    (variant) => variant.motif === filter.motif,
                                 )
                             ) {
                                 filter.motif = null;

@@ -484,7 +484,7 @@ const submit = () => {
             </div>
 
             <!-- Divider -->
-            <!-- <div class="my-2 border-b border-gray-300"></div> -->
+            <!-- <div class="my-2 border-b border-gray-200"></div> -->
 
             <!-- Note -->
             <!-- <p class="text-sm text-gray-500">Catatan:</p>
