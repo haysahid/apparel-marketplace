@@ -5,6 +5,8 @@ import axios from "axios";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
 import { useDialogStore } from "./dialog-store";
+import { db } from "@/db";
+import useDebounce from "@/plugins/debounce";
 
 export const useProductFormStore = defineStore("product_form", () => {
     const token = `Bearer ${cookieManager.getItem("access_token")}`;
@@ -16,47 +18,52 @@ export const useProductFormStore = defineStore("product_form", () => {
 
     const dialogStore = useDialogStore();
 
-    const product = ref<ProductEntity | null>(
-        localStorage.getItem(selectedProductKey)
-            ? JSON.parse(localStorage.getItem(selectedProductKey) as string)
-            : null,
-    );
+    const product = ref<ProductEntity | null>(null);
 
     const form = ref<
         ProductEntity & { errors: { [key: string]: string | null } }
-    >(
-        localStorage.getItem(productFormKey)
-            ? {
-                  ...JSON.parse(localStorage.getItem(productFormKey) as string),
-                  errors: {},
-              }
-            : {
-                  name: product.value?.name || null,
-                  sku_prefix: product.value?.sku_prefix || null,
-                  brand_id: product.value?.brand_id || null,
-                  brand: product.value?.brand || null,
-                  discount: product.value?.discount || 0,
-                  description: product.value?.description || null,
-                  categories: product.value?.categories || [],
-                  images: product.value?.images || [],
-                  links: product.value?.links || [],
-                  variants: product.value?.variants || [],
-                  errors: {},
-              },
-    );
+    >({
+        name: product.value?.name || null,
+        sku_prefix: product.value?.sku_prefix || null,
+        brand_id: product.value?.brand_id || null,
+        brand: product.value?.brand || null,
+        discount: product.value?.discount || 0,
+        description: product.value?.description || null,
+        categories: product.value?.categories || [],
+        images: product.value?.images || [],
+        links: product.value?.links || [],
+        variants: product.value?.variants || [],
+        errors: {},
+    } as ProductEntity & {
+        errors: { [key: string]: string | null };
+    });
 
-    const newProductForm = localStorage.getItem(newProductFormKey);
-    const clearNewProductForm = () => {
-        localStorage.removeItem(newProductFormKey);
+    const newProductForm = ref<
+        ProductEntity & { errors: { [key: string]: string | null } }
+    >(null);
+    const clearNewProductForm = async () => {
+        newProductForm.value = null;
     };
+
+    const productDebounce = useDebounce();
+    const formDebounce = useDebounce();
 
     watch(
         () => product.value,
         (newProduct) => {
-            localStorage.setItem(
-                selectedProductKey,
-                JSON.stringify(newProduct),
-            );
+            productDebounce(async () => {
+                console.log("Saving selected product...");
+                await db.selectedProduct.put(
+                    {
+                        id: selectedProductKey,
+                        content: newProduct
+                            ? JSON.parse(JSON.stringify(newProduct))
+                            : null,
+                        updatedAt: new Date(),
+                    },
+                    selectedProductKey,
+                );
+            }, 300);
         },
         { deep: true },
     );
@@ -64,20 +71,41 @@ export const useProductFormStore = defineStore("product_form", () => {
     watch(
         () => form.value,
         (newForm) => {
-            localStorage.setItem(productFormKey, JSON.stringify(newForm));
-
-            if (!product.value) {
-                localStorage.setItem(
-                    newProductFormKey,
-                    JSON.stringify(newForm),
+            formDebounce(async () => {
+                // Update current product form
+                console.log("Saving form...");
+                await db.formData.put(
+                    {
+                        id: productFormKey,
+                        content: JSON.parse(JSON.stringify(newForm)),
+                        updatedAt: new Date(),
+                    },
+                    productFormKey,
                 );
-            }
+
+                if (!product.value) {
+                    // Update new product form
+                    console.log("Saving new form...");
+                    await db.formData.put(
+                        {
+                            id: newProductFormKey,
+                            content: JSON.parse(JSON.stringify(newForm)),
+                            updatedAt: new Date(),
+                        },
+                        newProductFormKey,
+                    );
+                }
+            }, 300);
         },
         { deep: true },
     );
 
-    const initializeForm = (selectedProduct: ProductEntity | null = null) => {
+    const initializeForm = async (
+        selectedProduct: ProductEntity | null = null,
+    ) => {
         if (selectedProduct) {
+            console.log("Initializing form with selected product...");
+
             form.value = {
                 name: selectedProduct?.name || null,
                 sku_prefix: selectedProduct?.sku_prefix || null,
@@ -93,13 +121,26 @@ export const useProductFormStore = defineStore("product_form", () => {
             } as ProductEntity & {
                 errors: { [key: string]: string | null };
             };
-        } else if (product.value) {
-            if (newProductForm) {
+        } else {
+            const newProductFormData = await db.formData
+                .where("id")
+                .equals(newProductFormKey)
+                .first();
+
+            if (newProductFormData) {
+                newProductForm.value = newProductFormData.content;
+            }
+
+            if (newProductForm.value) {
+                console.log("Restoring new form...");
+
                 form.value = {
-                    ...JSON.parse(newProductForm),
+                    ...newProductForm.value,
                     errors: {},
                 };
             } else {
+                console.log("Initializing new form...");
+
                 form.value = {
                     name: null,
                     sku_prefix: null,
@@ -119,10 +160,6 @@ export const useProductFormStore = defineStore("product_form", () => {
         }
 
         product.value = selectedProduct;
-
-        if (!selectedProduct) {
-            localStorage.removeItem(selectedProductKey);
-        }
     };
 
     const page = usePage<CustomPageProps>();

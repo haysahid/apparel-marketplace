@@ -136,7 +136,12 @@ const tabIndex = computed(() => {
 const skuPrefixDebounce = useDebounce();
 const checkSkuPrefixStatus = ref(null);
 
-const checkSkuPrefix = (skuPrefix: string) => {
+const checkSkuPrefix = (skuPrefix: string | null) => {
+    if (!skuPrefix) {
+        checkSkuPrefixStatus.value = null;
+        return;
+    }
+
     skuPrefixDebounce(() => {
         formStore.checkSkuPrefixAvailability(skuPrefix, {
             onChangeStatus: (status) => {
@@ -148,13 +153,17 @@ const checkSkuPrefix = (skuPrefix: string) => {
 
 onMounted(() => {
     if (props.product) {
-        formStore.initializeForm(props.product);
+        formStore.initializeForm(props.product).then(() => {
+            if (formStore.form.sku_prefix) {
+                checkSkuPrefix(formStore.form.sku_prefix);
+            }
+        });
     } else {
-        formStore.initializeForm();
-    }
-
-    if (formStore.form.sku_prefix) {
-        checkSkuPrefix(formStore.form.sku_prefix);
+        formStore.initializeForm().then(() => {
+            if (formStore.form.sku_prefix) {
+                checkSkuPrefix(formStore.form.sku_prefix);
+            }
+        });
     }
 });
 
