@@ -307,6 +307,18 @@ onMounted(() => {
         const input = document.getElementById("barcode") as HTMLInputElement;
         input?.focus();
     });
+
+    // If editing existing variant, calculate initial selling margin percentage
+    if (props.variant) {
+        if (form.purchase_price && form.purchase_price > 0) {
+            sellingMarginPercentage.value =
+                ((form.base_selling_price - form.purchase_price) /
+                    form.purchase_price) *
+                100;
+        } else {
+            sellingMarginPercentage.value = 0;
+        }
+    }
 });
 
 const productFormStore = useProductFormStore();
