@@ -4,10 +4,10 @@ interface TransactionItemEntity {
     transaction_id: number;
     variant_id: number;
     quantity: number;
-    unit_base_price: number;
+    unit_base_selling_price: number;
     unit_discount_type: string;
     unit_discount: number;
-    unit_final_price: number;
+    unit_final_selling_price: number;
     subtotal: number;
     created_at: string;
     updated_at: string;

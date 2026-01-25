@@ -597,7 +597,7 @@ class OrderController extends Controller
             })->get()->map(function ($item) {
                 return [
                     'id' => $item->variant_id,
-                    'price' => $item->unit_final_price,
+                    'price' => $item->unit_final_selling_price,
                     'quantity' => $item->quantity,
                     'name' => $item->variant->sku,
                     'brand' => $item->variant->product->brand->name ?? null,

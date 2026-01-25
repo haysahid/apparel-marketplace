@@ -33,7 +33,7 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
-            $invoice = Invoice::with(['shipments', 'transaction.transaction_items'])
+            $invoice = Invoice::with(['shipments', 'transaction.items'])
                 ->findOrFail($validated['invoice_id']);
             $invoice->status = $validated['status'];
             $invoice->save();
@@ -49,8 +49,8 @@ class OrderController extends Controller
                 $transaction = $invoice->transaction;
 
                 // Update all transaction items to 'completed'
-                $transactionItems = $transaction->transaction_items;
-                foreach ($transactionItems as $item) {
+                $items = $transaction->items;
+                foreach ($items as $item) {
                     $item->fullfillment_status = 'completed';
                     $item->save();
                 }
@@ -72,7 +72,7 @@ class OrderController extends Controller
 
             Log::error('Change status failed: ' . $e->getMessage(), [
                 'user_id' => Auth::id(),
-                'transaction_id' => $validated['transaction_id'],
+                'invoice_id' => $validated['invoice_id'],
             ]);
 
             return ResponseFormatter::error(

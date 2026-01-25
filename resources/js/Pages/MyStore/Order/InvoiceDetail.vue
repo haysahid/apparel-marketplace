@@ -108,6 +108,13 @@ const emit = defineEmits(["continuePayment"]);
                             <h3 class="font-semibold text-gray-800">
                                 Data Pemesan
                             </h3>
+                            <a
+                                v-if="props.isShowingFromMyStore"
+                                :href="`/my-store/customer/${props.invoice.transaction.user.id}`"
+                                class="text-sm text-blue-500 hover:underline"
+                            >
+                                Lihat Profil
+                            </a>
                         </div>
                         <DetailRow
                             name="Nama"

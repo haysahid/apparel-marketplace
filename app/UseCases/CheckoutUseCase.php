@@ -186,10 +186,11 @@ class CheckoutUseCase
                         'user_id' => $customer->id,
                         'variant_id' => $variant->id,
                         'quantity' => $item['quantity'],
-                        'unit_base_price' => $variant->base_selling_price,
+                        'unit_purchase_price' => $variant->purchase_price,
+                        'unit_base_selling_price' => $variant->base_selling_price,
                         'unit_discount_type' => $variant->discount_type,
                         'unit_discount' => $variant->discount,
-                        'unit_final_price' => $variant->final_selling_price,
+                        'unit_final_selling_price' => $variant->final_selling_price,
                         'subtotal' => $itemSubTotal,
                         'fullfillment_status' => 'pending',
                     ]);
@@ -213,7 +214,7 @@ class CheckoutUseCase
                     )->where('transaction_id', $transaction->id)->get()->map(function ($item) {
                         return [
                             'id' => $item->variant_id,
-                            'price' => $item->unit_final_price,
+                            'price' => $item->unit_final_selling_price,
                             'quantity' => $item->quantity,
                             'name' => $item->variant->sku,
                             'brand' => $item->variant->product->brand->name ?? null,

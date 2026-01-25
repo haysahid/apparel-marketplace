@@ -11,6 +11,7 @@ use Carbon\Carbon;
             <th class="w-6">Kode</th>
             <th>Pemesan</th>
             <th class="w-6">Item</th>
+            <th>Total Pembelian</th>
             <th>Total Penjualan</th>
             <th>Total Diskon</th>
             <th>Margin</th>
@@ -35,6 +36,9 @@ use Carbon\Carbon;
                     {{ $transaction['total_items'] }}
                 </td>
                 <td class="text-right">
+                    {{ AppNumberFormatter::formatCurrency($transaction['total_purchase']) }}
+                </td>
+                <td class="text-right">
                     {{ AppNumberFormatter::formatCurrency($transaction['total_sales']) }}
                 </td>
                 <td class="text-right">
@@ -49,6 +53,9 @@ use Carbon\Carbon;
     <tfoot>
         <tr>
             <td colspan="5" class="!text-center">Total</td>
+            <td>
+                {{ AppNumberFormatter::formatCurrency($totals['total_purchase']) }}
+            </td>
             <td>
                 {{ AppNumberFormatter::formatCurrency($totals['total_sales']) }}
             </td>

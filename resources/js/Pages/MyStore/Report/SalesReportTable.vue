@@ -14,6 +14,7 @@ const props = defineProps({
                 <th class="w-6">Kode</th>
                 <th>Pemesan</th>
                 <th class="w-6">Item</th>
+                <th>Total Pembelian</th>
                 <th>Total Penjualan</th>
                 <th>Total Diskon</th>
                 <th>Margin</th>
@@ -40,6 +41,9 @@ const props = defineProps({
                     {{ transaction.total_items }}
                 </td>
                 <td class="text-right">
+                    {{ $formatCurrency(transaction.total_purchase) }}
+                </td>
+                <td class="text-right">
                     {{ $formatCurrency(transaction.total_sales) }}
                 </td>
                 <td class="text-right">
@@ -53,6 +57,9 @@ const props = defineProps({
         <tfoot>
             <tr>
                 <td colspan="5" class="!text-center">Total</td>
+                <td>
+                    {{ $formatCurrency(props.totals.total_purchase) }}
+                </td>
                 <td>
                     {{ $formatCurrency(props.totals.total_sales) }}
                 </td>

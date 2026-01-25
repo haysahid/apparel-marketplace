@@ -42,10 +42,10 @@ class ReportRepository
             'users.name as customer',
             'transactions.status',
             'COUNT(transaction_items.id) as total_items',
-            'CAST(SUM(transaction_items.unit_base_price::numeric * transaction_items.quantity) AS INTEGER) as total_purchase',
+            'CAST(SUM(transaction_items.unit_base_selling_price::numeric * transaction_items.quantity) AS INTEGER) as total_purchase',
             'CAST(SUM(transaction_items.subtotal) AS INTEGER) as total_sales',
-            'CAST(SUM(transaction_items.unit_base_price::numeric * transaction_items.quantity - transaction_items.subtotal) AS INTEGER) as total_discounts',
-            'CAST(SUM(transaction_items.subtotal) - SUM(transaction_items.unit_base_price::numeric * transaction_items.quantity) AS INTEGER) as margin'
+            'CAST(SUM(transaction_items.unit_base_selling_price::numeric * transaction_items.quantity - transaction_items.subtotal) AS INTEGER) as total_discounts',
+            'CAST(SUM(transaction_items.subtotal) - SUM(transaction_items.unit_base_selling_price::numeric * transaction_items.quantity) AS INTEGER) as margin'
         ];
 
         $query = $this->reportQuery
@@ -101,10 +101,10 @@ class ReportRepository
             'users.name as customer',
             'transactions.status',
             'COUNT(transaction_items.id) as total_items',
-            'CAST(SUM(transaction_items.unit_base_price::numeric * transaction_items.quantity) AS INTEGER) as total_purchase',
+            'CAST(SUM(transaction_items.unit_purchase_price::numeric * transaction_items.quantity) AS INTEGER) as total_purchase',
             'CAST(SUM(transaction_items.subtotal) AS INTEGER) as total_sales',
-            'CAST(SUM(transaction_items.unit_base_price::numeric * transaction_items.quantity - transaction_items.subtotal) AS INTEGER) as total_discounts',
-            'CAST(SUM(transaction_items.subtotal) - SUM(transaction_items.unit_base_price::numeric * transaction_items.quantity) AS INTEGER) as margin',
+            'CAST(SUM(transaction_items.unit_base_selling_price::numeric * transaction_items.quantity - transaction_items.subtotal) AS INTEGER) as total_discounts',
+            'CAST(SUM(transaction_items.subtotal) - SUM(transaction_items.unit_purchase_price::numeric * transaction_items.quantity) - SUM(transaction_items.unit_base_selling_price::numeric * transaction_items.quantity - transaction_items.subtotal) AS INTEGER) as margin',
         ];
 
         $query = $this->reportQuery
