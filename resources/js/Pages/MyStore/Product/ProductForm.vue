@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import TextInput from "@/Components/TextInput.vue";
 import TextAreaInput from "@/Components/TextAreaInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
@@ -16,7 +16,6 @@ import DefaultCard from "@/Components/DefaultCard.vue";
 import VariantList from "./VariantList.vue";
 import TabButton from "@/Components/TabButton.vue";
 import InfoTooltip from "@/Components/InfoTooltip.vue";
-import { goBack } from "@/plugins/helpers";
 import { useProductFormStore } from "@/stores/product-form-store";
 import MediaForm from "@/Components/MediaForm.vue";
 import Modal from "@/Components/Modal.vue";
@@ -26,6 +25,7 @@ import { router } from "@inertiajs/vue3";
 import useDebounce from "@/plugins/debounce";
 import DeleteConfirmationDialog from "@/Components/DeleteConfirmationDialog.vue";
 import mediaService from "@/services/my-store/media-service";
+import { useImageViewerStore } from "@/stores/image-viewer-store";
 
 const props = defineProps({
     product: {
@@ -504,6 +504,10 @@ const countImageUsedInVariants = (imageId: number | string) => {
                                             :showSize="false"
                                             @remove="
                                                 image.showDeleteDialog = true
+                                            "
+                                            @click="
+                                                useImageViewerStore().selectedImage =
+                                                    image
                                             "
                                         >
                                             <template #default>

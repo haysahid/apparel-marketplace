@@ -293,7 +293,7 @@ const breadcrumbs = [
                                     v-if="props.product.discount"
                                     :discount-type="props.product.discount_type"
                                     :discount="props.product.discount"
-                                    class="!px-1 !py-0 !rounded-md !text-[12px] !font-medium"
+                                    class="font-semibold"
                                 />
                                 <p
                                     class="text-sm text-gray-500 line-through strike"

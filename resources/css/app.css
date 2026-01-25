@@ -66,6 +66,23 @@ textarea::placeholder {
     -o-transform: translateY(0);
 }
 
+/* Transition styles for scale-fade */
+.scale-fade-enter-active,
+.scale-fade-leave-active {
+    transition: all 0.3s ease-in-out;
+}
+
+.scale-fade-enter-from,
+.scale-fade-leave-to {
+    opacity: 0;
+    transform: scale(0.95);
+}
+.scale-fade-enter-to,
+.scale-fade-leave-from {
+    opacity: 1;
+    transform: scale(1);
+}
+
 /* Transition styles for max-height */
 .accordion-enter-active,
 .accordion-leave-active {
@@ -148,7 +165,8 @@ textarea::placeholder {
         padding: 8px;
         aspect-ratio: 1;
         border-radius: 50%;
-        --_m: conic-gradient(#0000 10%, #000),
+        --_m:
+            conic-gradient(#0000 10%, #000),
             linear-gradient(#000 0 0) content-box;
         -webkit-mask: var(--_m);
         mask: var(--_m);
@@ -174,7 +192,8 @@ textarea::placeholder {
         padding: 5px;
         aspect-ratio: 1;
         border-radius: 50%;
-        --_m: conic-gradient(#0000 10%, #000),
+        --_m:
+            conic-gradient(#0000 10%, #000),
             linear-gradient(#000 0 0) content-box;
         -webkit-mask: var(--_m);
         mask: var(--_m);
@@ -195,7 +214,8 @@ textarea::placeholder {
         padding: 3px;
         aspect-ratio: 1;
         border-radius: 50%;
-        --_m: conic-gradient(#0000 10%, #000),
+        --_m:
+            conic-gradient(#0000 10%, #000),
             linear-gradient(#000 0 0) content-box;
         -webkit-mask: var(--_m);
         mask: var(--_m);

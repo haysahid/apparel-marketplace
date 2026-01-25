@@ -14,10 +14,10 @@ import UnitForm from "../Unit/UnitForm.vue";
 import SizeForm from "../Size/SizeForm.vue";
 import cookieManager from "@/plugins/cookie-manager";
 import MediaCard from "@/Components/MediaCard.vue";
-import { useProductFormStore } from "@/stores/product-form-store";
 import Modal from "@/Components/Modal.vue";
 import MediaForm from "@/Components/MediaForm.vue";
 import { useDialogStore } from "@/stores/dialog-store";
+import { useImageViewerStore } from "@/stores/image-viewer-store";
 
 const props = defineProps({
     product: {
@@ -321,7 +321,6 @@ onMounted(() => {
     }
 });
 
-const productFormStore = useProductFormStore();
 const showMediaFormModal = ref(false);
 </script>
 
@@ -750,6 +749,10 @@ const showMediaFormModal = ref(false);
                                     :showName="false"
                                     :showSize="false"
                                     @remove="form.images.splice(index, 1)"
+                                    @click="
+                                        useImageViewerStore().selectedImage =
+                                            image.media
+                                    "
                                 />
                             </template>
 

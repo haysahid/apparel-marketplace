@@ -4,12 +4,16 @@ import Banner from "@/Components/Banner.vue";
 import SuccessDialog from "./SuccessDialog.vue";
 import ErrorDialog from "./ErrorDialog.vue";
 import { useDialogStore } from "@/stores/dialog-store";
+import ImageViewer from "./ImageViewer.vue";
+import { useImageViewerStore } from "@/stores/image-viewer-store";
+import RawModal from "./RawModal.vue";
 
 defineProps({
     title: String,
 });
 
 const dialogStore = useDialogStore();
+const imageViewerStore = useImageViewerStore();
 </script>
 
 <template>
@@ -56,5 +60,23 @@ const dialogStore = useDialogStore();
                 </div>
             </template>
         </ErrorDialog>
+
+        <RawModal
+            :show="imageViewerStore.selectedImage !== null"
+            closeable
+            @close="imageViewerStore.selectedImage = null"
+        >
+            <div class="max-w-4xl mx-auto overflow-hidden">
+                <img
+                    :src="
+                        $getImageUrl(
+                            imageViewerStore.selectedImage?.original_url,
+                        )
+                    "
+                    :alt="imageViewerStore.selectedImage?.name"
+                    class="h-auto object-contain max-h-[80vh] w-fit"
+                />
+            </div>
+        </RawModal>
     </div>
 </template>
