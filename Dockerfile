@@ -69,4 +69,4 @@ COPY . .
 RUN npm install --production
 
 EXPOSE 13714
-CMD ["node", "ssr.js"]
+CMD ["node", "resources/js/ssr.js"]
