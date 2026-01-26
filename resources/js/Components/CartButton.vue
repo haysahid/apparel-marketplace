@@ -8,7 +8,7 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
-    invert: {
+    invertColor: {
         type: Boolean,
         default: false,
     },
@@ -27,7 +27,8 @@ const emit = defineEmits(["click"]);
         class="relative flex items-center justify-center p-2 transition duration-150 ease-in-out rounded-md text-gray-500/80 hover:text-gray-500 hover:bg-gray-500/10 focus:outline-none focus:bg-gray-500/10 focus:hover:bg-gray-500/20 focus:text-gray-500 group"
         :class="{
             '!bg-transparent !p-0 hover:!bg-transparent': !showBackground,
-            'hover:bg-white/20 focus:bg-white/10': showBackground && invert,
+            'hover:bg-white/20 focus:bg-white/10':
+                showBackground && invertColor,
             'bg-primary/10 hover:!bg-primary/10 focus:bg-primary/20':
                 showBackground && active,
         }"
@@ -42,7 +43,7 @@ const emit = defineEmits(["click"]);
             :class="{
                 'group-hover:fill-gray-500/80': !showBackground,
                 'fill-white/80 group-hover:fill-white/80':
-                    showBackground && invert,
+                    showBackground && invertColor,
                 'fill-primary group-hover:fill-primary': active,
             }"
         >
@@ -55,7 +56,8 @@ const emit = defineEmits(["click"]);
             class="px-1 py-0.5 ms-2 text-xs font-semibold text-white bg-primary rounded-full min-w-[20px] text-center absolute top-0 right-0"
             :class="{
                 'bg-primary/80': !showBackground,
-                'bg-primary': showBackground && invert,
+                'bg-primary': showBackground && !invertColor,
+                'bg-brand-yellow': showBackground && invertColor,
             }"
         >
             {{ length }}

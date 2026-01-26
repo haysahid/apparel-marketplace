@@ -5,7 +5,7 @@ import { router } from "@inertiajs/vue3";
 import { computed, getCurrentInstance } from "vue";
 
 const props = defineProps({
-    invert: {
+    invertColor: {
         type: Boolean,
         default: false,
     },
@@ -40,7 +40,7 @@ const hasShowStoreOptionsDialogCallback = computed(() => {
                     class="flex items-center justify-start w-full gap-2 px-4 py-2 text-sm font-medium leading-4 transition duration-150 ease-in-out bg-transparent border border-transparent rounded-md md:px-3 text-start md:w-auto text-gray-500/90 hover:text-gray-500 focus:outline-none hover:bg-gray-500/10 focus:bg-gray-500/10 active:bg-gray-500/20 group"
                     :class="{
                         '!text-white/80 hover:bg-white/10 focus:bg-white/10':
-                            props.invert,
+                            props.invertColor,
                     }"
                 >
                     <img
@@ -52,7 +52,7 @@ const hasShowStoreOptionsDialogCallback = computed(() => {
                         :src="
                             $getImageUrl(
                                 $page.props.auth.user.avatar ||
-                                    $page.props.auth.user.profile_photo_url
+                                    $page.props.auth.user.profile_photo_url,
                             )
                         "
                         :alt="$page.props.auth.user.name"
@@ -66,7 +66,7 @@ const hasShowStoreOptionsDialogCallback = computed(() => {
                         class="transition duration-150 ease-in-out fill-gray-400 size-8 shrink-0"
                         :class="{
                             'fill-white/80 group-hover:fill-white/80 group-focus:fill-white/80':
-                                props.invert,
+                                props.invertColor,
                         }"
                     >
                         <path
@@ -79,7 +79,14 @@ const hasShowStoreOptionsDialogCallback = computed(() => {
                     <span class="w-full md:w-auto md:hidden lg:inline">
                         <div class="flex flex-col items-start leading-tight">
                             <span>{{ $page.props.auth.user.name }}</span>
-                            <span class="text-xs text-gray-400">
+                            <span
+                                class="text-xs"
+                                :class="
+                                    props.invertColor
+                                        ? 'text-white/70'
+                                        : 'text-gray-400'
+                                "
+                            >
                                 {{ $page.props.auth.user.role?.name }}
                             </span>
                         </div>

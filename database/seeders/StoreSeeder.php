@@ -19,12 +19,12 @@ class StoreSeeder extends Seeder
     public function run(): void
     {
         Store::updateOrCreate([
-            'name' => 'Mustika Collection',
-            'description' => 'Toko Mustika Collection merupakan toko distributor busana muslim yang berlokasi di Jl. Anggur Raya, Kutabumi, Kec. Ps. Kemis, Kabupaten Tangerang, Provinsi Banten. Menyediakan berbagai busana muslim lengkap untuk semua usia.',
+            'name' => 'Nibras Gamis',
+            'description' => 'Toko Nibras Gamis merupakan toko distributor busana muslim yang berlokasi di Jl. Anggur Raya, Kutabumi, Kec. Ps. Kemis, Kabupaten Tangerang, Provinsi Banten. Menyediakan berbagai busana muslim lengkap untuk semua usia.',
             'address' => 'Jl. Anggur Raya, Kutabumi, Kec. Ps. Kemis, Kabupaten Tangerang, Provinsi Banten',
-            'email' => 'store@example.com',
-            'phone' => '021-12345678',
-            'logo' => 'logo_black.png',
+            'email' => 'info@nibrasgamis.id',
+            'phone' => '+62 882-9210-8740',
+            'logo' => config('app_setting.logo'),
             'banner' => 'store.png',
             'rajaongkir_origin_id' => 73442,
             'rajaongkir_origin_label' => 'KUTA BUMI, PASAR KEMIS, TANGERANG, BANTEN, 15560',

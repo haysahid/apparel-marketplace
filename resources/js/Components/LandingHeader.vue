@@ -38,11 +38,13 @@ const trailingMenus = [
 
 const showStoreOptionsDialog = ref(false);
 
+const invertColor = ref(false);
 const scrolled = ref(false);
 const scrollThreshold = 50;
 
 const handleScroll = () => {
     scrolled.value = window.scrollY > scrollThreshold;
+    invertColor.value = window.scrollY > scrollThreshold;
 };
 
 onMounted(() => {
@@ -54,7 +56,7 @@ onMounted(() => {
     <nav
         class="sticky top-0 z-50 py-1 bg-white sm:px-12 lg:px-[100px] w-full transition-all duration-300 ease-in-out border-b border-gray-100"
         :class="{
-            'border-b border-primary-box !bg-primary-box': scrolled,
+            'border-b border-primary !bg-primary': invertColor,
         }"
     >
         <!-- Primary Navigation Menu -->
@@ -66,7 +68,7 @@ onMounted(() => {
                         <Link :href="route('home')">
                             <img
                                 :src="
-                                    scrolled
+                                    invertColor
                                         ? getImageUrl(
                                               $page.props.setting.logo_white,
                                           )
@@ -94,8 +96,9 @@ onMounted(() => {
                                 class="text-sm font-normal"
                                 :class="{
                                     '!text-primary': menu.active,
+                                    '!text-white': invertColor && menu.active,
                                     '!text-gray-500 hover:!text-gray-600':
-                                        !scrolled && !menu.active,
+                                        !invertColor && !menu.active,
                                 }"
                             >
                                 {{ menu.name }}
@@ -121,7 +124,7 @@ onMounted(() => {
                                     <CartButton
                                         :length="cartStore.items.length"
                                         @click="$inertia.get(route('my-cart'))"
-                                        :invert="scrolled"
+                                        :invertColor="invertColor"
                                         :active="route().current('my-cart')"
                                     />
                                 </Tooltip>
@@ -138,7 +141,7 @@ onMounted(() => {
                                     <MyOrderButton
                                         v-if="$page.props.auth.user"
                                         @click="$inertia.get(route('my-order'))"
-                                        :invert="scrolled"
+                                        :invertColor="invertColor"
                                         :active="route().current('my-order')"
                                     />
                                 </Tooltip>
@@ -156,7 +159,7 @@ onMounted(() => {
                                         :class="{
                                             '!text-primary': menu.active,
                                             '!text-gray-500 hover:!text-gray-600':
-                                                !scrolled && !menu.active,
+                                                !invertColor && !menu.active,
                                         }"
                                     >
                                         {{ menu.name }}
@@ -169,7 +172,7 @@ onMounted(() => {
                                     class="relative"
                                 >
                                     <UserDropdown
-                                        :invert="scrolled"
+                                        :invertColor="invertColor"
                                         @showStoreOptionsDialog="
                                             showStoreOptionsDialog = true
                                         "
@@ -183,7 +186,7 @@ onMounted(() => {
                 <!-- Hamburger -->
                 <div class="flex items-center -me-2 sm:hidden">
                     <HamburgerButton
-                        :invert="scrolled"
+                        :invertColor="invertColor"
                         :active="showingNavigationDropdown"
                         @toggle="
                             showingNavigationDropdown =
@@ -211,11 +214,11 @@ onMounted(() => {
                         class="px-4 py-2.5 w-full bg-transparent !text-gray-500 font-normal hover:bg-primary/5 hover:border-l-4 hover:border-primary/50 border-l-4 transition-all duration-300 ease-in-out"
                         :class="{
                             '!text-primary-dark hover:!text-primary-dark':
-                                menu.active && !scrolled,
+                                menu.active && !invertColor,
                             '!text-primary hover:!text-primary':
-                                menu.active && scrolled,
+                                menu.active && invertColor,
                             '!text-white/80 hover:!text-white/80 hover:!bg-white/10 focus:!bg-white/10 border-transparent':
-                                scrolled && !menu.active,
+                                invertColor && !menu.active,
                         }"
                     >
                         {{ menu.name }}
@@ -226,7 +229,7 @@ onMounted(() => {
             <div
                 class="h-px mx-5 my-2 transition-all duration-300 ease-in-out bg-gray-300"
                 :class="{
-                    'bg-white/20': scrolled,
+                    'bg-white/20': invertColor,
                 }"
             ></div>
 
@@ -241,11 +244,11 @@ onMounted(() => {
                             class="px-4 py-2.5 w-full bg-transparent !text-gray-500 font-normal hover:bg-primary/5 hover:border-l-4 hover:border-primary/50 border-l-4 transition-all duration-300 ease-in-out"
                             :class="{
                                 '!text-primary-dark hover:!text-primary-dark':
-                                    menu.active && !scrolled,
+                                    menu.active && !invertColor,
                                 '!text-primary hover:!text-primary':
-                                    menu.active && scrolled,
+                                    menu.active && invertColor,
                                 '!text-white/80 hover:!text-white/80 hover:!bg-white/10 focus:!bg-white/10 border-transparent':
-                                    scrolled && !menu.active,
+                                    invertColor && !menu.active,
                             }"
                         >
                             {{ menu.name }}
@@ -257,7 +260,7 @@ onMounted(() => {
                 <li v-if="$page.props.auth.user">
                     <div class="relative">
                         <UserDropdown
-                            :invert="scrolled"
+                            :invertColor="invertColor"
                             @showStoreOptionsDialog="
                                 showStoreOptionsDialog = true
                             "

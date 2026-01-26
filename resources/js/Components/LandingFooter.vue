@@ -46,29 +46,26 @@ const isHome = route().current("home");
                     </Link>
 
                     <div class="text-start">
-                        <p v-if="setting.address" class="mb-2 text-gray-100">
+                        <p v-if="setting.address" class="mb-2 text-white/90">
                             {{ setting.address }}
                         </p>
                         <p
                             v-if="setting.contact_email"
-                            class="mb-2 text-gray-100"
+                            class="mb-2 text-white/90"
                         >
                             <a
                                 :href="`mailto:${setting.contact_email}`"
                                 target="_blank"
-                                class="text-gray-100 hover:text-white"
+                                class="text-white/90 hover:text-white"
                             >
                                 {{ setting.contact_email }}
                             </a>
                         </p>
-                        <p
-                            v-if="setting.contact_phone"
-                            class="mb-2 text-gray-100"
-                        >
+                        <p v-if="setting.contact_phone" class="mb-2 text-white">
                             <a
                                 :href="`https://wa.me/${setting.contact_phone}`"
                                 target="_blank"
-                                class="text-gray-100 hover:text-white"
+                                class="text-white/90 hover:text-white"
                             >
                                 {{ setting.contact_phone }}
                             </a>
@@ -115,7 +112,7 @@ const isHome = route().current("home");
                                             ? '#advantages'
                                             : route('home') + '#advantages'
                                     "
-                                    class="text-gray-100 hover:text-white"
+                                    class="text-white/90 hover:text-white"
                                 >
                                     Keunggulan
                                 </NavLink>
@@ -127,7 +124,7 @@ const isHome = route().current("home");
                                             ? '#certificates'
                                             : route('home') + '#certificates'
                                     "
-                                    class="text-gray-100 hover:text-white"
+                                    class="text-white/90 hover:text-white"
                                 >
                                     Sertifikasi
                                 </NavLink>
@@ -150,7 +147,7 @@ const isHome = route().current("home");
                                             categories: 'Gamis',
                                         })
                                     "
-                                    class="text-gray-100 hover:text-white"
+                                    class="text-white/90 hover:text-white"
                                 >
                                     Gamis
                                 </NavLink>
@@ -162,7 +159,7 @@ const isHome = route().current("home");
                                             categories: 'Aksesoris Muslim',
                                         })
                                     "
-                                    class="text-gray-100 hover:text-white"
+                                    class="text-white/90 hover:text-white"
                                 >
                                     Aksesoris
                                 </NavLink>
@@ -174,7 +171,7 @@ const isHome = route().current("home");
                                             categories: 'Baju Anak',
                                         })
                                     "
-                                    class="text-gray-100 hover:text-white"
+                                    class="text-white/90 hover:text-white"
                                 >
                                     Baju Anak
                                 </NavLink>
@@ -189,7 +186,7 @@ const isHome = route().current("home");
                             <li>
                                 <NavLink
                                     href="#about"
-                                    class="text-gray-100 hover:text-white"
+                                    class="text-white/90 hover:text-white"
                                 >
                                     Agen
                                 </NavLink>
@@ -197,7 +194,7 @@ const isHome = route().current("home");
                             <li>
                                 <NavLink
                                     :href="route('home')"
-                                    class="text-gray-100 hover:text-white"
+                                    class="text-white/90 hover:text-white"
                                 >
                                     Reseller
                                 </NavLink>
@@ -215,3 +212,9 @@ const isHome = route().current("home");
         </div>
     </footer>
 </template>
+
+<style scoped>
+.text-footer {
+    @apply text-white/90 hover:text-white;
+}
+</style>

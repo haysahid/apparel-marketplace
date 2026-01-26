@@ -33,17 +33,17 @@ const props = defineProps({
 <template>
     <Link :href="route('product.show', { slug: props.slug })">
         <div
-            class="bg-white rounded-lg outline outline-1 shadow-sm outline-gray-100 hover:outline-primary-light transition-all duration-300 cursor-pointer h-full hover:scale-[1.01] hover:shadow-md group overflow-hidden"
+            class="bg-white rounded-xl outline outline-1 shadow-sm outline-gray-200 hover:outline-primary-light transition-all duration-300 cursor-pointer h-full hover:scale-[1.01] hover:shadow-lg group overflow-hidden hover:ring-2 hover:ring-primary-light"
         >
             <img
                 v-if="props.image"
                 :src="getImageUrl(props.image)"
                 :alt="props.name"
-                class="object-cover w-full transition-transform duration-300 ease-in-out rounded-t-lg aspect-square group-hover:scale-105"
+                class="object-cover w-full transition-transform duration-300 ease-in-out rounded-t-xl aspect-square group-hover:scale-105"
             />
             <div
                 v-else
-                class="flex items-center justify-center bg-gray-100 rounded-t-lg aspect-square"
+                class="flex items-center justify-center bg-gray-100 rounded-t-xl aspect-square"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -62,7 +62,7 @@ const props = defineProps({
             >
                 <div class="flex flex-col h-[60px] sm:h-[80px] gap-1">
                     <h3
-                        class="text-sm font-bold sm:text-base line-clamp-2 overflow-ellipsis"
+                        class="text-sm font-bold transition-all duration-300 ease-in-out sm:text-base line-clamp-2 overflow-ellipsis"
                     >
                         {{ props.name }}
                     </h3>

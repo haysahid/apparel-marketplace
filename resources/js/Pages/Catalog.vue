@@ -204,11 +204,11 @@ function onChangeSearch() {
                                 name="search"
                                 placeholder="Cari produk..."
                                 :autofocus="true"
-                                class="w-full py-4 pl-8 pr-24 transition duration-150 ease-in-out border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-primary-light overflow-ellipsis focus:border-primary-light"
+                                class="w-full py-4 pl-8 pr-24 transition duration-150 ease-in-out border-gray-200 border-1 rounded-xl focus:outline-none focus:ring-1 focus:ring-primary-light overflow-ellipsis focus:border-primary-light"
                             />
                             <button
                                 type="submit"
-                                class="absolute flex items-center justify-center px-4 py-2 text-white transition duration-200 rounded-lg bg-primary hover:bg-primary-hover right-3"
+                                class="absolute flex items-center justify-center px-6 py-2 font-medium text-white transition duration-200 rounded-md bg-primary hover:bg-primary-hover right-2.5"
                             >
                                 Cari
                             </button>
@@ -220,7 +220,7 @@ function onChangeSearch() {
 
         <!-- Content -->
         <div
-            class="p-6 sm:p-12 md:p-[100px] md:pt-[80px] flex flex-col gap-12 lg:gap-20"
+            class="p-6 sm:p-12 md:p-[100px] md:pt-[80px] flex flex-col gap-12 lg:gap-20 bg-white"
         >
             <LandingSection>
                 <div
@@ -448,7 +448,7 @@ function onChangeSearch() {
                         <div class="flex flex-col items-start w-full gap-12">
                             <div
                                 v-if="products.length > 0"
-                                class="grid w-full grid-cols-2 gap-6 lg:gap-8 lg:grid-cols-3"
+                                class="grid w-full grid-cols-2 gap-4 lg:gap-6 lg:grid-cols-3"
                             >
                                 <template
                                     v-for="(product, index) in products"

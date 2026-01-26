@@ -60,8 +60,6 @@ onMounted(() => {
                     :alt="brand.name"
                     data-aos="zoom-in"
                     data-aos-duration="600"
-                    data-aos-delay="100"
-                    data-aos-once="true"
                     class="object-contain h-8 max-w-12 sm:max-w-20 lg:max-w-32 sm:h-16 lg:h-20"
                 />
             </template>
@@ -71,16 +69,14 @@ onMounted(() => {
             <!-- Best Seller Products -->
             <LandingSection>
                 <div
-                    data-aos="fade-up"
-                    data-aos-duration="600"
-                    data-aos-delay="200"
-                    data-aos-once="true"
                     class="flex flex-col items-start justify-center w-full gap-4 mx-auto max-w-7xl"
                 >
                     <div
                         class="flex flex-col items-start justify-center w-full gap-4"
                     >
                         <div
+                            data-aos="fade-up"
+                            data-aos-duration="600"
                             class="flex items-center justify-between w-full gap-12 mb-4"
                         >
                             <h1
@@ -124,41 +120,36 @@ onMounted(() => {
                             </TextInput>
                         </div>
                         <div
-                            class="grid w-full grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4 sm:gap-9"
+                            class="grid w-full grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 sm:gap-6"
                         >
-                            <template
+                            <div
                                 v-for="(
                                     product, index
                                 ) in props.popularProducts || []"
                                 :key="product.id"
+                                data-aos="fade-up"
+                                data-aos-duration="600"
                             >
-                                <div
-                                    data-aos="fade-up"
-                                    data-aos-duration="600"
-                                    :data-aos-delay="index * 50"
-                                >
-                                    <ProductCard
-                                        :name="product.name"
-                                        :basePrice="
-                                            product.lowest_base_selling_price
-                                        "
-                                        :discount="product.discount"
-                                        :finalPrice="
-                                            product.lowest_final_selling_price
-                                        "
-                                        :image="
-                                            (product.preview_url as string) ||
-                                            null
-                                        "
-                                        :description="product.brand?.name"
-                                        :slug="product.slug"
-                                    />
-                                </div>
-                            </template>
+                                <ProductCard
+                                    :name="product.name"
+                                    :basePrice="
+                                        product.lowest_base_selling_price
+                                    "
+                                    :discount="product.discount"
+                                    :finalPrice="
+                                        product.lowest_final_selling_price
+                                    "
+                                    :image="
+                                        (product.preview_url as string) || null
+                                    "
+                                    :description="product.brand?.name"
+                                    :slug="product.slug"
+                                />
+                            </div>
                         </div>
                     </div>
 
-                    <Link :href="route('catalog')" class="mx-auto mt-6">
+                    <Link :href="route('catalog')" class="mx-auto mt-10">
                         <PrimaryButton> Lihat Semua Produk </PrimaryButton>
                     </Link>
                 </div>
@@ -170,13 +161,11 @@ onMounted(() => {
                 class="min-h-[30vh]"
             >
                 <div
-                    data-aos="fade-up"
-                    data-aos-duration="600"
-                    data-aos-delay="200"
-                    data-aos-once="true"
                     class="flex flex-col items-start justify-center w-full gap-4 mx-auto max-w-7xl"
                 >
                     <div
+                        data-aos="fade-up"
+                        data-aos-duration="600"
                         class="flex items-center justify-between w-full gap-12 mb-4"
                     >
                         <h1 class="text-xl font-bold sm:text-2xl text-nowrap">
@@ -193,20 +182,25 @@ onMounted(() => {
                     <div
                         class="grid w-full grid-cols-3 gap-6 md:grid-cols-4 lg:grid-cols-5 sm:gap-9"
                     >
-                        <Link
-                            v-for="category in props.categories || []"
+                        <div
+                            v-for="(category, index) in props.categories || []"
                             :key="category.id"
-                            :href="
-                                route('catalog', {
-                                    categories: category.name,
-                                })
-                            "
+                            data-aos="fade-up"
+                            data-aos-duration="600"
                         >
-                            <CategoryCard
-                                :name="category.name"
-                                :image="getImageUrl(category.image)"
-                            />
-                        </Link>
+                            <Link
+                                :href="
+                                    route('catalog', {
+                                        categories: category.name,
+                                    })
+                                "
+                            >
+                                <CategoryCard
+                                    :name="category.name"
+                                    :image="getImageUrl(category.image)"
+                                />
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </LandingSection>

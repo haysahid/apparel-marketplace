@@ -4,7 +4,7 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-    invert: {
+    invertColor: {
         type: Boolean,
         default: false,
     },
@@ -15,7 +15,7 @@ const props = defineProps({
     <button
         class="inline-flex items-center justify-center p-2 transition duration-150 ease-in-out rounded-md text-gray-500/80 hover:text-gray-500 hover:bg-gray-500/10 focus:outline-none focus:bg-gray-500/10 focus:hover:bg-gray-500/20 focus:text-gray-500"
         :class="{
-            'hover:bg-white/10 focus:bg-white/10 !text-white/80': invert,
+            'hover:bg-white/10 focus:bg-white/10 !text-white/80': invertColor,
         }"
         @click="$emit('toggle')"
     >

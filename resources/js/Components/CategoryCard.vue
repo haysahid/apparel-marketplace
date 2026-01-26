@@ -8,13 +8,13 @@ const props = defineProps({
 <template>
     <button
         type="button"
-        class="flex flex-col items-center justify-center w-full gap-4 p-4 transition-all duration-300 ease-in-out bg-white border border-gray-200 rounded-2xl hover:ring-primary-light focus:outline-none hover:ring-2 focus:ring-2 focus:ring-primary-light aspect-square"
+        class="flex flex-col items-center justify-center w-full gap-4 p-4 transition-all duration-300 ease-in-out bg-white border border-gray-200 rounded-2xl hover:ring-primary-light focus:outline-none hover:ring-2 focus:ring-2 focus:ring-primary-light aspect-square group"
         @click="$emit('click')"
     >
         <img
             :src="props.image"
             :alt="props.name"
-            class="object-contain w-full h-12 sm:h-16 md:h-20"
+            class="object-contain w-full h-12 transition-transform duration-300 ease-in-out sm:h-16 md:h-20 group-hover:scale-105"
         />
         <p class="font-medium text-gray-700 sm:text-lg">
             {{ props.name }}
