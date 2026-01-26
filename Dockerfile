@@ -1,22 +1,39 @@
 # === STAGE 1: Build Frontend Assets (Node.js) ===
-FROM node:25-alpine AS frontend-builder
+# We need PHP in the build stage because Vite requires files inside /vendor
+FROM php:8.3-fpm-alpine AS builder
+
+# Install system dependencies needed for PHP & Node
+RUN apk add --no-cache \
+    $PHPIZE_DEPS \
+    nodejs \
+    npm \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    zip \
+    libzip-dev \
+    unzip \
+    git
+
+# Copy Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
 WORKDIR /app
-
-# Copy package files and install dependencies
-COPY package*.json ./
-RUN npm install
-
-# Copy all source code and build production assets
 COPY . .
+
+# 1. Install PHP dependencies FIRST (So the vendor/ziggy folder is available for Vite)
+RUN composer install --no-interaction --optimize-autoloader --no-dev
+
+# 2. Build Frontend Assets
+RUN npm install
 RUN npm run build
 
-# === STAGE 2: Setup Laravel Application (PHP) ===
+# === STAGE 2: Setup Laravel Application (Production) ===
 FROM php:8.3-fpm-alpine
 
-# Set working directory
 WORKDIR /var/www
 
-# Install lightweight system dependencies (alpine), PHP extensions, and Redis via PECL
+# Still use your chosen system dependencies and PHP extensions
 RUN apk add --no-cache \
     $PHPIZE_DEPS \
     autoconf \
@@ -30,27 +47,19 @@ RUN apk add --no-cache \
     git \
     curl \
     oniguruma-dev \
+    nodejs \
+    npm \
     && docker-php-ext-install pdo_mysql mbstring zip gd \
     && pecl install redis \
     && docker-php-ext-enable redis \
     && apk del autoconf build-base $PHPIZE_DEPS
 
-# Copy latest Composer from official image
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Copy all results from builder (including vendor and public/build)
+COPY --from=builder /app /var/www
 
-# Copy all Laravel source code
-COPY . .
-
-# Copy built frontend assets from Stage 1 (only public/build folder)
-COPY --from=frontend-builder /app/public/build ./public/build
-
-# Install PHP dependencies (production mode)
-RUN composer install --no-interaction --optimize-autoloader --no-dev
-
-# Set permissions for storage and cache directories
+# Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Expose port for PHP-FPM
 EXPOSE 9000
 
 CMD ["php-fpm"]
