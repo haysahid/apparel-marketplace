@@ -37,15 +37,14 @@ FROM php:8.3-fpm-alpine
 
 WORKDIR /var/www
 
-# Install runtime dependencies & PHP extensions (Sama seperti Stage 1 agar sinkron)
+# Tambahkan libpq-dev (untuk postgres) dan libtool (untuk kompilasi ekstensi)
 RUN apk add --no-cache \
     $PHPIZE_DEPS \
-    autoconf \
-    build-base \
     postgresql-dev \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
+    libwebp-dev \
     zip \
     libzip-dev \
     unzip \
@@ -54,8 +53,20 @@ RUN apk add --no-cache \
     oniguruma-dev \
     nodejs \
     npm \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql pdo_pgsql mbstring zip gd bcmath exif \
+    # Library tambahan untuk optimasi gambar otomatis dari Spatie
+    jpegoptim optipng pngquant gifsicle libwebp-tools \
+    # Ghostscript jika nanti butuh konversi PDF ke Image
+    ghostscript \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install \
+       pdo_mysql \
+       pdo_pgsql \
+       mbstring \
+       zip \
+       gd \
+       bcmath \
+       exif \
+       fileinfo \
     && pecl install redis \
     && docker-php-ext-enable redis \
     && apk del autoconf build-base $PHPIZE_DEPS
@@ -63,9 +74,8 @@ RUN apk add --no-cache \
 # Salin seluruh hasil dari builder
 COPY --from=builder /app /var/www
 
-# Set permissions
+# Permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
 EXPOSE 9000
-
 CMD ["php-fpm"]
