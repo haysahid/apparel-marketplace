@@ -1,8 +1,7 @@
 # === STAGE 1: Build Frontend Assets (Node.js) ===
-# We need PHP in the build stage because Vite requires files inside /vendor
 FROM php:8.3-fpm-alpine AS builder
 
-# Install system dependencies needed for PHP & Node
+# Install build tools, Node, dan dependensi sistem untuk ekstensi PHP
 RUN apk add --no-cache \
     $PHPIZE_DEPS \
     nodejs \
@@ -15,13 +14,17 @@ RUN apk add --no-cache \
     unzip \
     git
 
+# Install ekstensi PHP yang dibutuhkan (Termasuk EXIF untuk Spatie)
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo_mysql bcmath gd zip exif
+
 # Copy Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 COPY . .
 
-# 1. Install PHP dependencies FIRST (So the vendor/ziggy folder is available for Vite)
+# 1. Install PHP dependencies (Sekarang exif sudah ada, jadi tidak akan error)
 RUN composer install --no-interaction --optimize-autoloader --no-dev
 
 # 2. Build Frontend Assets
@@ -33,7 +36,7 @@ FROM php:8.3-fpm-alpine
 
 WORKDIR /var/www
 
-# Still use your chosen system dependencies and PHP extensions
+# Install runtime dependencies & PHP extensions (Sama seperti Stage 1 agar sinkron)
 RUN apk add --no-cache \
     $PHPIZE_DEPS \
     autoconf \
@@ -49,12 +52,13 @@ RUN apk add --no-cache \
     oniguruma-dev \
     nodejs \
     npm \
-    && docker-php-ext-install pdo_mysql mbstring zip gd \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo_mysql mbstring zip gd bcmath exif \
     && pecl install redis \
     && docker-php-ext-enable redis \
     && apk del autoconf build-base $PHPIZE_DEPS
 
-# Copy all results from builder (including vendor and public/build)
+# Salin seluruh hasil dari builder
 COPY --from=builder /app /var/www
 
 # Set permissions
