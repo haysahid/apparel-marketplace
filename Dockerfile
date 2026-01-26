@@ -37,9 +37,11 @@ FROM php:8.3-fpm-alpine
 
 WORKDIR /var/www
 
-# Tambahkan libpq-dev (untuk postgres) dan libtool (untuk kompilasi ekstensi)
-RUN apk add --no-cache \
+# Gunakan --update dan pastikan indeks paket segar
+RUN apk add --no-cache --update \
     $PHPIZE_DEPS \
+    autoconf \
+    build-base \
     postgresql-dev \
     libpng-dev \
     libjpeg-turbo-dev \
@@ -53,11 +55,11 @@ RUN apk add --no-cache \
     oniguruma-dev \
     nodejs \
     npm \
-    # Library tambahan untuk optimasi gambar otomatis dari Spatie
     jpegoptim optipng pngquant gifsicle libwebp-tools \
-    # Ghostscript jika nanti butuh konversi PDF ke Image
-    ghostscript \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    ghostscript
+
+# Install ekstensi PHP
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install \
        pdo_mysql \
        pdo_pgsql \
@@ -66,15 +68,15 @@ RUN apk add --no-cache \
        gd \
        bcmath \
        exif \
-       fileinfo \
-    && pecl install redis \
-    && docker-php-ext-enable redis \
-    && apk del autoconf build-base $PHPIZE_DEPS
+       fileinfo
 
-# Salin seluruh hasil dari builder
+# Install Redis secara terpisah untuk menghindari konflik pembersihan apk
+RUN pecl install redis && docker-php-ext-enable redis
+
+# Salin folder aplikasi
 COPY --from=builder /app /var/www
 
-# Permissions
+# Set Permission
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
 EXPOSE 9000
