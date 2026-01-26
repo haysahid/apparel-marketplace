@@ -4,6 +4,7 @@ FROM php:8.3-fpm-alpine AS builder
 # Install build tools, Node, dan dependensi sistem untuk ekstensi PHP
 RUN apk add --no-cache \
     $PHPIZE_DEPS \
+    postgresql-dev \
     nodejs \
     npm \
     libpng-dev \
@@ -16,7 +17,7 @@ RUN apk add --no-cache \
 
 # Install ekstensi PHP yang dibutuhkan (Termasuk EXIF untuk Spatie)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql bcmath gd zip exif
+    && docker-php-ext-install pdo_mysql pdo_pgsql bcmath gd zip exif
 
 # Copy Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -41,6 +42,7 @@ RUN apk add --no-cache \
     $PHPIZE_DEPS \
     autoconf \
     build-base \
+    postgresql-dev \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
@@ -53,7 +55,7 @@ RUN apk add --no-cache \
     nodejs \
     npm \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql mbstring zip gd bcmath exif \
+    && docker-php-ext-install pdo_mysql pdo_pgsql mbstring zip gd bcmath exif \
     && pecl install redis \
     && docker-php-ext-enable redis \
     && apk del autoconf build-base $PHPIZE_DEPS
