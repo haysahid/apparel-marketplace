@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             StoreRoleSeeder::class,
             // StoreMembershipSeeder::class,
 
-            ProductSeeder::class,
+            // ProductSeeder::class,
             TransactionSeeder::class,
             PointRuleSeeder::class,
 
