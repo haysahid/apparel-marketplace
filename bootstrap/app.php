@@ -24,7 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 // Remove the default cookie encryption middleware
                 \Illuminate\Cookie\Middleware\EncryptCookies::class,
             ]
-        );
+        )->trustProxies(at: '*');
 
         //
     })
