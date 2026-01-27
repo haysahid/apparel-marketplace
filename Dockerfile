@@ -79,8 +79,5 @@ COPY --from=builder /app /var/www
 # Set Permission
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Buat symbolic link storage
-RUN php artisan storage:link
-
 EXPOSE 9000
 CMD ["php-fpm"]
