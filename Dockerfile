@@ -83,7 +83,10 @@ RUN mkdir -p /var/www/public_backup && cp -r /var/www/public/* /var/www/public_b
 
 # Set Permission
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
-RUN chmod +x /var/www/docker-entrypoint.sh
+
+# Copy Entrypoint to system implementation path
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 9000
 CMD ["php-fpm"]
