@@ -21,5 +21,6 @@ createServer((page) =>
                     location: new URL(page.props.ziggy.location),
                 });
         },
-    })
+    }),
+    process.env.VITE_INERTIA_SSR_PORT || 13714
 );
