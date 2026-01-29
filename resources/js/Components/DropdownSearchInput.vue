@@ -276,6 +276,7 @@ const filteredOptions = computed(() => {
                     <TextInput
                         ref="searchInput"
                         :id="`textarea-input-search-${props.id}`"
+                        :name="`search-${props.id}`"
                         :modelValue="search"
                         @update:modelValue="search = $event"
                         class="w-full opacity-100"
@@ -284,6 +285,7 @@ const filteredOptions = computed(() => {
                         :placeholder="props.placeholder"
                         :error="props.error"
                         :disabled="props.disabled"
+                        :required="props.required"
                         autocomplete="off"
                     >
                         <template #prefix v-if="props.modelValue?.hexCode">
