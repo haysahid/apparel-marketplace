@@ -70,7 +70,7 @@ const search = ref("");
 const filteredOptions = computed(() => {
     return props.options.filter(
         (option) =>
-            !props.modelValue.some((item) => item.value === option.value)
+            !props.modelValue.some((item) => item.value === option.value),
     );
 });
 
@@ -78,7 +78,7 @@ watch(
     () => search.value,
     (newValue) => {
         emit("search", newValue);
-    }
+    },
 );
 
 const dropdown = ref(null);
@@ -113,6 +113,7 @@ function onFocusout() {
                             ? null
                             : (search = $event)
                     "
+                    :name="`search-${props.id}`"
                     class="w-full"
                     :textClass="
                         props.autoResize ? 'text-sm sm:text-base' : null
@@ -202,8 +203,8 @@ function onFocusout() {
                             emit(
                                 'update:modelValue',
                                 props.modelValue.filter(
-                                    (item) => item.value !== option.value
-                                )
+                                    (item) => item.value !== option.value,
+                                ),
                             )
                         "
                     >
