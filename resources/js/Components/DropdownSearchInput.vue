@@ -136,6 +136,7 @@ const filteredOptions = computed(() => {
                         ? null
                         : (search = $event)
                 "
+                :name="`search-${props.id}`"
                 class="w-full"
                 :bgClass="props.bgClass"
                 :textClass="props.modelValue?.hexCode ? 'pl-10' : ''"
