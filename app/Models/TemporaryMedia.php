@@ -45,7 +45,11 @@ class TemporaryMedia extends Model
 
     public function getOriginalUrlAttribute()
     {
-        return asset('storage/tmp/' . $this->folder . '/' . $this->file_name);
+        $path = 'tmp/';
+        if (!empty($this->folder)) {
+            $path .= $this->folder . '/';
+        }
+        return asset('storage/' . $path . $this->file_name);
     }
 
     public function getIsTemporaryAttribute()
