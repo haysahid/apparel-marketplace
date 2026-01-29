@@ -55,7 +55,6 @@ RUN apk add --no-cache --update \
     oniguruma-dev \
     nodejs \
     npm \
-    rsync \
     jpegoptim optipng pngquant gifsicle libwebp-tools \
     ghostscript
 
@@ -76,10 +75,6 @@ RUN pecl install redis && docker-php-ext-enable redis
 
 # Salin folder aplikasi
 COPY --from=builder /app /var/www
-
-# BACKUP PUBLIC ASSETS
-# Copied to a backup location so entrypoint can sync them to the named volume
-RUN mkdir -p /var/www/public_backup && cp -r /var/www/public/* /var/www/public_backup/
 
 # Set Permission
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
