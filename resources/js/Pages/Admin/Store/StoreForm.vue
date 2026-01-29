@@ -57,7 +57,7 @@ watch(
             origins.value = [];
             isOriginDropdownOpen.value = false;
         }
-    }
+    },
 );
 
 const form = useForm(
@@ -89,7 +89,7 @@ const form = useForm(
               ],
               rajaongkir_origin_id: null,
               rajaongkir_origin: null,
-          }
+          },
 );
 
 // Initialize origin
@@ -131,10 +131,10 @@ const submit = () => {
         fromMyStore
             ? route("my-store.store.update")
             : props.store
-            ? route("admin.store.update", {
-                  store: props.store.id,
-              })
-            : route("admin.store.store"),
+              ? route("admin.store.update", {
+                    store: props.store.id,
+                })
+              : route("admin.store.store"),
         {
             onSuccess: () => {
                 openSuccessDialog("Informasi Toko berhasil diperbarui.");
@@ -142,7 +142,7 @@ const submit = () => {
             onError: (errors) => {
                 openErrorDialog(errors.error);
             },
-        }
+        },
     );
 };
 
@@ -244,7 +244,7 @@ const openErrorDialog = (message) => {
                             (option) => {
                                 form.rajaongkir_origin_id = option.value;
                                 form.rajaongkir_origin = origins.find(
-                                    (o) => o.id === option.value
+                                    (o) => o.id === option.value,
                                 );
                                 form.errors.rajaongkir_origin_id = null;
                             }
@@ -374,7 +374,7 @@ const openErrorDialog = (message) => {
                             <LinkItem
                                 :name="link.name"
                                 :url="link.url"
-                                :index="(index as number)"
+                                :index="index as number"
                                 :showDeleteButton="false"
                                 @click="link.showEditForm = true"
                             >
