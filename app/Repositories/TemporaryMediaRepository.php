@@ -34,18 +34,16 @@ class TemporaryMediaRepository
         $file,
         $storeId = null,
     ) {
-        $folder =  now()->timestamp . '-' . uniqid();
-
-        $filename = $file->getClientOriginalName();
+        $filename = $file->getClientOriginalName() . '-' . now();
         $mimeType = $file->getClientMimeType();
         $size = $file->getSize();
 
         // Save to storage/app/tmp
-        $file->storeAs('tmp/' . $folder, $filename);
+        $file->storeAs('tmp/', $filename);
 
         return TemporaryMedia::create([
             'store_id' => $storeId,
-            'folder' => $folder,
+            'folder' => null,
             'name' => pathinfo($filename, PATHINFO_FILENAME),
             'file_name' => $filename,
             'mime_type' => $mimeType,
