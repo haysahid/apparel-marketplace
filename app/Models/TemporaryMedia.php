@@ -17,15 +17,14 @@ class TemporaryMedia extends Model
     protected static function booted()
     {
         static::deleted(function ($temporaryMedia) {
-            $storagePath = storage_path(self::TMP_STORAGE_PATH . $temporaryMedia->folder . '/' . $temporaryMedia->file_name);
-            if (file_exists($storagePath)) {
-                unlink($storagePath);
+            $path = self::TMP_STORAGE_PATH;
+            if (!empty($temporaryMedia->folder)) {
+                $path .= $temporaryMedia->folder . '/';
             }
 
-            // Optionally, delete the folder if empty
-            $folderPath = storage_path(self::TMP_STORAGE_PATH . $temporaryMedia->folder);
-            if (is_dir($folderPath) && count(scandir($folderPath)) == 2) {
-                rmdir($folderPath);
+            $storagePath = storage_path($path . $temporaryMedia->file_name);
+            if (file_exists($storagePath)) {
+                unlink($storagePath);
             }
         });
     }
@@ -57,7 +56,12 @@ class TemporaryMedia extends Model
     // Actions
     public function copyToMedia($model, $collectionName = 'default'): Media
     {
-        $sourcePath = storage_path(self::TMP_STORAGE_PATH . $this->folder . '/' . $this->file_name);
+        $path = self::TMP_STORAGE_PATH;
+        if (!empty($this->folder)) {
+            $path .= $this->folder . '/';
+        }
+
+        $sourcePath = storage_path($path . $this->file_name);
 
         if (!file_exists($sourcePath)) {
             throw new Exception("Temporary file does not exist at: {$sourcePath}");
@@ -72,7 +76,12 @@ class TemporaryMedia extends Model
 
     public function getPath()
     {
-        return storage_path(self::TMP_STORAGE_PATH . $this->folder . '/' . $this->file_name);
+        $path = self::TMP_STORAGE_PATH;
+        if (!empty($this->folder)) {
+            $path .= $this->folder . '/';
+        }
+
+        return storage_path($path . $this->file_name);
     }
 
     // Relationships
