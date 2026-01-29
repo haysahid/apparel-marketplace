@@ -34,12 +34,14 @@ class TemporaryMediaRepository
         $file,
         $storeId = null,
     ) {
-        $filename = $file->getClientOriginalName() . '-' . now();
+        $filename = now()->format('YmdHis') . '-' . $file->getClientOriginalName();
         $mimeType = $file->getClientMimeType();
         $size = $file->getSize();
 
+        $directory = 'tmp/';
+
         // Save to storage/app/tmp
-        $file->storeAs('tmp/', $filename);
+        $file->storeAs($directory, $filename);
 
         return TemporaryMedia::create([
             'store_id' => $storeId,
