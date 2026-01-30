@@ -4,25 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ProductVariant extends Model
 {
-    use SoftDeletes, InteractsWithMedia;
-
-    // Optional: Define automatic image conversions (Optimization)
-    public function registerMediaConversions(Media $media = null): void
-    {
-        $this->addMediaConversion('thumb')
-            ->width(200)
-            ->height(200)
-            ->sharpen(10);
-
-        $this->addMediaConversion('preview')
-            ->width(800)
-            ->quality(80); // Automatic compression for server efficiency
-    }
+    use SoftDeletes;
 
     protected $fillable = [
         'store_id',

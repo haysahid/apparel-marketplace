@@ -203,12 +203,13 @@ class ProductVariantRepository
             DB::beginTransaction();
 
             $variant = ProductVariant::findOrFail($id);
-            $variant->delete();
 
             // Delete associated images
             ProductVariantImage::where('product_variant_id', $id)->each(function ($image) {
                 $image->delete();
             });
+
+            $variant->delete();
 
             DB::commit();
         } catch (Exception $e) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\MyStore\API;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;

@@ -5,7 +5,7 @@ use App\Http\Controllers\API\CustomerController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\PaymentMethodController;
 use App\Http\Controllers\MyStore\API\ProductController;
-use App\Http\Controllers\API\ProductVariantController;
+use App\Http\Controllers\MyStore\API\ProductVariantController;
 use App\Http\Controllers\API\ProductVariantImageController;
 use App\Http\Controllers\API\ShippingMethodController;
 use App\Http\Controllers\API\InvoiceController;
