@@ -64,7 +64,7 @@ onMounted(() => {
         />
 
         <!-- Brands -->
-        <div
+        <!-- <div
             v-if="
                 props.brands.map((brand) => brand.logo).filter((logo) => logo)
                     .length > 0
@@ -81,7 +81,7 @@ onMounted(() => {
                     class="object-contain h-8 max-w-12 sm:max-w-20 lg:max-w-32 sm:h-16 lg:h-20"
                 />
             </template>
-        </div>
+        </div> -->
 
         <div class="p-6 sm:p-12 md:p-[100px] flex flex-col gap-12 lg:gap-20">
             <!-- Best Seller Products -->
