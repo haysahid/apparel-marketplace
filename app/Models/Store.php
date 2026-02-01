@@ -100,4 +100,9 @@ class Store extends Model
     {
         return $this->hasMany(Invoice::class);
     }
+
+    public function promotions()
+    {
+        return $this->hasMany(Promotion::class);
+    }
 }

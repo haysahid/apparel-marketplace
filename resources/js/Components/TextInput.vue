@@ -129,9 +129,12 @@ defineExpose({
                     {
                         'no-arrows':
                             props.hideArrows && props.type === 'number',
-                        'no-date-icon': props.type === 'date',
+                        'no-date-icon': ['date', 'datetime-local'].includes(
+                            props.type,
+                        ),
                         'text-gray-400':
-                            props.type === 'date' && !props.modelValue,
+                            ['date', 'datetime-local'].includes(props.type) &&
+                            !props.modelValue,
                     },
                     props.bgClass,
                     props.textClass,

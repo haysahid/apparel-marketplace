@@ -11,6 +11,7 @@ import { getImageUrl } from "@/plugins/helpers";
 import { onMounted } from "vue";
 import CustomPageProps from "@/types/model/CustomPageProps";
 import { useDialogStore } from "@/stores/dialog-store";
+import CarouselBanner from "@/Components/CarouselBanner.vue";
 
 const props = defineProps({
     store: Object,
@@ -23,6 +24,10 @@ const props = defineProps({
     },
     popularProducts: {
         type: Array as () => ProductEntity[],
+        default: () => [],
+    },
+    promotions: {
+        type: Array as () => PromotionEntity[],
         default: () => [],
     },
 });
@@ -39,7 +44,20 @@ onMounted(() => {
 <template>
     <LandingLayout title="Beranda">
         <!-- Banner -->
+        <CarouselBanner
+            v-if="props.promotions.length"
+            :items="
+                props.promotions.map((promotion) => ({
+                    image: promotion.image,
+                    alt: promotion.name,
+                    link: promotion.redirection_url || null,
+                }))
+            "
+            class="w-full"
+        />
+
         <img
+            v-else
             src="/storage/promotion_banner.png"
             alt="Banner Promosi"
             class="object-cover w-full"

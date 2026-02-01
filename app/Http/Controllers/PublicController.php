@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Color;
 use App\Models\PaymentMethod;
 use App\Models\Product;
+use App\Models\Promotion;
 use App\Models\ShippingMethod;
 use App\Models\Size;
 use App\Models\Store;
@@ -21,11 +22,17 @@ class PublicController extends Controller
         $brands = Brand::take(5)->get();
         $categories = Category::whereNotNull('image')->orderBy('name', 'asc')->get();
         $popularProducts = Product::with(['brand', 'categories', 'images'])->whereHas('variants')->take(8)->get();
+        $promotions = Promotion::where(function ($query) {
+            $query->whereNull('start_date')->orWhere('start_date', '<=', now());
+        })->where(function ($query) {
+            $query->whereNull('end_date')->orWhere('end_date', '>=', now());
+        })->get();
 
         return Inertia::render('Home', [
             'brands' => $brands,
             'categories' => $categories,
             'popularProducts' => $popularProducts,
+            'promotions' => $promotions,
         ]);
     }
 

@@ -13,6 +13,7 @@ use App\Http\Controllers\MyStore\PartnerController;
 use App\Http\Controllers\MyStore\PaymentController;
 use App\Http\Controllers\MyStore\PointRuleController;
 use App\Http\Controllers\MyStore\ProductController;
+use App\Http\Controllers\MyStore\PromotionController;
 use App\Http\Controllers\MyStore\ReportController;
 use App\Http\Controllers\MyStore\ShipmentController;
 use App\Http\Controllers\MyStore\SizeController;
@@ -182,6 +183,16 @@ Route::prefix('my-store')->name('my-store.')->middleware(['auth'])->group(functi
         Route::prefix('member')->name('member.')->group(function () {
             Route::get('/', [MemberController::class, 'index'])->name('index');
             Route::get('/{member}', [MemberController::class, 'show'])->name('show');
+        });
+
+        // Promotion
+        Route::prefix('promotion')->name('promotion.')->group(function () {
+            Route::get('/', [PromotionController::class, 'index'])->name('index');
+            Route::get('/create', [PromotionController::class, 'create'])->name('create');
+            Route::post('/', [PromotionController::class, 'store'])->name('store');
+            Route::get('/{promotion}/edit', [PromotionController::class, 'edit'])->name('edit');
+            Route::post('/{promotion}', [PromotionController::class, 'update'])->name('update');
+            Route::delete('/{promotion}', [PromotionController::class, 'destroy'])->name('destroy');
         });
     });
 });
