@@ -2,7 +2,10 @@ import axios from "axios";
 import cookieManager from "./cookie-manager";
 
 async function initScript() {
-    const snapScript = "https://app.sandbox.midtrans.com/snap/snap.js";
+    const snapScript =
+        import.meta.env.VITE_MIDTRANS_IS_PRODUCTION === "true"
+            ? "https://app.midtrans.com/snap/snap.js"
+            : "https://app.sandbox.midtrans.com/snap/snap.js";
     const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
 
     const script = document.createElement("script");
@@ -23,7 +26,7 @@ async function checkPayment(
         onSuccess = (response) => {},
         onError = (error) => {},
         onChangeStatus = (status) => {},
-    }
+    },
 ) {
     onChangeStatus("loading");
 
@@ -35,10 +38,10 @@ async function checkPayment(
             {
                 headers: {
                     authorization: `Bearer ${cookieManager.getItem(
-                        "access_token"
+                        "access_token",
                     )}`,
                 },
-            }
+            },
         )
         .then((response) => {
             onChangeStatus("success");
@@ -58,7 +61,7 @@ async function showSnap(
         onError = (result) => {},
         onClose = () => {},
         onChangeStatus = (status) => {},
-    }
+    },
 ) {
     console.log("showSnap called");
     onChangeStatus("loading");
@@ -101,7 +104,7 @@ async function showSnap(
 
 async function changePaymentType(
     { transactionCode },
-    { onSuccess = (response) => {}, onError = (error) => {} }
+    { onSuccess = (response) => {}, onError = (error) => {} },
 ) {
     await axios
         .put(
@@ -112,10 +115,10 @@ async function changePaymentType(
             {
                 headers: {
                     authorization: `Bearer ${cookieManager.getItem(
-                        "access_token"
+                        "access_token",
                     )}`,
                 },
-            }
+            },
         )
         .then(onSuccess)
         .catch(onError);
