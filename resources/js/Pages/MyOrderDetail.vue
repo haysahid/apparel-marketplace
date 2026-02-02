@@ -35,7 +35,7 @@ function checkPayment() {
             onChangeStatus: (status) => {
                 checkPaymentStatus.value = status;
             },
-        }
+        },
     );
 }
 
@@ -60,7 +60,7 @@ function showSnap() {
             onChangeStatus: (status) => {
                 resumePaymentStatus.value = status;
             },
-        }
+        },
     );
 }
 
@@ -77,7 +77,7 @@ function changePaymentType() {
                     showSnap();
                 }
             },
-        }
+        },
     );
 }
 
@@ -106,7 +106,7 @@ onMounted(() => {
         router.visit(
             route("my-order.detail", {
                 transaction_code: props.transaction.code,
-            })
+            }),
         );
     } else if (
         route().params?.show_snap == "1" &&
@@ -161,7 +161,7 @@ onMounted(() => {
                                 .map(
                                     (word) =>
                                         word.charAt(0).toUpperCase() +
-                                        word.slice(1)
+                                        word.slice(1),
                                 )
                                 .join(' ')
                         "

@@ -573,7 +573,8 @@ class OrderController extends Controller
                 'payment_method',
                 'shipping_method',
                 'invoices',
-                'payments'
+                'payments',
+                'user',
             ])->where('code', $validated['transaction_code'])->first();
 
             if (!$transaction) {
@@ -620,6 +621,12 @@ class OrderController extends Controller
             }
 
             $customer = User::find(Auth::id());
+
+            if (!$customer) {
+                // Get guest customer data from transaction
+                $customer = $transaction->user;
+            }
+
             $grossAmount = $transaction->invoices->sum('amount');
 
             $paymentsLength = $transaction->payments->count();

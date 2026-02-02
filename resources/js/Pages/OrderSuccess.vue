@@ -79,6 +79,7 @@ function changePaymentType() {
     midtransPayment.changePaymentType(
         {
             transactionCode: props.transaction.code,
+            isGuest: props.isGuest,
         },
         {
             onSuccess: async (response) => {

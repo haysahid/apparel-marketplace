@@ -103,12 +103,14 @@ async function showSnap(
 }
 
 async function changePaymentType(
-    { transactionCode },
+    { transactionCode, isGuest = false },
     { onSuccess = (response) => {}, onError = (error) => {} },
 ) {
     await axios
         .put(
-            "/api/change-payment-type",
+            isGuest
+                ? "/api/change-payment-type-guest"
+                : "/api/change-payment-type",
             {
                 transaction_code: transactionCode,
             },
