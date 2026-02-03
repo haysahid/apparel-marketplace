@@ -51,7 +51,7 @@ const proxyChecked = computed({
         :class="{
             'border-blue-500 ring-1 ring-blue-500': props.isSelected,
         }"
-        @click="proxyChecked = !proxyChecked"
+        @click.stop="proxyChecked = !proxyChecked"
     >
         <img
             v-if="props.media.original_url"

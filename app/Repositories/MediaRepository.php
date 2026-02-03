@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantImage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -72,7 +73,16 @@ class MediaRepository
         if ($fileName) {
             $mediaAdder->usingFileName($fileName);
         }
-        return $mediaAdder->toMediaCollection($collectionName);
+        $newMedia = $mediaAdder->toMediaCollection($collectionName);
+
+        if ($fileName === null && is_a($model, Product::class)) {
+            $newFileName = self::generateNewFileName($newMedia, $model);
+            $newMedia->file_name = $newFileName;
+            $newMedia->save();
+            return $newMedia;
+        }
+
+        return $newMedia;
     }
 
     public static function getMediaDetail($id)

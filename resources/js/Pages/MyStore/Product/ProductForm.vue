@@ -505,7 +505,7 @@ const countImageUsedInVariants = (imageId: number | string) => {
                                             @remove="
                                                 image.showDeleteDialog = true
                                             "
-                                            @click="
+                                            @click.stop="
                                                 useImageViewerStore().selectedImage =
                                                     image
                                             "

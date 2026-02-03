@@ -67,7 +67,7 @@ const goToNextImage = () => {
             <img
                 :src="getImageUrl(image.original_url)"
                 :alt="props.altText"
-                class="object-cover w-full transition-all duration-300 ease-in-out rounded-lg aspect-square group-hover:scale-105"
+                class="object-contain w-full transition-all duration-300 ease-in-out rounded-lg aspect-square group-hover:scale-105"
             />
             <button
                 v-if="canGoToPreviousImage"

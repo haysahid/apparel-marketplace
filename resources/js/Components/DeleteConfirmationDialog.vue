@@ -52,13 +52,17 @@ const close = () => {
         <slot />
         <template #footer>
             <div class="flex gap-4 text-base">
-                <SecondaryButton type="button" class="" @click="emit('close')">
+                <SecondaryButton
+                    type="button"
+                    class=""
+                    @click.stop="emit('close')"
+                >
                     Batalkan
                 </SecondaryButton>
                 <PrimaryButton
                     type="button"
                     class="bg-red-500 hover:bg-red-500/80 active:bg-red-500/90 focus:bg-red-500 focus:ring-red-500"
-                    @click="emit('delete')"
+                    @click.stop="emit('delete')"
                 >
                     {{ props.positiveButtonText }}
                 </PrimaryButton>
