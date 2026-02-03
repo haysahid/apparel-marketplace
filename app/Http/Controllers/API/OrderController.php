@@ -38,7 +38,12 @@ class OrderController extends Controller
     protected $midtransRepository;
 
     protected $weight = 1000; // 1000 gram (1 kg)
-    protected $courier = 'jne'; // Courier service
+
+    /**
+     * Default courier service.
+     * Available options: jne, sicepat, ide, sap, jnt, ninja, tiki, lion, anteraja, pos, ncs, rex, rpx, sentral, star, wahana, dse
+     */
+    protected $courier;
 
     public function __construct()
     {
@@ -46,6 +51,8 @@ class OrderController extends Controller
         $this->validateTransactionPaymentUseCase = new ValidateTransactionPaymentUseCase();
         $this->rajaongkirRepository = new RajaongkirRepository();
         $this->midtransRepository = new MidtransRepository();
+
+        $this->courier = config('app_setting.default_courier', 'lion');
     }
 
     public function getVouchers(Request $request)

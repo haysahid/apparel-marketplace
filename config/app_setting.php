@@ -39,4 +39,14 @@ return [
         'instagram' => env('APP_SETTING_SOCIAL_INSTAGRAM', 'https://instagram.com/apparelmarketplace'),
         'tiktok' => env('APP_SETTING_SOCIAL_TIKTOK', 'https://tiktok.com/@apparelmarketplace'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Order Settings
+    |--------------------------------------------------------------------------
+    | Here you may configure your order settings for your application.
+    | Available options: jne, sicepat, ide, sap, jnt, ninja, tiki, lion,
+    | anteraja, pos, ncs, rex, rpx, sentral, star, wahana, dse
+    |*/
+    'default_courier' => env('APP_SETTING_DEFAULT_COURIER', 'lion'),
 ];
