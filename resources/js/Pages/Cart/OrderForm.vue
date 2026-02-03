@@ -320,9 +320,14 @@ const submit = () => {
                                 value: destination.id,
                             }))
                         "
-                        placeholder="Cari Alamat Pengiriman"
+                        placeholder="Cari Kecamatan atau Kabupaten/Kota"
                         required
                         type="textarea"
+                        :bgClass="
+                            form.destination_id
+                                ? 'outline outline-1 -outline-offset-1 outline-gray-400'
+                                : ''
+                        "
                         :error="form.errors.destination_id"
                         @update:modelValue="
                             (option) => {

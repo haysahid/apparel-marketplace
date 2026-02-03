@@ -93,7 +93,7 @@ function formatPrice(price = 0) {
                             class="flex items-center justify-between w-full gap-4 xl:flex-col xl:items-end xl:justify-normal xl:w-fit"
                         >
                             <button
-                                class="text-xs text-gray-500 sm:block sm:text-base hover:text-red-500 sm:w-fit text-start"
+                                class="text-xs text-gray-500 sm:block sm:text-sm hover:text-red-500 sm:w-fit text-start hover:underline"
                                 @click="item.showDeleteConfirmation = true"
                             >
                                 Hapus
@@ -122,7 +122,7 @@ function formatPrice(price = 0) {
                                     {{
                                         formatPrice(
                                             item.variant.final_selling_price *
-                                                item.quantity
+                                                item.quantity,
                                         )
                                     }}
                                 </p>

@@ -86,7 +86,7 @@ const showGuestForm = ref(false);
                     cartStore.groups.length == 0,
             }"
         >
-            <h1 class="text-2xl font-bold text-start sm:text-center">
+            <h1 class="text-xl font-bold text-start sm:text-center">
                 Checkout Keranjang
             </h1>
             <div

@@ -66,7 +66,7 @@ function formatPrice(price = 0) {
                 "
             >
                 <h3
-                    class="w-full text-sm font-medium text-gray-800 sm:text-base hover:text-primary-dark"
+                    class="w-full text-sm font-medium text-gray-800 sm:text-base hover:text-primary-dark hover:underline"
                 >
                     {{ props.item.variant.name }}
                 </h3>
