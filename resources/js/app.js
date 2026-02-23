@@ -37,6 +37,29 @@ createInertiaApp({
         app.config.globalProperties.$formatNumber = formatNumber;
         app.config.globalProperties.$getImageUrl = getImageUrl;
         app.mount(el);
+
+        // Get authenticated user data from Inertia props
+        const user = usePage().props.auth.user;
+
+        if (user && window.fbq) {
+            const firstName = user.name ? user.name.split(' ')[0] : '';
+            const lastName = user.name ? user.name.split(' ').slice(1).join(' ') : '';
+
+            // Re-initialize Facebook Pixel with Advanced Matching data
+            window.fbq('init', import.meta.env.VITE_FACEBOOK_PIXEL_ID, {
+                em: user.email.toLowerCase().trim(),
+                external_id: user.id,
+                fn: firstName.toLowerCase().trim(),
+                ln: lastName.toLowerCase().trim()
+            });
+        }
+
+        // Track page views on every successful Inertia navigation
+        router.on('navigate', (event) => {
+            if (window.fbq) {
+                window.fbq('track', 'PageView');
+            }
+        });
     },
     progress: {
         color: '#4B5563',

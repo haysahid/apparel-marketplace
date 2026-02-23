@@ -16,9 +16,12 @@ declare global {
                     onPending?: (result: any) => void;
                     onError?: (result: any) => void;
                     onClose?: () => void;
-                }
+                },
             ) => void;
         };
+
+        // Facebook Pixel tracking function
+        fbq?: (command: string, eventName: string, params?: any) => void;
     }
 }
 

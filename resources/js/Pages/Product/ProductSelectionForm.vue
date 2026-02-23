@@ -10,10 +10,12 @@ import ErrorDialog from "@/Components/ErrorDialog.vue";
 import { useCartStore } from "@/stores/cart-store";
 import QuantityInput from "@/Components/QuantityInput.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import { trackCustomEvent } from "@/plugins/helpers";
+import CustomPageProps from "@/types/model/CustomPageProps";
 
 const cartStore = useCartStore();
 
-const page = usePage();
+const page = usePage<CustomPageProps>();
 
 const props = defineProps({
     product: {
@@ -127,6 +129,19 @@ function addToCart() {
 
     const existingCartItem = cartStore.getItemByVariant(selectedVariant.value);
 
+    const customEventData = {
+        // Product Variant Details
+        content_ids: [selectedVariant.value.id],
+        content_name: selectedVariant.value.name,
+        content_type: "product_variant",
+        value: selectedVariant.value.final_selling_price,
+        currency: "IDR",
+
+        // User and Page Details
+        user_status: page.props.auth?.user ? "logged_in" : "guest",
+        page_url: window.location.href,
+    };
+
     if (existingCartItem) {
         cartStore.updateItem({
             ...existingCartItem,
@@ -161,6 +176,8 @@ function addToCart() {
     };
 
     cartStore.addGroup(cartGroup);
+
+    trackCustomEvent("AddToCart", customEventData);
 
     openSuccessDialog(`Berhasil menambahkan produk ke keranjang.`);
 }

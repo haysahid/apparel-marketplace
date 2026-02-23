@@ -135,19 +135,21 @@ onMounted(() => {
 <template>
     <LandingLayout title="Berhasil Membuat Pesanan">
         <div class="flex flex-col gap-6 py-6 bg-secondary-box">
-            <DefaultCard
-                data-aos="fade-up"
-                data-aos-delay="600"
-                data-aos-duration="600"
-                isMain
-                class="p-6 sm:px-12 md:px-[100px] flex items-center justify-center max-w-7xl mx-auto w-full"
-            >
-                <SuccessView
-                    :order-number="props.transaction.code"
-                    title="Pesanan Berhasil Dibuat!"
-                    subtitle="Terima kasih telah melakukan pemesanan. Pesanan Anda telah berhasil dibuat."
-                />
-            </DefaultCard>
+            <div class="p-6 sm:px-12 md:px-[100px]">
+                <DefaultCard
+                    data-aos="fade-up"
+                    data-aos-delay="600"
+                    data-aos-duration="600"
+                    isMain
+                    class="flex items-center justify-center w-full mx-auto max-w-7xl !rounded-xl"
+                >
+                    <SuccessView
+                        :order-number="props.transaction.code"
+                        title="Pesanan Berhasil Dibuat!"
+                        subtitle="Terima kasih telah melakukan pemesanan. Pesanan Anda telah berhasil dibuat."
+                    />
+                </DefaultCard>
+            </div>
 
             <OrderTransactionDetail
                 data-aos="fade-up"

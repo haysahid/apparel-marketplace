@@ -60,3 +60,9 @@ export function scrollToTop({ id = null }) {
 export function goBack() {
     window.history.back();
 }
+
+export const trackCustomEvent = (eventName: string, params: any = {}): void => {
+    if (typeof window !== "undefined" && window.fbq) {
+        window.fbq("track", eventName, params);
+    }
+};

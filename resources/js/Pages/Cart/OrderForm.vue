@@ -16,6 +16,7 @@ import DropdownSearchInput from "@/Components/DropdownSearchInput.vue";
 import DetailRow from "@/Components/DetailRow.vue";
 import cookieManager from "@/plugins/cookie-manager";
 import CustomPageProps from "@/types/model/CustomPageProps";
+import { trackCustomEvent } from "@/plugins/helpers";
 
 const page = usePage<CustomPageProps>();
 const cartStore = useCartStore();
@@ -197,7 +198,7 @@ const submit = () => {
 
     checkoutStatus.value = "loading";
 
-    const data = {
+    const data: any = {
         cart_groups: cartStore.groupHasSelectedItems.map((group) => ({
             store_id: group.store_id,
             voucher_code: group.voucher?.code || null,
@@ -237,9 +238,48 @@ const submit = () => {
         })
         .then((response) => {
             const result = response.data.result;
+
+            const customerData = isGuest
+                ? {
+                      id: null,
+                      name: data.guest_name,
+                      email: data.guest_email,
+                      phone: data.guest_phone,
+                  }
+                : {
+                      id: page.props.auth.user.id,
+                      name: page.props.auth.user.name,
+                      email: page.props.auth.user.email,
+                      phone: page.props.auth.user.phone,
+                  };
+
+            const customEventData = {
+                transaction_code: result.transaction.code,
+                value: total.value,
+                currency: "IDR",
+                num_items: cartStore.selectedItems.length,
+                payment_method: form.payment_method?.name,
+                shipping_method: form.shipping_method?.name,
+
+                // Shipping Details
+                shipping_address: form.address,
+                shipping_destination: form.destination?.label,
+
+                // Customer Details
+                user_status: isGuest ? "guest" : "logged_in",
+                customer_id: customerData.id,
+                customer_name: customerData.name,
+                customer_email: customerData.email,
+                customer_phone: customerData.phone,
+
+                page_url: window.location.href,
+            };
+
             cartStore.removeSelectedItems();
 
             checkoutStatus.value = "success";
+
+            trackCustomEvent("Purchase", customEventData);
 
             router.visit(
                 route(isGuest ? "order.success.guest" : "order.success", {
