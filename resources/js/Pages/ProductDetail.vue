@@ -10,6 +10,9 @@ import ProductDetailTable from "./Product/ProductDetailTable.vue";
 import DiscountTag from "@/Components/DiscountTag.vue";
 import TextInput from "@/Components/TextInput.vue";
 import StoreCard from "@/Components/StoreCard.vue";
+import { trackCustomEvent } from "@/plugins/helpers";
+import CustomPageProps from "@/types/model/CustomPageProps";
+import { usePage } from "@inertiajs/vue3";
 
 const props = defineProps({
     product: {
@@ -209,8 +212,22 @@ const handleScroll = () => {
     scrolled.value = window.scrollY > scrollThreshold;
 };
 
+const page = usePage<CustomPageProps>();
+
 onMounted(() => {
     window.addEventListener("scroll", handleScroll);
+
+    trackCustomEvent("ViewProduct", {
+        content_name: props.product.name,
+        content_category:
+            props.product.categories?.map((cat) => cat.name).join(", ") || "",
+        content_ids: [props.product.id],
+        content_type: "product",
+
+        // User and Page Details
+        user_status: page.props.auth?.user ? "logged_in" : "guest",
+        page_url: window.location.href,
+    });
 });
 
 const breadcrumbs = [

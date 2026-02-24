@@ -3,7 +3,7 @@ import '../css/app.css';
 import 'aos/dist/aos.css';
 
 import { createApp, h } from 'vue';
-import { createInertiaApp } from '@inertiajs/vue3';
+import { createInertiaApp, router, usePage } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import { createPinia } from 'pinia'
@@ -42,6 +42,7 @@ createInertiaApp({
         const user = usePage().props.auth.user;
 
         if (user && window.fbq) {
+            console.log('Initializing Facebook Pixel with Advanced Matching for user:', user);
             const firstName = user.name ? user.name.split(' ')[0] : '';
             const lastName = user.name ? user.name.split(' ').slice(1).join(' ') : '';
 
